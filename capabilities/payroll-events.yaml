@@ -1,0 +1,74 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel Global Payroll API — Payroll Events
+  description: Self-contained Naftiko capability for retrieving Global Payroll cycles and event detail.
+  tags:
+  - Deel
+  - Payroll
+  - Global Payroll
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: payroll-events
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel Global Payroll Events capability.
+    resources:
+    - name: payroll-events
+      path: /gp/payroll-events
+      operations:
+      - name: listPayrollEvents
+        method: GET
+        description: List payroll events/cycles.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: legal_entity_id, in: query, type: string, required: false }
+        - { name: status, in: query, type: string, required: false }
+        - { name: from, in: query, type: string, required: false }
+        - { name: to, in: query, type: string, required: false }
+    - name: payroll-event
+      path: /gp/payroll-events/{event_id}
+      operations:
+      - name: getPayrollEvent
+        method: GET
+        description: Retrieve a payroll event.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: event_id, in: path, type: string, required: true }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: payroll-events-rest
+    port: 8080
+    description: REST adapter for Global Payroll events.
+    resources:
+    - path: /v1/gp/payroll-events
+      name: payroll-events
+      description: REST surface for payroll events.
+      operations:
+      - method: GET
+        name: listPayrollEvents
+        description: List payroll events.
+        call: payroll-events.listPayrollEvents
+        with: { legal_entity_id: rest.query.legal_entity_id, status: rest.query.status, from: rest.query.from, to: rest.query.to }
+    - path: /v1/gp/payroll-events/{event_id}
+      name: payroll-event
+      description: REST surface for payroll event detail.
+      operations:
+      - method: GET
+        name: getPayrollEvent
+        description: Get payroll event.
+        call: payroll-events.getPayrollEvent
+        with: { event_id: rest.path.event_id }

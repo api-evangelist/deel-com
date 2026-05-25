@@ -1,0 +1,89 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel Contractors API — Timesheets
+  description: Self-contained Naftiko capability for managing contractor timesheets (submit, list, approve).
+  tags:
+  - Deel
+  - Contractors
+  - Timesheets
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: contractors-timesheets
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel Contractor Timesheets capability.
+    resources:
+    - name: timesheets
+      path: /timesheets
+      operations:
+      - name: listTimesheets
+        method: GET
+        description: List contractor timesheets.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: contract_id, in: query, type: string, required: false }
+        - { name: status, in: query, type: string, required: false }
+        - { name: from, in: query, type: string, required: false }
+        - { name: to, in: query, type: string, required: false }
+      - name: createTimesheet
+        method: POST
+        description: Submit a timesheet entry.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: body, in: body, type: object, required: true }
+        - { name: Idempotency-Key, in: header, type: string, required: false }
+    - name: timesheet-review
+      path: /timesheets/{timesheet_id}/review
+      operations:
+      - name: reviewTimesheet
+        method: POST
+        description: Approve or decline a contractor timesheet.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: timesheet_id, in: path, type: string, required: true }
+        - { name: body, in: body, type: object, required: true }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: contractors-timesheets-rest
+    port: 8080
+    description: REST adapter for contractor timesheets.
+    resources:
+    - path: /v1/timesheets
+      name: timesheets
+      description: REST surface for timesheets.
+      operations:
+      - method: GET
+        name: listTimesheets
+        description: List timesheets.
+        call: contractors-timesheets.listTimesheets
+        with: { contract_id: rest.query.contract_id, status: rest.query.status, from: rest.query.from, to: rest.query.to }
+      - method: POST
+        name: createTimesheet
+        description: Submit timesheet.
+        call: contractors-timesheets.createTimesheet
+        with: { body: rest.body, Idempotency-Key: rest.header.idempotency_key }
+    - path: /v1/timesheets/{timesheet_id}/review
+      name: timesheet-review
+      description: REST surface for timesheet review.
+      operations:
+      - method: POST
+        name: reviewTimesheet
+        description: Review timesheet.
+        call: contractors-timesheets.reviewTimesheet
+        with: { timesheet_id: rest.path.timesheet_id, body: rest.body }

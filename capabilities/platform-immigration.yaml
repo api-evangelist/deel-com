@@ -1,0 +1,92 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel Platform Extensions API — Immigration
+  description: Self-contained Naftiko capability for retrieving immigration cases and visa requirements.
+  tags:
+  - Deel
+  - Immigration
+  - Visas
+  - Compliance
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: platform-immigration
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel Immigration capability.
+    resources:
+    - name: visa-types
+      path: /immigration/visa-types
+      operations:
+      - name: listVisaTypes
+        method: GET
+        description: List immigration visa types.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: country, in: query, type: string, required: false }
+    - name: business-visa-requirements
+      path: /immigration/business-visa/requirements
+      operations:
+      - name: getBusinessVisaRequirement
+        method: GET
+        description: Get business visa eligibility and requirements.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: nationality, in: query, type: string, required: true }
+        - { name: destination_country, in: query, type: string, required: true }
+        - { name: purpose, in: query, type: string, required: false }
+    - name: immigration-cases
+      path: /immigration/cases
+      operations:
+      - name: listImmigrationCases
+        method: GET
+        description: List immigration cases.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters: []
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: platform-immigration-rest
+    port: 8080
+    description: REST adapter for Deel Immigration.
+    resources:
+    - path: /v1/immigration/visa-types
+      name: visa-types
+      description: REST surface for visa types.
+      operations:
+      - method: GET
+        name: listVisaTypes
+        description: List visa types.
+        call: platform-immigration.listVisaTypes
+        with: { country: rest.query.country }
+    - path: /v1/immigration/business-visa/requirements
+      name: business-visa-requirements
+      description: REST surface for business visa eligibility.
+      operations:
+      - method: GET
+        name: getBusinessVisaRequirement
+        description: Get business visa requirements.
+        call: platform-immigration.getBusinessVisaRequirement
+        with: { nationality: rest.query.nationality, destination_country: rest.query.destination_country, purpose: rest.query.purpose }
+    - path: /v1/immigration/cases
+      name: immigration-cases
+      description: REST surface for immigration cases.
+      operations:
+      - method: GET
+        name: listImmigrationCases
+        description: List immigration cases.
+        call: platform-immigration.listImmigrationCases

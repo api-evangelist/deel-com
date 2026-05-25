@@ -1,0 +1,74 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel Core API — People
+  description: Self-contained Naftiko capability for listing and retrieving Deel people across IC, EOR, and employee worker types.
+  tags:
+  - Deel
+  - People
+  - HRIS
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: core-people
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel People capability.
+    resources:
+    - name: people
+      path: /people
+      operations:
+      - name: listPeople
+        method: GET
+        description: List people across all hiring types.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: hiring_type, in: query, type: string, required: false }
+        - { name: employment_status, in: query, type: string, required: false }
+        - { name: country, in: query, type: string, required: false }
+        - { name: limit, in: query, type: integer, required: false }
+    - name: person
+      path: /people/{person_id}
+      operations:
+      - name: getPerson
+        method: GET
+        description: Retrieve a single person.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: person_id, in: path, type: string, required: true }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: core-people-rest
+    port: 8080
+    description: REST adapter for Deel People.
+    resources:
+    - path: /v1/people
+      name: people
+      description: REST surface for people directory.
+      operations:
+      - method: GET
+        name: listPeople
+        description: List Deel people.
+        call: core-people.listPeople
+        with: { hiring_type: rest.query.hiring_type, employment_status: rest.query.employment_status, country: rest.query.country, limit: rest.query.limit }
+    - path: /v1/people/{person_id}
+      name: person
+      description: REST surface for a single person.
+      operations:
+      - method: GET
+        name: getPerson
+        description: Retrieve a Deel person.
+        call: core-people.getPerson
+        with: { person_id: rest.path.person_id }

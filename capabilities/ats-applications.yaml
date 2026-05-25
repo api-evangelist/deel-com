@@ -1,0 +1,88 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel ATS API — Applications
+  description: Self-contained Naftiko capability for managing the ATS application pipeline.
+  tags:
+  - Deel
+  - ATS
+  - Applications
+  - Pipeline
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: ats-applications
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel ATS Applications capability.
+    resources:
+    - name: ats-applications
+      path: /ats/applications
+      operations:
+      - name: listAtsApplications
+        method: GET
+        description: List ATS applications.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: job_id, in: query, type: string, required: false }
+        - { name: candidate_id, in: query, type: string, required: false }
+        - { name: stage, in: query, type: string, required: false }
+      - name: createAtsApplication
+        method: POST
+        description: Create an ATS application linking a candidate to a job.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: body, in: body, type: object, required: true }
+    - name: ats-application-stage
+      path: /ats/applications/{application_id}/stage
+      operations:
+      - name: advanceApplicationStage
+        method: PATCH
+        description: Advance an application to the next pipeline stage.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: application_id, in: path, type: string, required: true }
+        - { name: body, in: body, type: object, required: true }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: ats-applications-rest
+    port: 8080
+    description: REST adapter for ATS applications.
+    resources:
+    - path: /v1/ats/applications
+      name: ats-applications
+      description: REST surface for ATS applications.
+      operations:
+      - method: GET
+        name: listAtsApplications
+        description: List ATS applications.
+        call: ats-applications.listAtsApplications
+        with: { job_id: rest.query.job_id, candidate_id: rest.query.candidate_id, stage: rest.query.stage }
+      - method: POST
+        name: createAtsApplication
+        description: Create ATS application.
+        call: ats-applications.createAtsApplication
+        with: { body: rest.body }
+    - path: /v1/ats/applications/{application_id}/stage
+      name: ats-application-stage
+      description: REST surface for advancing application stage.
+      operations:
+      - method: PATCH
+        name: advanceApplicationStage
+        description: Advance application stage.
+        call: ats-applications.advanceApplicationStage
+        with: { application_id: rest.path.application_id, body: rest.body }

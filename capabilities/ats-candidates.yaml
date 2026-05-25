@@ -1,0 +1,65 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel ATS API — Candidates
+  description: Self-contained Naftiko capability for managing ATS candidates.
+  tags:
+  - Deel
+  - ATS
+  - Candidates
+  - Recruiting
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: ats-candidates
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel ATS Candidates capability.
+    resources:
+    - name: ats-candidates
+      path: /ats/candidates
+      operations:
+      - name: listAtsCandidates
+        method: GET
+        description: List ATS candidates.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: search, in: query, type: string, required: false }
+      - name: createAtsCandidate
+        method: POST
+        description: Create ATS candidate.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: body, in: body, type: object, required: true }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: ats-candidates-rest
+    port: 8080
+    description: REST adapter for ATS candidates.
+    resources:
+    - path: /v1/ats/candidates
+      name: ats-candidates
+      description: REST surface for ATS candidates.
+      operations:
+      - method: GET
+        name: listAtsCandidates
+        description: List ATS candidates.
+        call: ats-candidates.listAtsCandidates
+        with: { search: rest.query.search }
+      - method: POST
+        name: createAtsCandidate
+        description: Create ATS candidate.
+        call: ats-candidates.createAtsCandidate
+        with: { body: rest.body }

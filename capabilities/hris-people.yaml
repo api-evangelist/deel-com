@@ -1,0 +1,66 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel HRIS API — People
+  description: Self-contained Naftiko capability for the unified HRIS people directory.
+  tags:
+  - Deel
+  - HRIS
+  - People
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: hris-people
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel HRIS People capability.
+    resources:
+    - name: hris-people
+      path: /people
+      operations:
+      - name: listHrisPeople
+        method: GET
+        description: List people across all worker types.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: hiring_type, in: query, type: string, required: false }
+        - { name: country, in: query, type: string, required: false }
+        - { name: employment_status, in: query, type: string, required: false }
+      - name: createPersonWithoutContract
+        method: POST
+        description: Create a person record without a contract.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: body, in: body, type: object, required: true }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: hris-people-rest
+    port: 8080
+    description: REST adapter for HRIS People.
+    resources:
+    - path: /v1/people
+      name: hris-people
+      description: REST surface for HRIS people.
+      operations:
+      - method: GET
+        name: listHrisPeople
+        description: List HRIS people.
+        call: hris-people.listHrisPeople
+        with: { hiring_type: rest.query.hiring_type, country: rest.query.country, employment_status: rest.query.employment_status }
+      - method: POST
+        name: createPersonWithoutContract
+        description: Create person without contract.
+        call: hris-people.createPersonWithoutContract
+        with: { body: rest.body }

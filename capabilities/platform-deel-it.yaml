@@ -1,0 +1,73 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel Platform Extensions API — Deel IT
+  description: Self-contained Naftiko capability for Deel IT device/asset management and order placement.
+  tags:
+  - Deel
+  - IT
+  - Devices
+  - Equipment
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: platform-deel-it
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel IT capability.
+    resources:
+    - name: deel-it-assets
+      path: /deel-it/assets
+      operations:
+      - name: listAssets
+        method: GET
+        description: List Deel IT assets.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: person_id, in: query, type: string, required: false }
+        - { name: status, in: query, type: string, required: false }
+    - name: deel-it-orders
+      path: /deel-it/orders
+      operations:
+      - name: createAssetOrder
+        method: POST
+        description: Place a Deel IT equipment order for a worker.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: body, in: body, type: object, required: true }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: platform-deel-it-rest
+    port: 8080
+    description: REST adapter for Deel IT.
+    resources:
+    - path: /v1/deel-it/assets
+      name: deel-it-assets
+      description: REST surface for Deel IT assets.
+      operations:
+      - method: GET
+        name: listAssets
+        description: List Deel IT assets.
+        call: platform-deel-it.listAssets
+        with: { person_id: rest.query.person_id, status: rest.query.status }
+    - path: /v1/deel-it/orders
+      name: deel-it-orders
+      description: REST surface for Deel IT orders.
+      operations:
+      - method: POST
+        name: createAssetOrder
+        description: Create asset order.
+        call: platform-deel-it.createAssetOrder
+        with: { body: rest.body }

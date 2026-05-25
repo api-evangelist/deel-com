@@ -1,0 +1,100 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel HRIS API — SCIM
+  description: Self-contained Naftiko capability for SCIM 2.0 user provisioning into Deel from external identity providers.
+  tags:
+  - Deel
+  - HRIS
+  - SCIM
+  - Identity
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_SCIM_TOKEN: DEEL_SCIM_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: hris-scim
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel SCIM 2.0 capability.
+    resources:
+    - name: scim-users
+      path: /scim/v2/Users
+      operations:
+      - name: scimListUsers
+        method: GET
+        description: SCIM list users.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: filter, in: query, type: string, required: false }
+        - { name: startIndex, in: query, type: integer, required: false }
+        - { name: count, in: query, type: integer, required: false }
+      - name: scimCreateUser
+        method: POST
+        description: SCIM create user.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: body, in: body, type: object, required: true }
+    - name: scim-user
+      path: /scim/v2/Users/{user_id}
+      operations:
+      - name: scimGetUser
+        method: GET
+        description: SCIM get user.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: user_id, in: path, type: string, required: true }
+      - name: scimDeleteUser
+        method: DELETE
+        description: SCIM deactivate user.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: user_id, in: path, type: string, required: true }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_SCIM_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: hris-scim-rest
+    port: 8080
+    description: REST adapter for SCIM provisioning.
+    resources:
+    - path: /v1/scim/v2/Users
+      name: scim-users
+      description: REST surface for SCIM users.
+      operations:
+      - method: GET
+        name: scimListUsers
+        description: SCIM list users.
+        call: hris-scim.scimListUsers
+        with: { filter: rest.query.filter, startIndex: rest.query.startIndex, count: rest.query.count }
+      - method: POST
+        name: scimCreateUser
+        description: SCIM create user.
+        call: hris-scim.scimCreateUser
+        with: { body: rest.body }
+    - path: /v1/scim/v2/Users/{user_id}
+      name: scim-user
+      description: REST surface for a SCIM user.
+      operations:
+      - method: GET
+        name: scimGetUser
+        description: SCIM get user.
+        call: hris-scim.scimGetUser
+        with: { user_id: rest.path.user_id }
+      - method: DELETE
+        name: scimDeleteUser
+        description: SCIM deactivate user.
+        call: hris-scim.scimDeleteUser
+        with: { user_id: rest.path.user_id }

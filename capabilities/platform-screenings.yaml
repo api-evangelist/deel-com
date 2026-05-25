@@ -1,0 +1,87 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel Platform Extensions API — Screenings
+  description: Self-contained Naftiko capability for KYC/AML background screenings.
+  tags:
+  - Deel
+  - Screenings
+  - KYC
+  - AML
+  - Compliance
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: platform-screenings
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel Screenings capability.
+    resources:
+    - name: screenings
+      path: /screenings
+      operations:
+      - name: listScreenings
+        method: GET
+        description: List background screenings.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: person_id, in: query, type: string, required: false }
+        - { name: status, in: query, type: string, required: false }
+      - name: createScreening
+        method: POST
+        description: Initiate a background screening.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: body, in: body, type: object, required: true }
+    - name: screening
+      path: /screenings/{screening_id}
+      operations:
+      - name: getScreening
+        method: GET
+        description: Retrieve a screening.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: screening_id, in: path, type: string, required: true }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: platform-screenings-rest
+    port: 8080
+    description: REST adapter for screenings.
+    resources:
+    - path: /v1/screenings
+      name: screenings
+      description: REST surface for screenings.
+      operations:
+      - method: GET
+        name: listScreenings
+        description: List screenings.
+        call: platform-screenings.listScreenings
+        with: { person_id: rest.query.person_id, status: rest.query.status }
+      - method: POST
+        name: createScreening
+        description: Initiate screening.
+        call: platform-screenings.createScreening
+        with: { body: rest.body }
+    - path: /v1/screenings/{screening_id}
+      name: screening
+      description: REST surface for a screening.
+      operations:
+      - method: GET
+        name: getScreening
+        description: Get screening.
+        call: platform-screenings.getScreening
+        with: { screening_id: rest.path.screening_id }

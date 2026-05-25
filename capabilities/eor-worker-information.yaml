@@ -1,0 +1,73 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel EOR API — Worker Information
+  description: Self-contained Naftiko capability for retrieving EOR worker profile, payslips, and documents.
+  tags:
+  - Deel
+  - EOR
+  - Workers
+  - Payslips
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: eor-worker-information
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel EOR Worker Information capability.
+    resources:
+    - name: eor-worker
+      path: /eor/workers/{worker_id}
+      operations:
+      - name: getEorWorker
+        method: GET
+        description: Retrieve EOR worker information.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: worker_id, in: path, type: string, required: true }
+    - name: eor-worker-payslips
+      path: /eor/workers/{worker_id}/payslips
+      operations:
+      - name: getEorWorkerPayslips
+        method: GET
+        description: List EOR worker payslips.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: worker_id, in: path, type: string, required: true }
+        - { name: year, in: query, type: integer, required: false }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: eor-worker-information-rest
+    port: 8080
+    description: REST adapter for EOR Worker Information.
+    resources:
+    - path: /v1/eor/workers/{worker_id}
+      name: eor-worker
+      description: REST surface for EOR workers.
+      operations:
+      - method: GET
+        name: getEorWorker
+        description: Get EOR worker.
+        call: eor-worker-information.getEorWorker
+        with: { worker_id: rest.path.worker_id }
+    - path: /v1/eor/workers/{worker_id}/payslips
+      name: eor-worker-payslips
+      description: REST surface for EOR payslips.
+      operations:
+      - method: GET
+        name: getEorWorkerPayslips
+        description: Get EOR worker payslips.
+        call: eor-worker-information.getEorWorkerPayslips
+        with: { worker_id: rest.path.worker_id, year: rest.query.year }

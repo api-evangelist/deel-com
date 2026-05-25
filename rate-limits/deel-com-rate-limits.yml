@@ -1,0 +1,45 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: Deel
+providerId: deel-com
+created: '2026-05-25'
+modified: '2026-05-25'
+reconciled: true
+tags:
+  - HR
+  - Payroll
+  - Rate Limiting
+  - Quotas
+description: |
+  Deel API rate limits. A single ceiling of 5 requests per second per organization is shared
+  across all API tokens belonging to that organization. The same limits apply in sandbox.
+  The API does not return rate-limit headers — clients must proactively queue requests.
+sources:
+  - https://developer.deel.com/api/rate-limits
+  - https://developer.deel.com/api/best-practices
+  - https://developer.deel.com/api/sandbox
+headers:
+  limit: null
+  remaining: null
+  reset: null
+  retryAfter: Retry-After
+responseCodes:
+  throttled: 429
+  quotaExceeded: 429
+algorithm: fixed-window
+notes:
+  - Limits are shared across all API tokens in an organization.
+  - Rate limits apply identically in sandbox and production.
+  - Exponential backoff is recommended: 1s, 2s, 4s, with jitter.
+  - 429 and 5xx should be retried; 4xx other than 429 should not be retried.
+limits:
+  - scope: organization
+    requests: 5
+    period: 1s
+    description: Combined ceiling across all API tokens issued to the organization.
+recommendations:
+  - Implement proactive request queuing — the API does not expose rate-limit headers.
+  - Use UUID v4 idempotency keys on POST/PATCH so retries do not duplicate state.
+  - Set request timeouts of 10 seconds and use HTTP keep-alive connection pooling.
+  - Alert when error rates exceed 5% and when burst rate exceeds 80% of the ceiling.

@@ -1,0 +1,51 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Deel EOR API — Cost Calculator
+  description: Self-contained Naftiko capability for computing employment cost (salary, employer taxes, benefits, Deel fee).
+  tags:
+  - Deel
+  - EOR
+  - Cost Calculator
+  created: '2026-05-25'
+  modified: '2026-05-25'
+binds:
+- namespace: env
+  keys:
+    DEEL_API_TOKEN: DEEL_API_TOKEN
+capability:
+  consumes:
+  - type: http
+    namespace: eor-cost-calculator
+    baseUri: https://api.letsdeel.com/rest/v2
+    description: Deel EOR Cost Calculator capability.
+    resources:
+    - name: employment-cost
+      path: /eor/employment-cost
+      operations:
+      - name: calculateEmploymentCost
+        method: POST
+        description: Calculate the full employment cost for a country and salary.
+        outputRawFormat: json
+        outputParameters:
+        - { name: result, type: object, value: $. }
+        inputParameters:
+        - { name: body, in: body, type: object, required: true }
+    authentication:
+      type: bearer
+      value: '{{env.DEEL_API_TOKEN}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: eor-cost-calculator-rest
+    port: 8080
+    description: REST adapter for the EOR Cost Calculator.
+    resources:
+    - path: /v1/eor/employment-cost
+      name: employment-cost
+      description: REST surface for the employment cost calculator.
+      operations:
+      - method: POST
+        name: calculateEmploymentCost
+        description: Calculate employment cost.
+        call: eor-cost-calculator.calculateEmploymentCost
+        with: { body: rest.body }
