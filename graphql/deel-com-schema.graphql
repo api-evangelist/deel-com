@@ -1,0 +1,1583 @@
+"""
+Deel GraphQL Schema
+Global payroll, EOR, contractor management, HRIS, ATS, IT, immigration, and compliance.
+Source: https://developer.deel.com/api/introduction
+"""
+
+# ─── Scalars ─────────────────────────────────────────────────────────────────
+
+scalar Date
+scalar DateTime
+scalar JSON
+scalar URL
+scalar EmailAddress
+scalar CountryCode
+scalar CurrencyCode
+scalar UUID
+
+# ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum ContractType {
+  IC
+  EOR
+  COR
+  GLOBAL_PAYROLL
+  PAGR
+}
+
+enum ContractStatus {
+  PENDING
+  ACTIVE
+  PAUSED
+  TERMINATED
+  ENDED
+  AWAITING_SIGNATURE
+  AWAITING_COMPLIANCE
+}
+
+enum WorkerType {
+  EMPLOYEE
+  CONTRACTOR
+  EOR_EMPLOYEE
+  COR_CONTRACTOR
+  GLOBAL_PAYROLL_EMPLOYEE
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  FIXED_TERM
+  INDEFINITE
+}
+
+enum Seniority {
+  JUNIOR
+  MID
+  SENIOR
+  LEAD
+  PRINCIPAL
+  DIRECTOR
+  VP
+  C_LEVEL
+}
+
+enum PayrollCycleStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SUBMITTED
+  PENDING_APPROVAL
+  APPROVED
+  PAID
+  DECLINED
+  CANCELLED
+}
+
+enum TimeOffRequestStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  CANCELLED
+  WITHDRAWN
+}
+
+enum ApplicationStage {
+  APPLIED
+  SCREENING
+  INTERVIEW
+  TECHNICAL
+  OFFER
+  HIRED
+  REJECTED
+  WITHDRAWN
+}
+
+enum ScreeningStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+enum ImmigrationCaseStatus {
+  DRAFT
+  SUBMITTED
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  CLOSED
+}
+
+enum ITAssetStatus {
+  AVAILABLE
+  ASSIGNED
+  IN_REPAIR
+  RETIRED
+  ORDERED
+}
+
+enum WebhookEventStatus {
+  PENDING
+  DELIVERED
+  FAILED
+  RETRYING
+}
+
+enum CustomFieldType {
+  TEXT
+  NUMBER
+  DATE
+  BOOLEAN
+  SELECT
+  MULTI_SELECT
+}
+
+enum PaymentMethodType {
+  BANK_ACCOUNT
+  CRYPTO_WALLET
+  DEBIT_CARD
+  PAYONEER
+  PAYPAL
+  REVOLUT
+}
+
+enum AdjustmentType {
+  BONUS
+  DEDUCTION
+  ONE_TIME_PAYMENT
+  EXPENSE_REIMBURSEMENT
+  COMMISSION
+  ALLOWANCE
+}
+
+# ─── Core Organization Types ─────────────────────────────────────────────────
+
+"""Top-level tenant representing a Deel customer company."""
+type Organization {
+  id: ID!
+  name: String!
+  slug: String
+  logo: URL
+  legalEntities: [LegalEntity!]!
+  departments: [Department!]!
+  costCenters: [CostCenter!]!
+  groups: [Group!]!
+  workers: [Worker!]!
+  customFields: [CustomField!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A registered business entity within an organization tied to a specific country."""
+type LegalEntity {
+  id: ID!
+  name: String!
+  registrationNumber: String
+  country: Country!
+  currency: Currency!
+  organization: Organization!
+  address: Address
+  workers: [Worker!]!
+  payrollCycles: [PayrollCycle!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Organizational grouping for workers and cost centers."""
+type Department {
+  id: ID!
+  name: String!
+  organization: Organization!
+  parent: Department
+  children: [Department!]!
+  manager: Manager
+  workers: [Worker!]!
+  jobs: [Job!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Financial grouping for payroll allocation."""
+type CostCenter {
+  id: ID!
+  name: String!
+  code: String
+  organization: Organization!
+  legalEntity: LegalEntity
+  workers: [Worker!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Custom worker grouping for management and reporting."""
+type Group {
+  id: ID!
+  name: String!
+  description: String
+  organization: Organization!
+  workers: [Worker!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Person with supervisory authority and reporting relationships."""
+type Manager {
+  id: ID!
+  worker: Worker!
+  directReports: [Worker!]!
+  department: Department
+}
+
+"""Postal address."""
+type Address {
+  street: String
+  city: String
+  state: String
+  postalCode: String
+  country: Country!
+}
+
+# ─── Worker / People Types ────────────────────────────────────────────────────
+
+"""Unified person record spanning contractors, EOR employees, and direct employees."""
+type Worker {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: EmailAddress!
+  workerType: WorkerType!
+  status: String!
+  profile: WorkerProfile
+  employmentInfo: WorkerEmploymentInfo
+  contracts: [Contract!]!
+  documents: [WorkerDocument!]!
+  banks: [WorkerBank!]!
+  payslips: [WorkerPayslip!]!
+  benefits: [WorkerBenefit!]!
+  compliance: WorkerCompliance
+  timeOffEntitlements: [TimeOffEntitlement!]!
+  customFieldValues: [CustomFieldValue!]!
+  manager: Manager
+  department: Department
+  costCenter: CostCenter
+  legalEntity: LegalEntity
+  organization: Organization!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Extended biographical and contact information for a worker."""
+type WorkerProfile {
+  id: ID!
+  worker: Worker!
+  phone: String
+  dateOfBirth: Date
+  nationality: CountryCode
+  address: Address
+  timezone: String
+  preferredLanguage: String
+  pronouns: String
+  linkedIn: URL
+  avatar: URL
+  updatedAt: DateTime!
+}
+
+"""Employment classification, start date, seniority, job title, and work location."""
+type WorkerEmploymentInfo {
+  id: ID!
+  worker: Worker!
+  jobTitle: JobTitle!
+  seniority: Seniority
+  employmentType: EmploymentType
+  startDate: Date!
+  endDate: Date
+  workLocation: Address
+  workingHoursPerWeek: Float
+  workSchedule: WorkSchedule
+  updatedAt: DateTime!
+}
+
+"""Identity and compliance documents uploaded by or for a worker."""
+type WorkerDocument {
+  id: ID!
+  worker: Worker!
+  name: String!
+  documentType: String!
+  fileUrl: URL
+  expiresAt: Date
+  isVerified: Boolean!
+  uploadedAt: DateTime!
+}
+
+"""Bank account details for payment disbursement."""
+type WorkerBank {
+  id: ID!
+  worker: Worker!
+  bankName: String!
+  accountNumber: String
+  routingNumber: String
+  iban: String
+  swiftCode: String
+  currency: Currency!
+  country: Country!
+  isPrimary: Boolean!
+  createdAt: DateTime!
+}
+
+"""Payslip/paystub document for a completed pay period."""
+type WorkerPayslip {
+  id: ID!
+  worker: Worker!
+  payrollCycle: PayrollCycle
+  periodStart: Date!
+  periodEnd: Date!
+  grossAmount: Float!
+  netAmount: Float!
+  currency: Currency!
+  fileUrl: URL
+  issuedAt: DateTime!
+}
+
+"""Enrolled benefit plan for an EOR employee."""
+type WorkerBenefit {
+  id: ID!
+  worker: Worker!
+  benefitType: String!
+  provider: String
+  planName: String
+  coverageLevel: String
+  startDate: Date!
+  endDate: Date
+  employeeContribution: Float
+  employerContribution: Float
+  currency: Currency!
+}
+
+"""Compliance status and required document checklists per country."""
+type WorkerCompliance {
+  id: ID!
+  worker: Worker!
+  country: Country!
+  status: String!
+  requiredDocuments: [ComplianceDocument!]!
+  backgroundScreening: BackgroundScreening
+  updatedAt: DateTime!
+}
+
+# ─── Contract Types ───────────────────────────────────────────────────────────
+
+"""Polymorphic base contract covering IC, EOR, COR, and Global Payroll types."""
+interface Contract {
+  id: ID!
+  contractType: ContractType!
+  status: ContractStatus!
+  worker: Worker!
+  organization: Organization!
+  startDate: Date!
+  endDate: Date
+  currency: Currency!
+  amendments: [ContractAmendment!]!
+  termination: ContractTermination
+  magicLink: MagicLink
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Independent Contractor fixed-rate or pay-as-you-go contract."""
+type ICContract implements Contract {
+  id: ID!
+  contractType: ContractType!
+  status: ContractStatus!
+  worker: Worker!
+  organization: Organization!
+  startDate: Date!
+  endDate: Date
+  currency: Currency!
+  amendments: [ContractAmendment!]!
+  termination: ContractTermination
+  magicLink: MagicLink
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  jobTitle: JobTitle!
+  scope: String
+  paymentCycle: String!
+  rate: Float!
+  invoices: [Invoice!]!
+  timesheets: [Timesheet!]!
+}
+
+"""Employer of Record full-time employment contract."""
+type EORContract implements Contract {
+  id: ID!
+  contractType: ContractType!
+  status: ContractStatus!
+  worker: Worker!
+  organization: Organization!
+  startDate: Date!
+  endDate: Date
+  currency: Currency!
+  amendments: [ContractAmendment!]!
+  termination: ContractTermination
+  magicLink: MagicLink
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  country: Country!
+  jobTitle: JobTitle!
+  seniority: Seniority
+  annualSalary: Float!
+  employmentType: EmploymentType!
+  benefits: [WorkerBenefit!]!
+  payslips: [WorkerPayslip!]!
+}
+
+"""Contractor of Record contract."""
+type CORContract implements Contract {
+  id: ID!
+  contractType: ContractType!
+  status: ContractStatus!
+  worker: Worker!
+  organization: Organization!
+  startDate: Date!
+  endDate: Date
+  currency: Currency!
+  amendments: [ContractAmendment!]!
+  termination: ContractTermination
+  magicLink: MagicLink
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  country: Country!
+  jobTitle: JobTitle!
+  rate: Float!
+  paymentCycle: String!
+  invoices: [Invoice!]!
+}
+
+"""Direct employee payroll contract on the client's own legal entity."""
+type GlobalPayrollContract implements Contract {
+  id: ID!
+  contractType: ContractType!
+  status: ContractStatus!
+  worker: Worker!
+  organization: Organization!
+  startDate: Date!
+  endDate: Date
+  currency: Currency!
+  amendments: [ContractAmendment!]!
+  termination: ContractTermination
+  magicLink: MagicLink
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  legalEntity: LegalEntity!
+  jobTitle: JobTitle!
+  annualSalary: Float!
+  payrollCycles: [PayrollCycle!]!
+  payslips: [WorkerPayslip!]!
+}
+
+"""Modification to an existing contract."""
+type ContractAmendment {
+  id: ID!
+  contract: Contract!
+  reason: String!
+  changes: JSON!
+  effectiveDate: Date!
+  status: String!
+  createdAt: DateTime!
+}
+
+"""Structured record of an offboarding/termination event."""
+type ContractTermination {
+  id: ID!
+  contract: Contract!
+  reason: String!
+  terminationType: String!
+  effectiveDate: Date!
+  noticePeriodDays: Int
+  lastWorkingDay: Date
+  createdAt: DateTime!
+}
+
+"""Short-lived signing URL for worker onboarding or contract acceptance."""
+type MagicLink {
+  id: ID!
+  contract: Contract!
+  url: URL!
+  expiresAt: DateTime!
+  usedAt: DateTime
+  createdAt: DateTime!
+}
+
+# ─── Payroll Types ────────────────────────────────────────────────────────────
+
+"""A single payroll run covering a period, legal entity, and set of workers."""
+type PayrollCycle {
+  id: ID!
+  legalEntity: LegalEntity!
+  periodStart: Date!
+  periodEnd: Date!
+  paymentDate: Date
+  status: PayrollCycleStatus!
+  currency: Currency!
+  totalGross: Float
+  totalNet: Float
+  events: [PayrollEvent!]!
+  adjustments: [PayrollAdjustment!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Individual gross-to-net computation event within a payroll cycle."""
+type PayrollEvent {
+  id: ID!
+  payrollCycle: PayrollCycle!
+  worker: Worker!
+  grossAmount: Float!
+  netAmount: Float!
+  currency: Currency!
+  breakdown: GrossToNetBreakdown!
+  payslip: PayslipDocument
+  createdAt: DateTime!
+}
+
+"""Bonus, deduction, or one-time payment attached to a payroll cycle."""
+type PayrollAdjustment {
+  id: ID!
+  payrollCycle: PayrollCycle!
+  worker: Worker!
+  adjustmentType: AdjustmentType!
+  description: String
+  amount: Float!
+  currency: Currency!
+  effectiveDate: Date!
+  status: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Generated PDF payslip artifact for worker download."""
+type PayslipDocument {
+  id: ID!
+  payrollEvent: PayrollEvent!
+  worker: Worker!
+  fileUrl: URL!
+  generatedAt: DateTime!
+}
+
+"""Itemized breakdown of gross pay, taxes, deductions, and net pay."""
+type GrossToNetBreakdown {
+  grossPay: Float!
+  employeeTaxes: [TaxWithholding!]!
+  employerTaxes: [TaxWithholding!]!
+  deductions: [PayrollAdjustment!]!
+  additions: [PayrollAdjustment!]!
+  netPay: Float!
+}
+
+"""Country-specific tax withholding line item on a payroll event."""
+type TaxWithholding {
+  id: ID!
+  name: String!
+  taxCode: String
+  amount: Float!
+  rate: Float
+  currency: Currency!
+}
+
+# ─── Invoice / Payment Types ──────────────────────────────────────────────────
+
+"""Worker-submitted invoice for contractor payment."""
+type Invoice {
+  id: ID!
+  contract: Contract!
+  worker: Worker!
+  invoiceNumber: String!
+  status: InvoiceStatus!
+  currency: Currency!
+  subtotal: Float!
+  taxes: [InvoiceTax!]!
+  adjustments: [InvoiceAdjustment!]!
+  total: Float!
+  periodStart: Date
+  periodEnd: Date
+  submittedAt: DateTime
+  approvedAt: DateTime
+  paidAt: DateTime
+  payment: Payment
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Modification to a submitted invoice."""
+type InvoiceAdjustment {
+  id: ID!
+  invoice: Invoice!
+  description: String!
+  amount: Float!
+  adjustmentType: AdjustmentType!
+  createdAt: DateTime!
+}
+
+"""Applicable tax line items on a contractor invoice."""
+type InvoiceTax {
+  id: ID!
+  invoice: Invoice!
+  name: String!
+  rate: Float!
+  amount: Float!
+  taxCode: String
+}
+
+"""Disbursement record linking an invoice or payroll event to a transfer."""
+type Payment {
+  id: ID!
+  invoice: Invoice
+  payrollEvent: PayrollEvent
+  worker: Worker!
+  amount: Float!
+  currency: Currency!
+  paymentMethod: PaymentMethod!
+  status: String!
+  reference: String
+  initiatedAt: DateTime
+  completedAt: DateTime
+  createdAt: DateTime!
+}
+
+"""Stored payment method for a worker."""
+type PaymentMethod {
+  id: ID!
+  worker: Worker!
+  methodType: PaymentMethodType!
+  label: String
+  currency: Currency
+  isPrimary: Boolean!
+  details: JSON
+  createdAt: DateTime!
+}
+
+"""Worker-initiated transfer from Deel balance to an external account."""
+type Withdrawal {
+  id: ID!
+  worker: Worker!
+  amount: Float!
+  currency: Currency!
+  paymentMethod: PaymentMethod!
+  status: String!
+  fee: Float
+  initiatedAt: DateTime!
+  completedAt: DateTime
+}
+
+# ─── Time and Leave Types ─────────────────────────────────────────────────────
+
+"""Leave policy defining accrual rules, carry-over limits, and eligibility."""
+type TimeOffPolicy {
+  id: ID!
+  organization: Organization!
+  name: String!
+  leaveType: String!
+  accrualRate: Float
+  accrualUnit: String
+  maxCarryOver: Float
+  maxBalance: Float
+  isPaid: Boolean!
+  applicableWorkerTypes: [WorkerType!]!
+  countries: [Country!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Individual leave request with dates, type, status, and approval chain."""
+type TimeOffRequest {
+  id: ID!
+  worker: Worker!
+  policy: TimeOffPolicy!
+  startDate: Date!
+  endDate: Date!
+  daysRequested: Float!
+  status: TimeOffRequestStatus!
+  reason: String
+  approver: Worker
+  requestedAt: DateTime!
+  reviewedAt: DateTime
+  updatedAt: DateTime!
+}
+
+"""Worker's current balance and accrued hours/days under a policy."""
+type TimeOffEntitlement {
+  id: ID!
+  worker: Worker!
+  policy: TimeOffPolicy!
+  balance: Float!
+  accrued: Float!
+  used: Float!
+  pending: Float!
+  unit: String!
+  updatedAt: DateTime!
+}
+
+"""Historical event log for accruals, expirations, and manual adjustments."""
+type TimeOffEvent {
+  id: ID!
+  worker: Worker!
+  policy: TimeOffPolicy!
+  eventType: String!
+  amount: Float!
+  unit: String!
+  description: String
+  occurredAt: DateTime!
+}
+
+"""Defined weekly work pattern for a worker or department."""
+type WorkSchedule {
+  id: ID!
+  name: String!
+  organization: Organization!
+  timezone: String!
+  workDays: [String!]!
+  hoursPerDay: Float!
+  startTime: String
+  endTime: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Clock-in/clock-out record for hourly workers."""
+type TimeTrackingShift {
+  id: ID!
+  worker: Worker!
+  timesheet: Timesheet!
+  clockIn: DateTime!
+  clockOut: DateTime
+  durationMinutes: Int
+  breakMinutes: Int
+  notes: String
+  status: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Aggregated weekly or bi-weekly collection of shifts for payroll input."""
+type Timesheet {
+  id: ID!
+  worker: Worker!
+  contract: Contract!
+  periodStart: Date!
+  periodEnd: Date!
+  totalHours: Float!
+  status: String!
+  shifts: [TimeTrackingShift!]!
+  submittedAt: DateTime
+  approvedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# ─── Compliance and Background Check Types ────────────────────────────────────
+
+"""KYC/AML screening record with provider, status, and findings."""
+type BackgroundScreening {
+  id: ID!
+  worker: Worker!
+  screeningType: String!
+  provider: String
+  status: ScreeningStatus!
+  report: ScreeningReport
+  initiatedAt: DateTime!
+  completedAt: DateTime
+  expiresAt: Date
+  createdAt: DateTime!
+}
+
+"""Detailed findings from a completed background screening."""
+type ScreeningReport {
+  id: ID!
+  screening: BackgroundScreening!
+  summary: String
+  findings: JSON
+  result: String!
+  generatedAt: DateTime!
+  fileUrl: URL
+}
+
+"""Visa or work permit case with country, visa type, and document requirements."""
+type ImmigrationCase {
+  id: ID!
+  worker: Worker!
+  country: Country!
+  visaType: VisaType!
+  status: ImmigrationCaseStatus!
+  documents: [ComplianceDocument!]!
+  assignedAt: DateTime
+  submittedAt: DateTime
+  decidedAt: DateTime
+  expiresAt: Date
+  notes: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Reference data for visa categories by country."""
+type VisaType {
+  id: ID!
+  code: String!
+  name: String!
+  country: Country!
+  description: String
+  processingTimeDays: Int
+  requiredDocuments: [String!]!
+}
+
+"""Right-to-work verification record for EOR employees."""
+type RightToWork {
+  id: ID!
+  worker: Worker!
+  country: Country!
+  status: String!
+  verifiedAt: DateTime
+  expiresAt: Date
+  document: WorkerDocument
+}
+
+"""Country-required compliance document with upload status and expiry."""
+type ComplianceDocument {
+  id: ID!
+  worker: Worker
+  immigrationCase: ImmigrationCase
+  name: String!
+  documentType: String!
+  isRequired: Boolean!
+  status: String!
+  fileUrl: URL
+  uploadedAt: DateTime
+  expiresAt: Date
+}
+
+# ─── ATS Types ────────────────────────────────────────────────────────────────
+
+"""Open position with title, department, location, employment type, and status."""
+type Job {
+  id: ID!
+  organization: Organization!
+  title: String!
+  department: Department
+  location: String
+  country: Country
+  employmentType: EmploymentType!
+  status: String!
+  description: String
+  salaryMin: Float
+  salaryMax: Float
+  currency: Currency
+  postings: [JobPosting!]!
+  applications: [Application!]!
+  hiringMembers: [HiringMember!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Published job board listing linked to a Job record."""
+type JobPosting {
+  id: ID!
+  job: Job!
+  boardName: String!
+  postingUrl: URL
+  status: String!
+  publishedAt: DateTime
+  closedAt: DateTime
+  createdAt: DateTime!
+}
+
+"""Applicant record with contact info, resume, and source attribution."""
+type Candidate {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: EmailAddress!
+  phone: String
+  source: String
+  tags: [String!]!
+  applications: [Application!]!
+  attachments: [ApplicationAttachment!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A Candidate's progression through a Job pipeline."""
+type Application {
+  id: ID!
+  candidate: Candidate!
+  job: Job!
+  stage: ApplicationStage!
+  status: String!
+  currentStageDetail: InterviewStage
+  attachments: [ApplicationAttachment!]!
+  offer: Offer
+  rejectionReason: String
+  appliedAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Resume, cover letter, or other file attached to an Application."""
+type ApplicationAttachment {
+  id: ID!
+  application: Application
+  candidate: Candidate!
+  name: String!
+  fileUrl: URL!
+  fileType: String
+  uploadedAt: DateTime!
+}
+
+"""Formal employment or contract offer extended to a Candidate."""
+type Offer {
+  id: ID!
+  application: Application!
+  candidate: Candidate!
+  job: Job!
+  status: String!
+  contractType: ContractType
+  salary: Float
+  currency: Currency
+  startDate: Date
+  expiresAt: DateTime
+  sentAt: DateTime
+  acceptedAt: DateTime
+  declinedAt: DateTime
+  createdAt: DateTime!
+}
+
+"""Recruiter or hiring manager assigned to a Job."""
+type HiringMember {
+  id: ID!
+  job: Job!
+  worker: Worker!
+  role: String!
+  addedAt: DateTime!
+}
+
+"""A named stage in a hiring pipeline."""
+type InterviewStage {
+  id: ID!
+  job: Job!
+  name: String!
+  order: Int!
+  stageType: String!
+  durationMinutes: Int
+}
+
+# ─── IT / Device Types ────────────────────────────────────────────────────────
+
+"""Device record with serial number, OS, and assignment."""
+type ITAsset {
+  id: ID!
+  organization: Organization!
+  assetType: String!
+  brand: String
+  model: String
+  serialNumber: String
+  operatingSystem: String
+  osVersion: String
+  status: ITAssetStatus!
+  assignedTo: Worker
+  assignedAt: DateTime
+  purchaseDate: Date
+  purchasePrice: Float
+  currency: Currency
+  mdmEnrollment: MDMEnrollment
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Procurement order for a new device or peripheral."""
+type AssetOrder {
+  id: ID!
+  organization: Organization!
+  requestedBy: Worker!
+  assignedTo: Worker
+  assetType: String!
+  specifications: JSON
+  status: String!
+  estimatedDelivery: Date
+  trackingNumber: String
+  cost: Float
+  currency: Currency
+  orderedAt: DateTime!
+  deliveredAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Mobile device management enrollment status for an ITAsset."""
+type MDMEnrollment {
+  id: ID!
+  asset: ITAsset!
+  provider: String!
+  enrollmentId: String
+  status: String!
+  enrolledAt: DateTime
+  lastCheckedIn: DateTime
+}
+
+# ─── Webhook Types ────────────────────────────────────────────────────────────
+
+"""Registered webhook endpoint with event filters and HMAC secret."""
+type WebhookSubscription {
+  id: ID!
+  organization: Organization!
+  url: URL!
+  events: [String!]!
+  isActive: Boolean!
+  secretHint: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Fired event record with payload, delivery status, and retry history."""
+type WebhookEvent {
+  id: ID!
+  subscription: WebhookSubscription!
+  eventType: String!
+  payload: JSON!
+  status: WebhookEventStatus!
+  attempts: Int!
+  lastAttemptAt: DateTime
+  deliveredAt: DateTime
+  createdAt: DateTime!
+}
+
+"""Test event triggered in sandbox without production side-effects."""
+type WebhookSimulation {
+  id: ID!
+  organization: Organization!
+  eventType: String!
+  payload: JSON!
+  triggeredAt: DateTime!
+}
+
+# ─── Reference / Lookup Types ─────────────────────────────────────────────────
+
+"""ISO 3166-1 alpha-2 country record with Deel product availability."""
+type Country {
+  code: CountryCode!
+  name: String!
+  continent: String
+  currency: Currency
+  supportsEOR: Boolean!
+  supportsGlobalPayroll: Boolean!
+  supportsContractors: Boolean!
+  supportsImmigration: Boolean!
+}
+
+"""ISO 4217 currency with exchange rate and payment method flags."""
+type Currency {
+  code: CurrencyCode!
+  name: String!
+  symbol: String
+  exchangeRateToUSD: Float
+  supportsBankTransfer: Boolean!
+  supportsCrypto: Boolean!
+}
+
+"""Standardized job title from Deel's taxonomy."""
+type JobTitle {
+  id: ID!
+  name: String!
+  category: String
+  isCustom: Boolean!
+}
+
+"""Organization-defined metadata field."""
+type CustomField {
+  id: ID!
+  organization: Organization!
+  name: String!
+  fieldType: CustomFieldType!
+  isRequired: Boolean!
+  options: [String!]
+  applicableWorkerTypes: [WorkerType!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Worker-level value for a CustomField."""
+type CustomFieldValue {
+  id: ID!
+  worker: Worker!
+  customField: CustomField!
+  value: JSON
+  updatedAt: DateTime!
+}
+
+# ─── Query Root ───────────────────────────────────────────────────────────────
+
+type Query {
+  # Organization
+  organization(id: ID!): Organization
+  legalEntities(organizationId: ID!): [LegalEntity!]!
+  legalEntity(id: ID!): LegalEntity
+  departments(organizationId: ID!): [Department!]!
+  department(id: ID!): Department
+  costCenters(organizationId: ID!): [CostCenter!]!
+  groups(organizationId: ID!): [Group!]!
+
+  # Workers
+  workers(organizationId: ID!, workerType: WorkerType, status: String): [Worker!]!
+  worker(id: ID!): Worker
+  workerProfile(workerId: ID!): WorkerProfile
+  workerDocuments(workerId: ID!): [WorkerDocument!]!
+  workerBanks(workerId: ID!): [WorkerBank!]!
+  workerPayslips(workerId: ID!, limit: Int, offset: Int): [WorkerPayslip!]!
+  workerBenefits(workerId: ID!): [WorkerBenefit!]!
+  workerCompliance(workerId: ID!): WorkerCompliance
+
+  # Contracts
+  contracts(organizationId: ID!, contractType: ContractType, status: ContractStatus): [Contract!]!
+  contract(id: ID!): Contract
+  icContracts(organizationId: ID!): [ICContract!]!
+  eorContracts(organizationId: ID!): [EORContract!]!
+  corContracts(organizationId: ID!): [CORContract!]!
+  globalPayrollContracts(organizationId: ID!): [GlobalPayrollContract!]!
+
+  # Payroll
+  payrollCycles(legalEntityId: ID!, status: PayrollCycleStatus): [PayrollCycle!]!
+  payrollCycle(id: ID!): PayrollCycle
+  payrollEvents(payrollCycleId: ID!): [PayrollEvent!]!
+  payrollAdjustments(payrollCycleId: ID!): [PayrollAdjustment!]!
+
+  # Invoices and Payments
+  invoices(organizationId: ID!, status: InvoiceStatus, limit: Int, offset: Int): [Invoice!]!
+  invoice(id: ID!): Invoice
+  payments(organizationId: ID!, limit: Int, offset: Int): [Payment!]!
+  payment(id: ID!): Payment
+  withdrawals(workerId: ID!): [Withdrawal!]!
+
+  # Time Off
+  timeOffPolicies(organizationId: ID!): [TimeOffPolicy!]!
+  timeOffPolicy(id: ID!): TimeOffPolicy
+  timeOffRequests(organizationId: ID!, status: TimeOffRequestStatus, workerId: ID): [TimeOffRequest!]!
+  timeOffRequest(id: ID!): TimeOffRequest
+  timeOffEntitlements(workerId: ID!): [TimeOffEntitlement!]!
+  workSchedules(organizationId: ID!): [WorkSchedule!]!
+  timesheets(contractId: ID!, status: String): [Timesheet!]!
+  timesheet(id: ID!): Timesheet
+  shifts(timesheetId: ID!): [TimeTrackingShift!]!
+
+  # Compliance and Background Checks
+  backgroundScreenings(organizationId: ID!, status: ScreeningStatus): [BackgroundScreening!]!
+  backgroundScreening(id: ID!): BackgroundScreening
+  immigrationCases(organizationId: ID!, status: ImmigrationCaseStatus): [ImmigrationCase!]!
+  immigrationCase(id: ID!): ImmigrationCase
+  rightToWork(workerId: ID!): RightToWork
+  visaTypes(countryCode: CountryCode!): [VisaType!]!
+
+  # ATS
+  jobs(organizationId: ID!, status: String): [Job!]!
+  job(id: ID!): Job
+  candidates(organizationId: ID!, limit: Int, offset: Int): [Candidate!]!
+  candidate(id: ID!): Candidate
+  applications(jobId: ID, candidateId: ID, stage: ApplicationStage): [Application!]!
+  application(id: ID!): Application
+  offers(organizationId: ID!, status: String): [Offer!]!
+  offer(id: ID!): Offer
+
+  # IT Assets
+  itAssets(organizationId: ID!, status: ITAssetStatus): [ITAsset!]!
+  itAsset(id: ID!): ITAsset
+  assetOrders(organizationId: ID!, status: String): [AssetOrder!]!
+  assetOrder(id: ID!): AssetOrder
+
+  # Webhooks
+  webhookSubscriptions(organizationId: ID!): [WebhookSubscription!]!
+  webhookSubscription(id: ID!): WebhookSubscription
+  webhookEvents(subscriptionId: ID!, status: WebhookEventStatus): [WebhookEvent!]!
+
+  # Reference / Lookups
+  countries: [Country!]!
+  country(code: CountryCode!): Country
+  currencies: [Currency!]!
+  currency(code: CurrencyCode!): Currency
+  jobTitles(search: String): [JobTitle!]!
+  customFields(organizationId: ID!): [CustomField!]!
+}
+
+# ─── Mutation Root ────────────────────────────────────────────────────────────
+
+type Mutation {
+  # Contracts
+  createICContract(input: CreateICContractInput!): ICContract!
+  createEORContract(input: CreateEORContractInput!): EORContract!
+  createGlobalPayrollContract(input: CreateGlobalPayrollContractInput!): GlobalPayrollContract!
+  amendContract(contractId: ID!, input: AmendContractInput!): ContractAmendment!
+  terminateContract(contractId: ID!, input: TerminateContractInput!): ContractTermination!
+  signContract(contractId: ID!): Contract!
+  createMagicLink(contractId: ID!): MagicLink!
+
+  # Invoices
+  createInvoice(input: CreateInvoiceInput!): Invoice!
+  submitInvoice(invoiceId: ID!): Invoice!
+  adjustInvoice(invoiceId: ID!, input: AdjustInvoiceInput!): InvoiceAdjustment!
+  approveInvoice(invoiceId: ID!): Invoice!
+  declineInvoice(invoiceId: ID!, reason: String!): Invoice!
+
+  # Payroll Adjustments
+  createPayrollAdjustment(input: CreatePayrollAdjustmentInput!): PayrollAdjustment!
+  updatePayrollAdjustment(id: ID!, input: UpdatePayrollAdjustmentInput!): PayrollAdjustment!
+  deletePayrollAdjustment(id: ID!): Boolean!
+
+  # Time Off
+  requestTimeOff(input: RequestTimeOffInput!): TimeOffRequest!
+  approveTimeOff(requestId: ID!): TimeOffRequest!
+  declineTimeOff(requestId: ID!, reason: String): TimeOffRequest!
+  cancelTimeOff(requestId: ID!): TimeOffRequest!
+  createTimeOffPolicy(input: CreateTimeOffPolicyInput!): TimeOffPolicy!
+  updateTimeOffPolicy(id: ID!, input: UpdateTimeOffPolicyInput!): TimeOffPolicy!
+
+  # Time Tracking
+  createTimeTrackingShift(input: CreateShiftInput!): TimeTrackingShift!
+  updateTimeTrackingShift(id: ID!, input: UpdateShiftInput!): TimeTrackingShift!
+  submitTimesheet(timesheetId: ID!): Timesheet!
+  approveTimesheet(timesheetId: ID!): Timesheet!
+
+  # ATS
+  createJob(input: CreateJobInput!): Job!
+  updateJob(id: ID!, input: UpdateJobInput!): Job!
+  createCandidate(input: CreateCandidateInput!): Candidate!
+  updateCandidate(id: ID!, input: UpdateCandidateInput!): Candidate!
+  createApplication(input: CreateApplicationInput!): Application!
+  updateApplicationStage(applicationId: ID!, stage: ApplicationStage!): Application!
+  createOffer(input: CreateOfferInput!): Offer!
+  acceptOffer(offerId: ID!): Offer!
+  declineOffer(offerId: ID!, reason: String): Offer!
+
+  # Compliance
+  initiateBackgroundScreening(workerId: ID!, screeningType: String!): BackgroundScreening!
+  createImmigrationCase(input: CreateImmigrationCaseInput!): ImmigrationCase!
+  uploadComplianceDocument(input: UploadComplianceDocumentInput!): ComplianceDocument!
+
+  # IT Assets
+  createAssetOrder(input: CreateAssetOrderInput!): AssetOrder!
+  assignITAsset(assetId: ID!, workerId: ID!): ITAsset!
+  updateITAssetStatus(assetId: ID!, status: ITAssetStatus!): ITAsset!
+
+  # Webhooks
+  createWebhookSubscription(input: CreateWebhookSubscriptionInput!): WebhookSubscription!
+  updateWebhookSubscription(id: ID!, input: UpdateWebhookSubscriptionInput!): WebhookSubscription!
+  deleteWebhookSubscription(id: ID!): Boolean!
+  simulateWebhookEvent(input: SimulateWebhookEventInput!): WebhookSimulation!
+
+  # Custom Fields
+  createCustomField(input: CreateCustomFieldInput!): CustomField!
+  updateCustomField(id: ID!, input: UpdateCustomFieldInput!): CustomField!
+  setCustomFieldValue(workerId: ID!, customFieldId: ID!, value: JSON!): CustomFieldValue!
+
+  # Workers
+  updateWorkerProfile(workerId: ID!, input: UpdateWorkerProfileInput!): WorkerProfile!
+  addWorkerBank(workerId: ID!, input: AddWorkerBankInput!): WorkerBank!
+  updateWorkerEmploymentInfo(workerId: ID!, input: UpdateWorkerEmploymentInfoInput!): WorkerEmploymentInfo!
+
+  # Departments / Org Structure
+  createDepartment(input: CreateDepartmentInput!): Department!
+  updateDepartment(id: ID!, input: UpdateDepartmentInput!): Department!
+  createCostCenter(input: CreateCostCenterInput!): CostCenter!
+}
+
+# ─── Input Types ──────────────────────────────────────────────────────────────
+
+input CreateICContractInput {
+  workerId: ID!
+  organizationId: ID!
+  jobTitleId: ID!
+  startDate: Date!
+  endDate: Date
+  currencyCode: CurrencyCode!
+  rate: Float!
+  paymentCycle: String!
+  scope: String
+}
+
+input CreateEORContractInput {
+  workerId: ID!
+  organizationId: ID!
+  countryCode: CountryCode!
+  jobTitleId: ID!
+  seniority: Seniority
+  startDate: Date!
+  annualSalary: Float!
+  currencyCode: CurrencyCode!
+  employmentType: EmploymentType!
+}
+
+input CreateGlobalPayrollContractInput {
+  workerId: ID!
+  legalEntityId: ID!
+  jobTitleId: ID!
+  startDate: Date!
+  annualSalary: Float!
+  currencyCode: CurrencyCode!
+}
+
+input AmendContractInput {
+  reason: String!
+  changes: JSON!
+  effectiveDate: Date!
+}
+
+input TerminateContractInput {
+  reason: String!
+  terminationType: String!
+  effectiveDate: Date!
+  noticePeriodDays: Int
+}
+
+input CreateInvoiceInput {
+  contractId: ID!
+  currencyCode: CurrencyCode!
+  periodStart: Date
+  periodEnd: Date
+  lineItems: [InvoiceLineItemInput!]!
+}
+
+input InvoiceLineItemInput {
+  description: String!
+  quantity: Float!
+  unitPrice: Float!
+}
+
+input AdjustInvoiceInput {
+  description: String!
+  amount: Float!
+  adjustmentType: AdjustmentType!
+}
+
+input CreatePayrollAdjustmentInput {
+  payrollCycleId: ID!
+  workerId: ID!
+  adjustmentType: AdjustmentType!
+  description: String
+  amount: Float!
+  currencyCode: CurrencyCode!
+  effectiveDate: Date!
+}
+
+input UpdatePayrollAdjustmentInput {
+  description: String
+  amount: Float
+  effectiveDate: Date
+}
+
+input RequestTimeOffInput {
+  workerId: ID!
+  policyId: ID!
+  startDate: Date!
+  endDate: Date!
+  reason: String
+}
+
+input CreateTimeOffPolicyInput {
+  organizationId: ID!
+  name: String!
+  leaveType: String!
+  accrualRate: Float
+  accrualUnit: String
+  maxCarryOver: Float
+  isPaid: Boolean!
+  applicableWorkerTypes: [WorkerType!]!
+  countryCodes: [CountryCode!]
+}
+
+input UpdateTimeOffPolicyInput {
+  name: String
+  accrualRate: Float
+  maxCarryOver: Float
+  isPaid: Boolean
+}
+
+input CreateShiftInput {
+  timesheetId: ID!
+  workerId: ID!
+  clockIn: DateTime!
+  clockOut: DateTime
+  breakMinutes: Int
+  notes: String
+}
+
+input UpdateShiftInput {
+  clockIn: DateTime
+  clockOut: DateTime
+  breakMinutes: Int
+  notes: String
+}
+
+input CreateJobInput {
+  organizationId: ID!
+  title: String!
+  departmentId: ID
+  location: String
+  countryCode: CountryCode
+  employmentType: EmploymentType!
+  description: String
+  salaryMin: Float
+  salaryMax: Float
+  currencyCode: CurrencyCode
+}
+
+input UpdateJobInput {
+  title: String
+  status: String
+  description: String
+  salaryMin: Float
+  salaryMax: Float
+}
+
+input CreateCandidateInput {
+  firstName: String!
+  lastName: String!
+  email: EmailAddress!
+  phone: String
+  source: String
+  tags: [String!]
+}
+
+input UpdateCandidateInput {
+  firstName: String
+  lastName: String
+  phone: String
+  tags: [String!]
+}
+
+input CreateApplicationInput {
+  candidateId: ID!
+  jobId: ID!
+}
+
+input CreateOfferInput {
+  applicationId: ID!
+  contractType: ContractType
+  salary: Float
+  currencyCode: CurrencyCode
+  startDate: Date
+  expiresAt: DateTime
+}
+
+input CreateImmigrationCaseInput {
+  workerId: ID!
+  countryCode: CountryCode!
+  visaTypeId: ID!
+  notes: String
+}
+
+input UploadComplianceDocumentInput {
+  workerId: ID
+  immigrationCaseId: ID
+  name: String!
+  documentType: String!
+  fileUrl: URL!
+  expiresAt: Date
+}
+
+input CreateAssetOrderInput {
+  organizationId: ID!
+  requestedById: ID!
+  assignedToId: ID
+  assetType: String!
+  specifications: JSON
+  currencyCode: CurrencyCode
+  cost: Float
+}
+
+input CreateWebhookSubscriptionInput {
+  organizationId: ID!
+  url: URL!
+  events: [String!]!
+}
+
+input UpdateWebhookSubscriptionInput {
+  url: URL
+  events: [String!]
+  isActive: Boolean
+}
+
+input SimulateWebhookEventInput {
+  organizationId: ID!
+  eventType: String!
+  payload: JSON
+}
+
+input CreateCustomFieldInput {
+  organizationId: ID!
+  name: String!
+  fieldType: CustomFieldType!
+  isRequired: Boolean!
+  options: [String!]
+  applicableWorkerTypes: [WorkerType!]!
+}
+
+input UpdateCustomFieldInput {
+  name: String
+  isRequired: Boolean
+  options: [String!]
+}
+
+input UpdateWorkerProfileInput {
+  phone: String
+  address: AddressInput
+  timezone: String
+  preferredLanguage: String
+  pronouns: String
+  linkedIn: URL
+}
+
+input AddressInput {
+  street: String
+  city: String
+  state: String
+  postalCode: String
+  countryCode: CountryCode!
+}
+
+input AddWorkerBankInput {
+  bankName: String!
+  accountNumber: String
+  routingNumber: String
+  iban: String
+  swiftCode: String
+  currencyCode: CurrencyCode!
+  countryCode: CountryCode!
+  isPrimary: Boolean
+}
+
+input UpdateWorkerEmploymentInfoInput {
+  jobTitleId: ID
+  seniority: Seniority
+  workingHoursPerWeek: Float
+  workScheduleId: ID
+}
+
+input CreateDepartmentInput {
+  organizationId: ID!
+  name: String!
+  parentId: ID
+  managerId: ID
+}
+
+input UpdateDepartmentInput {
+  name: String
+  parentId: ID
+  managerId: ID
+}
+
+input CreateCostCenterInput {
+  organizationId: ID!
+  name: String!
+  code: String
+  legalEntityId: ID
+}
