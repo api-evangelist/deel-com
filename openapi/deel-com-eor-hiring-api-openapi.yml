@@ -1,0 +1,390 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments EOR Hiring API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: EOR Hiring
+  description: Hiring guides, contract creation, three-party quote signing
+paths:
+  /eor/hiring-guide/{country_code}:
+    get:
+      operationId: getEorHiringGuideByCountry
+      summary: Retrieve Detailed Hiring Guide For A Country
+      tags:
+      - EOR Hiring
+      parameters:
+      - name: country_code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Hiring guide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HiringGuide'
+  /eor/start-date:
+    get:
+      operationId: getStartDate
+      summary: Fetch Start Date For EOR Contracts
+      description: Returns the earliest legally compliant start date for a country and worker profile.
+      tags:
+      - EOR Hiring
+      parameters:
+      - name: country
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Start date
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      earliest_start_date:
+                        type: string
+                        format: date
+                      reasoning:
+                        type: string
+  /eor/additional-costs:
+    get:
+      operationId: getAdditionalCosts
+      summary: Get EOR Additional Costs
+      tags:
+      - EOR Hiring
+      parameters:
+      - name: country
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Additional cost items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdditionalCost'
+  /eor/contracts:
+    post:
+      operationId: createEorContract
+      summary: Create EOR Contract
+      description: 'Creates an EOR contract draft. The contract must then be quoted and signed by all
+
+        three parties (Deel, client, employee).
+
+        '
+      tags:
+      - EOR Hiring
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EorContractCreate'
+      responses:
+        '201':
+          description: EOR contract draft created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EorContract'
+  /eor/contracts/{contract_id}/accept-quote:
+    post:
+      operationId: acceptEorQuote
+      summary: Accept Quote
+      description: Complete the client side of the three-party signature process.
+      tags:
+      - EOR Hiring
+      parameters:
+      - name: contract_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - accepted_by
+              properties:
+                accepted_by:
+                  type: string
+                accepted_at:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Quote accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EorContract'
+  /eor/contracts/{contract_id}/cancel:
+    post:
+      operationId: cancelEorContract
+      summary: Cancel EOR Contract
+      tags:
+      - EOR Hiring
+      parameters:
+      - name: contract_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                effective_date:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Contract cancelled
+components:
+  schemas:
+    AdditionalCost:
+      type: object
+      properties:
+        name:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        frequency:
+          type: string
+          enum:
+          - one_time
+          - monthly
+          - annual
+        description:
+          type: string
+    HiringGuide:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            country:
+              type: string
+            minimum_wage:
+              type: number
+            notice_period_days:
+              type: integer
+            probation_period_days:
+              type: integer
+            working_hours_per_week:
+              type: integer
+            mandatory_benefits:
+              type: array
+              items:
+                type: string
+            optional_benefits:
+              type: array
+              items:
+                type: string
+            public_holidays_per_year:
+              type: integer
+            paid_time_off_days:
+              type: integer
+            sick_leave_days:
+              type: integer
+            maternity_leave_weeks:
+              type: integer
+            paternity_leave_weeks:
+              type: integer
+            termination_grounds:
+              type: array
+              items:
+                type: string
+    EorWorker:
+      type: object
+      properties:
+        id:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        country:
+          type: string
+        nationality:
+          type: string
+        date_of_birth:
+          type: string
+          format: date
+        job_title:
+          type: string
+        start_date:
+          type: string
+          format: date
+        external_id:
+          type: string
+    EorContract:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+          - draft
+          - quoted
+          - in_progress
+          - active
+          - cancelled
+          - terminated
+          - completed
+        country:
+          type: string
+        salary:
+          type: number
+        currency:
+          type: string
+        start_date:
+          type: string
+          format: date
+        employee:
+          $ref: '#/components/schemas/EorWorker'
+        signatures:
+          type: object
+          properties:
+            client:
+              type: object
+              properties:
+                signed:
+                  type: boolean
+                signed_at:
+                  type: string
+                  format: date-time
+            employee:
+              type: object
+              properties:
+                signed:
+                  type: boolean
+                signed_at:
+                  type: string
+                  format: date-time
+            deel:
+              type: object
+              properties:
+                signed:
+                  type: boolean
+                signed_at:
+                  type: string
+                  format: date-time
+    EorContractCreate:
+      type: object
+      required:
+      - employee
+      - country
+      - salary
+      - currency
+      - start_date
+      properties:
+        employee:
+          type: object
+          required:
+          - first_name
+          - last_name
+          - email
+          properties:
+            first_name:
+              type: string
+            last_name:
+              type: string
+            email:
+              type: string
+              format: email
+            nationality:
+              type: string
+            date_of_birth:
+              type: string
+              format: date
+        country:
+          type: string
+        state:
+          type: string
+        job_title:
+          type: string
+        seniority_level_id:
+          type: string
+        salary:
+          type: number
+        currency:
+          type: string
+        salary_frequency:
+          type: string
+          enum:
+          - yearly
+          - monthly
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        scope_of_work:
+          type: string
+        external_id:
+          type: string
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

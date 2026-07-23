@@ -1,0 +1,128 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments Time Tracking API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Time Tracking
+  description: Time tracking shifts for Global Payroll employees
+paths:
+  /gp/time-tracking/shifts:
+    get:
+      operationId: getShifts
+      summary: List Time Tracking Shifts
+      tags:
+      - Time Tracking
+      parameters:
+      - name: worker_id
+        in: query
+        schema:
+          type: string
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Shifts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Shift'
+    post:
+      operationId: createShift
+      summary: Create Shift
+      tags:
+      - Time Tracking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShiftCreate'
+      responses:
+        '201':
+          description: Shift created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shift'
+components:
+  schemas:
+    Shift:
+      type: object
+      properties:
+        id:
+          type: string
+        worker_id:
+          type: string
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+        break_minutes:
+          type: integer
+        notes:
+          type: string
+        status:
+          type: string
+          enum:
+          - draft
+          - submitted
+          - approved
+          - declined
+    ShiftCreate:
+      type: object
+      required:
+      - worker_id
+      - start_at
+      - end_at
+      properties:
+        worker_id:
+          type: string
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+        break_minutes:
+          type: integer
+        notes:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

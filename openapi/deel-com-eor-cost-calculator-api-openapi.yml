@@ -1,0 +1,105 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments EOR Cost Calculator API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: EOR Cost Calculator
+  description: Employment cost calculator including salary, benefits, and Deel fees
+paths:
+  /eor/employment-cost:
+    post:
+      operationId: calculateEmploymentCost
+      summary: Calculate Employment Cost
+      description: Returns total employment cost — gross salary, employer taxes, statutory benefits, mandatory insurance, and Deel platform fee — for a target country and salary.
+      tags:
+      - EOR Cost Calculator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - country
+              - salary
+              properties:
+                country:
+                  type: string
+                  description: ISO 3166-1 alpha-2
+                state:
+                  type: string
+                salary:
+                  type: number
+                currency:
+                  type: string
+                frequency:
+                  type: string
+                  enum:
+                  - yearly
+                  - monthly
+      responses:
+        '200':
+          description: Cost breakdown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmploymentCostBreakdown'
+components:
+  schemas:
+    EmploymentCostBreakdown:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            country:
+              type: string
+            salary:
+              type: number
+            currency:
+              type: string
+            employer_costs:
+              type: object
+              properties:
+                gross_salary:
+                  type: number
+                employer_taxes:
+                  type: number
+                statutory_benefits:
+                  type: number
+                insurance:
+                  type: number
+                deel_platform_fee:
+                  type: number
+                total_monthly:
+                  type: number
+                total_annual:
+                  type: number
+            notes:
+              type: array
+              items:
+                type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

@@ -1,0 +1,195 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments Deel IT API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Deel IT
+  description: Device provisioning and equipment lifecycle
+paths:
+  /deel-it/assets:
+    get:
+      operationId: getDeelItAssets
+      summary: List Deel IT Assets
+      tags:
+      - Deel IT
+      parameters:
+      - name: person_id
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - in_stock
+          - assigned
+          - in_transit
+          - returned
+          - retired
+      responses:
+        '200':
+          description: Assets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Asset'
+  /deel-it/orders:
+    post:
+      operationId: createAssetOrder
+      summary: Create Asset Order
+      description: Order a laptop, phone, or other equipment for a worker via Deel IT.
+      tags:
+      - Deel IT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetOrderCreate'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetOrder'
+components:
+  schemas:
+    Asset:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+          - laptop
+          - monitor
+          - phone
+          - headset
+          - keyboard
+          - mouse
+          - other
+        manufacturer:
+          type: string
+        model:
+          type: string
+        serial:
+          type: string
+        status:
+          type: string
+          enum:
+          - in_stock
+          - assigned
+          - in_transit
+          - returned
+          - retired
+        assigned_to_person_id:
+          type: string
+        country:
+          type: string
+        purchase_date:
+          type: string
+          format: date
+    AssetOrder:
+      type: object
+      properties:
+        id:
+          type: string
+        person_id:
+          type: string
+        status:
+          type: string
+          enum:
+          - placed
+          - processing
+          - shipped
+          - delivered
+          - cancelled
+        tracking_number:
+          type: string
+        carrier:
+          type: string
+        estimated_delivery:
+          type: string
+          format: date
+        total_amount:
+          type: number
+        currency:
+          type: string
+    AssetOrderCreate:
+      type: object
+      required:
+      - person_id
+      - items
+      - shipping_address
+      properties:
+        person_id:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            required:
+            - type
+            properties:
+              type:
+                type: string
+                enum:
+                - laptop
+                - monitor
+                - phone
+                - headset
+                - keyboard
+                - mouse
+                - other
+              manufacturer:
+                type: string
+              model:
+                type: string
+              quantity:
+                type: integer
+                default: 1
+        shipping_address:
+          type: object
+          properties:
+            line1:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            postal_code:
+              type: string
+            country:
+              type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

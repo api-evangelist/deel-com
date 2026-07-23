@@ -1,0 +1,107 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments GP Hiring API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: GP Hiring
+  description: Global Payroll employee hiring
+paths:
+  /gp/contracts:
+    post:
+      operationId: createGpContract
+      summary: Create Global Payroll Contract
+      description: Hire a direct employee onto a Global Payroll legal entity.
+      tags:
+      - GP Hiring
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GpContractCreate'
+      responses:
+        '201':
+          description: GP contract created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  status:
+                    type: string
+components:
+  schemas:
+    GpContractCreate:
+      type: object
+      required:
+      - legal_entity_id
+      - employee
+      - country
+      - salary
+      - currency
+      - start_date
+      properties:
+        legal_entity_id:
+          type: string
+        employee:
+          type: object
+          properties:
+            first_name:
+              type: string
+            last_name:
+              type: string
+            email:
+              type: string
+              format: email
+        country:
+          type: string
+        salary:
+          type: number
+        currency:
+          type: string
+        salary_frequency:
+          type: string
+          enum:
+          - yearly
+          - monthly
+        start_date:
+          type: string
+          format: date
+        job_title:
+          type: string
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

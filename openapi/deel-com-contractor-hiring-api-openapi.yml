@@ -1,0 +1,174 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments Contractor Hiring API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Contractor Hiring
+  description: Create and onboard IC, PAYG, milestone, and COR contracts
+paths:
+  /contracts/ic:
+    post:
+      operationId: createIcContract
+      summary: Create A New Contract
+      description: Create an Independent Contractor contract (ongoing, PAYG, milestone, or COR variant).
+      tags:
+      - Contractor Hiring
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IcContractCreate'
+      responses:
+        '201':
+          description: Contract created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcContract'
+  /contracts/{contract_id}/external-id:
+    patch:
+      operationId: addExternalId
+      summary: Add External ID
+      description: Attach a client-side external ID to a contract for cross-system reconciliation.
+      tags:
+      - Contractor Hiring
+      parameters:
+      - name: contract_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - external_id
+              properties:
+                external_id:
+                  type: string
+      responses:
+        '200':
+          description: External ID set
+components:
+  schemas:
+    IcContractCreate:
+      type: object
+      required:
+      - worker
+      - type
+      - currency
+      - country
+      properties:
+        worker:
+          type: object
+          required:
+          - email
+          - first_name
+          - last_name
+          properties:
+            email:
+              type: string
+              format: email
+            first_name:
+              type: string
+            last_name:
+              type: string
+            country:
+              type: string
+        type:
+          type: string
+          enum:
+          - ongoing_time_based
+          - pay_as_you_go_time_based
+          - milestones
+          - cor
+        currency:
+          type: string
+        country:
+          type: string
+        job_title:
+          type: string
+        seniority_level_id:
+          type: string
+        rate:
+          type: number
+        rate_frequency:
+          type: string
+          enum:
+          - hourly
+          - weekly
+          - monthly
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        scope_of_work:
+          type: string
+        external_id:
+          type: string
+    IcContract:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+        worker:
+          type: object
+          properties:
+            id:
+              type: string
+            email:
+              type: string
+              format: email
+        rate:
+          type: number
+        currency:
+          type: string
+        country:
+          type: string
+        start_date:
+          type: string
+          format: date
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

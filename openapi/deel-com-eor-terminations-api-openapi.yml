@@ -1,0 +1,100 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments EOR Terminations API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: EOR Terminations
+  description: Terminate EOR contracts with cause and offboarding workflow
+paths:
+  /eor/contracts/{contract_id}/terminations:
+    post:
+      operationId: createEorTermination
+      summary: Create EOR Termination
+      tags:
+      - EOR Terminations
+      parameters:
+      - name: contract_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EorTerminationCreate'
+      responses:
+        '201':
+          description: Termination initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EorTermination'
+components:
+  schemas:
+    EorTermination:
+      type: object
+      properties:
+        id:
+          type: string
+        contract_id:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - in_progress
+          - completed
+        reason:
+          type: string
+        last_working_day:
+          type: string
+          format: date
+    EorTerminationCreate:
+      type: object
+      required:
+      - reason
+      - last_working_day
+      properties:
+        reason:
+          type: string
+          enum:
+          - resignation
+          - end_of_contract
+          - mutual_agreement
+          - performance
+          - redundancy
+          - gross_misconduct
+          - other
+        last_working_day:
+          type: string
+          format: date
+        notice_already_given:
+          type: boolean
+        notes:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

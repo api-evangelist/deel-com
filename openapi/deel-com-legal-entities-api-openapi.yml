@@ -1,0 +1,105 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments Legal Entities API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Legal Entities
+  description: Client legal entities, industries
+paths:
+  /legal-entities:
+    get:
+      operationId: getLegalEntities
+      summary: List Legal Entities
+      description: Returns the client legal entities registered under the organization.
+      tags:
+      - Legal Entities
+      responses:
+        '200':
+          description: Legal entity list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalEntityListResponse'
+    post:
+      operationId: createLegalEntity
+      summary: Create A New Legal Entity
+      tags:
+      - Legal Entities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LegalEntityCreate'
+      responses:
+        '201':
+          description: Legal entity created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalEntity'
+components:
+  schemas:
+    LegalEntityCreate:
+      type: object
+      required:
+      - name
+      - country
+      properties:
+        name:
+          type: string
+        country:
+          type: string
+          description: ISO 3166-1 alpha-2
+        registration_number:
+          type: string
+        industry:
+          type: string
+        currency:
+          type: string
+    LegalEntity:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        country:
+          type: string
+        registration_number:
+          type: string
+        industry:
+          type: string
+        currency:
+          type: string
+    LegalEntityListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntity'
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

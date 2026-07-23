@@ -1,0 +1,336 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments Time Off API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Time Off
+  description: Time-off policies, requests, entitlements, events, work schedules
+paths:
+  /time-off/policies:
+    get:
+      operationId: getTimeOffPolicies
+      summary: List Policies
+      tags:
+      - Time Off
+      responses:
+        '200':
+          description: Policies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TimeOffPolicy'
+  /time-off/requests:
+    get:
+      operationId: getTimeOffRequests
+      summary: List Time-Off Requests
+      tags:
+      - Time Off
+      parameters:
+      - name: person_id
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - pending
+          - approved
+          - declined
+          - cancelled
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Time-off requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TimeOffRequest'
+    post:
+      operationId: createTimeOffRequest
+      summary: Create Time-Off Request
+      tags:
+      - Time Off
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeOffRequestCreate'
+      responses:
+        '201':
+          description: Time-off request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeOffRequest'
+  /time-off/requests/{request_id}/review:
+    post:
+      operationId: reviewTimeOffRequest
+      summary: Approve Or Reject Time-Off Requests
+      tags:
+      - Time Off
+      parameters:
+      - name: request_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - decision
+              properties:
+                decision:
+                  type: string
+                  enum:
+                  - approve
+                  - decline
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Request reviewed
+  /time-off/requests/{request_id}:
+    delete:
+      operationId: cancelTimeOffRequest
+      summary: Cancel Time-Off Request
+      tags:
+      - Time Off
+      parameters:
+      - name: request_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Request cancelled
+  /time-off/entitlements/{person_id}:
+    get:
+      operationId: getEntitlements
+      summary: Get Profile Entitlements
+      tags:
+      - Time Off
+      parameters:
+      - name: person_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Entitlements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Entitlement'
+  /time-off/work-schedule/{person_id}:
+    get:
+      operationId: getWorkSchedule
+      summary: Get Work Schedule And Holidays
+      tags:
+      - Time Off
+      parameters:
+      - name: person_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Work schedule
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      working_days:
+                        type: array
+                        items:
+                          type: string
+                      hours_per_week:
+                        type: number
+                      holidays:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date
+                            name:
+                              type: string
+components:
+  schemas:
+    Entitlement:
+      type: object
+      properties:
+        policy_id:
+          type: string
+        policy_name:
+          type: string
+        accrued:
+          type: number
+        used:
+          type: number
+        pending:
+          type: number
+        available:
+          type: number
+        unit:
+          type: string
+          enum:
+          - days
+          - hours
+        as_of:
+          type: string
+          format: date
+    TimeOffRequestCreate:
+      type: object
+      required:
+      - person_id
+      - policy_id
+      - start_date
+      - end_date
+      properties:
+        person_id:
+          type: string
+        policy_id:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        half_day:
+          type: boolean
+    TimeOffPolicy:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - vacation
+          - sick
+          - parental
+          - bereavement
+          - jury_duty
+          - study
+          - unpaid
+          - other
+        accrual_rate:
+          type: number
+        accrual_unit:
+          type: string
+          enum:
+          - days
+          - hours
+        carry_over_days:
+          type: integer
+        country:
+          type: string
+    TimeOffRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        person_id:
+          type: string
+        policy_id:
+          type: string
+        type:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        days:
+          type: number
+        status:
+          type: string
+          enum:
+          - pending
+          - approved
+          - declined
+          - cancelled
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

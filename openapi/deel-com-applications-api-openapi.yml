@@ -1,0 +1,168 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments Applications API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Applications
+  description: Application lifecycle and pipeline stages
+paths:
+  /ats/applications:
+    get:
+      operationId: getAtsApplications
+      summary: List Applications
+      tags:
+      - Applications
+      parameters:
+      - name: job_id
+        in: query
+        schema:
+          type: string
+      - name: candidate_id
+        in: query
+        schema:
+          type: string
+      - name: stage
+        in: query
+        schema:
+          type: string
+          enum:
+          - new
+          - screening
+          - interview
+          - offer
+          - hired
+          - rejected
+          - withdrawn
+      responses:
+        '200':
+          description: Applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AtsApplication'
+    post:
+      operationId: createAtsApplication
+      summary: Create Application
+      tags:
+      - Applications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AtsApplicationCreate'
+      responses:
+        '201':
+          description: Application created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AtsApplication'
+  /ats/applications/{application_id}/stage:
+    patch:
+      operationId: advanceApplicationStage
+      summary: Advance Application Stage
+      tags:
+      - Applications
+      parameters:
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - stage
+              properties:
+                stage:
+                  type: string
+                  enum:
+                  - new
+                  - screening
+                  - interview
+                  - offer
+                  - hired
+                  - rejected
+                  - withdrawn
+                reason_id:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Stage updated
+components:
+  schemas:
+    AtsApplication:
+      type: object
+      properties:
+        id:
+          type: string
+        job_id:
+          type: string
+        candidate_id:
+          type: string
+        stage:
+          type: string
+          enum:
+          - new
+          - screening
+          - interview
+          - offer
+          - hired
+          - rejected
+          - withdrawn
+        rejection_reason_id:
+          type: string
+        applied_at:
+          type: string
+          format: date-time
+        last_activity_at:
+          type: string
+          format: date-time
+    AtsApplicationCreate:
+      type: object
+      required:
+      - job_id
+      - candidate_id
+      properties:
+        job_id:
+          type: string
+        candidate_id:
+          type: string
+        source_id:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

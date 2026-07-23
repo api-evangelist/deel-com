@@ -1,0 +1,246 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments Contracts API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Contracts
+  description: IC and EOR contract list and detail
+paths:
+  /contracts:
+    get:
+      operationId: getContracts
+      summary: List Of Contracts
+      description: 'Returns a paginated list of contract summaries with optional filtering by status,
+
+        type, team, country, currency, external ID, or a name search term. Token scopes:
+
+        `contracts:read`.
+
+        '
+      tags:
+      - Contracts
+      parameters:
+      - name: after_cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 20
+          maximum: 100
+      - name: order_direction
+        in: query
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+      - name: types
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ongoing_time_based
+            - pay_as_you_go_time_based
+            - milestones
+            - eor
+            - global_payroll
+            - direct_employee
+            - cor
+      - name: statuses
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - new
+            - in_progress
+            - waiting_for_review
+            - waiting_for_signature
+            - active
+            - terminated
+            - cancelled
+            - completed
+      - name: team_id
+        in: query
+        schema:
+          type: string
+      - name: external_id
+        in: query
+        schema:
+          type: string
+      - name: countries
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+      - name: currencies
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+      - name: search
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Contract list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /contracts/{contract_id}:
+    get:
+      operationId: getContract
+      summary: Retrieve A Single Contract
+      tags:
+      - Contracts
+      parameters:
+      - name: contract_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Contract detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contract'
+components:
+  schemas:
+    ContractListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contract'
+        page:
+          type: object
+          properties:
+            limit:
+              type: integer
+            after_cursor:
+              type: string
+    Error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              message:
+                type: string
+              field:
+                type: string
+    Contract:
+      type: object
+      properties:
+        id:
+          type: string
+        external_id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - ongoing_time_based
+          - pay_as_you_go_time_based
+          - milestones
+          - eor
+          - global_payroll
+          - direct_employee
+          - cor
+        status:
+          type: string
+          enum:
+          - new
+          - in_progress
+          - waiting_for_review
+          - waiting_for_signature
+          - active
+          - terminated
+          - cancelled
+          - completed
+        country:
+          type: string
+        currency:
+          type: string
+        team:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        worker:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+              format: email
+        start_date:
+          type: string
+          format: date
+        created_at:
+          type: string
+          format: date-time
+  responses:
+    RateLimited:
+      description: Rate limit exceeded (5 requests/second per organization)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid bearer token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

@@ -1,0 +1,172 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments Screenings API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Screenings
+  description: KYC and AML background screenings
+paths:
+  /screenings:
+    get:
+      operationId: getScreenings
+      summary: List Background Screenings
+      tags:
+      - Screenings
+      parameters:
+      - name: person_id
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - pending
+          - in_progress
+          - completed
+          - failed
+          - cancelled
+      responses:
+        '200':
+          description: Screenings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Screening'
+    post:
+      operationId: createScreening
+      summary: Create Background Screening
+      tags:
+      - Screenings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScreeningCreate'
+      responses:
+        '201':
+          description: Screening created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+  /screenings/{screening_id}:
+    get:
+      operationId: getScreening
+      summary: Retrieve A Screening
+      tags:
+      - Screenings
+      parameters:
+      - name: screening_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Screening detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+components:
+  schemas:
+    Screening:
+      type: object
+      properties:
+        id:
+          type: string
+        person_id:
+          type: string
+        type:
+          type: string
+          enum:
+          - identity
+          - criminal
+          - credit
+          - employment_history
+          - education
+          - sanctions
+          - aml
+          - kyc
+        status:
+          type: string
+          enum:
+          - pending
+          - in_progress
+          - completed
+          - failed
+          - cancelled
+        result:
+          type: string
+          enum:
+          - clear
+          - consider
+          - suspected
+          - withdrawn
+        country:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        report_url:
+          type: string
+          format: uri
+    ScreeningCreate:
+      type: object
+      required:
+      - person_id
+      - type
+      - country
+      properties:
+        person_id:
+          type: string
+        type:
+          type: string
+          enum:
+          - identity
+          - criminal
+          - credit
+          - employment_history
+          - education
+          - sanctions
+          - aml
+          - kyc
+        country:
+          type: string
+        consent_obtained:
+          type: boolean
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

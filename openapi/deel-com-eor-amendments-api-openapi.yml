@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments EOR Amendments API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: EOR Amendments
+  description: Amend active EOR contracts with structured approval flow
+paths:
+  /eor/contracts/{contract_id}/amendments:
+    post:
+      operationId: createEorAmendment
+      summary: Create EOR Amendment
+      description: Submit a contract amendment for review and three-party approval.
+      tags:
+      - EOR Amendments
+      parameters:
+      - name: contract_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EorAmendmentCreate'
+      responses:
+        '201':
+          description: Amendment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EorAmendment'
+components:
+  schemas:
+    EorAmendmentCreate:
+      type: object
+      required:
+      - type
+      - effective_date
+      properties:
+        type:
+          type: string
+          enum:
+          - salary_change
+          - role_change
+          - working_hours_change
+          - benefits_change
+          - address_change
+        effective_date:
+          type: string
+          format: date
+        new_salary:
+          type: number
+        new_currency:
+          type: string
+        new_job_title:
+          type: string
+        notes:
+          type: string
+    EorAmendment:
+      type: object
+      properties:
+        id:
+          type: string
+        contract_id:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - approved
+          - declined
+          - applied
+        effective_date:
+          type: string
+          format: date
+        created_at:
+          type: string
+          format: date-time
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

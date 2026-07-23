@@ -1,0 +1,236 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments SCIM API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: SCIM
+  description: SCIM 2.0 user provisioning per RFC 7643/7644
+paths:
+  /scim/v2/Users:
+    get:
+      operationId: scimListUsers
+      summary: SCIM List Users
+      description: SCIM 2.0 user listing endpoint for IdP integration (Okta, Azure AD).
+      tags:
+      - SCIM
+      security:
+      - ScimBearerAuth: []
+      parameters:
+      - name: filter
+        in: query
+        schema:
+          type: string
+      - name: startIndex
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: count
+        in: query
+        schema:
+          type: integer
+          default: 100
+      responses:
+        '200':
+          description: SCIM ListResponse
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimListResponse'
+    post:
+      operationId: scimCreateUser
+      summary: SCIM Create User
+      tags:
+      - SCIM
+      security:
+      - ScimBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/ScimUser'
+      responses:
+        '201':
+          description: SCIM user created
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimUser'
+  /scim/v2/Users/{user_id}:
+    get:
+      operationId: scimGetUser
+      summary: SCIM Get User
+      tags:
+      - SCIM
+      security:
+      - ScimBearerAuth: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: SCIM user
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimUser'
+    patch:
+      operationId: scimPatchUser
+      summary: SCIM Patch User
+      tags:
+      - SCIM
+      security:
+      - ScimBearerAuth: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              type: object
+              properties:
+                schemas:
+                  type: array
+                  items:
+                    type: string
+                Operations:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      op:
+                        type: string
+                        enum:
+                        - add
+                        - replace
+                        - remove
+                      path:
+                        type: string
+                      value: {}
+      responses:
+        '200':
+          description: Patched
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimUser'
+    delete:
+      operationId: scimDeleteUser
+      summary: SCIM Deactivate User
+      tags:
+      - SCIM
+      security:
+      - ScimBearerAuth: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: User deactivated
+components:
+  schemas:
+    ScimUser:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:schemas:core:2.0:User
+        id:
+          type: string
+        userName:
+          type: string
+        active:
+          type: boolean
+        name:
+          type: object
+          properties:
+            givenName:
+              type: string
+            familyName:
+              type: string
+        emails:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+                format: email
+              type:
+                type: string
+              primary:
+                type: boolean
+        externalId:
+          type: string
+        meta:
+          type: object
+          properties:
+            resourceType:
+              type: string
+            created:
+              type: string
+              format: date-time
+            lastModified:
+              type: string
+              format: date-time
+            location:
+              type: string
+              format: uri
+    ScimListResponse:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+          example:
+          - urn:ietf:params:scim:api:messages:2.0:ListResponse
+        totalResults:
+          type: integer
+        startIndex:
+          type: integer
+        itemsPerPage:
+          type: integer
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScimUser'
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

@@ -1,0 +1,174 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments Timesheets API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Timesheets
+  description: Submit, approve, and manage contractor timesheets
+paths:
+  /timesheets:
+    get:
+      operationId: getTimesheets
+      summary: List Timesheets
+      tags:
+      - Timesheets
+      parameters:
+      - name: contract_id
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - pending
+          - approved
+          - declined
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Timesheets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Timesheet'
+    post:
+      operationId: createTimesheet
+      summary: Create Timesheet
+      tags:
+      - Timesheets
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimesheetCreate'
+      responses:
+        '201':
+          description: Timesheet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+  /timesheets/{timesheet_id}/review:
+    post:
+      operationId: reviewTimesheet
+      summary: Review Timesheet
+      description: Approve or decline a contractor timesheet.
+      tags:
+      - Timesheets
+      parameters:
+      - name: timesheet_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - decision
+              properties:
+                decision:
+                  type: string
+                  enum:
+                  - approve
+                  - decline
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Timesheet reviewed
+components:
+  schemas:
+    Timesheet:
+      type: object
+      properties:
+        id:
+          type: string
+        contract_id:
+          type: string
+        date:
+          type: string
+          format: date
+        hours:
+          type: number
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - approved
+          - declined
+        submitted_at:
+          type: string
+          format: date-time
+    TimesheetCreate:
+      type: object
+      required:
+      - contract_id
+      - date
+      - hours
+      properties:
+        contract_id:
+          type: string
+        date:
+          type: string
+          format: date
+        hours:
+          type: number
+        description:
+          type: string
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque

@@ -1,0 +1,86 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS Adjustments EOR Benefits API
+  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+
+    job postings, candidates, applications, attachments, offers, departments, locations,
+
+    email templates, hiring members, employment types, application sources, tags, and
+
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+
+    '
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: EOR Benefits
+  description: Country-specific benefit plans and worker enrollment
+paths:
+  /eor/benefits/{country_code}:
+    get:
+      operationId: getEorBenefitsByCountry
+      summary: Retrieve Benefits By Country
+      tags:
+      - EOR Benefits
+      parameters:
+      - name: country_code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Benefit plans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BenefitPlan'
+components:
+  schemas:
+    BenefitPlan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        provider:
+          type: string
+        category:
+          type: string
+          enum:
+          - health
+          - dental
+          - vision
+          - retirement
+          - life
+          - disability
+          - wellness
+          - other
+        cost:
+          type: number
+        currency:
+          type: string
+        coverage:
+          type: string
+        eligibility:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
