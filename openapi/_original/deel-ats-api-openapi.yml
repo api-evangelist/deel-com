@@ -1,0 +1,346 @@
+openapi: 3.1.0
+info:
+  title: Deel ATS API
+  description: |
+    Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+    job postings, candidates, applications, attachments, offers, departments, locations,
+    email templates, hiring members, employment types, application sources, tags, and
+    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/ats-guides/introduction
+
+servers:
+  - url: https://api.letsdeel.com/rest/v2
+    description: Production
+  - url: https://api-sandbox.demo.deel.com/rest/v2
+    description: Sandbox
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Jobs
+    description: Job and job-posting management
+  - name: Candidates
+    description: Candidate records and resume attachments
+  - name: Applications
+    description: Application lifecycle and pipeline stages
+  - name: Offers
+    description: Offer creation and acceptance
+  - name: Reference Data
+    description: Departments, locations, employment types, sources, tags, reasons
+
+paths:
+  /ats/jobs:
+    get:
+      operationId: getAtsJobs
+      summary: List ATS Jobs
+      tags: [Jobs]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [draft, open, on_hold, closed, filled] } }
+      responses:
+        '200':
+          description: Jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/AtsJob' } }
+    post:
+      operationId: createAtsJob
+      summary: Create ATS Job
+      tags: [Jobs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AtsJobCreate' }
+      responses:
+        '201':
+          description: Job created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AtsJob' }
+
+  /ats/jobs/{job_id}/postings:
+    get:
+      operationId: getAtsJobPostings
+      summary: List Job Postings
+      tags: [Jobs]
+      parameters:
+        - { name: job_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Postings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/AtsJobPosting' } }
+
+  /ats/candidates:
+    get:
+      operationId: getAtsCandidates
+      summary: List ATS Candidates
+      tags: [Candidates]
+      parameters:
+        - { name: search, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Candidates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/AtsCandidate' } }
+    post:
+      operationId: createAtsCandidate
+      summary: Create ATS Candidate
+      tags: [Candidates]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AtsCandidateCreate' }
+      responses:
+        '201':
+          description: Candidate created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AtsCandidate' }
+
+  /ats/applications:
+    get:
+      operationId: getAtsApplications
+      summary: List Applications
+      tags: [Applications]
+      parameters:
+        - { name: job_id, in: query, schema: { type: string } }
+        - { name: candidate_id, in: query, schema: { type: string } }
+        - { name: stage, in: query, schema: { type: string, enum: [new, screening, interview, offer, hired, rejected, withdrawn] } }
+      responses:
+        '200':
+          description: Applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/AtsApplication' } }
+    post:
+      operationId: createAtsApplication
+      summary: Create Application
+      tags: [Applications]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AtsApplicationCreate' }
+      responses:
+        '201':
+          description: Application created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AtsApplication' }
+
+  /ats/applications/{application_id}/stage:
+    patch:
+      operationId: advanceApplicationStage
+      summary: Advance Application Stage
+      tags: [Applications]
+      parameters:
+        - { name: application_id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stage]
+              properties:
+                stage: { type: string, enum: [new, screening, interview, offer, hired, rejected, withdrawn] }
+                reason_id: { type: string }
+                notes: { type: string }
+      responses:
+        '200': { description: Stage updated }
+
+  /ats/offers:
+    post:
+      operationId: createAtsOffer
+      summary: Create ATS Offer
+      tags: [Offers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AtsOfferCreate' }
+      responses:
+        '201':
+          description: Offer created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AtsOffer' }
+
+  /ats/offers/{offer_id}:
+    get:
+      operationId: getAtsOffer
+      summary: Retrieve Offer
+      tags: [Offers]
+      parameters:
+        - { name: offer_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Offer
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AtsOffer' }
+
+  /ats/departments:
+    get:
+      operationId: getAtsDepartments
+      summary: List ATS Departments
+      tags: [Reference Data]
+      responses:
+        '200':
+          description: Departments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { type: object, properties: { id: { type: string }, name: { type: string } } } }
+
+  /ats/employment-types:
+    get:
+      operationId: getAtsEmploymentTypes
+      summary: List ATS Employment Types
+      tags: [Reference Data]
+      responses:
+        '200':
+          description: Employment types
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { type: object, properties: { id: { type: string }, name: { type: string, enum: [full_time, part_time, contract, internship, temporary] } } } }
+
+  /ats/locations:
+    get:
+      operationId: getAtsLocations
+      summary: List ATS Locations
+      tags: [Reference Data]
+      responses:
+        '200':
+          description: Locations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { type: object, properties: { id: { type: string }, name: { type: string }, country: { type: string }, city: { type: string }, remote: { type: boolean } } } }
+
+components:
+  securitySchemes:
+    BearerAuth: { type: http, scheme: bearer, bearerFormat: opaque }
+  schemas:
+    AtsJob:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        status: { type: string, enum: [draft, open, on_hold, closed, filled] }
+        department_id: { type: string }
+        location_id: { type: string }
+        employment_type: { type: string }
+        hiring_manager_id: { type: string }
+        created_at: { type: string, format: date-time }
+    AtsJobCreate:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string }
+        department_id: { type: string }
+        location_id: { type: string }
+        employment_type: { type: string }
+        hiring_manager_id: { type: string }
+        description: { type: string }
+    AtsJobPosting:
+      type: object
+      properties:
+        id: { type: string }
+        job_id: { type: string }
+        title: { type: string }
+        url: { type: string, format: uri }
+        status: { type: string, enum: [draft, posted, closed] }
+        channel: { type: string, enum: [website, linkedin, indeed, internal, other] }
+    AtsCandidate:
+      type: object
+      properties:
+        id: { type: string }
+        first_name: { type: string }
+        last_name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        location: { type: string }
+        resume_url: { type: string, format: uri }
+        linkedin_url: { type: string, format: uri }
+        source_id: { type: string }
+        tags: { type: array, items: { type: string } }
+        created_at: { type: string, format: date-time }
+    AtsCandidateCreate:
+      type: object
+      required: [first_name, last_name, email]
+      properties:
+        first_name: { type: string }
+        last_name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        location: { type: string }
+        linkedin_url: { type: string, format: uri }
+        source_id: { type: string }
+    AtsApplication:
+      type: object
+      properties:
+        id: { type: string }
+        job_id: { type: string }
+        candidate_id: { type: string }
+        stage: { type: string, enum: [new, screening, interview, offer, hired, rejected, withdrawn] }
+        rejection_reason_id: { type: string }
+        applied_at: { type: string, format: date-time }
+        last_activity_at: { type: string, format: date-time }
+    AtsApplicationCreate:
+      type: object
+      required: [job_id, candidate_id]
+      properties:
+        job_id: { type: string }
+        candidate_id: { type: string }
+        source_id: { type: string }
+    AtsOfferCreate:
+      type: object
+      required: [application_id, salary, currency, start_date]
+      properties:
+        application_id: { type: string }
+        salary: { type: number }
+        currency: { type: string }
+        bonus: { type: number }
+        equity: { type: string }
+        start_date: { type: string, format: date }
+        expires_at: { type: string, format: date }
+        notes: { type: string }
+    AtsOffer:
+      type: object
+      properties:
+        id: { type: string }
+        application_id: { type: string }
+        status: { type: string, enum: [draft, sent, accepted, declined, expired, withdrawn] }
+        salary: { type: number }
+        currency: { type: string }
+        start_date: { type: string, format: date }
+        sent_at: { type: string, format: date-time }
+        accepted_at: { type: string, format: date-time }

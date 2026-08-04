@@ -1,0 +1,380 @@
+openapi: 3.1.0
+info:
+  title: Deel Contractors API
+  description: |
+    Independent Contractor (IC), Pay-As-You-Go, Milestone, and COR (Contractor of Record)
+    APIs covering contract creation, amendments, bulk signing, timesheets, milestones,
+    IC invoicing taxes, off-cycle payments, bonuses, expense reimbursements, and onboarding.
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/contractors/introduction
+
+servers:
+  - url: https://api.letsdeel.com/rest/v2
+    description: Production
+  - url: https://api-sandbox.demo.deel.com/rest/v2
+    description: Sandbox
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Contractor Hiring
+    description: Create and onboard IC, PAYG, milestone, and COR contracts
+  - name: Contractor Amendments
+    description: Amend active contractor contracts
+  - name: Timesheets
+    description: Submit, approve, and manage contractor timesheets
+  - name: Milestones
+    description: Milestone-based contract deliverables
+  - name: Off Cycle
+    description: One-off payments outside the normal cycle
+  - name: IC Invoicing Taxes
+    description: Contractor invoicing and tax handling
+
+paths:
+  /contracts/ic:
+    post:
+      operationId: createIcContract
+      summary: Create A New Contract
+      description: Create an Independent Contractor contract (ongoing, PAYG, milestone, or COR variant).
+      tags: [Contractor Hiring]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/IcContractCreate' }
+      responses:
+        '201':
+          description: Contract created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IcContract' }
+
+  /contracts/{contract_id}/external-id:
+    patch:
+      operationId: addExternalId
+      summary: Add External ID
+      description: Attach a client-side external ID to a contract for cross-system reconciliation.
+      tags: [Contractor Hiring]
+      parameters:
+        - { name: contract_id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [external_id]
+              properties:
+                external_id: { type: string }
+      responses:
+        '200': { description: External ID set }
+
+  /contracts/{contract_id}/amendments:
+    post:
+      operationId: createContractorAmendment
+      summary: Create Contractor Amendment
+      tags: [Contractor Amendments]
+      parameters:
+        - { name: contract_id, in: path, required: true, schema: { type: string } }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ContractorAmendmentCreate' }
+      responses:
+        '201':
+          description: Amendment created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContractorAmendment' }
+
+  /contracts/{contract_id}/amendments/bulk-sign:
+    post:
+      operationId: bulkSignAmendments
+      summary: Bulk Sign Contracts And Amendments
+      description: Sign multiple contract amendments programmatically.
+      tags: [Contractor Amendments]
+      parameters:
+        - { name: contract_id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amendment_ids]
+              properties:
+                amendment_ids: { type: array, items: { type: string } }
+      responses:
+        '200':
+          description: Amendments signed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  signed_count: { type: integer }
+
+  /timesheets:
+    get:
+      operationId: getTimesheets
+      summary: List Timesheets
+      tags: [Timesheets]
+      parameters:
+        - { name: contract_id, in: query, schema: { type: string } }
+        - { name: status, in: query, schema: { type: string, enum: [pending, approved, declined] } }
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+      responses:
+        '200':
+          description: Timesheets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Timesheet' } }
+    post:
+      operationId: createTimesheet
+      summary: Create Timesheet
+      tags: [Timesheets]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TimesheetCreate' }
+      responses:
+        '201':
+          description: Timesheet created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Timesheet' }
+
+  /timesheets/{timesheet_id}/review:
+    post:
+      operationId: reviewTimesheet
+      summary: Review Timesheet
+      description: Approve or decline a contractor timesheet.
+      tags: [Timesheets]
+      parameters:
+        - { name: timesheet_id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [approve, decline] }
+                notes: { type: string }
+      responses:
+        '200': { description: Timesheet reviewed }
+
+  /contracts/{contract_id}/milestones:
+    get:
+      operationId: getMilestones
+      summary: List Milestones
+      tags: [Milestones]
+      parameters:
+        - { name: contract_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Milestones
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Milestone' } }
+    post:
+      operationId: createMilestone
+      summary: Create Milestone
+      tags: [Milestones]
+      parameters:
+        - { name: contract_id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MilestoneCreate' }
+      responses:
+        '201':
+          description: Milestone created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Milestone' }
+
+  /off-cycle:
+    post:
+      operationId: createOffCyclePayment
+      summary: Create Off-Cycle Payment
+      description: Pay a contractor outside of the normal billing cycle (bonus, expense, ad-hoc).
+      tags: [Off Cycle]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OffCycleCreate' }
+      responses:
+        '201':
+          description: Off-cycle payment created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OffCyclePayment' }
+
+  /ic-invoicing/taxes/{contract_id}:
+    get:
+      operationId: getIcInvoicingTaxes
+      summary: Retrieve Contractor Invoicing Taxes
+      tags: [IC Invoicing Taxes]
+      parameters:
+        - { name: contract_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Tax configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      vat_applicable: { type: boolean }
+                      vat_rate: { type: number }
+                      tax_residency: { type: string }
+                      tax_id: { type: string }
+
+components:
+  securitySchemes:
+    BearerAuth: { type: http, scheme: bearer, bearerFormat: opaque }
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema: { type: string, format: uuid }
+  schemas:
+    IcContractCreate:
+      type: object
+      required: [worker, type, currency, country]
+      properties:
+        worker:
+          type: object
+          required: [email, first_name, last_name]
+          properties:
+            email: { type: string, format: email }
+            first_name: { type: string }
+            last_name: { type: string }
+            country: { type: string }
+        type: { type: string, enum: [ongoing_time_based, pay_as_you_go_time_based, milestones, cor] }
+        currency: { type: string }
+        country: { type: string }
+        job_title: { type: string }
+        seniority_level_id: { type: string }
+        rate: { type: number }
+        rate_frequency: { type: string, enum: [hourly, weekly, monthly] }
+        start_date: { type: string, format: date }
+        end_date: { type: string, format: date }
+        scope_of_work: { type: string }
+        external_id: { type: string }
+    IcContract:
+      type: object
+      properties:
+        id: { type: string }
+        type: { type: string }
+        status: { type: string }
+        worker:
+          type: object
+          properties:
+            id: { type: string }
+            email: { type: string, format: email }
+        rate: { type: number }
+        currency: { type: string }
+        country: { type: string }
+        start_date: { type: string, format: date }
+    ContractorAmendmentCreate:
+      type: object
+      required: [type, effective_date]
+      properties:
+        type: { type: string, enum: [rate_change, scope_change, currency_change, term_extension, role_change] }
+        effective_date: { type: string, format: date }
+        new_rate: { type: number }
+        new_currency: { type: string }
+        notes: { type: string }
+    ContractorAmendment:
+      type: object
+      properties:
+        id: { type: string }
+        contract_id: { type: string }
+        type: { type: string }
+        status: { type: string, enum: [pending, approved, declined, signed, applied] }
+        effective_date: { type: string, format: date }
+    Timesheet:
+      type: object
+      properties:
+        id: { type: string }
+        contract_id: { type: string }
+        date: { type: string, format: date }
+        hours: { type: number }
+        description: { type: string }
+        status: { type: string, enum: [pending, approved, declined] }
+        submitted_at: { type: string, format: date-time }
+    TimesheetCreate:
+      type: object
+      required: [contract_id, date, hours]
+      properties:
+        contract_id: { type: string }
+        date: { type: string, format: date }
+        hours: { type: number }
+        description: { type: string }
+    Milestone:
+      type: object
+      properties:
+        id: { type: string }
+        contract_id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        amount: { type: number }
+        currency: { type: string }
+        status: { type: string, enum: [pending, in_progress, submitted, approved, paid] }
+        due_date: { type: string, format: date }
+    MilestoneCreate:
+      type: object
+      required: [title, amount, currency]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        amount: { type: number }
+        currency: { type: string }
+        due_date: { type: string, format: date }
+    OffCycleCreate:
+      type: object
+      required: [contract_id, amount, currency, reason]
+      properties:
+        contract_id: { type: string }
+        amount: { type: number }
+        currency: { type: string }
+        reason: { type: string, enum: [bonus, commission, expense, reimbursement, advance, other] }
+        notes: { type: string }
+    OffCyclePayment:
+      type: object
+      properties:
+        id: { type: string }
+        contract_id: { type: string }
+        amount: { type: number }
+        currency: { type: string }
+        reason: { type: string }
+        status: { type: string, enum: [pending, processing, paid, failed] }
+        created_at: { type: string, format: date-time }

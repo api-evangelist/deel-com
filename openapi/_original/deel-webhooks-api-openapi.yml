@@ -1,0 +1,164 @@
+openapi: 3.1.0
+info:
+  title: Deel Webhooks API
+  description: |
+    Webhook management API and event catalog for real-time notifications across contracts,
+    invoices, payroll, time off, EOR onboarding, ATS, and worker lifecycle events. Webhook
+    payloads are HMAC-SHA256 signed and can be simulated from the Developer Center without
+    affecting production data.
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/api/webhooks/introduction
+
+servers:
+  - url: https://api.letsdeel.com/rest/v2
+    description: Production
+  - url: https://api-sandbox.demo.deel.com/rest/v2
+    description: Sandbox
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Webhooks
+    description: Create, list, update, and delete webhook subscriptions
+  - name: Webhook Events
+    description: Discover available webhook event types
+
+paths:
+  /webhooks:
+    get:
+      operationId: getWebhooks
+      summary: List Of Webhooks
+      tags: [Webhooks]
+      responses:
+        '200':
+          description: Webhooks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Webhook' } }
+    post:
+      operationId: createWebhook
+      summary: Create A Webhook
+      tags: [Webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WebhookCreate' }
+      responses:
+        '201':
+          description: Webhook created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Webhook' }
+
+  /webhooks/{webhook_id}:
+    get:
+      operationId: getWebhook
+      summary: Retrieve A Single Webhook
+      tags: [Webhooks]
+      parameters:
+        - { name: webhook_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Webhook
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Webhook' }
+    patch:
+      operationId: updateWebhook
+      summary: Edit A Webhook
+      tags: [Webhooks]
+      parameters:
+        - { name: webhook_id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WebhookUpdate' }
+      responses:
+        '200':
+          description: Webhook updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Webhook' }
+    delete:
+      operationId: deleteWebhook
+      summary: Delete A Webhook
+      tags: [Webhooks]
+      parameters:
+        - { name: webhook_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '204': { description: Webhook deleted }
+
+  /webhooks/events:
+    get:
+      operationId: getWebhookEvents
+      summary: List Of Webhook Event Types
+      tags: [Webhook Events]
+      responses:
+        '200':
+          description: Event types
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type: { type: string }
+                        description: { type: string }
+                        category: { type: string, enum: [contract, invoice, payroll, time_off, eor, ats, worker, document, immigration, screening] }
+
+components:
+  securitySchemes:
+    BearerAuth: { type: http, scheme: bearer, bearerFormat: opaque }
+  schemas:
+    Webhook:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        url: { type: string, format: uri }
+        events: { type: array, items: { type: string } }
+        active: { type: boolean }
+        secret_hint: { type: string, description: "Last 4 chars of the HMAC signing secret" }
+        created_at: { type: string, format: date-time }
+        last_delivery_at: { type: string, format: date-time }
+        last_delivery_status: { type: integer }
+    WebhookCreate:
+      type: object
+      required: [name, url, events]
+      properties:
+        name: { type: string }
+        url: { type: string, format: uri }
+        events: { type: array, items: { type: string } }
+        secret: { type: string, description: "HMAC signing secret (write-only). If omitted, Deel generates one." }
+        active: { type: boolean, default: true }
+    WebhookUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        url: { type: string, format: uri }
+        events: { type: array, items: { type: string } }
+        active: { type: boolean }
+        secret: { type: string }
+    WebhookEvent:
+      description: |
+        Outbound webhook payload signed via HMAC-SHA256 in the `Deel-Signature` header.
+        Verify with the per-webhook signing secret before processing.
+      type: object
+      properties:
+        event_id: { type: string, format: uuid }
+        event_type: { type: string, example: "contract.signed" }
+        created_at: { type: string, format: date-time }
+        organization_id: { type: string }
+        data: { type: object }
