@@ -1,0 +1,171 @@
+# x-archived-from: deel-subpackage-magiclink-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Magic Link API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_magicLink
+paths:
+  /magic-link:
+    post:
+      operationId: create-magic-link
+      summary: Create magic link
+      description: "Use this endpoint to generate secure, time-limited magic links that enable password-free, seamless worker authentication for quick and safe access. Ideal for temporary sessions or low-friction login flows.\n **Token scopes**: `worker:read`"
+      tags:
+      - subpackage_magicLink
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Magic link generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/magic-link_createMagicLink_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMagicLinkRequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMagicLinkRequestInternalServerError'
+      requestBody:
+        description: Details for magic link generation.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/MagicLinkPostRequestBodyContentApplicationJsonSchemaData'
+components:
+  schemas:
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    magic-link_createMagicLink_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/MagicLinkPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: magic-link_createMagicLink_Response_201
+    MagicLinkPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        redirect_path:
+          type: string
+          description: Path to redirect the user to after successful authentication.
+      title: MagicLinkPostRequestBodyContentApplicationJsonSchemaData
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    MagicLinkPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        expires_at:
+          type: string
+          format: date-time
+          description: When the magic link expires (ISO 8601 format)
+        magic_link:
+          type: string
+          description: The magic link URL that users can click and log in to deel automatically.
+      required:
+      - expires_at
+      - magic_link
+      title: MagicLinkPostResponsesContentApplicationJsonSchemaData
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    CreateMagicLinkRequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateMagicLinkRequestUnauthorizedError
+    CreateMagicLinkRequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateMagicLinkRequestInternalServerError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

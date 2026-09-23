@@ -1,0 +1,583 @@
+# x-archived-from: deel-subpackage-treasury-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Treasury API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_treasury
+paths:
+  /accounts-payable/vendor-bills:
+    post:
+      operationId: create-vendor-bill-v-2026-01-01
+      summary: Create Vendor Bill
+      description: "Creates vendor bills from structured invoice data submitted by an external invoice provider integration.\n **Token scopes**: `treasury-vendorbill:write`"
+      tags:
+      - subpackage_treasury
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Vendor bill created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Treasury_createVendorBill-v2026-01-01_Response_201'
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVendorBill-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '409':
+          description: Conflict - duplicate reference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVendorBill-v2026-01-01RequestConflictError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVendorBill-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Create vendor bills from external invoice provider data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AccountsPayableVendorBillsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /accounts-payable/vendor-bills/{vendor_bill_id}/attachments:
+    post:
+      operationId: upload-vendor-bill-attachment
+      summary: Upload Vendor Bill Attachment
+      description: "Use this endpoint to attach a PDF invoice file to an existing vendor bill entity. Submit the file via multipart/form-data with the file in the request body.\n **Token scopes**: `treasury-vendorbill:write`"
+      tags:
+      - subpackage_treasury
+      parameters:
+      - name: vendor_bill_id
+        in: path
+        description: Vendor bill id to attach the file to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Treasury_uploadVendorBillAttachment_Response_201'
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadVendorBillAttachmentRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Vendor bill not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadVendorBillAttachmentRequestNotFoundError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadVendorBillAttachmentRequestInternalServerError'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AccountsPayableVendorBillsVendorBillIdAttachmentsPostRequestBodyContentMultipartFormDataSchemaData'
+              required:
+              - data
+components:
+  schemas:
+    AccountsPayableVendorBillsVendorBillIdAttachmentsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the uploaded attachment
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      required:
+      - id
+      - created_at
+      - updated_at
+      title: AccountsPayableVendorBillsVendorBillIdAttachmentsPostResponsesContentApplicationJsonSchemaData
+    Treasury_uploadVendorBillAttachment_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AccountsPayableVendorBillsVendorBillIdAttachmentsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Treasury_uploadVendorBillAttachment_Response_201
+    AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation
+      required:
+      - code
+      - message
+      title: AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaErrorsItems
+    AccountsPayableVendorBillsPostRequestBodyContentApplicationJsonSchemaDataLineItemsItems:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+          description: Total amount for this line item
+        quantity:
+          type: number
+          format: double
+          description: Quantity of items
+        vat_code:
+          type: string
+          description: VAT Code name
+        vat_rate:
+          type: number
+          format: double
+          description: VAT rate percentage
+        unit_price:
+          type: number
+          format: double
+          description: Price per unit
+        vat_amount:
+          type: number
+          format: double
+          description: VAT amount for this line item
+        description:
+          type: string
+          description: Description of the line item
+        department_id:
+          type: string
+          description: Unique Identifier for the Financial department
+        expense_account_id:
+          type: string
+          description: Unique Identifier for the Expense account
+      required:
+      - amount
+      - quantity
+      - vat_rate
+      - unit_price
+      - description
+      title: AccountsPayableVendorBillsPostRequestBodyContentApplicationJsonSchemaDataLineItemsItems
+    AccountsPayableVendorBillsVendorBillIdAttachmentsPostRequestBodyContentMultipartFormDataSchemaData:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: PDF file to upload (max 8MB)
+      title: AccountsPayableVendorBillsVendorBillIdAttachmentsPostRequestBodyContentMultipartFormDataSchemaData
+    AccountsPayableVendorBillsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          description: Invoice/bill date
+        amount:
+          type: number
+          format: double
+          description: Total amount including VAT
+        currency:
+          type: string
+          description: ISO 4217 currency code
+        due_date:
+          type: string
+          format: date
+          description: Due date for payment
+        subtotal:
+          type: number
+          format: double
+          description: Subtotal amount excluding VAT
+        reference:
+          type: string
+          description: Vendor bill reference
+        vendor_id:
+          type: string
+          description: Unique identifier for the Vendor
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountsPayableVendorBillsPostRequestBodyContentApplicationJsonSchemaDataLineItemsItems'
+          description: Line items for the vendor bill
+        description:
+          type: string
+          description: General description of the vendor bill
+        external_id:
+          type: string
+          description: External system identifier (e.g., Brightflag ID)
+        subsidiary_id:
+          type: string
+          description: Unique identifier for the Deel legal entity/subsidiary
+      required:
+      - date
+      - amount
+      - currency
+      - due_date
+      - subtotal
+      - reference
+      - vendor_id
+      - line_items
+      - description
+      - external_id
+      - subsidiary_id
+      title: AccountsPayableVendorBillsPostRequestBodyContentApplicationJsonSchemaData
+    AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the vendor in the treasury system
+        date:
+          type: string
+          format: date
+          description: Invoice/bill date
+        amount:
+          type: number
+          format: double
+          description: Total amount including VAT
+        currency:
+          type: string
+          description: ISO 4217 currency code
+        due_date:
+          type: string
+          format: date
+          description: Due date for payment
+        subtotal:
+          type: number
+          format: double
+          description: Subtotal amount excluding VAT
+        is_active:
+          type: boolean
+          description: Whether the vendor bill is active
+        reference:
+          type: string
+          description: Vendor bill reference
+        vendor_id:
+          type: string
+          description: Vendor ID
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaDataLineItemsItems'
+          description: Line items for the vendor bill
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        description:
+          type: string
+          description: General description of the vendor bill
+        external_id:
+          type: string
+          description: External system identifier (e.g., Brightflag ID)
+        exchange_rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Exchange rate to USD
+        subsidiary_id:
+          type: string
+          description: Unique identifier for the Deel legal entity/subsidiary
+      required:
+      - id
+      - date
+      - amount
+      - currency
+      - due_date
+      - subtotal
+      - is_active
+      - reference
+      - vendor_id
+      - created_at
+      - line_items
+      - updated_at
+      - description
+      - external_id
+      - exchange_rate
+      - subsidiary_id
+      title: AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaData
+    UploadVendorBillAttachmentRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountsPayableVendorBillsVendorBillIdAttachmentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadVendorBillAttachmentRequestInternalServerError
+    UploadVendorBillAttachmentRequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountsPayableVendorBillsVendorBillIdAttachmentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadVendorBillAttachmentRequestNotFoundError
+    UploadVendorBillAttachmentRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountsPayableVendorBillsVendorBillIdAttachmentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadVendorBillAttachmentRequestBadRequestError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    CreateVendorBill-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateVendorBill-v2026-01-01RequestBadRequestError
+    AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaDataLineItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the line item
+        amount:
+          type: number
+          format: double
+          description: Total amount for this line item
+        quantity:
+          type: number
+          format: double
+          description: Quantity of items
+        vat_code:
+          type:
+          - string
+          - 'null'
+          description: VAT code name
+        vat_rate:
+          type: number
+          format: double
+          description: VAT rate percentage
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        unit_price:
+          type: number
+          format: double
+          description: Price per unit
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        vat_amount:
+          type: number
+          format: double
+          description: VAT amount for this line item
+        description:
+          type: string
+          description: Description of the line item
+        department_id:
+          type:
+          - string
+          - 'null'
+          description: Unique identifier for the Financial department
+        vendor_bill_id:
+          type: string
+          format: uuid
+          description: Reference to parent vendor bill
+        expense_account_id:
+          type:
+          - string
+          - 'null'
+          description: Unique identifier for the expense account
+      required:
+      - id
+      - amount
+      - quantity
+      - vat_rate
+      - created_at
+      - unit_price
+      - updated_at
+      - vat_amount
+      - description
+      - vendor_bill_id
+      title: AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaDataLineItemsItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    AccountsPayableVendorBillsVendorBillIdAttachmentsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation
+      required:
+      - code
+      - message
+      title: AccountsPayableVendorBillsVendorBillIdAttachmentsPostResponsesContentApplicationJsonSchemaErrorsItems
+    CreateVendorBill-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateVendorBill-v2026-01-01RequestInternalServerError
+    Treasury_createVendorBill-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Treasury_createVendorBill-v2026-01-01_Response_201
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    CreateVendorBill-v2026-01-01RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountsPayableVendorBillsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateVendorBill-v2026-01-01RequestConflictError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

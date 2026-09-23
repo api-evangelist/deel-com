@@ -1,0 +1,1068 @@
+# x-archived-from: deel-subpackage-screenings-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Screenings API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_screenings
+paths:
+  /screenings/manual-verification:
+    post:
+      operationId: create-manual-verification
+      summary: Create manual verification screening
+      description: "Use this endpoint to create a manual identity verification submission (in case automated one has failed multiple times or document country is not supported by automated solution)\n **Token scopes**: `worker:write`"
+      tags:
+      - subpackage_screenings
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/screenings_createManualVerification_Response_201'
+        '400':
+          description: Bad Request - Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateManualVerificationScreeningRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '409':
+          description: Conflict - There is an existing name change screening pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateManualVerificationScreeningRequestConflictError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                back:
+                  type: string
+                  format: binary
+                  description: The back side of the document
+                front:
+                  type: string
+                  format: binary
+                  description: The front side of the document
+                additional:
+                  type: string
+                  format: binary
+                  description: An additional document
+                document_type:
+                  $ref: '#/components/schemas/ScreeningsManualVerificationPostRequestBodyContentMultipartFormDataSchemaDocumentType'
+                  description: The type of document to be verified
+                operation_type:
+                  $ref: '#/components/schemas/ScreeningsManualVerificationPostRequestBodyContentMultipartFormDataSchemaOperationType'
+                  description: The type of KYC operation to perform
+                selfie_with_id:
+                  type: string
+                  format: binary
+                  description: A selfie of the user holding the ID document
+                document_country:
+                  type: string
+                  description: The issuing country code of the document to be verified (ISO 3166-1 alpha-2)
+                proof_of_residence:
+                  type: string
+                  format: binary
+                  description: A proof of residence document
+                translation_required:
+                  type: boolean
+                  description: Indicates whether the document requires translation
+              required:
+              - front
+              - document_type
+              - operation_type
+              - selfie_with_id
+              - translation_required
+  /veriff/session:
+    post:
+      operationId: create-veriff-session
+      summary: Create Veriff session
+      description: "Create Veriff session\n **Token scopes**: `screenings:write`, `worker:write`"
+      tags:
+      - subpackage_screenings
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/screenings_createVeriffSession_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/VeriffSessionPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /screenings/aml/{entity_type}/{entity_id}:
+    get:
+      operationId: get-aml-details
+      summary: Get entity screening details
+      description: "Get the latest screening for an entity.\n **Token scopes**: `screenings:read`"
+      tags:
+      - subpackage_screenings
+      parameters:
+      - name: entity_type
+        in: path
+        description: The type of entity to screen. Only 'profile', 'hris_profile', 'legal_entity' are accepted.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ScreeningsAmlEntityTypeEntityIdGetParametersEntityType'
+      - name: entity_id
+        in: path
+        description: UUID v4 of the entity
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Details of the screening request for the specified entity type and ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/screenings_getAMLDetails_Response_200'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AmlApiForWhitelabelDataRetrieval-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Entity not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AmlApiForWhitelabelDataRetrieval-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /screenings/verification-method:
+    get:
+      operationId: get-verification-method
+      summary: Get verification method
+      description: "Get verification method by provided country and document type\n **Token scopes**: `screenings:read`, `worker:read`"
+      tags:
+      - subpackage_screenings
+      parameters:
+      - name: country
+        in: query
+        description: The document's issuing country code (ISO 3166-1 alpha-2)
+        required: true
+        schema:
+          type: string
+      - name: document_type
+        in: query
+        description: The document to be provided during KYC
+        required: true
+        schema:
+          $ref: '#/components/schemas/ScreeningsVerificationMethodGetParametersDocumentType'
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/screenings_getVerificationMethod_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /screenings/kyc/details:
+    get:
+      operationId: get-kyc-details
+      summary: Get worker's KYC details
+      description: "This endpoint allows organizations managing workers on Deel to retrieve detailed KYC verification data using the worker’s profile ID. It provides comprehensive information including verification status, document type, submission, approval, rejection, and expiry dates, supporting compliance monitoring and onboarding workflows\n **Token scopes**: `screenings:read`"
+      tags:
+      - subpackage_screenings
+      parameters:
+      - name: worker_profile_id
+        in: query
+        description: Worker's HRIS profile public ID client requests to fetch KYC details for. This parameter is mutually exclusive with profile_id
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: contract_id
+        in: query
+        description: Worker's contract ID. This parameter is required in case there are multiple profiles associated to the target worker. For example, when worker used to work for the former company he had another profile ID. So we need contract ID to properly resolve profile's KYC details.  In case this parameter is not provided and multiple associated profiles are found, exception with 409 status code will be thrown
+        required: false
+        schema:
+          type: string
+      - name: profile_id
+        in: query
+        description: 'Worker''s profile public ID client requests to fetch KYC details for, This parameter is mutually exclusive with worker_profile_id '
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: KYC details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/screenings_getKYCDetails_Response_200'
+        '400':
+          description: Bad request - Invalid worker profile ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkersKycDetailsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - User not authorized to access this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkersKycDetailsRequestForbiddenError'
+        '404':
+          description: Not Found - We could not extract any profile by the provided hris profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkersKycDetailsRequestNotFoundError'
+        '409':
+          description: Conflict - We found multiple profiles for the provided worker ID. Please provide the contract id to resolve KYC details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkersKycDetailsRequestConflictError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /screenings/kyc/external:
+    post:
+      operationId: submit-external-kyc
+      summary: Submit external KYC
+      description: "The endpoint standardizes identity verification and compliance processes, combining automated Live ID verification (IDV) and manual review workflows\n **Token scopes**: `worker:write`"
+      tags:
+      - subpackage_screenings
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: KYC data successfully received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screenings_submitExternalKyc_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitExternalKycRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaData'
+              required:
+              - data
+components:
+  schemas:
+    ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaDataIdentityDocumentType:
+      type: string
+      enum:
+      - DRIVING_LICENSE
+      - PASSPORT
+      - GOVERNMENT_ID
+      - SELFIE_WITH_ID
+      - PROOF_OF_RESIDENCY
+      - OTHER
+      description: The type of identity document used for verification
+      title: ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaDataIdentityDocumentType
+    ScreeningsAmlEntityTypeEntityIdGetParametersEntityType:
+      type: string
+      enum:
+      - profile
+      - hris_profile
+      - legal_entity
+      title: ScreeningsAmlEntityTypeEntityIdGetParametersEntityType
+    VeriffSessionPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        user_input:
+          $ref: '#/components/schemas/VeriffSessionPostRequestBodyContentApplicationJsonSchemaDataUserInput'
+          description: Input data for the name change KYC operation
+        operation_type:
+          $ref: '#/components/schemas/VeriffSessionPostRequestBodyContentApplicationJsonSchemaDataOperationType'
+          description: The type of KYC operation to perform
+      required:
+      - operation_type
+      title: VeriffSessionPostRequestBodyContentApplicationJsonSchemaData
+    AmlApiForWhitelabelDataRetrieval-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: AmlApiForWhitelabelDataRetrieval-v2026-01-01RequestNotFoundError
+    ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaEntityType:
+      type: string
+      enum:
+      - profile
+      - hris_profile
+      - legal_entity
+      description: The type of entity being screened.
+      title: ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaEntityType
+    Screenings_submitExternalKyc_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ScreeningsKycExternalPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Screenings_submitExternalKyc_Response_201
+    CreateManualVerificationScreeningRequestBadRequestError:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: CreateManualVerificationScreeningRequestBadRequestError
+    ScreeningsManualVerificationPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when screening was successfully received and processed (ISO 8601)
+        request_id:
+          type: string
+          description: Unique request identifier
+      required:
+      - created_at
+      - request_id
+      title: ScreeningsManualVerificationPostResponsesContentApplicationJsonSchemaData
+    ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataScreeningType:
+      type: string
+      enum:
+      - live
+      - manual
+      description: Tells your API whether the identity verification check should be performed automatically (“live”) or via human review (“manual”)
+      title: ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataScreeningType
+    VeriffSessionPostRequestBodyContentApplicationJsonSchemaDataUserInput:
+      type: object
+      properties:
+        last_name:
+          type: string
+          description: The desired last name of the user
+        first_name:
+          type: string
+          description: The desired first name of the user
+        middle_name:
+          type:
+          - string
+          - 'null'
+          description: The desired middle name of the user
+      required:
+      - last_name
+      - first_name
+      description: Input data for the name change KYC operation
+      title: VeriffSessionPostRequestBodyContentApplicationJsonSchemaDataUserInput
+    ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataKycDocumentType:
+      type: string
+      enum:
+      - passport
+      - driving_license
+      - government_id
+      - other
+      description: Type of KYC document (e.g., passport, driver's license)
+      title: ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataKycDocumentType
+    AmlApiForWhitelabelDataRetrieval-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: AmlApiForWhitelabelDataRetrieval-v2026-01-01RequestBadRequestError
+    ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResultsSanctions:
+      type: string
+      enum:
+      - PASS
+      - FAIL
+      description: The result of the sanctions check.
+      title: ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResultsSanctions
+    ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaData:
+      type: object
+      properties:
+        back:
+          type: string
+          format: binary
+          description: Back side file of the KYC document. Required when kyc_document.type equals to either 'driving_license' or 'government_id'. Not needed when equals to 'passport'. Optional when type is 'other'
+        front:
+          type: string
+          format: binary
+          description: Front side file of the KYC document
+        last_name:
+          type: string
+          description: Worker's last name
+        first_name:
+          type: string
+          description: Worker's first name
+        middle_name:
+          type:
+          - string
+          - 'null'
+          description: Worker's middle name (if available)
+        kyc_document:
+          $ref: '#/components/schemas/ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataKycDocument'
+        date_of_birth:
+          type: string
+          format: date
+          description: Worker's date of birth (YYYY-MM-DD)
+        screening_type:
+          $ref: '#/components/schemas/ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataScreeningType'
+          description: Tells your API whether the identity verification check should be performed automatically (“live”) or via human review (“manual”)
+        selfie_with_id:
+          type: string
+          format: binary
+          description: Selfie file for identity verification
+        screening_status:
+          $ref: '#/components/schemas/ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataScreeningStatus'
+          description: The result of the screening process
+      required:
+      - front
+      - last_name
+      - first_name
+      - kyc_document
+      - date_of_birth
+      - screening_type
+      - selfie_with_id
+      - screening_status
+      title: ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaData
+    VeriffSessionPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL of the Veriff session
+      required:
+      - url
+      title: VeriffSessionPostResponsesContentApplicationJsonSchemaData
+    SubmitExternalKycRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScreeningsKycExternalPostResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/ScreeningsKycExternalPostResponsesContentApplicationJsonSchemaRequest'
+      title: SubmitExternalKycRequestBadRequestError
+    ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ScreeningsKycExternalPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: ScreeningsKycExternalPostResponsesContentApplicationJsonSchemaErrorsItems
+    GetWorkersKycDetailsRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetWorkersKycDetailsRequestBadRequestError
+    ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResults:
+      type: object
+      properties:
+        pep:
+          $ref: '#/components/schemas/ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResultsPep'
+          description: The result of the PEP (Politically Exposed Person) check.
+        sanctions:
+          $ref: '#/components/schemas/ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResultsSanctions'
+          description: The result of the sanctions check.
+        adverse_media:
+          $ref: '#/components/schemas/ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResultsAdverseMedia'
+          description: The result of the adverse media check.
+      description: Details of checks performed for this screening.
+      title: ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResults
+    ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaResult:
+      type: string
+      enum:
+      - ACCEPT
+      - REJECT
+      - REFERRED
+      - PENDING
+      description: The result of the screening. ACCEPT means the screening passed, REJECT means it failed, and REFERRED means it is pending further review.
+      title: ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaResult
+    ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResultsPep:
+      type: string
+      enum:
+      - PASS
+      - FAIL
+      description: The result of the PEP (Politically Exposed Person) check.
+      title: ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResultsPep
+    GetWorkersKycDetailsRequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetWorkersKycDetailsRequestConflictError
+    GetWorkersKycDetailsRequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetWorkersKycDetailsRequestNotFoundError
+    CreateManualVerificationScreeningRequestConflictError:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: CreateManualVerificationScreeningRequestConflictError
+    ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataScreeningStatus:
+      type: string
+      enum:
+      - approved
+      - rejected
+      description: The result of the screening process
+      title: ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataScreeningStatus
+    VeriffSessionPostRequestBodyContentApplicationJsonSchemaDataOperationType:
+      type: string
+      enum:
+      - IDENTITY_RESUBMISSION_KYC
+      - IDENTITY_VERIFICATION_KYC
+      - NAME_CHANGE_KYC
+      - EMAIL_CHANGE_KYC
+      description: The type of KYC operation to perform
+      title: VeriffSessionPostRequestBodyContentApplicationJsonSchemaDataOperationType
+    ScreeningsManualVerificationPostRequestBodyContentMultipartFormDataSchemaOperationType:
+      type: string
+      enum:
+      - IDENTITY_RESUBMISSION_KYC
+      - IDENTITY_VERIFICATION_KYC
+      - NAME_CHANGE_KYC
+      description: The type of KYC operation to perform
+      title: ScreeningsManualVerificationPostRequestBodyContentMultipartFormDataSchemaOperationType
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the KYC screening was created
+        kyc_status:
+          $ref: '#/components/schemas/ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaDataKycStatus'
+          description: The current KYC verification status of the profile
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the KYC screening was last updated
+        approval_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the KYC screening was approved (null if not approved)
+        rejection_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the KYC screening was rejected (null if not rejected or pending review for Veriff)
+        expiration_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the KYC screening expires (null if no expiry)
+        submission_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the KYC screening was submitted
+        identity_document_name:
+          type:
+          - string
+          - 'null'
+          description: The name of the identity document used for verification (in case of other document type)
+        identity_document_type:
+          oneOf:
+          - $ref: '#/components/schemas/ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaDataIdentityDocumentType'
+          - type: 'null'
+          description: The type of identity document used for verification
+        identity_document_number:
+          type:
+          - string
+          - 'null'
+          description: Number of the submitted document
+        document_extracted_last_name:
+          type:
+          - string
+          - 'null'
+          description: The last name extracted from the submitted document
+        document_extracted_first_name:
+          type:
+          - string
+          - 'null'
+          description: The first name extracted from the submitted document
+        document_extracted_middle_name:
+          type:
+          - string
+          - 'null'
+          description: The middle name extracted from the submitted document
+      required:
+      - created_at
+      - kyc_status
+      - updated_at
+      - approval_date
+      - rejection_date
+      - expiration_date
+      - submission_date
+      - identity_document_type
+      - document_extracted_middle_name
+      title: ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaData
+    screenings_getVerificationMethod_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ScreeningsVerificationMethodGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: screenings_getVerificationMethod_Response_200
+    ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataKycDocument:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataKycDocumentType'
+          description: Type of KYC document (e.g., passport, driver's license)
+        id_number:
+          type: string
+          description: Document identification number
+        document_name:
+          type: string
+          description: Name of the document when type is 'other'
+        issuance_date:
+          type: string
+          format: date
+          description: Date when the document was issued (YYYY-MM-DD)
+        expiration_date:
+          type: string
+          format: date
+          description: Expiry date of the document (YYYY-MM-DD)
+        issuance_country:
+          type: string
+          description: Country where the document was issued (ISO 3166‑1 alpha‑2)
+      required:
+      - type
+      - id_number
+      - issuance_country
+      title: ScreeningsKycExternalPostRequestBodyContentMultipartFormDataSchemaDataKycDocument
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ScreeningsManualVerificationPostRequestBodyContentMultipartFormDataSchemaDocumentType:
+      type: string
+      enum:
+      - PASSPORT
+      - DRIVING_LICENSE
+      - GOVERNMENT_ID
+      - OTHER
+      description: The type of document to be verified
+      title: ScreeningsManualVerificationPostRequestBodyContentMultipartFormDataSchemaDocumentType
+    ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+      title: ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    screenings_getKYCDetails_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: screenings_getKYCDetails_Response_200
+    ScreeningsKycExternalPostResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: ScreeningsKycExternalPostResponsesContentApplicationJsonSchemaRequest
+    ScreeningsVerificationMethodGetParametersDocumentType:
+      type: string
+      enum:
+      - passport
+      - government_id
+      - driving_license
+      - other
+      title: ScreeningsVerificationMethodGetParametersDocumentType
+    screenings_getAMLDetails_Response_200:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaResult'
+          description: The result of the screening. ACCEPT means the screening passed, REJECT means it failed, and REFERRED means it is pending further review.
+        entity_id:
+          type: string
+          description: UUID of the entity.
+        entity_type:
+          $ref: '#/components/schemas/ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaEntityType'
+          description: The type of entity being screened.
+        detailed_results:
+          $ref: '#/components/schemas/ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResults'
+          description: Details of checks performed for this screening.
+      required:
+      - result
+      - entity_id
+      - entity_type
+      - detailed_results
+      title: screenings_getAMLDetails_Response_200
+    ScreeningsVerificationMethodGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        verification_method:
+          type: string
+          description: The supported method for KYC
+      required:
+      - verification_method
+      title: ScreeningsVerificationMethodGetResponsesContentApplicationJsonSchemaData
+    GetWorkersKycDetailsRequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetWorkersKycDetailsRequestForbiddenError
+    ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaDataKycStatus:
+      type: string
+      enum:
+      - APPROVED
+      - REJECTED
+      - PENDING_REVIEW
+      - EXPIRED
+      - EXPIRING_SOON
+      - NOT_SUBMITTED
+      - NOT_REQUESTED
+      description: The current KYC verification status of the profile
+      title: ScreeningsKycDetailsGetResponsesContentApplicationJsonSchemaDataKycStatus
+    screenings_createVeriffSession_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/VeriffSessionPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: screenings_createVeriffSession_Response_201
+    ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResultsAdverseMedia:
+      type: string
+      enum:
+      - PASS
+      - FAIL
+      description: The result of the adverse media check.
+      title: ScreeningsAmlEntityTypeEntityIdGetResponsesContentApplicationJsonSchemaDetailedResultsAdverseMedia
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    screenings_createManualVerification_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ScreeningsManualVerificationPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: screenings_createManualVerification_Response_201
+    ScreeningsKycExternalPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when screening was successfully received and processed (ISO 8601)
+        request_id:
+          type: string
+          description: Request identifier for this KYC submission
+      required:
+      - created_at
+      - request_id
+      title: ScreeningsKycExternalPostResponsesContentApplicationJsonSchemaData
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

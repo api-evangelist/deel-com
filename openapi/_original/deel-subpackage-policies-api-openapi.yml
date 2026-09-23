@@ -1,0 +1,168 @@
+# x-archived-from: deel-subpackage-policies-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Policies API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_policies
+paths:
+  /it/policies:
+    get:
+      operationId: get-it-policies
+      summary: List IT hardware policies
+      description: "Retrieve a list of all available IT hardware policies. These policies define the equipment that can be ordered.  For more info, visit [IT policies](https://developer.deel.com/docs/deel-it-api#it-policies).\n **Token scopes**: `it-policies:read`"
+      tags:
+      - subpackage_policies
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/policies_getITPolicies_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItHardwarePoliciesRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItHardwarePoliciesRequestInternalServerError'
+components:
+  schemas:
+    policies_getITPolicies_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesGetResponsesContentApplicationJsonSchemaDataItems'
+      title: policies_getITPolicies_Response_200
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ItPoliciesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the policy
+        name:
+          type: string
+          description: Policy name
+      title: ItPoliciesGetResponsesContentApplicationJsonSchemaDataItems
+    ListItHardwarePoliciesRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListItHardwarePoliciesRequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ListItHardwarePoliciesRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListItHardwarePoliciesRequestInternalServerError
+    ItPoliciesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      title: ItPoliciesGetResponsesContentApplicationJsonSchemaErrorsItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

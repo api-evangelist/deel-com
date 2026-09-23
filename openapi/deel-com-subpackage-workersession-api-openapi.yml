@@ -1,0 +1,227 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Worker Session API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_workerSession
+paths:
+  /workers/session:
+    post:
+      operationId: create-worker-access-token
+      summary: Create worker access token
+      description: 'Creates a worker access token
+
+        **Token scopes**: `admin:worker`'
+      tags:
+      - subpackage_workerSession
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Worker_Session_createWorkerAccessToken_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/WorkersSessionPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /workers/{worker_id}/session:
+    delete:
+      operationId: delete-worker-access-token
+      summary: Delete worker access token
+      description: 'Deletes the worker access token
+
+        **Token scopes**: `admin:worker`'
+      tags:
+      - subpackage_workerSession
+      parameters:
+      - name: worker_id
+        in: path
+        description: The ID of the worker whose access token you want to delete.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Worker_Session_deleteWorkerAccessToken_Response_204'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    Worker_Session_createWorkerAccessToken_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WorkersSessionPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Worker Session_createWorkerAccessToken_Response_201
+    WorkersSessionPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        profile_id:
+          type: string
+          format: uuid
+          description: The ID of the profile to create access token for
+      required:
+      - profile_id
+      title: WorkersSessionPostRequestBodyContentApplicationJsonSchemaData
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    WorkersSessionPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Access token
+        expires_at:
+          type: string
+          format: date-time
+          description: Expiration date of the access token
+      required:
+      - token
+      - expires_at
+      title: WorkersSessionPostResponsesContentApplicationJsonSchemaData
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    Worker_Session_deleteWorkerAccessToken_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: Worker Session_deleteWorkerAccessToken_Response_204
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

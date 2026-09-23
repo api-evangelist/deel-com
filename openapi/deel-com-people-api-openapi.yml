@@ -1,19 +1,19 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Deel ATS Adjustments People API
-  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+  title: Deel HRIS People API
+  description: 'Unified HR Information System API across all worker types (IC, EOR, employee).
 
-    job postings, candidates, applications, attachments, offers, departments, locations,
+    Surfaces include people directory, working locations, time off (policies, requests,
 
-    email templates, hiring members, employment types, application sources, tags, and
+    entitlements, events, work schedules), positions, employment information, departments,
 
-    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
+    manager hierarchy, custom HR fields, and SCIM 2.0 user provisioning for Okta, Azure AD,
 
-    '
+    and other identity providers.'
   version: '2026-05-25'
   contact:
     name: Deel Developer Support
-    url: https://developer.deel.com/api/ats-guides/introduction
+    url: https://developer.deel.com/api/hris/introduction
 servers:
 - url: https://api.letsdeel.com/rest/v2
   description: Production
@@ -21,6 +21,7 @@ servers:
   description: Sandbox
 security:
 - BearerAuth: []
+- ScimBearerAuth: []
 tags:
 - name: People
   description: Unified directory across IC, EOR, and direct employees
@@ -138,6 +139,37 @@ paths:
           description: Location updated
 components:
   schemas:
+    WorkingLocationUpdate:
+      type: object
+      required:
+      - country
+      properties:
+        country:
+          type: string
+        state:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        timezone:
+          type: string
+        effective_date:
+          type: string
+          format: date
+    WorkingLocation:
+      type: object
+      properties:
+        country:
+          type: string
+        state:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        timezone:
+          type: string
     PersonCreate:
       type: object
       required:
@@ -216,39 +248,13 @@ components:
           format: date
         external_id:
           type: string
-    WorkingLocationUpdate:
-      type: object
-      required:
-      - country
-      properties:
-        country:
-          type: string
-        state:
-          type: string
-        city:
-          type: string
-        address:
-          type: string
-        timezone:
-          type: string
-        effective_date:
-          type: string
-          format: date
-    WorkingLocation:
-      type: object
-      properties:
-        country:
-          type: string
-        state:
-          type: string
-        city:
-          type: string
-        address:
-          type: string
-        timezone:
-          type: string
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: opaque
+    ScimBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: scim_token
+      description: Dedicated SCIM bearer token configured per IdP in the Developer Center.

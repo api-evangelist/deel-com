@@ -1,0 +1,2305 @@
+# x-archived-from: deel-subpackage-eorcontract-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Eor Contract API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_eorContract
+paths:
+  /eor:
+    post:
+      operationId: create-eor-contract
+      summary: Create an EOR contract
+      description: "Creates an Employee of Record (EOR) contract quote. This endpoint allows to submit details for an EOR contract. Deel will process the information and return a quote for the requested contract.\n **Token scopes**: `contracts:write`"
+      tags:
+      - subpackage_eorContract
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successfully created the EOR contract quote.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-contract_createEORContract_Response_201'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: The details of the Employee (EOR) contract to be created.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /eor/contracts/{contract_id}/details:
+    get:
+      operationId: get-eor-contract-details
+      summary: Retrieve EOR Contract Details
+      description: "Returns the basic information for an EOR contract, along with employment costs associated to it\n **Token scopes**: `contracts:read`"
+      tags:
+      - subpackage_eorContract
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier for the Deel contract
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-contract_getEORContractDetails_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveEorContractDetails-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /eor/contract/{contract_id}:
+    patch:
+      operationId: update-eor-contract
+      summary: Update EOR Contract
+      description: "This endpoint is used to modify mutable fields of an EOR contract, such as salary, job title, or benefits. It supports partial updates—only include fields that should be updated. Required fields must still be present for validation.\n **Token scopes**: `contracts:write`"
+      tags:
+      - subpackage_eorContract
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Contract updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-contract_updateEORContract_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEorContractRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEorContractRequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEorContractRequestNotFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEorContractRequestInternalServerError'
+      requestBody:
+        description: Contract update request object
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+components:
+  schemas:
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentNoticePeriodType:
+      type: string
+      enum:
+      - STANDARD
+      - CUSTOM
+      description: Type of notice period.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentNoticePeriodType
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSummary:
+      type: object
+      properties:
+        salary:
+          type: string
+          description: Annual gross salary in local currency.
+        currency:
+          type: string
+          description: Local currency code (e.g., BRL, PLN).
+        exchange_rate:
+          type: string
+          description: Exchange rate used to convert from local to supporting currency.
+        totals_formatted:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSummaryTotalsFormattedItems'
+          description: Formatted summary totals in both local and supporting currencies.
+        supporting_currency:
+          type: string
+          description: Reference or secondary currency (e.g., USD) used for reporting totals.
+      description: Top-level overview of costs, including key totals and currency metadata.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSummary
+    EorPostResponsesContentApplicationJsonSchemaDataCosts:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsSummary'
+          description: Top-level overview of costs, including key totals and currency metadata.
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItems'
+          description: Detailed and categorized cost sections including grouped and standalone items.
+        additional_data:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsAdditionalData'
+          description: Supplementary notes and contextual information relevant to the cost quote.
+      description: Detailed breakdown of employment costs including summary totals, sectioned cost groups, and additional context notes.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCosts
+    eor-contract_updateEORContract_Response_200:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: The unique identifier of the employee contract.
+        status:
+          $ref: '#/components/schemas/EorContractContractIdPatchResponsesContentApplicationJsonSchemaStatus'
+          description: Current status of the contract
+        scope_of_work:
+          type: string
+          description: Scope of work description.
+      required:
+      - oid
+      - status
+      title: eor-contract_updateEORContract_Response_200
+    EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItemsTotalsItems:
+      type: object
+      properties:
+        total:
+          type: string
+          description: Group total in local currency.
+        frequency:
+          type: string
+          description: How often the total is calculated (e.g., monthly, annual).
+        total_supporting:
+          type: string
+          description: Group total in supporting currency.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItemsTotalsItems
+    EorPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        client:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataClient'
+          description: Client details for the contract.
+        pension:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataPension'
+          description: Some countries required a pension benefit.
+        benefits:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataBenefitsItems'
+        employee:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmployee'
+        job_title:
+          type: string
+          description: Employee's job title.
+        seniority:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataSeniority'
+          description: Seniority selection for the role.
+        employment:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmployment'
+          description: Employment contract specific details.
+        health_plan_id:
+          type: string
+          description: Healthcare plan id. You can see available healthcare plans in the country guide endpoint.
+        compensation_details:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetails'
+        quote_additional_fields:
+          oneOf:
+          - $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFields'
+          - type: 'null'
+          description: Some countries require additional employee information for employment contracts.
+      required:
+      - client
+      - employee
+      - job_title
+      - seniority
+      - employment
+      - compensation_details
+      title: EorPostRequestBodyContentApplicationJsonSchemaData
+    EorPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - new
+      - under_review
+      - waiting_for_employee_contract
+      - waiting_for_client_sign
+      - processing_payment
+      - waiting_for_contractor_sign
+      - waiting_for_eor_sign
+      - waiting_for_employee_sign
+      - awaiting_deposit_payment
+      - in_progress
+      - completed
+      - cancelled
+      - user_cancelled
+      - rejected
+      - waiting_for_client_payment
+      - onboarding
+      description: Current status of the contract.
+      title: EorPostResponsesContentApplicationJsonSchemaDataStatus
+    EorPostResponsesContentApplicationJsonSchemaDataCostsAdditionalData:
+      type: object
+      properties:
+        annual_notes:
+          type: array
+          items:
+            type: string
+          description: Notes or assumptions specifically relevant to annual cost calculations.
+        monthly_notes:
+          type: array
+          items:
+            type: string
+          description: Notes or assumptions specifically relevant to monthly cost calculations.
+        once_off_notes:
+          type: array
+          items:
+            type: string
+          description: Notes regarding one-time costs or irregular payments in the quote.
+        additional_notes:
+          type: array
+          items:
+            type: string
+          description: General conditions, assumptions, or fees that may apply to the quote.
+      description: Supplementary notes and contextual information relevant to the cost quote.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsAdditionalData
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSummaryTotalsFormattedItems:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Display title for the total (e.g., 'Monthly Total').
+        total:
+          type: string
+          description: Formatted amount in local currency.
+        frequency:
+          type: string
+          description: Time period for the total (e.g., monthly, annual).
+        total_supporting:
+          type: string
+          description: Formatted amount in supporting currency.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSummaryTotalsFormattedItems
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaCreator:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the contract creator.
+        email:
+          type: string
+          description: The email address of the contract creator.
+        firstname:
+          type: string
+          description: The first name of the contract creator.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaCreator
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaPayrollType:
+      type: string
+      enum:
+      - BIMONTHLY
+      - MONTHLY
+      description: Payroll frequency for the contract
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaPayrollType
+    EorPostResponsesContentApplicationJsonSchemaDataCostsSummary:
+      type: object
+      properties:
+        salary:
+          type: string
+          description: Annual gross salary in local currency.
+        currency:
+          type: string
+          description: Local currency code (e.g., BRL, PLN).
+        exchange_rate:
+          type: string
+          description: Exchange rate used to convert from local to supporting currency.
+        totals_formatted:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsSummaryTotalsFormattedItems'
+          description: Formatted summary totals in both local and supporting currencies.
+        supporting_currency:
+          type: string
+          description: Reference or secondary currency (e.g., USD) used for reporting totals.
+      description: Top-level overview of costs, including key totals and currency metadata.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsSummary
+    UpdateEorContractRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/EorContractContractIdPatchResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: UpdateEorContractRequestNotFoundError
+    EorPostResponsesContentApplicationJsonSchemaDataEmployment:
+      type: object
+      properties:
+        state:
+          type:
+          - string
+          - 'null'
+          description: State or province of employment
+        country:
+          type: string
+          description: Country of employment
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Employment end date
+        start_date:
+          type: string
+          format: date-time
+          description: Employment start date
+        scope_of_work:
+          type: string
+          description: Scope of work description.
+        time_off_type:
+          type: string
+          description: Type of time off for the employee
+        probation_period:
+          type:
+          - integer
+          - 'null'
+          description: Number of probation days
+        work_visa_required:
+          type: boolean
+          description: If a work visa is required
+        calculated_holidays:
+          type: string
+          description: Number of calculated holidays
+      description: Employment contract specific details.
+      title: EorPostResponsesContentApplicationJsonSchemaDataEmployment
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsStandaloneItemsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Internal identifier for the standalone cost item.
+        label:
+          type: string
+          description: Display name for the standalone cost item.
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsStandaloneItemsItemsTotalsItems'
+          description: Monthly and annual totals for the standalone item in local and supporting currencies.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsStandaloneItemsItems
+    eor-contract_getEORContractDetails_Response_200:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the Deel contract.
+        name:
+          type: string
+          description: Contract name
+        team:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaTeam'
+        salary:
+          type: string
+          description: Annual salary as a string to preserve decimal precision.
+        status:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaStatus'
+          description: The current status of the contract.
+        creator:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaCreator'
+        currency:
+          type: string
+          description: The currency used in the contract.
+        employee:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmployee'
+          description: Employee details
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The end date of the contract, if applicable.
+        timezone:
+          type: string
+          description: The timezone of the contract.
+        seniority:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaSeniority'
+        sick_days:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaSickDays'
+          description: Allowed sick days range.
+        work_visa:
+          type: boolean
+          description: Indicates if a work visa is required.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the contract was created.
+        start_date:
+          type: string
+          format: date-time
+          description: The start date of the contract.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the contract was last updated.
+        description:
+          type: string
+          description: Contract description
+        signed_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the contract was signed by both parties.
+        cancelled_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the contract was cancelled.
+        completed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the contract was completed.
+        payroll_type:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaPayrollType'
+          description: Payroll frequency for the contract
+        can_adjust_on:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaCanAdjustOn'
+          - type: 'null'
+          description: Time frame when adjustments can be made.
+        contract_type:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaContractType'
+          description: The type of contract.
+        scope_of_work:
+          type: string
+          description: Description of job scope and responsibilities.
+        signing_bonus:
+          type:
+          - string
+          - 'null'
+          description: One-time bonus paid at contract sign.
+        time_off_type:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaTimeOffType'
+          description: Type of time off policy.
+        deposit_months:
+          type:
+          - string
+          - 'null'
+          description: Number of deposit months required.
+        effective_date:
+          type: string
+          format: date-time
+          description: The date and time when the contract is effective.
+        job_title_name:
+          type:
+          - string
+          - 'null'
+          description: The contract's job title.
+        completion_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The completion date of the contract.
+        employment_type:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentType'
+          description: The type of employment.
+        client_signature:
+          type:
+          - string
+          - 'null'
+          description: The signature of the client.
+        client_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the client signed the contract.
+        employment_costs:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCosts'
+          - type: 'null'
+          description: Detailed breakdown of employment costs including summary totals, sectioned cost groups, and additional context notes.
+        employment_state:
+          type:
+          - string
+          - 'null'
+          description: The state of the employment.
+        hiring_objective:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaHiringObjective'
+          - type: 'null'
+          description: Information about the hiring objective.
+        probation_period:
+          type: integer
+          description: Number of days in the probation period.
+        employee_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Date and time when the employee signed.
+        employment_country:
+          type: string
+          description: Two letter country code of the employment country.
+        notice_period_type:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaNoticePeriodType'
+          - type: 'null'
+          description: Type of notice period if applicable.
+        original_start_date:
+          type: string
+          format: date-time
+          description: The originally planned start date.
+        work_hours_per_week:
+          type: string
+          description: Number of work hours per week.
+        contractor_signature:
+          type:
+          - string
+          - 'null'
+          description: The signature of the EOR entity representative.
+        contractor_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the contractor signed the contract.
+        effective_plain_date:
+          type: string
+          format: date
+          description: The effective date in plain format.
+        fixed_adjustment_ids:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: List of fixed adjustment ids.
+        invited_client_email:
+          type:
+          - string
+          - 'null'
+          description: The email address of the invited client.
+        last_quote_rejection:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejection'
+          - type: 'null'
+          description: Timestamp of last quote rejection.
+        completion_plain_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The completion date of the contract in plain contract.
+        is_onboarding_on_hold:
+          type: boolean
+          description: Whether onboarding is currently on hold or not.
+        monthly_employer_cost:
+          type: string
+          description: Monthly cost to the employer.
+        employee_late_sign_start:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Date when employee signed late, if applicable.
+        is_early_invoice_enabled:
+          type: boolean
+          description: Whether early invoicing is enabled or not.
+        onboarding_step_duration:
+          type:
+          - integer
+          - 'null'
+          description: Duration of onboarding steps in days.
+        variable_compensation_ids:
+          type: array
+          items:
+            type: string
+          description: List of variable compensation IDs.
+        can_remind_employee_to_sign:
+          type: boolean
+          description: Whether reminders to sign the employee resignation can be sent to the employee or not.
+        initial_effective_plain_date:
+          type: string
+          format: date
+          description: The initial effective date in plain format.
+        is_foreign_currency_contract:
+          type: boolean
+          description: Whether the contract uses foreign currency or not.
+        is_employee_onboarding_delayed:
+          type: boolean
+          description: Determines if the invite for employee onboarding should be dispatch manually.
+        monthly_eor_management_fee_usd:
+          type: string
+          description: Monthly EOR management fee in USD.
+        work_schedule_assignment_settings:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaWorkScheduleAssignmentSettings'
+          description: Work schedule assignment setting.
+        probation_period_type_for_definite:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaProbationPeriodTypeForDefinite'
+          - type: 'null'
+          description: Probation period type for definite contracts.
+      title: eor-contract_getEORContractDetails_Response_200
+    ? EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItemsCostsItemsTotalsItems
+    : type: object
+      properties:
+        total:
+          type: string
+          description: Total cost amount in local currency.
+        frequency:
+          type: string
+          description: How often this cost occurs (e.g., monthly, annual, one-time).
+        total_supporting:
+          type: string
+          description: Total cost amount in the supporting currency.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItemsCostsItemsTotalsItems
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataHiringObjective:
+      type: string
+      enum:
+      - EXPANDING_TO_NEW_COUNTRY
+      - TEMP_EOR_OPENING_ENTITY
+      - ONE_OFF_HIRE
+      - CONVERTING_CONTRACTOR
+      - OTHER
+      description: Objective for hiring
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataHiringObjective
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaContractType:
+      type: string
+      enum:
+      - eor
+      description: The type of contract.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaContractType
+    EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsStandaloneItemsItemsTotalsItems:
+      type: object
+      properties:
+        total:
+          type: string
+          description: Standalone cost amount in local currency.
+        frequency:
+          type: string
+          description: How often this cost occurs (e.g., monthly, annual, one-time).
+        total_supporting:
+          type: string
+          description: Standalone cost amount in the supporting currency.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsStandaloneItemsItemsTotalsItems
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataScope1:
+      type: object
+      properties:
+        scope_template_id:
+          type: string
+          format: uuid
+          description: Scope template UUID.
+        scope_validation_id:
+          type: string
+          format: uuid
+          description: Scope validation UUID.
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataScope1
+    EorPostRequestBodyContentApplicationJsonSchemaDataSeniority:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataSeniorityId'
+          description: Identifier for the seniority level (string or numeric ID).
+      description: Seniority selection for the role.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataSeniority
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataEmploymentType:
+      type: string
+      enum:
+      - Full-time
+      - Part-time
+      description: Type of employment
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataEmploymentType
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentScopeOfWork1:
+      type: object
+      properties:
+        scope_template_id:
+          type: string
+          format: uuid
+          description: Scope template UUID.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentScopeOfWork1
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentNoticePeriodDuringProbationTimeUnit:
+      type: string
+      enum:
+      - DAY
+      - WEEK
+      - MONTH
+      description: Time unit of notice period during probation.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentNoticePeriodDuringProbationTimeUnit
+    EorPostRequestBodyContentApplicationJsonSchemaDataSeniorityId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      description: Identifier for the seniority level (string or numeric ID).
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataSeniorityId
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataTimeOffType:
+      type: string
+      enum:
+      - STANDARD
+      - SPECIFIC
+      - PRORATED
+      description: Type of time off
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataTimeOffType
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Internal identifier for the cost section (e.g., MONTHLY_EMPLOYMENT_BREAKDOWN).
+        label:
+          type: string
+          description: Display name for the cost section.
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItems'
+          description: Collections of related costs grouped under a common label.
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsTotalsItems'
+          description: Overall totals for the section, summing all groups and standalone items.
+        is_summarized:
+          type: boolean
+          description: Indicates whether the section is presented in summarized form.
+        standalone_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsStandaloneItemsItems'
+          description: Cost items that do not belong to regular groups, often irregular or one-off costs.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItems
+    eor-contract_createEORContract_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaData'
+      title: eor-contract_createEORContract_Response_201
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFieldsEmployeeType:
+      type: string
+      enum:
+      - Employee
+      - Manager
+      description: Type of employee
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFieldsEmployeeType
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaNoticePeriodType:
+      type: string
+      enum:
+      - STANDARD
+      - CUSTOM
+      description: Type of notice period if applicable.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaNoticePeriodType
+    EorPostRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFieldsWorkerType:
+      type: string
+      enum:
+      - Skilled
+      - Unskilled
+      description: Type of worker.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFieldsWorkerType
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmployeePfDeductions:
+      type: string
+      enum:
+      - 12% of Basic
+      - 12% of Rs 15,000 (Rs 1,800)
+      description: Employee's PF deductions. Required only for India contracts.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmployeePfDeductions
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentScopeOfWork:
+      oneOf:
+      - type: string
+      - $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentScopeOfWork1'
+      - $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentScopeOfWork2'
+      description: Scope of work; either a string with full text or an object referencing a template/validation UUID.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentScopeOfWork
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentNoticePeriodAfterProbationTimeUnit:
+      type: string
+      enum:
+      - DAY
+      - WEEK
+      - MONTH
+      description: Time unit of notice period after probation.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentNoticePeriodAfterProbationTimeUnit
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentType:
+      type: string
+      enum:
+      - Full-time
+      - Part-time
+      description: The type of employment.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentType
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaTimeOffType:
+      type: string
+      enum:
+      - STANDARD
+      - SPECIFIC
+      - PRORATED
+      description: Type of time off policy.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaTimeOffType
+    EorPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntityId'
+          description: Legal entity reference for the client.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejectionRejectionReason:
+      type: string
+      enum:
+      - TOO_EXPENSIVE
+      - DECIDED_AGAINST_EMPLOYING_EOR
+      - TEST_QUOTE
+      - NOT_SATISFIED_WITH_DEEL
+      - INACCURATE_INFO_JOB_TITLE
+      - INACCURATE_INFO_JOB_DESCRIPTION
+      - INACCURATE_INFO_JOB_DUTIES_SCOPE_OF_WORK
+      - OTHER
+      description: Reason why the rejection occurred.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejectionRejectionReason
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCosts:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSummary'
+          description: Top-level overview of costs, including key totals and currency metadata.
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItems'
+          description: Detailed and categorized cost sections including grouped and standalone items.
+        additional_data:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsAdditionalData'
+          description: Supplementary notes and contextual information relevant to the cost quote.
+      description: Detailed breakdown of employment costs including summary totals, sectioned cost groups, and additional context notes.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCosts
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItemsTotalsItems:
+      type: object
+      properties:
+        total:
+          type: string
+          description: Group total in local currency.
+        frequency:
+          type: string
+          description: How often the total is calculated (e.g., monthly, annual).
+        total_supporting:
+          type: string
+          description: Group total in supporting currency.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItemsTotalsItems
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataReasonForFixedTerm:
+      type: string
+      enum:
+      - SEASONAL_OR_TEMPORARY_WORK
+      - PROJECT_BASED_EMPLOYMENT
+      - REPLACEMENT_FOR_PERMANENT_STAFF
+      - TRIAL_PERIODS_FOR_NEW_ROLES_OR_BUSINESSES
+      description: Reason for fixed-term contract
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataReasonForFixedTerm
+    EorContractContractIdPatchResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifier
+        status:
+          type: integer
+          description: HTTP status code
+        message:
+          type: string
+          description: Error message details
+      title: EorContractContractIdPatchResponsesContentApplicationJsonSchemaError
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaTeam:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the team.
+        name:
+          type: string
+          description: The name of the team.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaTeam
+    EorPostRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFields:
+      type: object
+      properties:
+        dob:
+          type: string
+          description: Employee's date of birth.
+        gender:
+          type: string
+          description: Employee's gender.
+        worker_type:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFieldsWorkerType'
+          description: Type of worker.
+      description: Some countries require additional employee information for employment contracts.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFields
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaStatus:
+      type: string
+      enum:
+      - under_review
+      - waiting_for_employee_contract
+      - waiting_for_client_sign
+      - waiting_for_eor_sign
+      - waiting_for_employee_sign
+      - awaiting_deposit_payment
+      - in_progress
+      - completed
+      - cancelled
+      - user_cancelled
+      - rejected
+      description: The current status of the contract.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaStatus
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaSeniority:
+      type: object
+      properties:
+        id:
+          type: number
+          format: double
+          description: The unique identifier for the seniority level.
+        name:
+          type: string
+          description: The name of the seniority level.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaSeniority
+    EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Internal identifier for the cost section (e.g., MONTHLY_EMPLOYMENT_BREAKDOWN).
+        label:
+          type: string
+          description: Display name for the cost section.
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItems'
+          description: Collections of related costs grouped under a common label.
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsTotalsItems'
+          description: Overall totals for the section, summing all groups and standalone items.
+        is_summarized:
+          type: boolean
+          description: Indicates whether the section is presented in summarized form.
+        standalone_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsStandaloneItemsItems'
+          description: Cost items that do not belong to regular groups, often irregular or one-off costs.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItems
+    UpdateEorContractRequestForbiddenError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/EorContractContractIdPatchResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: UpdateEorContractRequestForbiddenError
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentScopeOfWork2:
+      type: object
+      properties:
+        scope_validation_id:
+          type: string
+          format: uuid
+          description: Scope validation UUID.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentScopeOfWork2
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataSigningBonusPayoutType:
+      type: string
+      enum:
+      - FIRST_CYCLE
+      - AFTER_PROBATION
+      - AFTER_FIRST_CONTRACT_ANNIVERSARY
+      default: FIRST_CYCLE
+      description: Determines when the signing bonus will be paid out
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataSigningBonusPayoutType
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaHiringObjectiveType:
+      type: string
+      enum:
+      - EXPANDING_TO_NEW_COUNTRY
+      - TEMP_EOR_OPENING_ENTITY
+      - ONE_OFF_HIRE
+      - CONVERTING_CONTRACTOR
+      - OTHER
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaHiringObjectiveType
+    EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsVariableCompensationTimeline:
+      type: string
+      enum:
+      - ANNUALLY
+      - BIANNUALLY
+      - QUARTERLY
+      - MONTHLY
+      description: Variable compensation timeline.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsVariableCompensationTimeline
+    EorPostRequestBodyContentApplicationJsonSchemaDataClientTeamId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      description: Team identifying information.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataClientTeamId
+    EorPostResponsesContentApplicationJsonSchemaDataHealthPlan:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Health plan ID
+        name:
+          type: string
+          description: Health plan name
+      title: EorPostResponsesContentApplicationJsonSchemaDataHealthPlan
+    EorPostResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of the contract.
+      title: EorPostResponsesContentApplicationJsonSchemaDataType
+    EorPostResponsesContentApplicationJsonSchemaDataClientLegalEntity:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Legal entity name
+      title: EorPostResponsesContentApplicationJsonSchemaDataClientLegalEntity
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        scope:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataScope'
+        salary:
+          type: number
+          format: double
+          description: Annual salary amount
+        benefits:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataBenefitsItems'
+          description: Array of employee benefits
+        currency:
+          type: string
+          description: Currency code for salary and benefits
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Employment end date
+        holidays:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of holiday days per year
+        is_hourly:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates if compensation is hourly
+        job_title:
+          type: string
+          description: Job title (cannot be C-level position)
+        work_visa:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates if work visa is required
+        start_date:
+          type: string
+          format: date
+          description: Employment start date
+        employee_id:
+          type: string
+          description: Employee's unique identifier
+        hourly_rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Hourly rate (required if is_hourly is true)
+        is_resubmit:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates if this is a resubmission
+        schedule_id:
+          type:
+          - string
+          - 'null'
+          description: Unique identifier for the employee's work schedule
+        seniority_id:
+          type: number
+          format: double
+          description: Seniority level identifier
+        work_pension:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates if work pension is included
+        signing_bonus:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Signing bonus amount
+        time_off_type:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataTimeOffType'
+          description: Type of time off
+        employee_email:
+          type: string
+          format: email
+          description: Employee's email address
+        seniority_date:
+          type: string
+          format: date
+          description: Employee seniority date
+        employment_type:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataEmploymentType'
+          description: Type of employment
+        sick_leave_days:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of sick leave days per year
+        employee_address:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataEmployeeAddress'
+          description: Employee's address information
+        employment_state:
+          type:
+          - string
+          - 'null'
+          description: State/Province of employment
+        hiring_objective:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataHiringObjective'
+          description: Objective for hiring
+        probation_period:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Probation period duration
+        work_arrangement:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataWorkArrangement'
+          - type: 'null'
+          description: Work arrangement type
+        work_eligibility:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataWorkEligibility'
+          description: Work eligibility documentation
+        medical_insurance:
+          type: boolean
+          description: Medical insurance coverage
+        contract_term_type:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataContractTermType'
+          description: Type of contract term
+        employee_last_name:
+          type: string
+          description: Employee's last name
+        employment_country:
+          type: string
+          description: Country of employment
+        notice_period_type:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataNoticePeriodType'
+          description: Type of notice period
+        employee_first_name:
+          type: string
+          description: Employee's first name
+        work_hours_per_week:
+          type: number
+          format: double
+          description: Working hours per week
+        employee_nationality:
+          type: string
+          description: Employee's nationality
+        reason_for_fixed_term:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataReasonForFixedTerm'
+          - type: 'null'
+          description: Reason for fixed-term contract
+        quote_additional_fields:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFields'
+          description: Additional quote-specific information
+        signing_bonus_payout_type:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataSigningBonusPayoutType'
+          - type: 'null'
+          description: Determines when the signing bonus will be paid out
+        hiring_objective_extra_info:
+          type:
+          - string
+          - 'null'
+          description: Additional information about hiring objective
+        notice_period_after_probation:
+          type: number
+          format: double
+          description: Notice period after probation (days)
+        notice_period_during_probation:
+          type: number
+          format: double
+          description: Notice period during probation (days)
+        is_auto_quote_validation_passed:
+          type:
+          - boolean
+          - 'null'
+          description: Auto quote validation status
+        probation_period_type_for_definite:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataProbationPeriodTypeForDefinite'
+          description: Unit of time for probation period
+        allow_consultant_equipment_reimbursement:
+          type: boolean
+          description: Allow equipment reimbursement for consultants
+      required:
+      - salary
+      - job_title
+      - start_date
+      - employee_email
+      - employment_type
+      - employee_last_name
+      - employment_country
+      - employee_first_name
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaData
+    RetrieveEorContractDetails-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Contract is not accessible to the user/organization
+      title: RetrieveEorContractDetails-v2026-01-01RequestForbiddenError
+    UpdateEorContractRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/EorContractContractIdPatchResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: UpdateEorContractRequestBadRequestError
+    EorPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the created contract quote.
+        type:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataType'
+          description: Type of the contract.
+        costs:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCosts'
+          description: Detailed breakdown of employment costs including summary totals, sectioned cost groups, and additional context notes.
+        client:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataClient'
+          description: Client information for the contract.
+        status:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current status of the contract.
+        employee:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataEmployee'
+        job_title:
+          type: string
+          description: Employee's job title
+        seniority:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataSeniority'
+          description: Seniority level of the employee
+        created_at:
+          type: string
+          format: date-time
+          description: Contract creation timestamp
+        employment:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataEmployment'
+          description: Employment contract specific details.
+        health_plan:
+          oneOf:
+          - $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataHealthPlan'
+          - type: 'null'
+        compensation_details:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCompensationDetails'
+      title: EorPostResponsesContentApplicationJsonSchemaData
+    EorPostRequestBodyContentApplicationJsonSchemaDataBenefitsItems:
+      type: object
+      properties:
+        plan_id:
+          type: string
+          description: The ID of a benefits plan to include in the calculation.
+        cover_all:
+          type: boolean
+          description: Flag indicating if benefit will fully cover the employee.
+        provider_id:
+          type: string
+          description: The ID of a benefits provider to include in the calculation.
+        contribution:
+          type: number
+          format: double
+          description: The amount the client will contribute for the benefit in the currency of the contract. Only taken into account if cover_all is set to false. For Unisure provider contribution is always in USD.
+        cover_dependents:
+          type: boolean
+          description: Flag indicating if benefit will cover dependents. Only needed if cover_all is set to true.
+      description: List of additional benefits to include in the calculation
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataBenefitsItems
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaProbationPeriodTypeForDefinite:
+      type: string
+      enum:
+      - STANDARD
+      - CUSTOM
+      description: Probation period type for definite contracts.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaProbationPeriodTypeForDefinite
+    EorPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntityId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      description: Legal entity reference for the client.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntityId
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaHiringObjective:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaHiringObjectiveType'
+        extra_info:
+          type:
+          - string
+          - 'null'
+      description: Information about the hiring objective.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaHiringObjective
+    EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItemsCostsItemsTotalsItems:
+      type: object
+      properties:
+        total:
+          type: string
+          description: Total cost amount in local currency.
+        frequency:
+          type: string
+          description: How often this cost occurs (e.g., monthly, annual, one-time).
+        total_supporting:
+          type: string
+          description: Total cost amount in the supporting currency.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItemsCostsItemsTotalsItems
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsTotalsItems:
+      type: object
+      properties:
+        total:
+          type: string
+          description: Total cost for the section in local currency.
+        frequency:
+          type: string
+          description: How often the total is calculated (e.g., monthly, annual).
+        total_supporting:
+          type: string
+          description: Total cost for the section in supporting currency.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsTotalsItems
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataContractTermType:
+      type: string
+      enum:
+      - DEFINITE
+      - INDEFINITE
+      description: Type of contract term
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataContractTermType
+    UpdateEorContractRequestInternalServerError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/EorContractContractIdPatchResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: UpdateEorContractRequestInternalServerError
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataEmployeeAddress:
+      type: object
+      properties:
+        zip:
+          type: string
+          description: ZIP/Postal code
+        city:
+          type: string
+          description: City of residence
+        phone:
+          type: string
+          description: Phone number
+        state:
+          type: string
+          description: State of residence
+        street:
+          type: string
+          description: Street address
+        country:
+          type: string
+          description: Country of residence (can be country code or name)
+        province:
+          type: string
+          description: Province of residence
+        calling_code:
+          type: string
+          description: Country calling code
+      required:
+      - city
+      - street
+      - country
+      description: Employee's address information
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataEmployeeAddress
+    ? EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsStandaloneItemsItemsTotalsItems
+    : type: object
+      properties:
+        total:
+          type: string
+          description: Standalone cost amount in local currency.
+        frequency:
+          type: string
+          description: How often this cost occurs (e.g., monthly, annual, one-time).
+        total_supporting:
+          type: string
+          description: Standalone cost amount in the supporting currency.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsStandaloneItemsItemsTotalsItems
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentType:
+      type: string
+      enum:
+      - Full-time
+      - Part-time
+      description: Is it a full-time contract or a part-time contract?
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentType
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsAdditionalData:
+      type: object
+      properties:
+        annual_notes:
+          type: array
+          items:
+            type: string
+          description: Notes or assumptions specifically relevant to annual cost calculations.
+        monthly_notes:
+          type: array
+          items:
+            type: string
+          description: Notes or assumptions specifically relevant to monthly cost calculations.
+        once_off_notes:
+          type: array
+          items:
+            type: string
+          description: Notes regarding one-time costs or irregular payments in the quote.
+        additional_notes:
+          type: array
+          items:
+            type: string
+          description: General conditions, assumptions, or fees that may apply to the quote.
+      description: Supplementary notes and contextual information relevant to the cost quote.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsAdditionalData
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataWorkEligibility:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Unique identifier for the work eligibility document
+        file_name:
+          type: string
+          description: Name of the work eligibility document file
+      required:
+      - key
+      - file_name
+      description: Work eligibility documentation
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataWorkEligibility
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejectionRejectedBy:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Full name of the rejecting person.
+        profile_public_id:
+          type: string
+          format: uuid
+          description: Public identifier for the rejecting person's profile.
+      description: Details of the person who rejected.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejectionRejectedBy
+    EorPostResponsesContentApplicationJsonSchemaDataClient:
+      type: object
+      properties:
+        legal_entity:
+          $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataClientLegalEntity'
+      description: Client information for the contract.
+      title: EorPostResponsesContentApplicationJsonSchemaDataClient
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmployee:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Employee's email address.
+        address:
+          oneOf:
+          - $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmployeeAddress'
+          - type: 'null'
+        last_name:
+          type: string
+          description: Employee's last name.
+        first_name:
+          type: string
+          description: Employee's first name.
+        external_id:
+          type: string
+          description: External identifier of the employee.
+        nationality:
+          type: string
+          description: Employee's nationality.
+        pf_deductions:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmployeePfDeductions'
+          description: Employee's PF deductions. Required only for India contracts.
+      required:
+      - last_name
+      - first_name
+      - nationality
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmployee
+    EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsTotalsItems:
+      type: object
+      properties:
+        total:
+          type: string
+          description: Total cost for the section in local currency.
+        frequency:
+          type: string
+          description: How often the total is calculated (e.g., monthly, annual).
+        total_supporting:
+          type: string
+          description: Total cost for the section in supporting currency.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsTotalsItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetails:
+      type: object
+      properties:
+        salary:
+          type: number
+          format: double
+          description: Employee's gross annual salary. Required only if contract is salaried.
+        currency:
+          type: string
+          description: Salary currency.
+        hourly_rate:
+          type: number
+          format: double
+          description: Employee's hourly rate. Required only if contract is set as hourly.
+        signing_bonus:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Signing bonus amount.
+        fixed_adjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsFixedAdjustmentsItems'
+        variable_compensation:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Variable compensation. For example, if the person will earn 5% of the gross annual salary as the variable compensation, enter 5.
+        signing_bonus_payout_type:
+          oneOf:
+          - $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsSigningBonusPayoutType'
+          - type: 'null'
+          description: Should be set only if signing_bonus is set. It defines when the bonus is paid.
+        variable_compensation_type:
+          oneOf:
+          - $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsVariableCompensationType'
+          - type: 'null'
+          description: Should be set only if variable_compensation is set. It can be PERCENTAGE or FIXED.
+        variable_compensation_title:
+          type: string
+          description: Variable compensation title.
+        variable_compensation_timeline:
+          oneOf:
+          - $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsVariableCompensationTimeline'
+          - type: 'null'
+          description: Variable compensation timeline.
+        variable_compensation_effective_date:
+          type: string
+          format: date
+          description: Variable compensation effective date.
+      required:
+      - currency
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetails
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataProbationPeriodTypeForDefinite:
+      type: string
+      enum:
+      - CUSTOM
+      - STANDARD
+      description: Unit of time for probation period
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataProbationPeriodTypeForDefinite
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataScope:
+      oneOf:
+      - type: string
+      - $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataScope1'
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataScope
+    EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsFixedAdjustmentsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Adjustment name.
+        value:
+          type: number
+          format: double
+          description: Adjustment value.
+        opt_out:
+          type: boolean
+          description: Whether the adjustment is being opted out of.
+        optional:
+          type: boolean
+          description: Whether the adjustment is optional.
+        description:
+          type: string
+          description: Adjustment description.
+        is_recurring:
+          type: boolean
+          description: Whether the adjustment is paid recurring monthly or one-time on employee's first payroll.
+        rule_cost_id:
+          type: string
+          description: Identifier of the rule cost associated with the adjustment.
+        is_country_specific:
+          type: boolean
+          description: Whether this adjustment is country-specific.
+        skipping_confirmation_text:
+          type: string
+          description: Optional skipping confirmation text shown to the user.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsFixedAdjustmentsItems
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmployeeAddress:
+      type: object
+      properties:
+        zip:
+          type: string
+          description: Zip code.
+        city:
+          type: string
+          description: City name.
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code.
+        street:
+          type: string
+          description: Street and number.
+        country:
+          type: string
+          description: Country code.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmployeeAddress
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentTimeOffType:
+      type: string
+      enum:
+      - STANDARD
+      - SPECIFIC
+      description: If you want to use standard number of holidays for this employee, choose "STANDARD". If you want to enter a specific number of holidays, choose "SPECIFIC" and enter the number of days in the holidays field.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentTimeOffType
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejectionRejectionType:
+      type: string
+      enum:
+      - CLIENT
+      - EOR_AGENT
+      description: Type of rejection.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejectionRejectionType
+    EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsSigningBonusPayoutType:
+      type: string
+      enum:
+      - FIRST_CYCLE
+      - AFTER_PROBATION
+      - AFTER_FIRST_CONTRACT_ANNIVERSARY
+      description: Should be set only if signing_bonus is set. It defines when the bonus is paid.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsSigningBonusPayoutType
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    EorPostResponsesContentApplicationJsonSchemaDataEmployee:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Employee's email
+        last_name:
+          type: string
+          description: Employee's last name
+        first_name:
+          type: string
+          description: Employee's first name
+        legal_name:
+          type: string
+          description: Employee's legal name
+      title: EorPostResponsesContentApplicationJsonSchemaDataEmployee
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Internal identifier for the group.
+        costs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItemsCostsItems'
+          description: Individual cost items within the group.
+        label:
+          type: string
+          description: Display name for the group (e.g., Gross Salary, Employer Cost).
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItemsTotalsItems'
+          description: Aggregated totals for all items within the group.
+        has_breakdown:
+          type: boolean
+          description: Indicates if the group contains multiple detailed cost items to be expanded.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItems
+    EorPostResponsesContentApplicationJsonSchemaDataSeniority:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Seniority level ID
+        name:
+          type: string
+          description: Seniority level name
+      required:
+      - id
+      - name
+      description: Seniority level of the employee
+      title: EorPostResponsesContentApplicationJsonSchemaDataSeniority
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmployment:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentType'
+          description: Is it a full-time contract or a part-time contract?
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code of the state/province where the this person will be employed.
+        country:
+          type: string
+          description: Country code of employment.
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: End date in ISO-8601 format (YYYY-MM-DD).
+        holidays:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Enter the number of holidays. Leave this field blank if you are choosing "STANDARD" time_off_type.
+        is_hourly:
+          type: boolean
+          description: Is the employee contract hourly instead of salaried?
+        start_date:
+          type: string
+          format: date
+          description: Start date in ISO-8601 format (YYYY-MM-DD).
+        scope_of_work:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentScopeOfWork'
+          description: Scope of work; either a string with full text or an object referencing a template/validation UUID.
+        time_off_type:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentTimeOffType'
+          description: If you want to use standard number of holidays for this employee, choose "STANDARD". If you want to enter a specific number of holidays, choose "SPECIFIC" and enter the number of days in the holidays field.
+        seniority_date:
+          type: string
+          format: date
+          description: Seniority date
+        sick_leave_days:
+          type: integer
+          description: Number of sick leave days
+        probation_period:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of probation days.
+        notice_period_type:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentNoticePeriodType'
+          description: Type of notice period.
+        work_visa_required:
+          type: boolean
+          default: false
+          description: Do you require Deel to apply for work visa for this person?
+        work_hours_per_week:
+          type: number
+          format: double
+          description: Employee's work hours per week. Required only if contract is set as hourly.
+        probation_period_time_unit:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentProbationPeriodTimeUnit'
+          description: Time unit of probation period.
+        notice_period_after_probation:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Notice period after probation required when type is CUSTOM.
+        notice_period_during_probation:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Notice period during probation required when type is CUSTOM.
+        employee_completed_past_probation:
+          type: boolean
+          default: false
+          description: Whether the employee has previously passed the probation period.
+        probation_period_type_for_definite:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentProbationPeriodTypeForDefinite'
+          description: Type of probation period for definite contracts.
+        notice_period_after_probation_time_unit:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentNoticePeriodAfterProbationTimeUnit'
+          description: Time unit of notice period after probation.
+        notice_period_during_probation_time_unit:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentNoticePeriodDuringProbationTimeUnit'
+          description: Time unit of notice period during probation.
+      required:
+      - country
+      - start_date
+      - scope_of_work
+      - work_visa_required
+      description: Employment contract specific details.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmployment
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejection:
+      type: object
+      properties:
+        created_at:
+          type: string
+          description: Timestamp of when the rejection was made.
+        rejected_by:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejectionRejectedBy'
+          description: Details of the person who rejected.
+        rejection_type:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejectionRejectionType'
+          - type: 'null'
+          description: Type of rejection.
+        rejection_reason:
+          $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejectionRejectionReason'
+          description: Reason why the rejection occurred.
+        rejection_message:
+          type:
+          - string
+          - 'null'
+          description: Optional message explaining the rejection.
+      description: Timestamp of last quote rejection.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaLastQuoteRejection
+    EorPostRequestBodyContentApplicationJsonSchemaDataPension:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Pension provider id. You can see available pension providers in the country guide endpoint.
+        contribution:
+          type: string
+          description: Enter the value of pension contribution. You should send this value only if the contribution object is available in the country guide endpoint and the value should be there between minimum and maximum values indicated.
+      description: Some countries required a pension benefit.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataPension
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataNoticePeriodType:
+      type: string
+      enum:
+      - STANDARD
+      - CUSTOM
+      description: Type of notice period
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataNoticePeriodType
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmployee:
+      type: object
+      properties:
+        email:
+          type: string
+          description: The email of the employee.
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: URL to employee's picture.
+        last_name:
+          type: string
+          description: The last name of the employee.
+        first_name:
+          type: string
+          description: The first name of the employee.
+        legal_name:
+          type: string
+          description: The legal name of the employee.
+        nationality:
+          type: string
+          description: Two letter country code of the employee nationality.
+      description: Employee details
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmployee
+    EorPostResponsesContentApplicationJsonSchemaDataCompensationDetails:
+      type: object
+      properties:
+        salary:
+          type: string
+          description: Gross annual salary
+        currency:
+          type: string
+          description: Currency of the salary
+        variable_compensation:
+          type: string
+          description: Variable compensation account or percentage
+        variable_compensation_type:
+          type:
+          - string
+          - 'null'
+          description: Type of variable compensation
+      title: EorPostResponsesContentApplicationJsonSchemaDataCompensationDetails
+    EorPostRequestBodyContentApplicationJsonSchemaDataClientTeam:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataClientTeamId'
+          description: Team identifying information.
+      required:
+      - id
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataClientTeam
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItemsCostsItems:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Name of the specific cost item (e.g., Salary, Meal Voucher).
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItemsCostsItemsTotalsItems'
+          description: Monthly and annual totals for the cost item in local and supporting currencies.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaEmploymentCostsSectionsItemsGroupsItemsCostsItems
+    EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsStandaloneItemsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Internal identifier for the standalone cost item.
+        label:
+          type: string
+          description: Display name for the standalone cost item.
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsStandaloneItemsItemsTotalsItems'
+          description: Monthly and annual totals for the standalone item in local and supporting currencies.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsStandaloneItemsItems
+    EorPostResponsesContentApplicationJsonSchemaDataCostsSummaryTotalsFormattedItems:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Display title for the total (e.g., 'Monthly Total').
+        total:
+          type: string
+          description: Formatted amount in local currency.
+        frequency:
+          type: string
+          description: Time period for the total (e.g., monthly, annual).
+        total_supporting:
+          type: string
+          description: Formatted amount in supporting currency.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsSummaryTotalsFormattedItems
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentProbationPeriodTypeForDefinite:
+      type: string
+      enum:
+      - STANDARD
+      - CUSTOM
+      description: Type of probation period for definite contracts.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentProbationPeriodTypeForDefinite
+    EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsVariableCompensationType:
+      type: string
+      enum:
+      - PERCENTAGE
+      - FIXED
+      description: Should be set only if variable_compensation is set. It can be PERCENTAGE or FIXED.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsVariableCompensationType
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataBenefitsItems:
+      type: object
+      properties:
+        plan_id:
+          type:
+          - string
+          - 'null'
+          description: Benefit plan ID
+        cover_all:
+          type: boolean
+          description: Indicates if benefit covers all
+        provider_id:
+          type:
+          - string
+          - 'null'
+          description: Benefit provider ID
+        contribution:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Contribution amount
+        cover_dependents:
+          type: boolean
+          description: Indicates if benefit covers dependents
+      description: Benefit plan details
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataBenefitsItems
+    EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentProbationPeriodTimeUnit:
+      type: string
+      enum:
+      - DAY
+      - WEEK
+      - MONTH
+      description: Time unit of probation period.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataEmploymentProbationPeriodTimeUnit
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataWorkArrangement:
+      type: string
+      enum:
+      - REMOTE
+      - ON_SITE_OR_HYBRID
+      description: Work arrangement type
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataWorkArrangement
+    EorContractContractIdPatchResponsesContentApplicationJsonSchemaStatus:
+      type: string
+      enum:
+      - new
+      - under_review
+      - waiting_for_client_sign
+      - waiting_for_eor_sign
+      - waiting_for_employee_sign
+      - awaiting_deposit_payment
+      - rejected
+      description: Current status of the contract
+      title: EorContractContractIdPatchResponsesContentApplicationJsonSchemaStatus
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaSickDays:
+      type: object
+      properties:
+        max:
+          type:
+          - string
+          - 'null'
+          description: Maximum number of sick days allowed.
+        min:
+          type:
+          - string
+          - 'null'
+          description: Minimum number of sick days allowed.
+      description: Allowed sick days range.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaSickDays
+    EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItemsCostsItems:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Name of the specific cost item (e.g., Salary, Meal Voucher).
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItemsCostsItemsTotalsItems'
+          description: Monthly and annual totals for the cost item in local and supporting currencies.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItemsCostsItems
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaWorkScheduleAssignmentSettings:
+      type: string
+      enum:
+      - NOT_AVAILABLE
+      - SPECIFIC_SCHEDULES
+      - GENERAL_SCHEDULES
+      - ONE_TIME_AMENDMENT
+      description: Work schedule assignment setting.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaWorkScheduleAssignmentSettings
+    EorPostRequestBodyContentApplicationJsonSchemaDataClient:
+      type: object
+      properties:
+        team:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataClientTeam'
+        legal_entity:
+          $ref: '#/components/schemas/EorPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity'
+      required:
+      - team
+      description: Client details for the contract.
+      title: EorPostRequestBodyContentApplicationJsonSchemaDataClient
+    EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Internal identifier for the group.
+        costs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItemsCostsItems'
+          description: Individual cost items within the group.
+        label:
+          type: string
+          description: Display name for the group (e.g., Gross Salary, Employer Cost).
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItemsTotalsItems'
+          description: Aggregated totals for all items within the group.
+        has_breakdown:
+          type: boolean
+          description: Indicates if the group contains multiple detailed cost items to be expanded.
+      title: EorPostResponsesContentApplicationJsonSchemaDataCostsSectionsItemsGroupsItems
+    EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFields:
+      type: object
+      properties:
+        employee_type:
+          $ref: '#/components/schemas/EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFieldsEmployeeType'
+          description: Type of employee
+        qualifications:
+          type: string
+          description: Required qualifications
+        scope_german_translation:
+          type: string
+          description: German translation of scope
+        qualifications_german_translation:
+          type: string
+          description: German translation of qualifications
+      description: Additional quote-specific information
+      title: EorContractContractIdPatchRequestBodyContentApplicationJsonSchemaDataQuoteAdditionalFields
+    EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaCanAdjustOn:
+      type: object
+      properties:
+        end:
+          type: string
+          description: End of the period when adjustments can be made.
+        start:
+          type: string
+          description: Start of the period when adjustments can be made.
+      description: Time frame when adjustments can be made.
+      title: EorContractsContractIdDetailsGetResponsesContentApplicationJsonSchemaCanAdjustOn
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

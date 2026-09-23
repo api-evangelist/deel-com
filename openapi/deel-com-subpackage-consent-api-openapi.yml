@@ -1,0 +1,190 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Consent API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_consent
+paths:
+  /consent_token:
+    post:
+      operationId: create-consent-token
+      summary: Create a consent token
+      description: Creates a consent token for the specified user, profile and contract
+      tags:
+      - subpackage_consent
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Consent token created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Consent_createConsentToken_Response_201'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateConsentTokenRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateConsentTokenRequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ConsentTokenPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+components:
+  schemas:
+    CreateConsentTokenRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateConsentTokenRequestBadRequestError
+    Consent_createConsentToken_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ConsentTokenPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Consent_createConsentToken_Response_201
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ConsentTokenPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: User ID
+        profile_id:
+          type: string
+          description: Profile ID
+        contract_id:
+          type: string
+          description: Contract ID
+      required:
+      - user_id
+      - profile_id
+      - contract_id
+      title: ConsentTokenPostRequestBodyContentApplicationJsonSchemaData
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ConsentTokenPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: Token creation timestamp
+        expires_at:
+          type: string
+          format: date-time
+          description: Token expiration timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Token last update timestamp
+        unique_consent_token:
+          type: string
+          description: JWT token for consent
+      required:
+      - created_at
+      - expires_at
+      - updated_at
+      - unique_consent_token
+      title: ConsentTokenPostResponsesContentApplicationJsonSchemaData
+    CreateConsentTokenRequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateConsentTokenRequestInternalServerError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

@@ -1,0 +1,237 @@
+# x-archived-from: deel-subpackage-listcycles-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage List Cycles API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_listCycles
+paths:
+  /legal-entities/{legal_entity_id}/payroll-events:
+    get:
+      operationId: list-payroll-cycles-v-2026-01-01
+      summary: List payroll cycles
+      description: "Use this endpoint to retrieve a list of payroll events for a specified legal entity.\n **Token scopes**: `legal-entity:read`"
+      tags:
+      - subpackage_listCycles
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: The unique identifier (public ID) for the legal entity.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: date_start
+        in: query
+        description: Start date in the format 'YYYY-MM-DD'. Must not be earlier than 5 years ago.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_end
+        in: query
+        description: End date in the format 'YYYY-MM-DD'. Must not exceed 5 years in the future.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        description: Maximum number of items to return.
+        required: false
+        schema:
+          type: integer
+          default: 20
+      - name: cursor
+        in: query
+        description: Pagination cursor, CUID or UUID format.
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_Cycles_listPayrollCycles-v2026-01-01_Response_200'
+        '400':
+          description: Validation error or bad input.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayrollCycles-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayrollCycles-v2026-01-01RequestInternalServerError'
+components:
+  schemas:
+    ListPayrollCycles-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdPayrollEventsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListPayrollCycles-v2026-01-01RequestInternalServerError
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    LegalEntitiesLegalEntityIdPayrollEventsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the payroll cycle.
+        type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdPayrollEventsGetResponsesContentApplicationJsonSchemaDataItemsType'
+          description: The type of payroll cycle (e.g., OFFCYCLE, REGULAR).
+        date_end:
+          type: string
+          format: date-time
+          description: The end date of the payroll cycle.
+        date_start:
+          type: string
+          format: date-time
+          description: The start date of the payroll cycle.
+        legal_entity_id:
+          type: string
+          description: The unique identifier for the associated legal entity.
+        payroll_group_id:
+          type:
+          - string
+          - 'null'
+          description: The unique identifier for the payroll group.
+      title: LegalEntitiesLegalEntityIdPayrollEventsGetResponsesContentApplicationJsonSchemaDataItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    LegalEntitiesLegalEntityIdPayrollEventsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: LegalEntitiesLegalEntityIdPayrollEventsGetResponsesContentApplicationJsonSchemaErrorsItems
+    List_Cycles_listPayrollCycles-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdPayrollEventsGetResponsesContentApplicationJsonSchemaDataItems'
+        has_more:
+          type: boolean
+          description: Indicates whether more pages are available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Pagination cursor to fetch the next page of results.
+        items_per_page:
+          type: integer
+          description: The number of items per page.
+      required:
+      - data
+      - has_more
+      - items_per_page
+      title: List Cycles_listPayrollCycles-v2026-01-01_Response_200
+    ListPayrollCycles-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdPayrollEventsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListPayrollCycles-v2026-01-01RequestBadRequestError
+    LegalEntitiesLegalEntityIdPayrollEventsGetResponsesContentApplicationJsonSchemaDataItemsType:
+      type: string
+      enum:
+      - OFFCYCLE
+      - REGULAR
+      description: The type of payroll cycle (e.g., OFFCYCLE, REGULAR).
+      title: LegalEntitiesLegalEntityIdPayrollEventsGetResponsesContentApplicationJsonSchemaDataItemsType
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

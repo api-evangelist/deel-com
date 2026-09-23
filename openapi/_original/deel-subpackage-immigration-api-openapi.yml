@@ -1,0 +1,2467 @@
+# x-archived-from: deel-subpackage-immigration-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Immigration API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_immigration
+paths:
+  /immigration/visa-requirement/business:
+    get:
+      operationId: get-business-visa-requirement
+      summary: Get business visa eligibility and requirements
+      description: "This endpoint receives personal information and desired travel information, analyzes and returns the possible business visa options for the given data.\n **Token scopes**: `immigration:read`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: destination_country
+        in: query
+        description: The destination country code of the trip in ISO 3166-1 alpha-2 format
+        required: true
+        schema:
+          type: string
+      - name: nationality
+        in: query
+        description: The nationality country code of the person in ISO 3166-1 alpha-2 format
+        required: true
+        schema:
+          type: string
+      - name: residence_country
+        in: query
+        description: The residence country code of the person in ISO 3166-1 alpha-2 format
+        required: true
+        schema:
+          type: string
+      - name: trip_start_date
+        in: query
+        description: The trip start date in ISO 8601 format (YYYY-MM-DD)
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: trip_end_date
+        in: query
+        description: The trip end date in ISO 8601 format (YYYY-MM-DD)
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: trip_reason
+        in: query
+        description: The reason for the trip
+        required: true
+        schema:
+          $ref: '#/components/schemas/ImmigrationVisaRequirementBusinessGetParametersTripReason'
+      - name: second_nationality
+        in: query
+        description: The second nationality country code of the person in ISO 3166-1 alpha-2 format (optional)
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immigration_getBusinessVisaRequirement_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBusinessVisaEligibilityAndRequirementsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBusinessVisaEligibilityAndRequirementsRequestInternalServerError'
+  /immigration/client/cases/{id}:
+    get:
+      operationId: get-client-case
+      summary: Get immigration case details
+      description: "Get detailed information for a specific immigration case. Use this to check case status and track process progress. The id path parameter is the case UUID returned from the 'Create Client Case' endpoint. Response is enriched with applicant profile, visa type, case status, estimated completion date, process details, and compliance document details.\n **Token scopes**: `immigration:read`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: id
+        in: path
+        description: Immigration case id
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immigration_getClientCase_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetImmigrationCaseDetails-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetImmigrationCaseDetails-v2026-01-01RequestInternalServerError'
+  /immigration/workers/cases/{case_id}:
+    get:
+      operationId: get-worker-case
+      summary: 'Get specific immigration case details '
+      description: "Get detailed information for a specific immigration case. Use this to check case status and track process progress. The id path parameter is the case UUID returned from the 'Create Client Case' endpoint. Response is enriched with applicant profile, visa type, case status, estimated completion date, process details, and compliance document details.\n **Token scopes**: `worker:read`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: case_id
+        in: path
+        description: Filter by case ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immigration_getWorkerCase_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSpecificImmigrationCaseDetails-v2026-04-02RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSpecificImmigrationCaseDetails-v2026-04-02RequestInternalServerError'
+  /immigration/documents/{id}:
+    get:
+      operationId: get-document
+      summary: Immigration document
+      description: "Fetch immigration document details by document id\n **Token scopes**: `immigration:read`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: id
+        in: path
+        description: 'Immigration case document id '
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immigration_getDocument_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /immigration/visa-types/{country_code}:
+    get:
+      operationId: get-visa-types
+      summary: Immigration visa types
+      description: "Fetch immigration supported visa types by country\n **Token scopes**: `immigration:read`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: country_code
+        in: path
+        description: Alpha 2 country code
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immigration_getVisaTypes_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /immigration/client/cases:
+    get:
+      operationId: get-client-cases
+      summary: List of immigration cases
+      description: "Retrieves a paginated list of immigration cases with filters for applicant name, case type, status, and country. Returns case details including type, status, process, timestamps, and optional closure information.\n **Token scopes**: `immigration:read`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: search
+        in: query
+        description: Search by applicant name or code
+        required: false
+        schema:
+          type: string
+      - name: case_type_ids
+        in: query
+        description: Filter by case type IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: statuses
+        in: query
+        description: Filter by case status
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationClientCasesGetParametersStatusesSchemaItems'
+      - name: countries
+        in: query
+        description: Filter by country. Uses ISO 3166-1 alpha-2 codes (https://www.iban.com/country-codes).
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: cursor
+        in: query
+        description: Pagination cursor for fetching next set of results
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Max number of results to return
+        required: false
+        schema:
+          type: integer
+          default: 20
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immigration_getClientCases_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfImmigrationCases-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfImmigrationCases-v2026-01-01RequestInternalServerError'
+    post:
+      operationId: create-an-immigration-case
+      summary: Create an immigration case
+      description: "Create an immigration case.\n **Token scopes**: `immigration:write`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Immigration_createAnImmigrationCase_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAnImmigrationCaseRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAnImmigrationCaseRequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData'
+  /immigration/workers/cases:
+    get:
+      operationId: get-worker-cases
+      summary: List of immigration cases for workers
+      description: "Retrieves a paginated list of immigration cases with filters for applicant name, case type, status, and country. Returns case details including type, status, process, timestamps, and optional closure information.\n **Token scopes**: `worker:read`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: search
+        in: query
+        description: Search by applicant name or code
+        required: false
+        schema:
+          type: string
+      - name: case_type_ids
+        in: query
+        description: Filter by case type IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: statuses
+        in: query
+        description: Filter by case status
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersCasesGetParametersStatusesSchemaItems'
+      - name: countries
+        in: query
+        description: Filter by country. Uses ISO 3166-1 alpha-2 codes (https://www.iban.com/country-codes).
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: cursor
+        in: query
+        description: Pagination cursor for fetching next set of results
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Max number of results to return
+        required: false
+        schema:
+          type: integer
+          default: 20
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immigration_getWorkerCases_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfImmigrationCasesForWorkers-v2026-04-02RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfImmigrationCasesForWorkers-v2026-04-02RequestInternalServerError'
+  /immigration/workers/{worker_id}/cases/{case_id}/required-document:
+    get:
+      operationId: get-worker-case-required-document
+      summary: Retrieve a required document for a case
+      description: "Use this endpoint to retrieve the details of a specific document requirement for a worker's case. This includes the requirement's status and information about any previously rejected documents\n **Token scopes**: `worker:read`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: worker_id
+        in: path
+        description: The hris profile oid (public id) of the worker.
+        required: true
+        schema:
+          type: string
+      - name: case_id
+        in: path
+        description: The unique identifier of the case for which the required document is being requested.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immigration_getWorkerCaseRequiredDocument_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /immigration/workers/{worker_id}/onboarding-case:
+    get:
+      operationId: get-worker-onboarding-case
+      summary: Retrieve onboarding right-to-work case for a worker
+      description: "Returns the right to work case for employee onboarding including the documents if any. In case no right to work case is open, the response will be empty.\n **Token scopes**: `worker:read`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: worker_id
+        in: path
+        description: The hris profile oid (public id) of the worker.
+        required: true
+        schema:
+          type: string
+      - name: contract_id
+        in: query
+        description: Filters the worker's onboarding case to a specific contract. If the worker has multiple contracts and this parameter is omitted, the response may return a case from any associated contract; the response includes contract.id to indicate which contract was used. Provide this parameter for deterministic results.
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immigration_getWorkerOnboardingCase_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveOnboardingRightToWorkCaseForAWorkerRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Case not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveOnboardingRightToWorkCaseForAWorkerRequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveOnboardingRightToWorkCaseForAWorkerRequestInternalServerError'
+  /immigration/workers/{worker_id}/cases/{case_id}/required-document/{document_request_id}:
+    post:
+      operationId: create-worker-case-required-document
+      summary: Upload a required immigration document
+      description: "Upload a required immigration document for a specific case. The document will be submitted for review.\n **Token scopes**: `worker:write`"
+      tags:
+      - subpackage_immigration
+      parameters:
+      - name: worker_id
+        in: path
+        description: The hris profile oid (public id) of the worker.
+        required: true
+        schema:
+          type: string
+      - name: case_id
+        in: path
+        description: The unique identifier of the case for which the required document is being requested.
+        required: true
+        schema:
+          type: string
+      - name: document_request_id
+        in: path
+        description: The unique identifier of the document request fo which this document is being uplodaded
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Document uploaded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/immigration_createWorkerCaseRequiredDocument_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Upload of immigration document
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentDocumentRequestIdPostRequestBodyContentMultipartFormDataSchemaData'
+                  description: Details of immigration document upload
+              required:
+              - data
+components:
+  schemas:
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataProcessStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - AWAITING_DOCUMENTS
+      - IN_REVIEW
+      - APPROVED
+      - REJECTED
+      description: Status of the current active process.
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataProcessStatus
+    ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaDataEstimatedTimeline:
+      type: string
+      enum:
+      - SIX_WEEKS
+      - THREE_MONTHS
+      - ONE_WEEK
+      - THREE_WEEKS
+      - ONE_YEAR
+      - TWO_WEEKS
+      - FIVE_WEEKS
+      - TWO_MONTHS
+      - FIVE_MONTHS
+      - FOUR_MONTHS
+      - SIX_MONTHS
+      - FOUR_WEEKS
+      description: Estimated processing timeline, in weeks, months or years
+      title: ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaDataEstimatedTimeline
+    immigration_getVisaTypes_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationVisaTypesCountryCodeGetResponsesContentApplicationJsonSchemaDataItems'
+      title: immigration_getVisaTypes_Response_200
+    ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataDocumentStatus:
+      type: string
+      enum:
+      - PENDING
+      - IN_REVIEW
+      - ACTIVE
+      - EXPIRING
+      - EXPIRED
+      description: Status of the document.
+      title: ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataDocumentStatus
+    ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus:
+      type: string
+      enum:
+      - IN_REVIEW
+      - APPROVED
+      - REJECTED
+      description: Status of the document.
+      title: ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of immigration case.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Status of the immigration case.
+        process:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataProcess'
+          description: The current active process
+        contract:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataContract'
+          description: The contract associated with the returned immigration case
+        applicant:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataApplicant'
+          - type: 'null'
+          description: The employee for which this Right to Work case has been created for
+        case_type:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataCaseType'
+          description: ' Type of the case. It will always be IMMIGRATION_DOCUMENT_REVIEW for this endpoint.'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataDocumentsItems'
+          description: A list of documents associated to the immigration case
+        visa_type:
+          type:
+          - string
+          - 'null'
+          description: The type of the visa.
+        created_at:
+          type: string
+          format: date-time
+          description: Creation date of the immigration case.
+        updated_at:
+          type: string
+          format: date-time
+          description: Last activity on the immigration case.
+        country_code:
+          type: string
+          description: The country of the immigration case.
+        estimated_completion_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Estimated completion date of the immigration case.
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaData
+    ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - OPEN
+      - CLOSED
+      - ON_HOLD
+      description: Current lifecycle status of the immigration case.
+      title: ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsProcessStatus:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of the process status.
+        name:
+          type:
+          - string
+          - 'null'
+          description: Human-readable name of the process status.
+      required:
+      - id
+      - name
+      description: Current status of the process.
+      title: ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsProcessStatus
+    ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataPreviousRejectedDocument:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the document.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataPreviousRejectedDocumentStatus'
+          description: Status of the document.
+        rejection_note:
+          type:
+          - string
+          - 'null'
+          description: A detailed description about why the document was rejected.
+        rejection_reason:
+          type:
+          - string
+          - 'null'
+          description: The reason why the document was rejected.
+      title: ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataPreviousRejectedDocument
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf2CaseType:
+      type: string
+      enum:
+      - SPONSORED_VISA
+      description: The type of immigration case to be created. Determines the workflow and requirements
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf2CaseType
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5CaseType:
+      type: string
+      enum:
+      - BUSINESS_VISA
+      description: The type of immigration case to be created. Determines the workflow and requirements
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5CaseType
+    ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsCaseType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the case type.
+        name:
+          type: string
+          description: Human-readable name of the case type.
+      required:
+      - id
+      - name
+      description: Type of immigration case.
+      title: ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsCaseType
+    ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the case
+        status:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current status of the case
+        process:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaDataProcess'
+          description: Details about the current immigration process associated with the case
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the case was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the case was last updated
+        closure_note:
+          type:
+          - string
+          - 'null'
+          description: Optional note explaining why the case was closed
+        closure_reason:
+          type:
+          - string
+          - 'null'
+          description: Standardized reason for case closure
+      required:
+      - id
+      - status
+      - process
+      - created_at
+      - updated_at
+      description: The immigration case data returned after successful creation
+      title: ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaData
+    ImmigrationVisaTypesCountryCodeGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of a visa type.
+        name:
+          type: string
+          description: The name of a visa.
+      title: ImmigrationVisaTypesCountryCodeGetResponsesContentApplicationJsonSchemaDataItems
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5TravelInformation:
+      type: object
+      properties:
+        purpose:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5TravelInformationPurpose'
+          description: The purpose of the business trip
+        end_date:
+          type: string
+          format: date
+          description: Trip end date in YYYY-MM-DD format
+        start_date:
+          type: string
+          format: date
+          description: Trip start date in YYYY-MM-DD format
+      required:
+      - purpose
+      - end_date
+      - start_date
+      description: Travel details for the business visa
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5TravelInformation
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData4:
+      type: object
+      properties:
+        team_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the team for which the pre-hire sponsorship visa case is being created
+        case_type:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf4CaseType'
+          description: The type of immigration case to be created. Determines the workflow and requirements
+        entity_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the entity sponsoring the visa. Required for sponsored visa applications
+        country_code:
+          type: string
+          description: ISO 3166-1 alpha-2 country code where the immigration case needs to be processed
+        visa_type_id:
+          type: string
+          format: uuid
+          description: The id of visa type that is being applied for. Identifies the type of the visa.
+      required:
+      - team_id
+      - case_type
+      - country_code
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData4
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf4CaseType:
+      type: string
+      enum:
+      - PRE_HIRE_SPONSORSHIP_VISA
+      description: The type of immigration case to be created. Determines the workflow and requirements
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf4CaseType
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveOnboardingRightToWorkCaseForAWorkerRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveOnboardingRightToWorkCaseForAWorkerRequestInternalServerError
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf1CaseType:
+      type: string
+      enum:
+      - EOR_VISA
+      description: The type of immigration case to be created. Determines the workflow and requirements
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf1CaseType
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentDocumentRequestIdPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the document.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentDocumentRequestIdPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Status of the document.
+        created_at:
+          type: string
+          format: date-time
+          description: Creation date of the document.
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update date of the document.
+      title: ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentDocumentRequestIdPostResponsesContentApplicationJsonSchemaData
+    immigration_getDocument_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationDocumentsIdGetResponsesContentApplicationJsonSchemaDataItems'
+      title: immigration_getDocument_Response_200
+    ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsCaseType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the case type.
+        name:
+          type: string
+          description: Human-readable name of the case type.
+      required:
+      - id
+      - name
+      description: Type of immigration case.
+      title: ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsCaseType
+    ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaErrorsItems
+    immigration_getWorkerCaseRequiredDocument_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaData'
+      title: immigration_getWorkerCaseRequiredDocument_Response_200
+    ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaErrorsItems
+    CreateAnImmigrationCaseRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateAnImmigrationCaseRequestBadRequestError
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataApplicant:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the applicant profile id.
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: External identifier of the applicant  (from partner system or third party).
+      description: The employee for which this Right to Work case has been created for
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataApplicant
+    GetImmigrationCaseDetails-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetImmigrationCaseDetails-v2026-01-01RequestInternalServerError
+    ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataDocumentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the document.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus'
+          description: Status of the document.
+        document_type:
+          type:
+          - string
+          - 'null'
+          description: The type of the document. Represents the visa type for right to work cases.
+        expiration_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Expiry date of the document. If document does not expire, it will be null
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataDocumentsItems
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataCaseType:
+      type: string
+      enum:
+      - IMMIGRATION_DOCUMENT_REVIEW
+      description: ' Type of the case. It will always be IMMIGRATION_DOCUMENT_REVIEW for this endpoint.'
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataCaseType
+    immigration_createWorkerCaseRequiredDocument_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentDocumentRequestIdPostResponsesContentApplicationJsonSchemaData'
+      title: immigration_createWorkerCaseRequiredDocument_Response_201
+    ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsProcess:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the current process.
+        name:
+          type: string
+          description: Human-readable name of the current process step.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsProcessStatus'
+          description: Current status of the process.
+      required:
+      - id
+      - name
+      - status
+      description: Current active process associated with the case.
+      title: ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsProcess
+    immigration_getClientCase_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaData'
+      title: immigration_getClientCase_Response_200
+    ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsClosure:
+      type: object
+      properties:
+        note:
+          type:
+          - string
+          - 'null'
+          description: Additional notes explaining the case closure.
+        reason:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsClosureReason'
+          - type: 'null'
+          description: Reason why the immigration case was closed.
+      required:
+      - note
+      - reason
+      description: Closure details of the case if the case has been closed.
+      title: ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsClosure
+    ImmigrationVisaRequirementBusinessGetParametersTripReason:
+      type: string
+      enum:
+      - INTERNAL_BUSINESS_WITH_WORK_FOR_CLIENT
+      - INTERNAL_BUSINESS_WITHOUT_WORK_FOR_CLIENT
+      - MEETINGS_WITH_OR_FOR_A_CLIENT
+      - MEETINGS_WITH_POTENTIAL_CLIENTS
+      - NEGOTIATING_CONTRACTS_OR_SIGNING_AGREEMENTS
+      - OTHER_EXTERNAL_BUSINESS
+      - CONFERENCE
+      - TEAM_OFFSITE
+      - SPEAKING_AT_CONFERENCE_UNPAID
+      - SPEAKING_AT_CONFERENCE_PAID
+      - ATTENDING_INTERNAL_TRAINING
+      - ATTENDING_EXTERNAL_TRAINING
+      - DELIVERING_TRAINING_TO_INTERNAL_PARTICIPANTS
+      - DELIVERING_TRAINING_TO_EXTERNAL_PARTICIPANTS_UNPAID
+      - DELIVERING_TRAINING_TO_EXTERNAL_PARTICIPANTS_PAID
+      - PARTICIPATION_IN_RESEARCH_PROJECTS_AND_STUDIES
+      - ASSEMBLY_MAINTENANCE_REPAIR_INSTALLATION
+      - TECHNICAL_SUPPORT_OR_SUPERVISION
+      - OTHER_HANDS_ON_LABOUR
+      - MARKET_RESEARCH_AND_EXPLORING_INVESTMENT_OPPORTUNITIES
+      - OTHER
+      title: ImmigrationVisaRequirementBusinessGetParametersTripReason
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData2:
+      type: object
+      properties:
+        case_type:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf2CaseType'
+          description: The type of immigration case to be created. Determines the workflow and requirements
+        entity_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the entity sponsoring the visa. Required for sponsored visa applications
+        contract_id:
+          type: string
+          description: The contract object identifier. Required for document reviews and visa applications
+        country_code:
+          type: string
+          description: ISO 3166-1 alpha-2 country code where the immigration case needs to be processed
+        visa_type_id:
+          type: string
+          format: uuid
+          description: The id of visa type that is being applied for. Identifies the type of the visa.
+      required:
+      - case_type
+      - entity_id
+      - contract_id
+      - country_code
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData2
+    ListOfImmigrationCases-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListOfImmigrationCases-v2026-01-01RequestBadRequestError
+    ImmigrationDocumentsIdGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The UUID of document entity.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationDocumentsIdGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          - type: 'null'
+          description: Current status of the document.
+        document_type:
+          type:
+          - string
+          - 'null'
+          description: The type of the document. Represents the visa type for right to work cases.
+        download_link:
+          type: array
+          items:
+            type: string
+          description: S3 download link of all the files uploaded within current document record.
+        expiration_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Expiry date of the document.
+      title: ImmigrationDocumentsIdGetResponsesContentApplicationJsonSchemaDataItems
+    ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataDocument:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the document.
+        name:
+          type: string
+          description: The name of the document.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataDocumentStatus'
+          description: Status of the document.
+        expiration_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Expiration date of the document. If document does not expire, it will be null
+      title: ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataDocument
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataCaseType:
+      type: string
+      enum:
+      - IMMIGRATION_DOCUMENT_REVIEW
+      description: ' Type of the case. It will always be IMMIGRATION_DOCUMENT_REVIEW for this endpoint.'
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataCaseType
+    immigration_getClientCases_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of cases in the current page.
+        has_more:
+          type: boolean
+          description: Indicates whether more results are available for pagination.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor value to be used for fetching the next page of results.
+        total_count:
+          type: integer
+          description: Total number of cases matching the search criteria.
+      required:
+      - data
+      - has_more
+      - total_count
+      title: immigration_getClientCases_Response_200
+    ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataProcess:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the current active process.
+        name:
+          type: string
+          description: Name of the current active process.
+        status:
+          type: string
+          description: Status of the current active process.
+      title: ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataProcess
+    GetSpecificImmigrationCaseDetails-v2026-04-02RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetSpecificImmigrationCaseDetails-v2026-04-02RequestBadRequestError
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataProcessName:
+      type: string
+      enum:
+      - WORK_AUTHORIZATION_VERIFICATION
+      description: Name of the current active process.
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataProcessName
+    ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - OPEN
+      - CLOSED
+      - ON_HOLD
+      description: Current lifecycle status of the immigration case.
+      title: ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    immigration_getWorkerCases_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of cases in the current page.
+        has_more:
+          type: boolean
+          description: Indicates whether more results are available for pagination.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor value to be used for fetching the next page of results.
+        total_count:
+          type: integer
+          description: Total number of cases matching the search criteria.
+      required:
+      - data
+      - has_more
+      - total_count
+      title: immigration_getWorkerCases_Response_200
+    GetBusinessVisaEligibilityAndRequirementsRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetBusinessVisaEligibilityAndRequirementsRequestBadRequestError
+    ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsProcess:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the current process.
+        name:
+          type: string
+          description: Human-readable name of the current process step.
+        status:
+          $ref: '#/components/schemas/ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsProcessStatus'
+          description: Current status of the process.
+      required:
+      - id
+      - name
+      - status
+      description: Current active process associated with the case.
+      title: ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsProcess
+    CreateAnImmigrationCaseRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateAnImmigrationCaseRequestInternalServerError
+    ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaErrorsItems
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataProcessName:
+      type: string
+      enum:
+      - WORK_AUTHORIZATION_VERIFICATION
+      description: Name of the current active process.
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataProcessName
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - OPEN
+      - CLOSED
+      - ON_HOLD
+      description: Status of the immigration case.
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataStatus
+    ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentDocumentRequestIdPostRequestBodyContentMultipartFormDataSchemaData:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: 'Immigration right to work document. More than 1 document can be uploaded at the same time (e.g.: front and back)'
+      required:
+      - file
+      description: Details of immigration document upload
+      title: ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentDocumentRequestIdPostRequestBodyContentMultipartFormDataSchemaData
+    RetrieveOnboardingRightToWorkCaseForAWorkerRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveOnboardingRightToWorkCaseForAWorkerRequestBadRequestError
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataContract:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: Id of the contract associated with the immigration case
+      description: The contract associated with the returned immigration case
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataContract
+    Immigration_createAnImmigrationCase_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaData'
+          description: The immigration case data returned after successful creation
+      required:
+      - data
+      title: Immigration_createAnImmigrationCase_Response_201
+    ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the immigration case.
+        status:
+          $ref: '#/components/schemas/ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Current lifecycle status of the immigration case.
+        closure:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsClosure'
+          - type: 'null'
+          description: Closure details of the case if the case has been closed.
+        process:
+          $ref: '#/components/schemas/ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsProcess'
+          description: Current active process associated with the case.
+        applicant:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsApplicant'
+          - type: 'null'
+          description: Applicant associated with the immigration case.
+        case_type:
+          $ref: '#/components/schemas/ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsCaseType'
+          description: Type of immigration case.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the case was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the case was last updated.
+      required:
+      - id
+      - status
+      - closure
+      - process
+      - applicant
+      - case_type
+      - created_at
+      - updated_at
+      title: ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItems
+    RetrieveOnboardingRightToWorkCaseForAWorkerRequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveOnboardingRightToWorkCaseForAWorkerRequestNotFoundError
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataContract:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: Id of the contract associated with the immigration case
+      description: The contract associated with the returned immigration case
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataContract
+    ? ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataPreviousRejectedDocumentStatus
+    : type: string
+      enum:
+      - REJECTED
+      description: Status of the document.
+      title: ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataPreviousRejectedDocumentStatus
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf3CaseType:
+      type: string
+      enum:
+      - PRE_HIRE_EOR_VISA
+      description: The type of immigration case to be created. Determines the workflow and requirements
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf3CaseType
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf0CaseType:
+      type: string
+      enum:
+      - RIGHT_TO_WORK
+      description: The type of immigration case to be created. Determines the workflow and requirements
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf0CaseType
+    GetImmigrationCaseDetails-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetImmigrationCaseDetails-v2026-01-01RequestBadRequestError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the document requirement.
+        name:
+          type: string
+          description: The name of the document requirement to be uploaded.
+        document:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataDocument'
+        created_at:
+          type: string
+          format: date-time
+          description: Creation date of the document request.
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update date of the document request.
+        description:
+          type: string
+          description: A short text description of the document requirement to be uploaded.
+        previous_rejected_document:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaDataPreviousRejectedDocument'
+        immigration_document_requirement_id:
+          type: string
+          description: The unique identifier of the immigration document requirement.
+      title: ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentGetResponsesContentApplicationJsonSchemaData
+    ListOfImmigrationCases-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListOfImmigrationCases-v2026-01-01RequestInternalServerError
+    ImmigrationClientCasesGetParametersStatusesSchemaItems:
+      type: string
+      enum:
+      - OPEN
+      - ON_HOLD
+      - CLOSED
+      title: ImmigrationClientCasesGetParametersStatusesSchemaItems
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - OPEN
+      - CLOSED
+      - ON_HOLD
+      description: Status of the immigration case.
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataStatus
+    ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the immigration case.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Current lifecycle status of the immigration case.
+        closure:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsClosure'
+          - type: 'null'
+          description: Closure details of the case if the case has been closed.
+        process:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsProcess'
+          description: Current active process associated with the case.
+        applicant:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsApplicant'
+          - type: 'null'
+          description: Applicant associated with the immigration case.
+        case_type:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsCaseType'
+          description: Type of immigration case.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the case was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the case was last updated.
+      required:
+      - id
+      - status
+      - closure
+      - process
+      - applicant
+      - case_type
+      - created_at
+      - updated_at
+      title: ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItems
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData5:
+      type: object
+      properties:
+        team_id:
+          type: string
+          format: uuid
+          description: The id of the team for which the employee will be added to. Required if contract_id is not provided
+        case_type:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5CaseType'
+          description: The type of immigration case to be created. Determines the workflow and requirements
+        entity_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the entity sponsoring the visa. Required for sponsored visa applications
+        contract_id:
+          type: string
+          description: The contract object identifier. If not provided, employee_details and team_id become required
+        country_code:
+          type: string
+          description: ISO 3166-1 alpha-2 country code where the immigration case needs to be processed
+        visa_type_id:
+          type: string
+          format: uuid
+          description: The id of visa type that is being applied for. Identifies the type of the visa
+        employee_details:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5EmployeeDetails'
+          description: Employee information. Citizenships and residence attributes are always required for business visa cases. The remaining fields are only required when no contract_id is present.
+        travel_information:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5TravelInformation'
+          description: Travel details for the business visa
+      required:
+      - case_type
+      - country_code
+      - visa_type_id
+      - employee_details
+      - travel_information
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData5
+    ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - OPEN
+      - CLOSED
+      - ON_HOLD
+      description: Current status of the case
+      title: ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaDataStatus
+    ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - OPEN
+      - CLOSED
+      - ON_HOLD
+      description: Status of the immigration case.
+      title: ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataStatus
+    ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaDataQualification:
+      type: string
+      enum:
+      - VISA_REQUIRED
+      - NO_VISA_REQUIRED
+      - UNSUPPORTED
+      description: Visa qualification status, whether it is required or not. It can be also unsupported if the country does not support business visa options.
+      title: ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaDataQualification
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaErrorsItems
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaErrorsItems
+    immigration_getBusinessVisaRequirement_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: immigration_getBusinessVisaRequirement_Response_200
+    ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsApplicant:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of the applicant.
+        name:
+          type: string
+          description: Full name of the applicant.
+      required:
+      - name
+      description: Applicant associated with the immigration case.
+      title: ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsApplicant
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData0:
+      type: object
+      properties:
+        case_type:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf0CaseType'
+          description: The type of immigration case to be created. Determines the workflow and requirements
+        contract_id:
+          type: string
+          description: The contract object identifier. Required for document reviews and visa applications
+        country_code:
+          type: string
+          description: ISO 3166-1 alpha-2 country code where the immigration case needs to be processed
+      required:
+      - case_type
+      - contract_id
+      - country_code
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData0
+    ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsClosureReason:
+      type: string
+      enum:
+      - CONTRACT_CANCELLED
+      - NATIONALITY_CHANGE
+      - NEW_CASE_TYPE_IS_REQUIRED
+      - ONBOARDING_RELEASED
+      - OTHER
+      description: Reason why the immigration case was closed.
+      title: ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsClosureReason
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataDocumentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the document.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus'
+          description: Status of the document.
+        document_type:
+          type:
+          - string
+          - 'null'
+          description: The type of the document. Represents the visa type for right to work cases.
+        expiration_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Expiry date of the document. If document does not expire, it will be null
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataDocumentsItems
+    ListOfImmigrationCasesForWorkers-v2026-04-02RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListOfImmigrationCasesForWorkers-v2026-04-02RequestBadRequestError
+    GetSpecificImmigrationCaseDetails-v2026-04-02RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetSpecificImmigrationCaseDetails-v2026-04-02RequestInternalServerError
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataProcess:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the current active process.
+        name:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataProcessName'
+          description: Name of the current active process.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataProcessStatus'
+          description: Status of the current active process.
+        rejection_note:
+          type: string
+          description: A detailed description of why the case was rejected. Only available if the case status is REJECTED.
+        rejection_reason:
+          type: string
+          description: The reason why the case was rejected. Only available if the case status is REJECTED.
+      description: The current active process
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataProcess
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData3:
+      type: object
+      properties:
+        team_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the team for which the pre-hire visa case is being created
+        case_type:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf3CaseType'
+          description: The type of immigration case to be created. Determines the workflow and requirements
+        country_code:
+          type: string
+          description: ISO 3166-1 alpha-2 country code where the immigration case needs to be processed
+        visa_type_id:
+          type: string
+          format: uuid
+          description: The id of visa type that is being applied for. Identifies the type of the visa.
+      required:
+      - team_id
+      - case_type
+      - country_code
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData3
+    ImmigrationWorkersCasesGetParametersStatusesSchemaItems:
+      type: string
+      enum:
+      - OPEN
+      - ON_HOLD
+      - CLOSED
+      title: ImmigrationWorkersCasesGetParametersStatusesSchemaItems
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5TravelInformationPurpose:
+      type: string
+      enum:
+      - INTERNAL_BUSINESS_WITH_WORK_FOR_CLIENT
+      - INTERNAL_BUSINESS_WITHOUT_WORK_FOR_CLIENT
+      - MEETINGS_WITH_OR_FOR_A_CLIENT
+      - MEETINGS_WITH_POTENTIAL_CLIENTS
+      - NEGOTIATING_CONTRACTS_OR_SIGNING_AGREEMENTS
+      - OTHER_EXTERNAL_BUSINESS
+      - CONFERENCE
+      - TEAM_OFFSITE
+      - SPEAKING_AT_CONFERENCE_UNPAID
+      - SPEAKING_AT_CONFERENCE_PAID
+      - ATTENDING_INTERNAL_TRAINING
+      - ATTENDING_EXTERNAL_TRAINING
+      - DELIVERING_TRAINING_TO_INTERNAL_PARTICIPANTS
+      - DELIVERING_TRAINING_TO_EXTERNAL_PARTICIPANTS_UNPAID
+      - DELIVERING_TRAINING_TO_EXTERNAL_PARTICIPANTS_PAID
+      - PARTICIPATION_IN_RESEARCH_PROJECTS_AND_STUDIES
+      - ASSEMBLY_MAINTENANCE_REPAIR_INSTALLATION
+      - TECHNICAL_SUPPORT_OR_SUPERVISION
+      - OTHER_HANDS_ON_LABOUR
+      - MARKET_RESEARCH_AND_EXPLORING_INVESTMENT_OPPORTUNITIES
+      - OTHER
+      description: The purpose of the business trip
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5TravelInformationPurpose
+    ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsApplicant:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of the applicant.
+        name:
+          type: string
+          description: Full name of the applicant.
+      required:
+      - name
+      description: Applicant associated with the immigration case.
+      title: ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsApplicant
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus:
+      type: string
+      enum:
+      - IN_REVIEW
+      - ACTIVE
+      - EXPIRED
+      - EXPIRING
+      description: Status of the document.
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus
+    ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataDocumentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the document.
+        status:
+          $ref: '#/components/schemas/ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus'
+          description: Status of the document.
+        document_type:
+          type: string
+          description: The type of the document. Represents the visa type for right to work cases.
+        expiration_date:
+          type: string
+          format: date-time
+          description: Expiry date of the document.
+      title: ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataDocumentsItems
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataApplicant:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the applicant profile id.
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: External identifier of the applicant  (from partner system or third party).
+      description: The employee for which this Right to Work case has been created for
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataApplicant
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData:
+      oneOf:
+      - $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData0'
+      - $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData1'
+      - $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData2'
+      - $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData3'
+      - $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData4'
+      - $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData5'
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus:
+      type: string
+      enum:
+      - IN_REVIEW
+      - ACTIVE
+      - EXPIRED
+      - EXPIRING
+      description: Status of the document.
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus
+    immigration_getWorkerCase_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaData'
+      title: immigration_getWorkerCase_Response_200
+    ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsProcessStatus:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of the process status.
+        name:
+          type:
+          - string
+          - 'null'
+          description: Human-readable name of the process status.
+      required:
+      - id
+      - name
+      description: Current status of the process.
+      title: ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsProcessStatus
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of immigration case.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Status of the immigration case.
+        process:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataProcess'
+          description: The current active process
+        contract:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataContract'
+          description: The contract associated with the returned immigration case
+        applicant:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataApplicant'
+          - type: 'null'
+          description: The employee for which this Right to Work case has been created for
+        case_type:
+          $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataCaseType'
+          description: ' Type of the case. It will always be IMMIGRATION_DOCUMENT_REVIEW for this endpoint.'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataDocumentsItems'
+          description: A list of documents associated to the immigration case
+        visa_type:
+          type:
+          - string
+          - 'null'
+          description: The type of the visa.
+        created_at:
+          type: string
+          format: date-time
+          description: Creation date of the immigration case.
+        updated_at:
+          type: string
+          format: date-time
+          description: Last activity on the immigration case.
+        country_code:
+          type: string
+          description: The country of the immigration case.
+        estimated_completion_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Estimated completion date of the immigration case.
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaData
+    ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataProcessStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - AWAITING_DOCUMENTS
+      - IN_REVIEW
+      - APPROVED
+      - REJECTED
+      - IN_PROGRESS
+      description: Status of the current active process.
+      title: ImmigrationWorkersCasesCaseIdGetResponsesContentApplicationJsonSchemaDataProcessStatus
+    ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsClosureReason:
+      type: string
+      enum:
+      - CONTRACT_CANCELLED
+      - NATIONALITY_CHANGE
+      - NEW_CASE_TYPE_IS_REQUIRED
+      - ONBOARDING_RELEASED
+      - OTHER
+      description: Reason why the immigration case was closed.
+      title: ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaDataItemsClosureReason
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5EmployeeDetails:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: Employee's email address.  Required if contract_id is not provided
+        last_name:
+          type: string
+          description: Employee's last name.  Required if contract_id is not provided
+        residence:
+          type: string
+          description: ISO 3166-1 alpha-2 country code of employee's current residence
+        first_name:
+          type: string
+          description: Employee's first name.  Required if contract_id is not provided
+        citizenships:
+          type: array
+          items:
+            type: string
+          description: List of ISO 3166-1 alpha-2 country codes representing employee's citizenships
+      required:
+      - residence
+      - citizenships
+      description: Employee information. Citizenships and residence attributes are always required for business visa cases. The remaining fields are only required when no contract_id is present.
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf5EmployeeDetails
+    ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataProcess:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the current active process.
+        name:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataProcessName'
+          description: Name of the current active process.
+        status:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataProcessStatus'
+          description: Status of the current active process.
+        rejection_note:
+          type: string
+          description: A detailed description of why the case was rejected. Only available if the case status is REJECTED.
+        rejection_reason:
+          type: string
+          description: The reason why the case was rejected. Only available if the case status is REJECTED.
+      description: The current active process
+      title: ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaDataProcess
+    ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentDocumentRequestIdPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - IN_REVIEW
+      description: Status of the document.
+      title: ImmigrationWorkersWorkerIdCasesCaseIdRequiredDocumentDocumentRequestIdPostResponsesContentApplicationJsonSchemaDataStatus
+    ListOfImmigrationCasesForWorkers-v2026-04-02RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationWorkersCasesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListOfImmigrationCasesForWorkers-v2026-04-02RequestInternalServerError
+    GetBusinessVisaEligibilityAndRequirementsRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetBusinessVisaEligibilityAndRequirementsRequestInternalServerError
+    ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData1:
+      type: object
+      properties:
+        case_type:
+          $ref: '#/components/schemas/ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaDataOneOf1CaseType'
+          description: The type of immigration case to be created. Determines the workflow and requirements
+        contract_id:
+          type: string
+          description: The contract object identifier. Required for document reviews and visa applications
+        country_code:
+          type: string
+          description: ISO 3166-1 alpha-2 country code where the immigration case needs to be processed
+        visa_type_id:
+          type: string
+          format: uuid
+          description: The id of visa type that is being applied for. Identifies the type of the visa.
+      required:
+      - case_type
+      - contract_id
+      - country_code
+      title: ImmigrationClientCasesPostRequestBodyContentApplicationJsonSchemaData1
+    ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of immigration case.
+        status:
+          $ref: '#/components/schemas/ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Status of the immigration case.
+        process:
+          $ref: '#/components/schemas/ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataProcess'
+        applicant:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataApplicant'
+          - type: 'null'
+        case_type:
+          type: string
+          description: Name of the case type
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataDocumentsItems'
+        visa_type:
+          type:
+          - string
+          - 'null'
+          description: The type of the the visa.
+        country_code:
+          type: string
+          description: The country of the immigration case.
+        last_update_at:
+          type: string
+          format: date-time
+          description: Last activity on the immigration case.
+        case_created_at:
+          type: string
+          format: date-time
+          description: Creation date of the immigration case.
+        estimated_completion_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Estimated completion date of the immigration case.
+      title: ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaData
+    ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaDataProcess:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the process
+        status_name:
+          type: string
+          description: Human-readable status of the process
+        process_name:
+          type: string
+          description: Name of the immigration process
+      required:
+      - id
+      - status_name
+      - process_name
+      description: Details about the current immigration process associated with the case
+      title: ImmigrationClientCasesPostResponsesContentApplicationJsonSchemaDataProcess
+    ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsClosure:
+      type: object
+      properties:
+        note:
+          type:
+          - string
+          - 'null'
+          description: Additional notes explaining the case closure.
+        reason:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsClosureReason'
+          - type: 'null'
+          description: Reason why the immigration case was closed.
+      required:
+      - note
+      - reason
+      description: Closure details of the case if the case has been closed.
+      title: ImmigrationClientCasesGetResponsesContentApplicationJsonSchemaDataItemsClosure
+    ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        fee:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Fee amount
+        name:
+          type:
+          - string
+          - 'null'
+          description: Name of the visa type
+        description:
+          type: string
+          description: Description of the visa type
+        fee_currency:
+          type:
+          - string
+          - 'null'
+          description: Currency code for the fee in ISO 4217 format
+        visa_type_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of the visa type. This can be used to create a new business visa case on the create cases endpoint.
+        qualification:
+          $ref: '#/components/schemas/ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaDataQualification'
+          description: Visa qualification status, whether it is required or not. It can be also unsupported if the country does not support business visa options.
+        estimated_timeline:
+          oneOf:
+          - $ref: '#/components/schemas/ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaDataEstimatedTimeline'
+          - type: 'null'
+          description: Estimated processing timeline, in weeks, months or years
+      required:
+      - fee
+      - name
+      - description
+      - fee_currency
+      - visa_type_id
+      - qualification
+      - estimated_timeline
+      title: ImmigrationVisaRequirementBusinessGetResponsesContentApplicationJsonSchemaData
+    ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataApplicant:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the applicant profile id.
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: External identifier of the applicant.
+      title: ImmigrationClientCasesIdGetResponsesContentApplicationJsonSchemaDataApplicant
+    immigration_getWorkerOnboardingCase_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ImmigrationWorkersWorkerIdOnboardingCaseGetResponsesContentApplicationJsonSchemaData'
+      title: immigration_getWorkerOnboardingCase_Response_200
+    ImmigrationDocumentsIdGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - IN_REVIEW
+      - APPROVED
+      - REJECTED
+      description: Current status of the document.
+      title: ImmigrationDocumentsIdGetResponsesContentApplicationJsonSchemaDataItemsStatus
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

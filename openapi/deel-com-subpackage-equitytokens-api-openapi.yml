@@ -1,0 +1,284 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Equity Tokens API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_equityTokens
+paths:
+  /equities-tokens/tax-events:
+    post:
+      operationId: create-equity-or-token-tax-event
+      summary: Create equity or token tax event
+      description: 'Use this endpoint to submit an equity or token tax event for an EOR onboarded to Equity & Token Services
+
+        **Token scopes**: `equities:write`'
+      tags:
+      - subpackage_equityTokens
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_Tokens_createEquityOrTokenTaxEvent_Response_201'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateEquityOrTokenTaxEventRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaData'
+components:
+  schemas:
+    EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: the id of the equity/token tax event generated
+        created_at:
+          type: string
+          format: date-time
+          description: the date and time when the equity/token tax event was created
+      title: EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaData
+    CreateEquityOrTokenTaxEventRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateEquityOrTokenTaxEventRequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaDataMethodOfTaxCoverage:
+      type: string
+      enum:
+      - AD_HOC
+      - BIK_REPORTING_ONLY
+      - BIK_WITHHOLDING_AT_SOURCE_CLIENT
+      - BIK_WITHHOLDING_AT_SOURCE_CLIENT_REVERSE
+      - BIK_WITHHOLDING_GROSSED_UP_BONUS
+      - BIK_WITHHOLDING_NET_SETTLEMENT
+      - BIK_WITHHOLDING_SALARY_DEDUCTION
+      - BIK_WITHHOLDING_WORKER
+      - NO_BIK_NO_WITHHOLDING
+      description: The method used to cover the taxes
+      title: EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaDataMethodOfTaxCoverage
+    EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        fx_rate:
+          type: number
+          format: double
+          description: The exchange rate used to convert the local currency to the payroll currency
+        tax_rate:
+          type: number
+          format: double
+          description: The tax rate applied to the benefit in kind
+        unit_fmv:
+          type: number
+          format: double
+          description: The fair market value of the equity/token grant at the time of the event
+        event_date:
+          type: string
+          format: date
+          description: The date of the event
+        sale_price:
+          type: number
+          format: double
+          description: The price at which the equity/token was sold
+        contract_id:
+          type: string
+          description: The unique identifier of the contract of the employee who received the equity/token grant
+        gross_value:
+          type: number
+          format: double
+          description: The gross value of the equity/token grant
+        plan_currency:
+          type: string
+          description: The currency in which the equity/token grant was issued
+        exercise_price:
+          type: number
+          format: double
+          description: The price at which the equity/token was exercised
+        equity_grant_id:
+          type: string
+          description: The unique identifier of the equity/token grant - optional in case you don't have remove the property
+        settlement_date:
+          type: string
+          format: date
+          description: The date of the settlement
+        payroll_currency:
+          type: string
+          description: The currency in which the payroll is processed
+        tax_jurisdiction:
+          type: string
+          description: The tax jurisdiction in which the equity/token grant was issued
+        transaction_fees:
+          type: number
+          format: double
+          description: The fees associated with the transaction
+        quantity_remaining:
+          type: number
+          format: double
+          description: The quantity of equity/token that remains
+        taxable_gain_or_loss:
+          type: number
+          format: double
+          description: The taxable gain or loss
+        total_exercise_price:
+          type: number
+          format: double
+          description: The total exercise price
+        total_taxes_withheld:
+          type: number
+          format: double
+          description: The total amount of taxes withheld
+        method_of_tax_coverage:
+          $ref: '#/components/schemas/EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaDataMethodOfTaxCoverage'
+          description: The method used to cover the taxes
+        quantity_withheld_or_sold:
+          type: number
+          format: double
+          description: The quantity of equity/token that was withheld or sold
+        withheld_tax_local_currency:
+          type: number
+          format: double
+          description: The tax withheld in the local currency
+        benefit_in_kind_local_currency:
+          type: number
+          format: double
+          description: The benefit in kind in the local currency
+        quantity_exercised_or_released:
+          type: number
+          format: double
+          description: The quantity of equity/token that was exercised or released
+      required:
+      - fx_rate
+      - contract_id
+      - plan_currency
+      - settlement_date
+      - payroll_currency
+      - tax_jurisdiction
+      - taxable_gain_or_loss
+      - total_taxes_withheld
+      - method_of_tax_coverage
+      - withheld_tax_local_currency
+      - benefit_in_kind_local_currency
+      title: EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaData
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: return code error
+        field:
+          type: string
+          description: field that caused the error
+        message:
+          type: string
+          description: description of the error
+      title: EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaErrorsItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    Equity_Tokens_createEquityOrTokenTaxEvent_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaData'
+      title: Equity Tokens_createEquityOrTokenTaxEvent_Response_201
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

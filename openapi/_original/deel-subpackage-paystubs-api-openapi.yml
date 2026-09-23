@@ -1,0 +1,336 @@
+# x-archived-from: deel-subpackage-paystubs-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Paystubs API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_paystubs
+paths:
+  /benefits/legal-entities/{legal_entity_id}/paystubs:
+    get:
+      operationId: get-paystubs-from-legal-entity-integrated-with-external-benefits-vendor-v-2026-01-01
+      summary: Get paystubs from legal entity integrated with external benefits vendor
+      description: "Returns paginated paystubs for a legal entity that is integrated with an external benefits vendor. Results can be filtered by payroll state and date range; paystubs in the `OPEN` state do not include employee-level detail.\n **Token scopes**: `benefits:read`"
+      tags:
+      - subpackage_paystubs
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: Id from the legal entity to fetch data
+        required: true
+        schema:
+          type: string
+      - name: states
+        in: query
+        description: 'Payroll states: OPEN | LOCKED | CLOSED (OPEN doesn''t have `employees` info)'
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetParametersStatesSchemaItems'
+      - name: date_start
+        in: query
+        description: Start date to fectch the paystubs from
+        required: false
+        schema:
+          type: string
+      - name: date_end
+        in: query
+        description: End date to fectch the paystubs
+        required: false
+        schema:
+          type: string
+      - name: items_per_page
+        in: query
+        description: Items per page
+        required: false
+        schema:
+          type: integer
+          default: 10
+      - name: cursor
+        in: query
+        description: The last fetched id to start querying from
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Paystubs_getPaystubsFromLegalEntityIntegratedWithExternalBenefitsVendor-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollState:
+      type: string
+      enum:
+      - OPEN
+      - LOCKED
+      - CLOSED
+      description: Payroll state.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollState
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItems'
+          description: List of paystubs
+        page:
+          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataPage'
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaData
+    ? BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsContributionsItems
+    : type: object
+      properties:
+        name:
+          type: string
+          description: The contribution name.
+        type:
+          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsContributionsItemsType'
+          description: The type of contribution.
+        amount:
+          type: number
+          format: double
+          description: The contribution amount.
+      description: Details about the contributions.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsContributionsItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ? BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItemsType
+    : type: string
+      enum:
+      - Match Rate
+      - Non Elective
+      - Safe Harbor Type 1
+      - Safe Harbor Type 2
+      description: The type of contribution.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItemsType
+    ? BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItems
+    : type: object
+      properties:
+        name:
+          type: string
+          description: The contribution name.
+        type:
+          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItemsType'
+          description: The type of contribution.
+        amount:
+          type: number
+          format: double
+          description: The contribution amount.
+      description: Details about the contributions.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItems
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItems:
+      type: object
+      properties:
+        gross_pay:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Gross pay.
+        contract_id:
+          type: string
+          description: The contract id.
+        employee_id:
+          type: string
+          description: Unique identifier for the employee.
+        hours_worked:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The worked hours.
+        contributions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsContributionsItems'
+          description: List of employee's contributions.
+        employerContributions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItems'
+          description: List of employeer's contributions.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItems
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataPage:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: The last fetched id to start querying from
+        total_rows:
+          type: integer
+          description: Total number of rows
+        items_per_page:
+          type: integer
+          description: Items per page
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataPage
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItems:
+      type: object
+      properties:
+        employees:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItems'
+          description: List of employees associated with the payroll.
+        payroll_id:
+          type: string
+          description: Unique identifier for the payroll.
+        payment_date:
+          type: string
+          description: Payment date.
+        payroll_type:
+          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollType'
+          description: Payroll type.
+        payroll_state:
+          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollState'
+          description: Payroll state.
+        payroll_end_date:
+          type: string
+          description: Payroll end date.
+        payroll_schedule:
+          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollSchedule'
+          description: Payroll cycle type.
+        payroll_start_date:
+          type: string
+          description: Payroll start date.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItems
+    Paystubs_getPaystubsFromLegalEntityIntegratedWithExternalBenefitsVendor-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaData'
+      title: Paystubs_getPaystubsFromLegalEntityIntegratedWithExternalBenefitsVendor-v2026-01-01_Response_200
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollType:
+      type: string
+      enum:
+      - CORRECTION
+      - RECONCILIATION
+      - PARALLEL
+      - HISTORICAL
+      - OFFCYCLE
+      - REGULAR
+      description: Payroll type.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollType
+    ? BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsContributionsItemsType
+    : type: string
+      enum:
+      - Roth
+      - Trad
+      - Loan
+      description: The type of contribution.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsContributionsItemsType
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetParametersStatesSchemaItems:
+      type: string
+      enum:
+      - OPEN
+      - LOCKED
+      - CLOSED
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetParametersStatesSchemaItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollSchedule:
+      type: string
+      enum:
+      - MONTHLY
+      - BIMONTHLY
+      - BIWEEKLY
+      - WEEKLY
+      description: Payroll cycle type.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollSchedule
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

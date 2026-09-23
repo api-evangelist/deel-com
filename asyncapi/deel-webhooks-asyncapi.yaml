@@ -1,0 +1,589 @@
+asyncapi: '2.6.0'
+info:
+  title: Deel Webhooks
+  version: 'v2'
+  description: |
+    AsyncAPI definition for Deel's webhook surface. Deel webhooks are HTTP
+    POST deliveries from Deel to a subscriber-controlled `url` registered
+    via the Deel Webhooks API (`POST /rest/v2/webhooks`). A subscription
+    declares one or more `events` (event type names) and is signed with a
+    subscriber-supplied `signing_key`.
+
+    Each delivery is a JSON document with a top-level `data` object that
+    contains `meta` (event metadata including `event_type`,
+    `organization_id`, and on simulated deliveries `is_simulation: true`),
+    a `resource` array carrying event-specific fields, and a top-level
+    `timestamp` (ISO 8601). The exact shape of `resource` varies by event
+    type; documented field names are modeled below and additional fields
+    are permitted because Deel's public documentation does not exhaustively
+    enumerate them.
+
+    Every delivery carries three Deel-specific HTTP headers:
+    `x-deel-signature` (HMAC-SHA256 of `"POST" + raw_payload_body` computed
+    with the subscription `signing_key`), `x-deel-hmac-label` (identifies
+    which signing key was used), and `x-deel-webhook-version` (API version
+    used for serialization, typically `v2`).
+
+    Deel publishes more than 100 webhook event types accessible via
+    `GET /rest/v2/webhooks/events/types`; only those whose names appear
+    verbatim in Deel's public developer documentation
+    (https://developer.deel.com/api/webhooks/introduction,
+    https://developer.deel.com/api/webhooks/events,
+    https://developer.deel.com/llms-full.txt) are modeled here. Subscribers
+    should call the events endpoint at runtime to discover the full,
+    authoritative catalog and per-event `payload_example`. Fields the
+    documentation does not describe are not invented in this spec.
+  contact:
+    name: Deel Developer Platform
+    url: https://developer.deel.com/
+  license:
+    name: Proprietary
+    url: https://www.deel.com/legal/
+  tags:
+    - name: Deel
+    - name: Webhooks
+    - name: Payroll
+    - name: HR
+    - name: EOR
+    - name: Contracts
+
+defaultContentType: application/json
+
+servers:
+  subscriber:
+    url: '{webhookUrl}'
+    protocol: https
+    description: |
+      The HTTPS endpoint that the webhook subscriber registers with Deel
+      via `POST /rest/v2/webhooks` (`url` field). Deel delivers every event
+      this subscription opts into to this URL via HTTP POST with a JSON
+      body. Endpoints must respond with a 2xx status within 30 seconds or
+      Deel retries with exponential backoff (up to 10 attempts before the
+      subscription is automatically disabled).
+    variables:
+      webhookUrl:
+        description: Subscriber-controlled URL configured on the Deel webhook subscription.
+        default: https://example.com/webhooks/deel
+
+channels:
+  contract.created:
+    description: |
+      A new contract has been created in Deel (EOR, contractor, or Global
+      Payroll). Subscribe to mirror new hires into downstream systems.
+    bindings:
+      http:
+        type: request
+        method: POST
+        bindingVersion: 0.3.0
+    subscribe:
+      summary: Contract created
+      operationId: onContractCreated
+      bindings:
+        http:
+          type: request
+          method: POST
+          bindingVersion: 0.3.0
+      message:
+        $ref: '#/components/messages/ContractCreated'
+
+  contract.signed:
+    description: |
+      A contract has been signed by all required parties and is now in an
+      active state. Commonly used to provision access and kick off
+      onboarding workflows.
+    bindings:
+      http:
+        type: request
+        method: POST
+        bindingVersion: 0.3.0
+    subscribe:
+      summary: Contract signed
+      operationId: onContractSigned
+      bindings:
+        http:
+          type: request
+          method: POST
+          bindingVersion: 0.3.0
+      message:
+        $ref: '#/components/messages/ContractSigned'
+
+  contract.terminated:
+    description: |
+      A contract has been terminated. Use for offboarding flows such as
+      revoking app access, archiving records, and closing payroll cycles.
+    bindings:
+      http:
+        type: request
+        method: POST
+        bindingVersion: 0.3.0
+    subscribe:
+      summary: Contract terminated
+      operationId: onContractTerminated
+      bindings:
+        http:
+          type: request
+          method: POST
+          bindingVersion: 0.3.0
+      message:
+        $ref: '#/components/messages/ContractTerminated'
+
+  invoice.paid:
+    description: |
+      An invoice (contractor invoice or EOR/PEO bill) has been marked as
+      paid. Use to reconcile invoices in accounting/ERP systems.
+    bindings:
+      http:
+        type: request
+        method: POST
+        bindingVersion: 0.3.0
+    subscribe:
+      summary: Invoice paid
+      operationId: onInvoicePaid
+      bindings:
+        http:
+          type: request
+          method: POST
+          bindingVersion: 0.3.0
+      message:
+        $ref: '#/components/messages/InvoicePaid'
+
+  payment.completed:
+    description: |
+      A Deel-initiated payment to a worker, contractor, or supplier has
+      completed end-to-end. Use to confirm payouts and trigger
+      notification flows.
+    bindings:
+      http:
+        type: request
+        method: POST
+        bindingVersion: 0.3.0
+    subscribe:
+      summary: Payment completed
+      operationId: onPaymentCompleted
+      bindings:
+        http:
+          type: request
+          method: POST
+          bindingVersion: 0.3.0
+      message:
+        $ref: '#/components/messages/PaymentCompleted'
+
+  eor.payslips.available:
+    description: |
+      EOR payslips are available for an employee or pay cycle. Use to
+      notify employees or trigger downstream archival.
+    bindings:
+      http:
+        type: request
+        method: POST
+        bindingVersion: 0.3.0
+    subscribe:
+      summary: EOR payslips available
+      operationId: onEorPayslipsAvailable
+      bindings:
+        http:
+          type: request
+          method: POST
+          bindingVersion: 0.3.0
+      message:
+        $ref: '#/components/messages/EorPayslipsAvailable'
+
+  eor.amendment.status.updated:
+    description: |
+      The status of an EOR contract amendment changed (e.g. moved into
+      `EOR_AMENDMENT_V2_CLIENT_ACTIVE`). Use to track the amendment
+      lifecycle without polling.
+    bindings:
+      http:
+        type: request
+        method: POST
+        bindingVersion: 0.3.0
+    subscribe:
+      summary: EOR amendment status updated
+      operationId: onEorAmendmentStatusUpdated
+      bindings:
+        http:
+          type: request
+          method: POST
+          bindingVersion: 0.3.0
+      message:
+        $ref: '#/components/messages/EorAmendmentStatusUpdated'
+
+components:
+  messageTraits:
+    DeelWebhookHeaders:
+      headers:
+        type: object
+        properties:
+          Content-Type:
+            type: string
+            const: application/json
+          x-deel-signature:
+            type: string
+            description: |
+              HMAC-SHA256 signature of the raw request body, computed as
+              `HMAC-SHA256(signing_key, "POST" + raw_payload_body)`. Use the
+              `signing_key` configured on the webhook subscription and
+              compare in constant time before processing.
+          x-deel-hmac-label:
+            type: string
+            description: |
+              Identifies which signing key was used to compute
+              `x-deel-signature`. Useful when rotating webhook signing keys.
+          x-deel-webhook-version:
+            type: string
+            description: |
+              Deel API version used to serialize the payload (e.g. `v1` or
+              `v2`). Pinned by `api_version` at webhook creation.
+            example: v2
+
+  messages:
+    ContractCreated:
+      name: ContractCreated
+      title: contract.created
+      summary: A contract was created.
+      contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/DeelWebhookHeaders'
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/WebhookEnvelope'
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  meta:
+                    allOf:
+                      - $ref: '#/components/schemas/EventMeta'
+                      - type: object
+                        properties:
+                          event_type:
+                            const: contract.created
+                  resource:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContractCreatedResource'
+
+    ContractSigned:
+      name: ContractSigned
+      title: contract.signed
+      summary: A contract was signed.
+      contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/DeelWebhookHeaders'
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/WebhookEnvelope'
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  meta:
+                    allOf:
+                      - $ref: '#/components/schemas/EventMeta'
+                      - type: object
+                        properties:
+                          event_type:
+                            const: contract.signed
+                  resource:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContractResource'
+
+    ContractTerminated:
+      name: ContractTerminated
+      title: contract.terminated
+      summary: A contract was terminated.
+      contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/DeelWebhookHeaders'
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/WebhookEnvelope'
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  meta:
+                    allOf:
+                      - $ref: '#/components/schemas/EventMeta'
+                      - type: object
+                        properties:
+                          event_type:
+                            const: contract.terminated
+                  resource:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContractResource'
+
+    InvoicePaid:
+      name: InvoicePaid
+      title: invoice.paid
+      summary: An invoice was paid.
+      contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/DeelWebhookHeaders'
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/WebhookEnvelope'
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  meta:
+                    allOf:
+                      - $ref: '#/components/schemas/EventMeta'
+                      - type: object
+                        properties:
+                          event_type:
+                            const: invoice.paid
+                  resource:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GenericResource'
+
+    PaymentCompleted:
+      name: PaymentCompleted
+      title: payment.completed
+      summary: A payment has been completed end-to-end.
+      contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/DeelWebhookHeaders'
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/WebhookEnvelope'
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  meta:
+                    allOf:
+                      - $ref: '#/components/schemas/EventMeta'
+                      - type: object
+                        properties:
+                          event_type:
+                            const: payment.completed
+                  resource:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GenericResource'
+
+    EorPayslipsAvailable:
+      name: EorPayslipsAvailable
+      title: eor.payslips.available
+      summary: EOR payslips are available.
+      description: |
+        Module `payslips` (label `Payslips`). Triggered when EOR payslips
+        are available for delivery to employees. Full `resource` shape is
+        published by Deel via the `payload_example` field returned from
+        `GET /rest/v2/webhooks/events/types`.
+      contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/DeelWebhookHeaders'
+      payload:
+        allOf:
+          - $ref: '#/components/schemas/WebhookEnvelope'
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  meta:
+                    allOf:
+                      - $ref: '#/components/schemas/EventMeta'
+                      - type: object
+                        properties:
+                          event_type:
+                            const: eor.payslips.available
+                  resource:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GenericResource'
+
+    EorAmendmentStatusUpdated:
+      name: EorAmendmentStatusUpdated
+      title: eor.amendment.status.updated
+      summary: An EOR amendment's status changed.
+      description: |
+        Carries the amendment identifier, owning organization, and the
+        new status (e.g. `EOR_AMENDMENT_V2_CLIENT_ACTIVE`). For this event
+        type Deel delivers `resource` as a single object rather than an
+        array; subscribers should accept either shape.
+      contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/DeelWebhookHeaders'
+      payload:
+        allOf:
+          - type: object
+            required:
+              - data
+              - timestamp
+            properties:
+              data:
+                type: object
+                required:
+                  - meta
+                  - resource
+                properties:
+                  meta:
+                    allOf:
+                      - $ref: '#/components/schemas/EventMeta'
+                      - type: object
+                        properties:
+                          event_type:
+                            const: eor.amendment.status.updated
+                          event_type_id:
+                            type: string
+                            description: UUID identifying the event type definition.
+                          tracking_id:
+                            type: string
+                            description: Per-delivery tracking identifier used in Deel logs.
+                          organization_name:
+                            type: string
+                            description: Display name of the receiving organization.
+                  resource:
+                    $ref: '#/components/schemas/EorAmendmentResource'
+              timestamp:
+                type: string
+                format: date-time
+
+  schemas:
+    WebhookEnvelope:
+      type: object
+      description: |
+        Standard Deel webhook envelope. Every delivery is a JSON document
+        whose top-level `data` object carries `meta` (event metadata) and
+        `resource` (event-specific data). A top-level `timestamp`
+        indicates when the event occurred in ISO 8601 format.
+      required:
+        - data
+        - timestamp
+      properties:
+        data:
+          type: object
+          required:
+            - meta
+            - resource
+          properties:
+            meta:
+              $ref: '#/components/schemas/EventMeta'
+            resource:
+              type: array
+              description: |
+                Event-specific resource payload. Shape varies by event
+                type. Documented field names are modeled per message;
+                additional fields are permitted because Deel's public
+                documentation does not exhaustively enumerate them.
+              items:
+                type: object
+                additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the event occurred.
+
+    EventMeta:
+      type: object
+      description: Common envelope metadata included on every Deel webhook delivery.
+      required:
+        - event_type
+        - organization_id
+      properties:
+        event_type:
+          type: string
+          description: |
+            Canonical event type name (e.g. `contract.created`). Matches
+            one of the names returned from `GET /rest/v2/webhooks/events/types`.
+        organization_id:
+          type: string
+          description: Identifier of the Deel organization the event belongs to.
+        event_id:
+          type: string
+          description: Unique identifier for this individual event.
+        occurred_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp at which the underlying business event happened.
+        is_simulation:
+          type: boolean
+          description: |
+            Present and `true` when this delivery was generated by Deel's
+            webhook simulation feature (Developer Center → Webhooks →
+            Simulate, or `POST /rest/v2/webhooks/test`). Absent or `false`
+            for real events.
+
+    ContractCreatedResource:
+      type: object
+      description: |
+        Resource payload Deel documents for `contract.created`. Subscribers
+        should accept additional fields.
+      additionalProperties: true
+      properties:
+        contract_id:
+          type: string
+          description: Deel contract identifier.
+        worker_email:
+          type: string
+          format: email
+          description: Email address of the worker on the contract.
+        status:
+          type: string
+          description: |
+            Current contract status. Documented example values include
+            `pending`.
+        type:
+          type: string
+          description: |
+            Contract type. Documented example values include `eor`.
+        country:
+          type: string
+          description: ISO country code where the contract is hosted.
+        created_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp at which the contract was created.
+
+    ContractResource:
+      type: object
+      description: |
+        Generic contract resource. Deel does not publish a full field-level
+        schema for `contract.signed` and `contract.terminated`; subscribers
+        should rely on the `payload_example` retrieved from
+        `GET /rest/v2/webhooks/events/types` and accept additional fields.
+      additionalProperties: true
+      properties:
+        contract_id:
+          type: string
+          description: Deel contract identifier.
+
+    EorAmendmentResource:
+      type: object
+      description: |
+        Resource payload Deel documents for `eor.amendment.status.updated`.
+        Subscribers should accept additional fields.
+      additionalProperties: true
+      properties:
+        amendment_flow_id:
+          type: string
+          description: Identifier of the EOR amendment flow.
+        organization_id:
+          type: string
+          description: Identifier of the owning Deel organization.
+        status:
+          type: string
+          description: |
+            Current amendment status (e.g. `EOR_AMENDMENT_V2_CLIENT_ACTIVE`).
+
+    GenericResource:
+      type: object
+      description: |
+        Generic event-specific resource. Deel's public documentation does
+        not publish a field-level schema for this event; rely on the
+        `payload_example` returned from `GET /rest/v2/webhooks/events/types`
+        at runtime and accept additional fields.
+      additionalProperties: true

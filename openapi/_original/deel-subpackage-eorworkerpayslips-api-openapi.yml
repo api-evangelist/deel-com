@@ -1,0 +1,138 @@
+# x-archived-from: deel-subpackage-eorworkerpayslips-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Eor Worker Payslips API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_eorWorkerPayslips
+paths:
+  /eor/workers/{worker_id}/payslips/{payslip_id}/download:
+    get:
+      operationId: get-worker-payslips-download
+      summary: Retrieve payslip PDF download link
+      description: "Retrieve a URL to download a specific payslip PDF for a EoR worker. This endpoint is useful for accessing detailed payment records in a portable document format.\n **Token scopes**: `payslips:read`"
+      tags:
+      - subpackage_eorWorkerPayslips
+      parameters:
+      - name: worker_id
+        in: path
+        description: The ID of the worker whose payslip download link is being requested.
+        required: true
+        schema:
+          type: string
+      - name: payslip_id
+        in: path
+        description: The ID of the specific payslip to download.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved the payslip download link.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-worker-payslips_getWorkerPayslipsDownload_Response_200'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    EorWorkersWorkerIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL to download the payslip PDF.
+      required:
+      - url
+      title: EorWorkersWorkerIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaData
+    eor-worker-payslips_getWorkerPayslipsDownload_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorWorkersWorkerIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-worker-payslips_getWorkerPayslipsDownload_Response_200
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

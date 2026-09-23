@@ -1,0 +1,649 @@
+# x-archived-from: deel-subpackage-eorworkerinformation-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Eor Worker Information API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_eorWorkerInformation
+paths:
+  /eor/workers/contracts/{contract_id}/additional-information:
+    post:
+      operationId: create-gp-worker-additional-information
+      summary: Add additional information
+      description: "Add additional information for an EOR employee.\n **Token scopes**: `worker:write`"
+      tags:
+      - subpackage_eorWorkerInformation
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-worker-information_createGPWorkerAdditionalInformation_Response_200'
+        '400':
+          description: Bad request. Contract not found, contract is not EOR, required base fields are missing, or country-specific additional field validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddAdditionalInformation-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Authentication failed. Bearer token is missing, expired, or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddAdditionalInformation-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden. The token lacks worker:write scope or the worker cannot update this contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddAdditionalInformation-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not found. No additional information template exists for the employment country/state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddAdditionalInformation-v2026-01-01RequestNotFoundError'
+        '429':
+          description: Rate limit exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddAdditionalInformation-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddAdditionalInformation-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Add additional information for an EOR employee.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Additional fields are country/state-specific and validated against the worker additional fields form for the employment country.
+              required:
+              - data
+    patch:
+      operationId: update-eor-worker-additional-information
+      summary: Update additional information
+      description: "Updates additional information for an EOR employee agreement. Only works if the employee’s contract status is new, under_review, or waiting_for_employee_contract. Using other statuses can cause errors.\n **Token scopes**: `worker:write`"
+      tags:
+      - subpackage_eorWorkerInformation
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-worker-information_updateEORWorkerAdditionalInformation_Response_200'
+        '400':
+          description: Bad request. Contract not found, contract is not EOR, or additional information validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAdditionalInformation-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Authentication failed. Bearer token is missing, expired, or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAdditionalInformation-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden. The token lacks worker:write scope or the worker cannot update this contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAdditionalInformation-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not found. No additional info template exists for the employment country/state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAdditionalInformation-v2026-01-01RequestNotFoundError'
+        '429':
+          description: Rate limit exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAdditionalInformation-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAdditionalInformation-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Patch additional information for an EOR employee contract.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPatchRequestBodyContentApplicationJsonSchemaData'
+                  description: You can submit any subset of fields. Keys not listed above are treated as country/state-specific additional information fields. Those keys must match the fields returned by GET /forms/eor/worker-additional-fields/{country_code} (public keys).
+              required:
+              - data
+  /eor/workers/banks:
+    post:
+      operationId: create-eor-worker-bank-account
+      summary: Add bank account
+      description: "Add bank account for an EOR employee.\n **Token scopes**: `worker:write`"
+      tags:
+      - subpackage_eorWorkerInformation
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-worker-information_createEORWorkerBankAccount_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EorWorkersBanksPostRequestBodyContentApplicationJsonSchemaDataItems'
+                  description: Array of key value properties of bank account
+              required:
+              - data
+  /eor/workers/tax-documents:
+    get:
+      operationId: get-eor-worker-tax-documents
+      summary: List of tax documents for an employee
+      description: "Get list of tax documents for an employee.\n **Token scopes**: `worker:read`"
+      tags:
+      - subpackage_eorWorkerInformation
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Tax documents successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-worker-information_getEORWorkerTaxDocuments_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    UpdateAdditionalInformation-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UpdateAdditionalInformation-v2026-01-01RequestTooManyRequestsError
+    eor-worker-information_updateEORWorkerAdditionalInformation_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-worker-information_updateEORWorkerAdditionalInformation_Response_200
+    eor-worker-information_getEORWorkerTaxDocuments_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersTaxDocumentsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: eor-worker-information_getEORWorkerTaxDocuments_Response_200
+    UpdateAdditionalInformation-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UpdateAdditionalInformation-v2026-01-01RequestBadRequestError
+    UpdateAdditionalInformation-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UpdateAdditionalInformation-v2026-01-01RequestInternalServerError
+    EorWorkersTaxDocumentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id of the tax document
+        url:
+          type: string
+          description: URL of the tax document
+        type:
+          type: string
+          description: Type of the tax document
+        year:
+          type: number
+          format: double
+          description: Year of tax document
+        country:
+          type: string
+          description: Country of the tax document
+      title: EorWorkersTaxDocumentsGetResponsesContentApplicationJsonSchemaDataItems
+    EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        updated:
+          type: boolean
+          description: Indicates if contract was updated
+      required:
+      - updated
+      title: EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaData
+    EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        updated:
+          type: boolean
+          description: Indicates if contract was updated
+      required:
+      - updated
+      title: EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaData
+    AddAdditionalInformation-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AddAdditionalInformation-v2026-01-01RequestUnauthorizedError
+    EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+      title: EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems
+    UpdateAdditionalInformation-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UpdateAdditionalInformation-v2026-01-01RequestUnauthorizedError
+    EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+      title: EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems
+    EorWorkersBanksPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of Bank Account.
+      required:
+      - id
+      title: EorWorkersBanksPostResponsesContentApplicationJsonSchemaData
+    AddAdditionalInformation-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AddAdditionalInformation-v2026-01-01RequestForbiddenError
+    AddAdditionalInformation-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AddAdditionalInformation-v2026-01-01RequestNotFoundError
+    UpdateAdditionalInformation-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UpdateAdditionalInformation-v2026-01-01RequestForbiddenError
+    EorWorkersBanksPostRequestBodyContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The key of the bank account properties.
+        value:
+          type: string
+          description: The value for that key property.
+      required:
+      - key
+      - value
+      title: EorWorkersBanksPostRequestBodyContentApplicationJsonSchemaDataItems
+    AddAdditionalInformation-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems'
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaTranslationsItems'
+          description: Present when additional fields fail validation, to map internal field keys back to public API keys.
+      required:
+      - errors
+      title: AddAdditionalInformation-v2026-01-01RequestBadRequestError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    eor-worker-information_createEORWorkerBankAccount_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorWorkersBanksPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-worker-information_createEORWorkerBankAccount_Response_201
+    AddAdditionalInformation-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AddAdditionalInformation-v2026-01-01RequestTooManyRequestsError
+    eor-worker-information_createGPWorkerAdditionalInformation_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-worker-information_createGPWorkerAdditionalInformation_Response_200
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    EorWorkersContractsContractIdAdditionalInformationPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        city:
+          type: string
+          description: City
+        phone:
+          type: string
+          description: Worker phone
+        state:
+          type: string
+          description: State/province (required for countries with provinces/states).
+        street:
+          type: string
+          description: Street
+        zip_code:
+          type: string
+          description: Zipcode/Post code
+        tax_residence:
+          type: string
+          description: Worker tax residence
+        is_payslip_access_allowed:
+          type: boolean
+          description: Worker access to payslips
+        is_compliance_access_allowed:
+          type: boolean
+          description: Worker access to compliance documents
+      required:
+      - city
+      - phone
+      - street
+      - zip_code
+      - tax_residence
+      - is_payslip_access_allowed
+      - is_compliance_access_allowed
+      description: Additional fields are country/state-specific and validated against the worker additional fields form for the employment country.
+      title: EorWorkersContractsContractIdAdditionalInformationPostRequestBodyContentApplicationJsonSchemaData
+    UpdateAdditionalInformation-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UpdateAdditionalInformation-v2026-01-01RequestNotFoundError
+    EorWorkersContractsContractIdAdditionalInformationPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        dob:
+          type: string
+          description: Date of birth (ISO 8601 date)
+        city:
+          type: string
+          description: City
+        phone:
+          type: string
+          description: Worker phone
+        state:
+          type: string
+          description: State/province
+        street:
+          type: string
+          description: Street
+        zip_code:
+          type: string
+          description: Zipcode/Post code
+        tax_residence:
+          type: string
+          description: Worker tax residence
+        is_payslip_access_allowed:
+          type: boolean
+          description: Worker access to payslips
+        is_compliance_access_allowed:
+          type: boolean
+          description: Worker access to compliance documents
+      description: You can submit any subset of fields. Keys not listed above are treated as country/state-specific additional information fields. Those keys must match the fields returned by GET /forms/eor/worker-additional-fields/{country_code} (public keys).
+      title: EorWorkersContractsContractIdAdditionalInformationPatchRequestBodyContentApplicationJsonSchemaData
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaTranslationsItems:
+      type: object
+      properties:
+        originalKey:
+          type: string
+        publicApiKey:
+          type: string
+      required:
+      - originalKey
+      - publicApiKey
+      title: EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaTranslationsItems
+    AddAdditionalInformation-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AddAdditionalInformation-v2026-01-01RequestInternalServerError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

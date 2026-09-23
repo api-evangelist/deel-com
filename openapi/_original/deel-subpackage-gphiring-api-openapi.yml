@@ -1,0 +1,1485 @@
+# x-archived-from: deel-subpackage-gphiring-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Gp Hiring API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_gpHiring
+paths:
+  /contracts/gp:
+    post:
+      operationId: create-gp-contract
+      summary: Create a Global Payroll (GP) contract
+      description: "Create a Global Payroll contract, including dataset such as employment, employee address, client legal_entity/team, compensation_details, job_title, invite_employee_to_app, work_location for US\n **Token scopes**: `contracts:write`"
+      tags:
+      - subpackage_gpHiring
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gp-hiring_createGPContract_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAGlobalPayrollGpContract-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAGlobalPayrollGpContract-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Global Payroll (GP) contract object that needs to be created.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /gp/workers/{worker_id}/terminations:
+    post:
+      operationId: create-gp-worker-termination
+      summary: Request termination
+      description: "Request a termination for a global payroll employee. A successful call starts the termination process and does not confirm termination.\n **Token scopes**: `global-payroll:write`"
+      tags:
+      - subpackage_gpHiring
+      parameters:
+      - name: worker_id
+        in: path
+        description: Unique identifier for a worker in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gp-hiring_createGPWorkerTermination_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Request body to request a termination for an employee.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+components:
+  schemas:
+    GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeveranceOneOf1Type:
+      type: string
+      enum:
+      - CASH
+      description: The type of severance, in cash.
+      title: GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeveranceOneOf1Type
+    gp-hiring_createGPWorkerTermination_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpWorkersWorkerIdTerminationsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: gp-hiring_createGPWorkerTermination_Response_201
+    ContractsGpPostResponsesContentApplicationJsonSchemaDataEmploymentHolidays:
+      type: object
+      properties:
+        allowance:
+          type: number
+          format: double
+          description: Number of holidays.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601.
+      title: ContractsGpPostResponsesContentApplicationJsonSchemaDataEmploymentHolidays
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the legal entity.
+      required:
+      - id
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity
+    ContractsGpPostResponsesContentApplicationJsonSchemaDataEmployee:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Employee's email address.
+        last_name:
+          type: string
+          description: Employee's last name.
+        first_name:
+          type: string
+          description: Employee's first name.
+        employee_number:
+          type:
+          - string
+          - 'null'
+          description: Employee's number.
+      title: ContractsGpPostResponsesContentApplicationJsonSchemaDataEmployee
+    CreateAGlobalPayrollGpContract-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateAGlobalPayrollGpContract-v2026-01-01RequestInternalServerError
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmploymentHolidays:
+      type: object
+      properties:
+        allowance:
+          type: number
+          format: double
+          description: Number of paid holiday days allocated per year.
+        start_date:
+          type: string
+          format: date
+          description: Date when the holiday entitlement becomes effective (ISO-8601 YYYY-MM-DD).
+      required:
+      - allowance
+      - start_date
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmploymentHolidays
+    GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeverance1:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeveranceOneOf1Type'
+          description: The type of severance, in cash.
+        amount:
+          type: number
+          format: double
+          description: The amount of severance, specified in the designated currency.
+        currency:
+          type: string
+          description: Currency code for severance.
+      required:
+      - type
+      - amount
+      - currency
+      title: GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeverance1
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployeeAddress:
+      type: object
+      properties:
+        zip:
+          type: string
+          description: Postal or ZIP code.
+        city:
+          type: string
+          description: City of residence.
+        state:
+          type: string
+          description: State or province code.
+        street:
+          type: string
+          description: Street name and building number.
+        country:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployeeAddressCountry'
+          description: ISO 3166-1 alpha-2 country code.
+      required:
+      - zip
+      - city
+      - street
+      - country
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployeeAddress
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployment:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmploymentType'
+          description: Employment type indicating whether the employee works full-time or part-time.
+        country:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmploymentCountry'
+          description: Country where the employee is employed, in ISO 3166-1 alpha-2 format. Used as the contract country. Falls back to employee address country if not provided.
+        holidays:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmploymentHolidays'
+        start_date:
+          type: string
+          format: date
+          description: Employment start date in ISO-8601 format (YYYY-MM-DD).
+      required:
+      - type
+      - holidays
+      - start_date
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployment
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataClientTeam:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Refers to Groups in the platform. Working groups that reflect the organization's structure.
+      required:
+      - id
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataClientTeam
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployee:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: Employee's personal email address used for communication and onboarding.
+        address:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployeeAddress'
+        last_name:
+          type: string
+          description: Employee's last name.
+        first_name:
+          type: string
+          description: Employee's first name.
+        work_email:
+          type: string
+          format: email
+          description: Employee's company email address associated with the client organization.
+        nationality:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployeeNationality'
+          description: Employee's nationality in ISO 3166-1 alpha-2 format.
+        employee_number:
+          type: string
+          description: Internal employee identifier within the client organization.
+      required:
+      - email
+      - address
+      - last_name
+      - first_name
+      - work_email
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployee
+    gp-hiring_createGPContract_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: gp-hiring_createGPContract_Response_201
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmploymentType:
+      type: string
+      enum:
+      - Full-time
+      - Part-time
+      description: Employment type indicating whether the employee works full-time or part-time.
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmploymentType
+    ContractsGpPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id of the contract created.
+        type:
+          $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaDataType'
+          description: Type of a contract.
+        client:
+          $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaDataClient'
+        status:
+          $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Status of a contract in Deel workflow.
+        employee:
+          $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaDataEmployee'
+        job_title:
+          type: string
+          description: Employee's job title.
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601.
+        employment:
+          $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaDataEmployment'
+        compensation_details:
+          $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaDataCompensationDetails'
+      title: ContractsGpPostResponsesContentApplicationJsonSchemaData
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsScale:
+      type: string
+      enum:
+      - YEAR
+      - MONTH
+      default: YEAR
+      description: Defines whether the salary amount represents yearly or monthly gross compensation.
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsScale
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmploymentCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XA
+      - XB
+      - XC
+      - XK
+      - XX
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country where the employee is employed, in ISO 3166-1 alpha-2 format. Used as the contract country. Falls back to employee address country if not provided.
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmploymentCountry
+    GpWorkersWorkerIdTerminationsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the termination request.
+        last_date_of_work:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601.
+      required:
+      - id
+      - last_date_of_work
+      title: GpWorkersWorkerIdTerminationsPostResponsesContentApplicationJsonSchemaData
+    ContractsGpPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ContractsGpPostResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsGpPostResponsesContentApplicationJsonSchemaDataEmployment:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Is it a full-time contract or a part-time contract?
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code of the state/province where this person will be employed.
+        country:
+          type: string
+          description: Country of employment.
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601.
+        holidays:
+          $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaDataEmploymentHolidays'
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601.
+        work_visa_required:
+          type: boolean
+          description: Do you require Deel to apply for a work visa for this person?
+      title: ContractsGpPostResponsesContentApplicationJsonSchemaDataEmployment
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        client:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataClient'
+        employee:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployee'
+        job_title:
+          type: string
+          description: Employee's official job title as stated in the employment agreement.
+        employment:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployment'
+        work_location:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataWorkLocation'
+          description: Work location details for the employee. Required for US legal entities.
+        compensation_details:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataCompensationDetails'
+        invite_employee_to_app:
+          type: boolean
+          description: When true, the employee will receive an invitation to join the platform for onboarding.
+      required:
+      - client
+      - employee
+      - job_title
+      - employment
+      - compensation_details
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaData
+    ContractsGpPostResponsesContentApplicationJsonSchemaDataCompensationDetails:
+      type: object
+      properties:
+        scale:
+          type: string
+          description: Scale at which the salary is paid.
+        salary:
+          type: number
+          format: double
+          description: Gross annual/month salary.
+        currency:
+          type: string
+          description: Currency of gross annual/month salary.
+      title: ContractsGpPostResponsesContentApplicationJsonSchemaDataCompensationDetails
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployeeAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XA
+      - XB
+      - XC
+      - XK
+      - XX
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: ISO 3166-1 alpha-2 country code.
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployeeAddressCountry
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataCompensationDetails:
+      type: object
+      properties:
+        scale:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsScale'
+          description: Defines whether the salary amount represents yearly or monthly gross compensation.
+        salary:
+          type: number
+          format: double
+          description: Gross salary amount based on the selected scale.
+        currency:
+          type: string
+          description: Three-letter ISO 4217 currency code representing the salary currency.
+      required:
+      - scale
+      - salary
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataCompensationDetails
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ContractsGpPostResponsesContentApplicationJsonSchemaDataClientLegalEntity:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Legal entity name.
+      title: ContractsGpPostResponsesContentApplicationJsonSchemaDataClientLegalEntity
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataWorkLocation:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the registered entity address where the employee works. Use 'Remote' if applicable.
+        is_wfh:
+          type: boolean
+          description: Indicates whether the employee works remotely.
+        effective_date:
+          type: string
+          format: date
+          description: Date when the work location becomes effective (ISO-8601 YYYY-MM-DD).
+      required:
+      - is_wfh
+      description: Work location details for the employee. Required for US legal entities.
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataWorkLocation
+    ContractsGpPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - new
+      - under_review
+      - waiting_for_employee_contract
+      - waiting_for_client_sign
+      - processing_payment
+      - waiting_for_contractor_sign
+      - waiting_for_eor_sign
+      - waiting_for_employee_sign
+      - awaiting_deposit_payment
+      - in_progress
+      - completed
+      - cancelled
+      - user_cancelled
+      - rejected
+      - waiting_for_client_payment
+      - onboarding
+      description: Status of a contract in Deel workflow.
+      title: ContractsGpPostResponsesContentApplicationJsonSchemaDataStatus
+    CreateAGlobalPayrollGpContract-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateAGlobalPayrollGpContract-v2026-01-01RequestBadRequestError
+    GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeverance:
+      oneOf:
+      - $ref: '#/components/schemas/GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeverance0'
+      - $ref: '#/components/schemas/GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeverance1'
+      title: GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeverance
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataClient:
+      type: object
+      properties:
+        team:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataClientTeam'
+        legal_entity:
+          $ref: '#/components/schemas/ContractsGpPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity'
+      required:
+      - team
+      - legal_entity
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataClient
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeverance0:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeveranceOneOf0Type'
+          description: The type of severance, either in time off.
+        amount:
+          type: number
+          format: double
+          description: The amount of severance, specified in the designated currency or time unit.
+        currency:
+          type: string
+          description: Currency code for severance.
+        time_unit:
+          $ref: '#/components/schemas/GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeveranceOneOf0TimeUnit'
+          description: The unit of time for severance (e.g., DAYS, WEEKS, MONTHS).
+      required:
+      - type
+      - amount
+      - currency
+      - time_unit
+      title: GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeverance0
+    GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeveranceOneOf0TimeUnit:
+      type: string
+      enum:
+      - DAYS
+      - WEEKS
+      - MONTHS
+      description: The unit of time for severance (e.g., DAYS, WEEKS, MONTHS).
+      title: GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeveranceOneOf0TimeUnit
+    GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The reason for terminating the worker's engagement.
+        severance:
+          $ref: '#/components/schemas/GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeverance'
+        is_voluntary:
+          type: boolean
+          description: Indicates whether the worker termination is voluntary (true) or involuntary (false).
+        desired_end_date:
+          type: string
+          format: date
+          description: The preferred end date for terminating the worker's engagement, in ISO-8601 format (YYYY-MM-DD).
+        last_date_of_work:
+          type: string
+          format: date
+          description: The effective termination date of the worker's employment, in ISO-8601 format (YYYY-MM-DD).
+      required:
+      - message
+      - severance
+      - is_voluntary
+      - desired_end_date
+      - last_date_of_work
+      title: GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaData
+    ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployeeNationality:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XA
+      - XB
+      - XC
+      - XK
+      - XX
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Employee's nationality in ISO 3166-1 alpha-2 format.
+      title: ContractsGpPostRequestBodyContentApplicationJsonSchemaDataEmployeeNationality
+    ContractsGpPostResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract.
+      title: ContractsGpPostResponsesContentApplicationJsonSchemaDataType
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeveranceOneOf0Type:
+      type: string
+      enum:
+      - TIME
+      description: The type of severance, either in time off.
+      title: GpWorkersWorkerIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataSeveranceOneOf0Type
+    ContractsGpPostResponsesContentApplicationJsonSchemaDataClient:
+      type: object
+      properties:
+        legal_entity:
+          $ref: '#/components/schemas/ContractsGpPostResponsesContentApplicationJsonSchemaDataClientLegalEntity'
+      title: ContractsGpPostResponsesContentApplicationJsonSchemaDataClient
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

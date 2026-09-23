@@ -1,0 +1,1241 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Projects API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_projects
+paths:
+  /timesheets/presets:
+    post:
+      operationId: create-timesheets-preset
+      summary: Create Hourly Report Preset
+      description: 'Create a new hourly report preset.
+
+        **Token scopes**: `timesheets:write`'
+      tags:
+      - subpackage_projects
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects_createTimesheetsPreset_Response_201'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateHourlyReportPresetRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateHourlyReportPresetRequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimesheetsPresetsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /timesheets/root-presets:
+    post:
+      operationId: create-root-timesheets-preset
+      summary: Create Hourly Report Root Preset
+      description: 'Create a new hourly report root preset.
+
+        **Token scopes**: `timesheets:write`'
+      tags:
+      - subpackage_projects
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects_createRootTimesheetsPreset_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateHourlyReportRootPresetRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type:
+                  - string
+                  - 'null'
+                  format: binary
+                  description: Optional file attachment for the root preset
+                type:
+                  $ref: '#/components/schemas/TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaType'
+                  description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
+                title:
+                  type: string
+                  description: The title of the hourly report root preset (maximum 255 characters)
+                description:
+                  type: string
+                  description: Detailed description of the root preset's purpose and usage (maximum 30000 characters)
+                hourly_report_presets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItems'
+                  description: Array of preset configurations to be created along with the root preset
+                hourly_report_presets_processing_type:
+                  $ref: '#/components/schemas/TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsProcessingType'
+                  description: Determines whether presets should be processed synchronously or asynchronously
+              required:
+              - title
+    get:
+      operationId: get-hourly-report-root-presets
+      summary: Get Hourly Report Root Presets
+      description: 'Retrieve a list of hourly report root presets.
+
+        **Token scopes**: `timesheets:read`'
+      tags:
+      - subpackage_projects
+      parameters:
+      - name: limit
+        in: query
+        description: 'Maximum number of items to return per page (max: 100)'
+        required: false
+        schema:
+          type: integer
+          default: 10
+      - name: order_by
+        in: query
+        description: Field to order the results by
+        required: false
+        schema:
+          $ref: '#/components/schemas/TimesheetsRootPresetsGetParametersOrderBy'
+      - name: order_direction
+        in: query
+        description: Direction to order the results (ascending or descending)
+        required: false
+        schema:
+          $ref: '#/components/schemas/TimesheetsRootPresetsGetParametersOrderDirection'
+      - name: work_statement_statuses
+        in: query
+        description: Filter results by work statement status
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: cursor
+        in: query
+        description: Pagination cursor for fetching the next page of results
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects_getHourlyReportRootPresets_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHourlyReportRootPresetsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /timesheets/presets/{id}:
+    delete:
+      operationId: delete-timesheets-preset
+      summary: Delete Hourly Report Preset
+      description: 'Delete an existing hourly report preset.
+
+        **Token scopes**: `timesheets:write`'
+      tags:
+      - subpackage_projects
+      parameters:
+      - name: id
+        in: path
+        description: The unique identifier of the hourly report preset to delete
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects_deleteTimesheetsPreset_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteHourlyReportPresetRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteHourlyReportPresetRequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteHourlyReportPresetRequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    get:
+      operationId: get-timesheets-preset-by-id
+      summary: Get Hourly Report Preset by ID
+      description: 'Retrieve a specific hourly report preset by its ID.
+
+        **Token scopes**: `timesheets:read`'
+      tags:
+      - subpackage_projects
+      parameters:
+      - name: id
+        in: path
+        description: The unique identifier of the hourly report preset to retrieve
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects_getTimesheetsPresetById_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHourlyReportPresetByIdRequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHourlyReportPresetByIdRequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    patch:
+      operationId: update-timesheets-preset
+      summary: Update Hourly Report Preset
+      description: 'Update an existing hourly report preset.
+
+        **Token scopes**: `timesheets:write`'
+      tags:
+      - subpackage_projects
+      parameters:
+      - name: id
+        in: path
+        description: The unique identifier of the hourly report preset to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects_updateTimesheetsPreset_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateHourlyReportPresetRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateHourlyReportPresetRequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateHourlyReportPresetRequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimesheetsPresetsIdPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /contracts/{contract_id}/timesheets/presets:
+    get:
+      operationId: get-contract-timesheets-presets
+      summary: Get Hourly Report Presets
+      description: 'Retrieve hourly report presets for a given contract and work statement.
+
+        **Token scopes**: `timesheets:read`'
+      tags:
+      - subpackage_projects
+      parameters:
+      - name: contract_id
+        in: path
+        description: ID of the Deel contract
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: work_statement_id
+        in: query
+        description: ID of the work statement (optional)
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: order_by
+        in: query
+        description: Field to order results by (title or created_at)
+        required: false
+        schema:
+          type: string
+          default: title
+      - name: order_direction
+        in: query
+        description: Direction of ordering (ASC or DESC)
+        required: false
+        schema:
+          type: string
+          default: ASC
+      - name: cursor
+        in: query
+        description: Pagination cursor for fetching next set of results
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Number of results to return per page
+        required: false
+        schema:
+          type: integer
+          default: 100
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects_getContractTimesheetsPresets_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHourlyReportPresetsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /timesheets/root-presets/{id}:
+    get:
+      operationId: get-hourly-report-root-preset-by-id
+      summary: Get Hourly Report Root Preset by ID
+      description: 'Retrieve a specific hourly report root preset by its ID.
+
+        **Token scopes**: `timesheets:read`'
+      tags:
+      - subpackage_projects
+      parameters:
+      - name: id
+        in: path
+        description: The unique identifier of the hourly report root preset to retrieve
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects_getHourlyReportRootPresetById_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHourlyReportRootPresetByIdRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHourlyReportRootPresetByIdRequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type: string
+          description: Pagination cursor for fetching the next set of results
+        total_rows:
+          type: integer
+          description: Total number of rows available in the result set
+      required:
+      - cursor
+      - total_rows
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaPage
+    TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type: string
+          description: Pagination cursor for fetching the next set of results
+        total_rows:
+          type: integer
+          description: Total number of root presets available
+      required:
+      - cursor
+      - total_rows
+      title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaPage
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPreset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the root preset
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetFile'
+          - type: 'null'
+        type:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetType'
+          description: The type of preset based on type of root preset
+        title:
+          type: string
+          description: The title of the root preset template
+        description:
+          type: string
+          description: Detailed description of the root preset template
+      required:
+      - id
+      - title
+      - description
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPreset
+    GetHourlyReportRootPresetByIdRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: GetHourlyReportRootPresetByIdRequestBadRequestError
+    Projects_getHourlyReportRootPresetById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_getHourlyReportRootPresetById_Response_200
+    DeleteHourlyReportPresetRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: DeleteHourlyReportPresetRequestBadRequestError
+    CreateHourlyReportPresetRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateHourlyReportPresetRequestBadRequestError
+    GetHourlyReportRootPresetByIdRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: GetHourlyReportRootPresetByIdRequestNotFoundError
+    TimesheetsPresetsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        file:
+          type:
+          - string
+          - 'null'
+          format: binary
+          description: Optional file attachment for the hourly report preset
+        rate:
+          type: number
+          format: double
+          description: The hourly rate for this preset (must be greater than 0)
+        title:
+          type: string
+          description: The title of the hourly report preset
+        description:
+          type:
+          - string
+          - 'null'
+          description: A detailed description of the hourly report preset's purpose and contents
+        work_statement_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the associated work statement
+        hourly_report_root_preset_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the root preset this report is based on
+      required:
+      - work_statement_id
+      - hourly_report_root_preset_id
+      title: TimesheetsPresetsPostRequestBodyContentApplicationJsonSchemaData
+    TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the created root preset
+        async_task:
+          $ref: '#/components/schemas/TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaDataAsyncTask'
+      required:
+      - id
+      title: TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaData
+    Projects_deleteTimesheetsPreset_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsPresetsIdDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_deleteTimesheetsPreset_Response_200
+    TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the hourly report preset
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataFile'
+          - type: 'null'
+        type:
+          $ref: '#/components/schemas/TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataType'
+          description: The type of preset based on type of root preset
+        title:
+          type: string
+          description: The title of the hourly report preset
+        status:
+          type: string
+          description: The current status of the hourly report preset
+        description:
+          type: string
+          description: A detailed description of the hourly report preset
+      required:
+      - id
+      - title
+      - status
+      - description
+      title: TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaData
+    TimesheetsPresetsIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the updated hourly report preset
+      required:
+      - id
+      title: TimesheetsPresetsIdPatchResponsesContentApplicationJsonSchemaData
+    Projects_createTimesheetsPreset_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsPresetsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_createTimesheetsPreset_Response_201
+    TimesheetsRootPresetsGetParametersOrderDirection:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      default: DESC
+      title: TimesheetsRootPresetsGetParametersOrderDirection
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    GetHourlyReportPresetsRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
+      title: GetHourlyReportPresetsRequestBadRequestError
+    TimesheetsPresetsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the newly created hourly report preset
+      required:
+      - id
+      title: TimesheetsPresetsPostResponsesContentApplicationJsonSchemaData
+    GetHourlyReportRootPresetsRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: GetHourlyReportRootPresetsRequestBadRequestError
+    TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItems:
+      type: object
+      properties:
+        file:
+          type:
+          - string
+          - 'null'
+          format: binary
+          description: Optional file attachment for this specific preset instance
+        rate:
+          type: number
+          format: double
+          description: The hourly rate for this preset (must be greater than 0)
+        title:
+          type: string
+          description: The title for this specific preset instance (maximum 255 characters)
+        action_type:
+          $ref: '#/components/schemas/TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItemsActionType'
+          description: The action to perform with this preset (currently only ADD is supported)
+        contract_id:
+          type: string
+          description: The unique identifier of the contract this preset is associated with
+        description:
+          type:
+          - string
+          - 'null'
+          description: Detailed description for this specific preset instance (maximum 30000 characters)
+      required:
+      - contract_id
+      title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItems
+    Projects_getContractTimesheetsPresets_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaPage'
+      required:
+      - data
+      - page
+      title: Projects_getContractTimesheetsPresets_Response_200
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the hourly report preset
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile'
+          - type: 'null'
+        rate:
+          type: number
+          format: double
+          description: The hourly rate for this preset
+        title:
+          type: string
+          description: Title of the hourly report preset.
+        description:
+          type: string
+          description: Detailed description of the hourly report preset
+        hourly_report_root_preset:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPreset'
+      required:
+      - id
+      - rate
+      - title
+      - description
+      - hourly_report_root_preset
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItems
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type of the file
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile
+    UpdateHourlyReportPresetRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: UpdateHourlyReportPresetRequestNotFoundError
+    TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsType:
+      type: string
+      enum:
+      - RATE
+      - TRACKING
+      description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
+      title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsType
+    TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type of the file
+      title: TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataFile
+    TimesheetsRootPresetsGetParametersOrderBy:
+      type: string
+      enum:
+      - created_at
+      default: created_at
+      title: TimesheetsRootPresetsGetParametersOrderBy
+    TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaType:
+      type: string
+      enum:
+      - RATE
+      - TRACKING
+      description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
+      title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaType
+    TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItemsActionType:
+      type: string
+      enum:
+      - ADD
+      default: ADD
+      description: The action to perform with this preset (currently only ADD is supported)
+      title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItemsActionType
+    TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - RATE
+      - TRACKING
+      description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
+      title: TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataType
+    TimesheetsPresetsIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        file:
+          type:
+          - string
+          - 'null'
+          format: binary
+          description: The file to be attached to this hourly report preset (optional)
+        rate:
+          type: number
+          format: double
+          description: The hourly rate for this preset (must be greater than 0)
+        title:
+          type: string
+          description: The title of the hourly report preset (maximum 255 characters)
+        description:
+          type:
+          - string
+          - 'null'
+          description: A detailed description of the hourly report preset's purpose and contents (maximum 30000 characters)
+      title: TimesheetsPresetsIdPatchRequestBodyContentApplicationJsonSchemaData
+    GetHourlyReportPresetByIdRequestForbiddenError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: GetHourlyReportPresetByIdRequestForbiddenError
+    TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaDataAsyncTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The identifier of the asynchronous task processing this request
+      title: TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaDataAsyncTask
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetType:
+      type: string
+      enum:
+      - RATE
+      - TRACKING
+      description: The type of preset based on type of root preset
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetType
+    DeleteHourlyReportPresetRequestForbiddenError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: DeleteHourlyReportPresetRequestForbiddenError
+    CreateHourlyReportPresetRequestForbiddenError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateHourlyReportPresetRequestForbiddenError
+    TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type of the file
+      title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile
+    Projects_getTimesheetsPresetById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_getTimesheetsPresetById_Response_200
+    TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type of the file
+      title: TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataFile
+    TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - RATE
+      - TRACKING
+      description: The type of preset based on type of root preset
+      title: TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataType
+    UpdateHourlyReportPresetRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: UpdateHourlyReportPresetRequestBadRequestError
+    UpdateHourlyReportPresetRequestForbiddenError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: UpdateHourlyReportPresetRequestForbiddenError
+    Projects_updateTimesheetsPreset_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsPresetsIdPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_updateTimesheetsPreset_Response_200
+    TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the hourly report root preset
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataFile'
+          - type: 'null'
+        type:
+          $ref: '#/components/schemas/TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataType'
+          description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
+        title:
+          type: string
+          description: The title of the hourly report root preset
+        status:
+          type: string
+          description: The current status of the hourly report root preset
+        description:
+          type: string
+          description: Detailed description of the hourly report root preset's purpose and contents
+      required:
+      - id
+      - title
+      - status
+      - description
+      title: TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaData
+    DeleteHourlyReportPresetRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: DeleteHourlyReportPresetRequestNotFoundError
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type of the file
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetFile
+    TimesheetsPresetsIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Indicates whether the hourly report preset was successfully deleted
+      required:
+      - deleted
+      title: TimesheetsPresetsIdDeleteResponsesContentApplicationJsonSchemaData
+    Projects_createRootTimesheetsPreset_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_createRootTimesheetsPreset_Response_200
+    CreateHourlyReportRootPresetRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateHourlyReportRootPresetRequestBadRequestError
+    Projects_getHourlyReportRootPresets_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaPage'
+      required:
+      - data
+      - page
+      title: Projects_getHourlyReportRootPresets_Response_200
+    TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the hourly report root preset
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile'
+          - type: 'null'
+        type:
+          $ref: '#/components/schemas/TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsType'
+          description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
+        title:
+          type: string
+          description: The title of the hourly report root preset
+        description:
+          type: string
+          description: Detailed description of the hourly report root preset
+        contracts_count:
+          type: integer
+          description: Number of contracts using this root preset
+        hourly_report_presets_count:
+          type: integer
+          description: Number of hourly report presets created from this root preset
+      required:
+      - id
+      - title
+      - description
+      - contracts_count
+      - hourly_report_presets_count
+      title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsProcessingType:
+      type: string
+      enum:
+      - ASYNC
+      - SYNC
+      default: SYNC
+      description: Determines whether presets should be processed synchronously or asynchronously
+      title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsProcessingType
+    GetHourlyReportPresetByIdRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: GetHourlyReportPresetByIdRequestNotFoundError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

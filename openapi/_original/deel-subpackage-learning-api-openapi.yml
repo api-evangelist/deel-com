@@ -1,0 +1,720 @@
+# x-archived-from: deel-subpackage-learning-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Learning API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_learning
+paths:
+  /engage/learning/actionable-journeys:
+    get:
+      operationId: retrieve-workers-actionable-journeys
+      summary: Retrieve worker's actionable journeys
+      description: "Return list of ActionableJourneys for a given Worker. The concept of Actionable Journeys in the Public API corresponds directly to what is labeled as Courses in the user interface. Learn more about [Learning Management](https://www.deel.com/hr/engage/learning-management-software/)\n **Token scopes**: `worker:read`"
+      tags:
+      - subpackage_learning
+      parameters:
+      - name: journey_ids
+        in: query
+        description: Filter by Journey IDs.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: journey_assignment_ids
+        in: query
+        description: Filter by JourneyAssignment IDs.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records.
+        required: false
+        schema:
+          type: number
+          format: double
+          default: 20
+      - name: cursor
+        in: query
+        description: Cursor to the next page of results. If not provided, the first page will be returned.
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful retrieval of actionable journeys
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Learning_retrieveWorkersActionableJourneys_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWorkersActionableJourneysRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsRecipientSettingType:
+      type: string
+      enum:
+      - hris_organization_user
+      - manager
+      - buddy
+      - mentor
+      description: Type of RecipientSetting. e.g Manager, Buddy etc.
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsRecipientSettingType
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsRecipientable:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsRecipientableType'
+          description: Type of the recipient User
+        email:
+          type: string
+          format: email
+          description: Email address of the recipient
+        country:
+          type:
+          - string
+          - 'null'
+          description: Country of the recipient
+        pic_url:
+          type: string
+          format: uri
+          description: URL of the profile picture of the recipient
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title of the recipient
+        last_name:
+          type: string
+          description: Last name of the recipient
+        first_name:
+          type: string
+          description: First name of the recipient
+        work_email:
+          type: string
+          format: email
+          description: Work email of the recipient
+        deactivated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Deactivation timestamp of the recipient, if applicable
+        preferred_name:
+          type: string
+          description: Preferred name of the recipient
+        organization_public_id:
+          type: string
+          format: uuid
+          description: Public ID of the organization the recipient belongs to
+        hris_organization_user_id:
+          type: string
+          format: uuid
+          description: HRIS organization user ID of the recipient
+      required:
+      - type
+      - email
+      - country
+      - pic_url
+      - job_title
+      - last_name
+      - first_name
+      - work_email
+      - deactivated_at
+      - preferred_name
+      - organization_public_id
+      - hris_organization_user_id
+      description: Recipient for the ActionableJourney Step. Used in conjunction with recipient_setting_type. Recipient can be the same user as Assignee or any other user e.g Manager or Accounts Lead based on the RecipientSetting for the Step.
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsRecipientable
+    ? EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyUpdatedByHrisOrganizationUserProfileType
+    : type: string
+      enum:
+      - WORKER
+      - CLIENT
+      description: Type of the User
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyUpdatedByHrisOrganizationUserProfileType
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsRecipientableType:
+      type: string
+      enum:
+      - WORKER
+      - CLIENT
+      description: Type of the recipient User
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsRecipientableType
+    ? EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyCreatedByHrisOrganizationUserProfile
+    : type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyCreatedByHrisOrganizationUserProfileType'
+          description: Type of the User
+        email:
+          type: string
+          format: email
+          description: Email of the user who created the Journey
+        country:
+          type:
+          - string
+          - 'null'
+          description: Country of the User
+        pic_url:
+          type: string
+          format: uri
+          description: URL of the profile picture
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title of the User
+        last_name:
+          type: string
+          description: Last name of the User
+        first_name:
+          type: string
+          description: First name of the User
+        work_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Work email of the User
+        deactivated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Deactivation timestamp, if applicable
+        preferred_name:
+          type: string
+          description: Preferred name of the User
+        organization_public_id:
+          type: string
+          format: uuid
+          description: Public ID of the organization
+        hris_organization_user_id:
+          type: string
+          format: uuid
+          description: HRIS organization user ID
+      description: Profile of the user who created the journey
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyCreatedByHrisOrganizationUserProfile
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsScopeableAssigneeHrisOrganizationUser:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsScopeableAssigneeHrisOrganizationUserType'
+          description: Type of the assignee user
+        email:
+          type: string
+          format: email
+          description: Email address of the assignee
+        country:
+          type:
+          - string
+          - 'null'
+          description: Country of the assignee
+        pic_url:
+          type: string
+          format: uri
+          description: URL of the profile picture of the assignee
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title of the assignee
+        last_name:
+          type: string
+          description: Last name of the assignee
+        first_name:
+          type: string
+          description: First name of the assignee
+        work_email:
+          type: string
+          format: email
+          description: Work email of the assignee
+        deactivated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Deactivation timestamp of the assignee, if applicable
+        preferred_name:
+          type: string
+          description: Preferred name of the assignee
+        organization_public_id:
+          type: string
+          format: uuid
+          description: Public ID of the organization the assignee belongs to
+        hris_organization_user_id:
+          type: string
+          format: uuid
+          description: HRIS organization user ID of the assignee
+      description: Details of the assigned user
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsScopeableAssigneeHrisOrganizationUser
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsCompletion:
+      type: object
+      properties:
+        percentage:
+          type: number
+          format: double
+          description: Completion percentage of the Journey
+      required:
+      - percentage
+      description: Completion status of the Journey
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsCompletion
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsStepJourney:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the Journey
+        title:
+          type: string
+          description: Title of the journey
+      description: Basic Journey information for the step
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsStepJourney
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsScopeable:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the scopeable entity e.g AssignmentID
+        is_self_assigned:
+          type: boolean
+          description: Whether the assignment was self-assigned
+        assignee_hris_organization_user:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsScopeableAssigneeHrisOrganizationUser'
+          description: Details of the assigned user
+      required:
+      - id
+      - is_self_assigned
+      - assignee_hris_organization_user
+      description: Scopeable entity details e.g Assignment details
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsScopeable
+    RetrieveWorkersActionableJourneysRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaRequest'
+      title: RetrieveWorkersActionableJourneysRequestBadRequestError
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        step:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsStep'
+          description: Step details
+        journey:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourney'
+          description: Journey details
+        scopeable:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsScopeable'
+          description: Scopeable entity details e.g Assignment details
+        completion:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsCompletion'
+          description: Completion status of the Journey
+        recipientable:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsRecipientable'
+          description: Recipient for the ActionableJourney Step. Used in conjunction with recipient_setting_type. Recipient can be the same user as Assignee or any other user e.g Manager or Accounts Lead based on the RecipientSetting for the Step.
+        actionable_path:
+          type: string
+          description: Path to redirect User for starting/resuming the Actionable Journey.
+        recipient_setting_type:
+          oneOf:
+          - $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsRecipientSettingType'
+          - type: 'null'
+          description: Type of RecipientSetting. e.g Manager, Buddy etc.
+        recipient_setting_dynamic_role_id:
+          type:
+          - string
+          - 'null'
+          description: Dynamic role/relationship ID for RecipientSetting.
+        recipient_setting_dynamic_role_name:
+          type:
+          - string
+          - 'null'
+          description: Dynamic role name for RecipientSetting
+      required:
+      - step
+      - journey
+      - scopeable
+      - completion
+      - recipientable
+      - actionable_path
+      - recipient_setting_type
+      - recipient_setting_dynamic_role_id
+      - recipient_setting_dynamic_role_name
+      description: ActionableJourney item
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItems
+    ? EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyCreatedByHrisOrganizationUserProfileType
+    : type: string
+      enum:
+      - WORKER
+      - CLIENT
+      description: Type of the User
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyCreatedByHrisOrganizationUserProfileType
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyCoverPicture:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the CoverPicture Attachment
+        url:
+          type: string
+          format: uri
+          description: URL to access the cover picture
+        file_name:
+          type: string
+          description: Name of the file
+        attachable_id:
+          type: string
+          format: uuid
+          description: ID of the entity this attachment belongs to e.g. JourneyID
+        attachable_type:
+          type: string
+          description: Type of the entity this attachment belongs to e.g Journey
+        file_content_type:
+          type: string
+          description: Content type of the file
+        attachment_type_slug:
+          type: string
+          description: Type of the attachment (e.g., cover_picture)
+      description: CoverPicture details for the Journey
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyCoverPicture
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsScopeableAssigneeHrisOrganizationUserType:
+      type: string
+      enum:
+      - WORKER
+      - CLIENT
+      description: Type of the assignee user
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsScopeableAssigneeHrisOrganizationUserType
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsStep:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the Step
+        journey:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsStepJourney'
+          description: Basic Journey information for the step
+        journey_id:
+          type: string
+          format: uuid
+          description: ID of the Journey this step belongs to
+      required:
+      - id
+      - journey
+      - journey_id
+      description: Step details
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsStep
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourney:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the journey
+        title:
+          type: string
+          description: Title of the journey
+        type_slug:
+          type: string
+          description: The type slug of the Journey e.g default, Scorm
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the Journey was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the Journey was last updated
+        description:
+          type: string
+          description: Description of the Journey
+        is_template:
+          type: boolean
+          description: Whether the Journey is a template
+        draft_for_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: If this is draft for an existing Journey, draft_for_id is the reference to the original Journey ID.
+        published_at:
+          type: string
+          format: date-time
+          description: The timestamp when the Journey was published
+        cover_picture:
+          oneOf:
+          - $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyCoverPicture'
+          - type: 'null'
+          description: CoverPicture details for the Journey
+        is_time_based:
+          type: boolean
+          description: Whether the Journey is time-based
+        is_cohort_based:
+          type: boolean
+          description: Whether the Journey is cohort-based
+        organization_id:
+          type: integer
+          description: The organizationID this Journey belongs to
+        visibility_slug:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyVisibilitySlug'
+          description: The visibility setting of the Journey
+        recently_edited_at:
+          type: string
+          format: date-time
+          description: The timestamp when the Journey was recently edited
+        is_visible_in_library:
+          type: boolean
+          description: Whether the Journey is visible in the library
+        is_self_assignment_allowed:
+          type: boolean
+          description: Whether self-assignment is allowed for this Journey
+        created_by_hris_organization_user_profile:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyCreatedByHrisOrganizationUserProfile'
+          description: Profile of the user who created the journey
+        updated_by_hris_organization_user_profile:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyUpdatedByHrisOrganizationUserProfile'
+          description: Profile of the user who last updated the journey
+      required:
+      - id
+      - title
+      - type_slug
+      - created_at
+      - updated_at
+      - description
+      - is_template
+      - draft_for_id
+      - published_at
+      - cover_picture
+      - is_time_based
+      - is_cohort_based
+      - organization_id
+      - visibility_slug
+      - recently_edited_at
+      - is_visible_in_library
+      - is_self_assignment_allowed
+      - created_by_hris_organization_user_profile
+      - updated_by_hris_organization_user_profile
+      description: Journey details
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourney
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaErrorsItems
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyVisibilitySlug:
+      type: string
+      enum:
+      - organization
+      - public
+      - private-marketplace
+      description: The visibility setting of the Journey
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyVisibilitySlug
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ? EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyUpdatedByHrisOrganizationUserProfile
+    : type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyUpdatedByHrisOrganizationUserProfileType'
+          description: Type of the User
+        email:
+          type: string
+          format: email
+          description: Email of the user who last updated the journey
+        country:
+          type:
+          - string
+          - 'null'
+          description: Country of the User
+        pic_url:
+          type: string
+          format: uri
+          description: URL of the profile picture
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title of the User
+        last_name:
+          type: string
+          description: Last name of the User
+        first_name:
+          type: string
+          description: First name of the User
+        work_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Work email of the User
+        deactivated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Deactivation timestamp, if applicable
+        preferred_name:
+          type: string
+          description: Preferred name of the User
+        organization_public_id:
+          type: string
+          format: uuid
+          description: Public ID of the organization
+        hris_organization_user_id:
+          type: string
+          format: uuid
+          description: HRIS organization user ID
+      description: Profile of the user who last updated the journey
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItemsJourneyUpdatedByHrisOrganizationUserProfile
+    Learning_retrieveWorkersActionableJourneys_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaDataItems'
+        next_cursor:
+          type: string
+          description: Cursor for the next page of results
+      required:
+      - data
+      - next_cursor
+      description: ActionableJourney is a representation of a JourneyAssignment and JourneyStep. This defines which Worker should be acting on which Step of the Journey. Generally, it would be same as Assignee of the JourneyAssignment, but can be different when RecipientSettings are added to Steps.
+      title: Learning_retrieveWorkersActionableJourneys_Response_200
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: EngageLearningActionableJourneysGetResponsesContentApplicationJsonSchemaRequest
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

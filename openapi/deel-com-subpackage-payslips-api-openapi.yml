@@ -1,0 +1,196 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Payslips API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_payslips
+paths:
+  /gp/workers/{id}/payslips:
+    get:
+      operationId: get-gp-worker-payslips
+      summary: Retrieve employee payslips
+      description: 'Returns a list of payslips for a Global Payroll (GP) employee, including each payslip''s date range and current status. Use this endpoint to display payslip history or verify that payslips have been published before initiating a download. Requires the worker id (UUID), which can be obtained from the List GPworkers endpoint. Each payslip in the response includes an id that is required for the download endpoint. Supports only GP contract types.
+
+        **Token scopes**: `payslips:read`'
+      tags:
+      - subpackage_payslips
+      parameters:
+      - name: id
+        in: path
+        description: Unique identifier for the worker.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/payslips_getGPWorkerPayslips_Response_200'
+        '400':
+          description: Bad Request - Validation error or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveEmployeePayslips-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    GpWorkersIdPayslipsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error response
+      required:
+      - message
+      title: GpWorkersIdPayslipsGetResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveEmployeePayslips-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersIdPayslipsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Error messages
+        request:
+          $ref: '#/components/schemas/GpWorkersIdPayslipsGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details
+      required:
+      - errors
+      title: RetrieveEmployeePayslips-v2026-01-01RequestBadRequestError
+    GpWorkersIdPayslipsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the payslip.
+        to:
+          type: string
+          format: date
+          description: End date of the payslip period in ISO-8601 format.
+        from:
+          type: string
+          format: date
+          description: Start date of the payslip period in ISO-8601 format.
+        status:
+          type: string
+          description: The current status of the payslip (e.g., AVAILABLE, PENDING, PUBLISHED).
+      required:
+      - id
+      - to
+      - from
+      - status
+      title: GpWorkersIdPayslipsGetResponsesContentApplicationJsonSchemaDataItems
+    GpWorkersIdPayslipsGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: Method of the API
+        status:
+          type: number
+          format: double
+          description: Status of API response
+      description: Error request details
+      title: GpWorkersIdPayslipsGetResponsesContentApplicationJsonSchemaRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    payslips_getGPWorkerPayslips_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersIdPayslipsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: payslips_getGPWorkerPayslips_Response_200
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

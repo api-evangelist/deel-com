@@ -1,0 +1,369 @@
+# x-archived-from: deel-subpackage-positions-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Positions API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_positions
+paths:
+  /hris/positions/apply_changes:
+    post:
+      operationId: apply-position-changes
+      summary: Apply changes to positions.
+      description: "Applies a set of position changes (add, edit, delete) for a given HRIS profile.\n **Token scopes**: `profile:write`"
+      tags:
+      - subpackage_positions
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/positions_applyPositionChanges_Response_204'
+        '400':
+          description: Bad Request. Invalid input parameters.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '401':
+          description: Unauthorized. Invalid or expired token.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error. Could not process the request.
+          content:
+            application/json:
+              schema:
+                description: Any type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaData'
+                  description: The request payload containing the position changes to apply.
+  /hris/positions/profile/{hrisProfileId}:
+    get:
+      operationId: get-positions-by-profile
+      summary: Get Positions By Profile
+      tags:
+      - subpackage_positions
+      parameters:
+      - name: hrisProfileId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+  /hris/positions/profile/{hris_profile_id}:
+    get:
+      operationId: fetch-hris-positions-from-a-hris-profile-v-2026-01-01
+      summary: Fetch HrisPositions from a HrisProfile
+      description: "Retrieves all positions assigned to a given HRIS profile, including the associated role, team, and organization structure for each position.\n **Token scopes**: `profile:read`"
+      tags:
+      - subpackage_positions
+      parameters:
+      - name: hris_profile_id
+        in: path
+        description: HRIS Profile ID
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Positions_fetchHrisPositionsFromAHrisProfile-v2026-01-01_Response_200'
+        '400':
+          description: Bad request - The provided hrisProfileId or hrisOrgStructureId is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not found - No HRIS profile exists for the provided ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsRole:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Role ID
+        name:
+          type: string
+          description: Role Name
+      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsRole
+    HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataAddItems:
+      type: object
+      properties:
+        role_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Id of the role to be assigned to the position.
+        team_id:
+          type: string
+          format: uuid
+          description: Id of the team to be assigned to the position.
+        is_supportive:
+          type: boolean
+          description: Flag to indicate if the position is supportive.
+      required:
+      - team_id
+      title: HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataAddItems
+    HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        add:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataAddItems'
+        edit:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataEditItems'
+        delete:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataDeleteItems'
+        profile_id:
+          type: string
+          format: uuid
+          description: Id of the profile to which the positions belong.
+      required:
+      - profile_id
+      description: The request payload containing the position changes to apply.
+      title: HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaData
+    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeamOrganizationStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Organization Structure ID
+        name:
+          type: string
+          description: Organization Structure Name
+      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeamOrganizationStructure
+    Positions_fetchHrisPositionsFromAHrisProfile-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItems'
+      title: Positions_fetchHrisPositionsFromAHrisProfile-v2026-01-01_Response_200
+    FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestNotFoundError
+    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: HRIS Position ID
+        role:
+          $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsRole'
+        team:
+          $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeam'
+        is_supportive:
+          type: boolean
+          description: Is Supportive Position
+      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItems
+    FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestBadRequestError
+    HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataDeleteItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of the position to be deleted.
+      required:
+      - id
+      title: HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataDeleteItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataEditItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of the position to be edited.
+        role_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Id of the role to be assigned to the position.
+        is_supportive:
+          type: boolean
+          description: Flag to indicate if the position is supportive.
+      required:
+      - id
+      title: HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataEditItems
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    positions_applyPositionChanges_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: positions_applyPositionChanges_Response_204
+    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeam:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Team ID
+        name:
+          type: string
+          description: Team Name
+        organization_structure:
+          $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeamOrganizationStructure'
+      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeam
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

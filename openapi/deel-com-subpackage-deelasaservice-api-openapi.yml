@@ -1,0 +1,314 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Deel As A Service API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_deelAsAService
+paths:
+  /daas/payslips:
+    get:
+      operationId: get-eor-employee-payslips
+      summary: Get list of payslips for an EOR employee
+      description: 'Get list of payslips for an EOR employee.
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - subpackage_deelAsAService
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Payslip records successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deel_As_a_Service_getEorEmployeePayslips_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /daas/banks/{bank_id}:
+    patch:
+      operationId: patch-eor-bank-account
+      summary: Modify bank account for an EOR employee
+      description: 'Modify bank account for an EOR employee.
+
+        **Token scopes**: `worker:write`'
+      tags:
+      - subpackage_deelAsAService
+      parameters:
+      - name: bank_id
+        in: path
+        description: Unique identifier for a bank in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deel_As_a_Service_patchEORBankAccount_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Bank Account object that needs to be modified
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DaasBanksBankIdPatchRequestBodyContentApplicationJsonSchemaDataItems'
+                  description: Array of key value properties of bank account
+              required:
+              - data
+components:
+  schemas:
+    Deel_As_a_Service_patchEORBankAccount_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DaasBanksBankIdPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Deel As a Service_patchEORBankAccount_Response_201
+    Deel_As_a_Service_getEorEmployeePayslips_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DaasPayslipsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: Deel As a Service_getEorEmployeePayslips_Response_200
+    DaasPayslipsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the payslip record.
+        to:
+          type: string
+          format: date-time
+          description: End date of the payment period.
+        url:
+          type: string
+          description: URL
+        from:
+          type: string
+          format: date-time
+          description: Start date of the payment period.
+        status:
+          type: string
+          description: Status of the payslip (e.g., 'Pending', 'Processed').
+        created_at:
+          type: string
+          format: date-time
+          description: Creation date
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update date
+        rejected_at:
+          type: string
+          format: date-time
+          description: Rejection date
+        uploaded_at:
+          type: string
+          format: date-time
+          description: Upload date
+        published_at:
+          type: string
+          format: date-time
+          description: Publish date
+        reject_reason:
+          type: string
+          description: Rejection reason
+        schedule_publishing_date:
+          type: string
+          format: date-time
+          description: Scheduled for publishing date
+      required:
+      - id
+      - to
+      - url
+      - from
+      - status
+      - created_at
+      - updated_at
+      - rejected_at
+      - uploaded_at
+      - published_at
+      - reject_reason
+      - schedule_publishing_date
+      title: DaasPayslipsGetResponsesContentApplicationJsonSchemaDataItems
+    DaasBanksBankIdPatchResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - new
+      - pending
+      - approved
+      - failed
+      description: Bank Account status
+      title: DaasBanksBankIdPatchResponsesContentApplicationJsonSchemaDataStatus
+    DaasBanksBankIdPatchRequestBodyContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The key of the bank account properties.
+        value:
+          type: string
+          description: The value for that key property.
+      required:
+      - key
+      - value
+      title: DaasBanksBankIdPatchRequestBodyContentApplicationJsonSchemaDataItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    DaasBanksBankIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of Bank Account.
+        status:
+          $ref: '#/components/schemas/DaasBanksBankIdPatchResponsesContentApplicationJsonSchemaDataStatus'
+          description: Bank Account status
+        created_at:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+        updated_at:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+      title: DaasBanksBankIdPatchResponsesContentApplicationJsonSchemaData
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

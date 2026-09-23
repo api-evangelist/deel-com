@@ -1,0 +1,680 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Eor Project Assignment API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_eorProjectAssignment
+paths:
+  /eor/contracts/{contract_id}/project-assignment/accept:
+    post:
+      operationId: accept-project-assignment
+      summary: Accept EOR project assignment as client
+      description: 'Utilize this endpoint to accept a project assignment for an EOR contract once the client has reviewed and approved the terms.
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - subpackage_eorProjectAssignment
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: The project assignment was accepted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-project-assignment_acceptProjectAssignment_Response_204'
+        '400':
+          description: Bad Request. The request could not be understood or was missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcceptEorProjectAssignmentAsClientRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '409':
+          description: The requested version of the document mismatch the current version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcceptEorProjectAssignmentAsClientRequestConflictError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcceptEorProjectAssignmentAsClientRequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentAcceptPostRequestBodyContentApplicationJsonSchemaData'
+  /eor/contracts/{contract_id}/project-assignment:
+    get:
+      operationId: get-project-assignment
+      summary: Fetch EOR project assignment PDF
+      description: 'Utilize this endpoint to retrieve the PDF of the project assignment for an EOR contract that a client is required to approve.
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - subpackage_eorProjectAssignment
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: This field is to ensure that the latest version of the project assignment PDF matches the version received from the webhook. If it is not sent, the version validation is not performed and the endpoint returns the PDF. If it is sent, it is checked whether the current version is equal to the version sent; if not, a 409 error occurs, otherwise, the PDF is returned.
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad Request. The request could not be understood or was missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchEorProjectAssignmentPdfRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '409':
+          description: The requested version of the document mismatch the current version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchEorProjectAssignmentPdfRequestConflictError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchEorProjectAssignmentPdfRequestInternalServerError'
+  /eor/contracts/{contract_id}/project-assignment/checkin:
+    get:
+      operationId: get-project-assignment-checkin
+      summary: Fetch Project Assignment Checkin Questionnaire Data
+      description: 'Use this endpoint to fetch the project assignment checkin data with all necessary information to render in your side the questionnaire
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - subpackage_eorProjectAssignment
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the contract.
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: This field is to ensure that the latest version of the project assignment checkin matches the version received from the webhook. If it is not sent, the version validation is not performed. If it is sent, it is checked whether the current version is equal to the version sent; if not, a 409 error occurs, otherwise, the data is returned.
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response containing form configuration data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-project-assignment_getProjectAssignmentCheckin_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '409':
+          description: The requested version of the document mismatch the current version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchProjectAssignmentCheckinQuestionnaireDataRequestConflictError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError'
+    post:
+      operationId: checkin-project-assignment
+      summary: Submit Project Assignment Checkin Questionnaire Data
+      description: 'Use this endpoint to submit the checkin questionnaire. It is necessary to send all required questionnaire answers.
+
+        **Token scopes**: `contracts:read`, `contracts:write`'
+      tags:
+      - subpackage_eorProjectAssignment
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the contract.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No content. The request was successful, but there is no response body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-project-assignment_checkinProjectAssignment_Response_204'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '409':
+          description: The requested version of the document mismatch the current version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitProjectAssignmentCheckinQuestionnaireDataRequestConflictError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError'
+      requestBody:
+        description: Payload for submitting employee or client form answers.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Form submission payload containing respondent type, question answers, and optional version.
+components:
+  schemas:
+    FetchProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: FetchProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError
+    EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      required:
+      - code
+      - message
+      title: EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems
+    AcceptEorProjectAssignmentAsClientRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentAcceptPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AcceptEorProjectAssignmentAsClientRequestInternalServerError
+    eor-project-assignment_checkinProjectAssignment_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: eor-project-assignment_checkinProjectAssignment_Response_204
+    AcceptEorProjectAssignmentAsClientRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentAcceptPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AcceptEorProjectAssignmentAsClientRequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    SubmitProjectAssignmentCheckinQuestionnaireDataRequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: SubmitProjectAssignmentCheckinQuestionnaireDataRequestConflictError
+    FetchEorProjectAssignmentPdfRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchEorProjectAssignmentPdfRequestInternalServerError
+    EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems
+    eor-project-assignment_getProjectAssignmentCheckin_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-project-assignment_getProjectAssignmentCheckin_Response_200
+    EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - EMPLOYEE
+      - CLIENT
+      description: Indicates who is submitting the form. Can be either 'EMPLOYEE' or 'CLIENT'.
+      title: EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaDataType
+    SubmitProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SubmitProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError
+    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Unique key identifier for the question.
+        type:
+          $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsType'
+          description: Type of the question.
+        title:
+          type: string
+          description: Title of the question.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsOptionsItems'
+          description: List of selectable options for selection-type questions. Value may be of any type.
+        is_required:
+          type: boolean
+          description: Indicates if the question is required.
+        default_value:
+          $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsDefaultValue'
+          description: Default value to pre-fill in the form.
+        is_only_digits:
+          type: boolean
+          description: Restricts input to numeric characters only, for FreeText questions.
+      required:
+      - key
+      - type
+      - title
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItems
+    FetchProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: FetchProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError
+    FetchProjectAssignmentCheckinQuestionnaireDataRequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchProjectAssignmentCheckinQuestionnaireDataRequestConflictError
+    SubmitProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SubmitProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError
+    ? EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsDefaultValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      description: Default value to pre-fill in the form.
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsDefaultValue
+    EorContractsContractIdProjectAssignmentAcceptPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      required:
+      - code
+      - message
+      title: EorContractsContractIdProjectAssignmentAcceptPostResponsesContentApplicationJsonSchemaErrorsItems
+    eor-project-assignment_acceptProjectAssignment_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: eor-project-assignment_acceptProjectAssignment_Response_204
+    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItems:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the section.
+        subtitle:
+          type: string
+          description: Additional information shown at the top of the section.
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItems'
+          description: List of questions within the section.
+      required:
+      - title
+      - questions
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItems
+    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the resource
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItems'
+          description: Sections of questions
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the resource was created (ISO 8601).
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the resource was last updated (ISO 8601).
+      required:
+      - id
+      - sections
+      - created_at
+      - updated_at
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaData
+    EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaDataType'
+          description: Indicates who is submitting the form. Can be either 'EMPLOYEE' or 'CLIENT'.
+        version:
+          type: string
+          description: Optional version identifier of the form or schema.
+        questions_with_answers:
+          type: object
+          additionalProperties:
+            type: string
+          description: Map of question IDs to their corresponding answers.
+      required:
+      - type
+      - questions_with_answers
+      description: Form submission payload containing respondent type, question answers, and optional version.
+      title: EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaData
+    FetchEorProjectAssignmentPdfRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchEorProjectAssignmentPdfRequestBadRequestError
+    ? EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsOptionsItems
+    : type: object
+      properties:
+        title:
+          type: string
+          description: Display text for the option.
+        value:
+          type:
+          - string
+          - 'null'
+          description: Value associated with the option.
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsOptionsItems
+    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems
+    EorContractsContractIdProjectAssignmentAcceptPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        version:
+          type: string
+          description: This field is to ensure that the latest version of the project assignment PDF matches the version received from the webhook. If it is not sent, the version validation is not performed and the endpoint returns the PDF. If it is sent, it is checked whether the current version is equal to the version sent; if not, a 409 error occurs, otherwise, the PDF is returned.
+      title: EorContractsContractIdProjectAssignmentAcceptPostRequestBodyContentApplicationJsonSchemaData
+    FetchEorProjectAssignmentPdfRequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchEorProjectAssignmentPdfRequestConflictError
+    AcceptEorProjectAssignmentAsClientRequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentAcceptPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AcceptEorProjectAssignmentAsClientRequestConflictError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsType:
+      type: string
+      enum:
+      - FreeText
+      - Paragraph
+      - SingleSelection
+      - MultiSelection
+      - Address
+      - PhoneNumber
+      - DocumentUpload
+      - Number
+      - Dropdown
+      - DatePicker
+      - Email
+      description: Type of the question.
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsType
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

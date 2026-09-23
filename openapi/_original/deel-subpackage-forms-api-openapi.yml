@@ -1,0 +1,801 @@
+# x-archived-from: deel-subpackage-forms-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Forms API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_forms
+paths:
+  /forms/eor/create-contract/definitions:
+    post:
+      operationId: fetch-multiple-eor-contract-forms
+      summary: Fetch multiple EOR Contract forms
+      description: "Retrieve paginated, versioned form definitions for creating EOR contracts for the specified countries. Use this endpoint when initializing or resuming a contract-creation flow to determine the required sections, fields, validation rules, and conditional logic per country (and optional contract type/locale). Always consume the latest effective version from the response and handle pagination. Not intended for reading or updating existing contracts.\n **Token scopes**: `forms:read`"
+      tags:
+      - subpackage_forms
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of countries to return in a single response. Defaults to 10.
+        required: false
+        schema:
+          type: integer
+          default: 10
+      - name: cursor
+        in: query
+        description: Pagination cursor for fetching subsequent pages of results.
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response containing multiple form configuration data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forms_fetchMultipleEorContractForms_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchMultipleEorContractFormsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchMultipleEorContractFormsRequestInternalServerError'
+      requestBody:
+        description: Request body containing countries and optional parameters for bulk quote form fetching.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /forms/eor/worker-additional-fields/{country_code}:
+    get:
+      operationId: get-worker-additional-fields-for-eor
+      summary: Get worker additional fields for (EOR)
+      description: "Use this endpoint to retrieve the additional form fields required for EOR workers in a specified country.\n **Token scopes**: `forms:read`"
+      tags:
+      - subpackage_forms
+      parameters:
+      - name: country_code
+        in: path
+        description: Country code
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forms_getWorkerAdditionalFieldsForEor_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkerAdditionalFieldsForEorRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkerAdditionalFieldsForEorRequestInternalServerError'
+components:
+  schemas:
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsType
+    : type: string
+      enum:
+      - FreeText
+      - Paragraph
+      - SingleSelection
+      - MultiSelection
+      - Address
+      - PhoneNumber
+      - DocumentUpload
+      - Number
+      - Dropdown
+      - DatePicker
+      - Email
+      description: Type of the question.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsType
+    FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Unique identifier for the field
+        type:
+          type: string
+          description: Data type of the field
+        ui_guide:
+          $ref: '#/components/schemas/FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsUiGuide'
+          description: UI guidelines for rendering the field
+        validation:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsValidationItems'
+          description: Array of validation rules to apply to the field input
+        is_required:
+          type: boolean
+          description: Indicates if the field is required
+        required_by:
+          type: string
+          description: Indicates when the field is required (e.g., sign_up, contract_signing)
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems'
+          description: Array of field dependencies that determine when this field should be displayed
+        values_allowed:
+          type: array
+          items:
+            type: string
+          description: List of allowed values for select fields
+      required:
+      - key
+      - type
+      - ui_guide
+      - validation
+      - is_required
+      - dependencies
+      title: FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItems
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsMaxValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Maximum value allowed.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsMaxValue
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItemsValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      description: Expected value for the condition.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItemsValue
+    Forms_getWorkerAdditionalFieldsForEor_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Array of field configuration objects
+      required:
+      - data
+      title: Forms_getWorkerAdditionalFieldsForEor_Response_200
+    FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaErrorsItems
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsMaxValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Maximum value allowed.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsMaxValue
+    FetchMultipleEorContractFormsRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: FetchMultipleEorContractFormsRequestInternalServerError
+    FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Unique key identifier for the question.
+        type:
+          $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsType'
+          description: Type of the question.
+        rules:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItems'
+          description: Validation rules for the question.
+        title:
+          type: string
+          description: Title of the question.
+        source:
+          oneOf:
+          - $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsSource'
+          - type: 'null'
+          description: Defines dynamic data source for the question.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsOptionsItems'
+          description: List of selectable options for selection-type questions. Value may be of any type.
+        is_range:
+          type: boolean
+          description: Specifies whether a date picker allows range selection.
+        max_value:
+          $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsMaxValue'
+          description: Maximum value allowed.
+        min_value:
+          $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsMinValue'
+          description: Minimum value allowed.
+        max_length:
+          type:
+          - integer
+          - 'null'
+          description: Maximum character length for text responses.
+        min_length:
+          type:
+          - integer
+          - 'null'
+          description: Minimum character length for text responses.
+        helper_text:
+          type:
+          - string
+          - 'null'
+          description: Additional information to assist the user.
+        is_disabled:
+          type: boolean
+          description: If true, the field is disabled and cannot be edited.
+        is_required:
+          type: boolean
+          description: Indicates if the question is required.
+        number_type:
+          type: string
+          description: Used for number fields to define the unit or representation.
+        default_value:
+          $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsDefaultValue'
+          description: Default value to pre-fill in the form.
+        is_only_digits:
+          type: boolean
+          description: Restricts input to numeric characters only, for FreeText questions.
+        date_limitation:
+          type:
+          - string
+          - 'null'
+          description: Limits date selection (e.g., blocking past dates). Will always be 'BLOCK_PAST' for now.
+        is_multiple_selection:
+          type: boolean
+          description: Indicates if the user can select multiple values.
+        must_request_validation:
+          type: boolean
+          description: Whether additional validation should be triggered for this field.
+      required:
+      - key
+      - type
+      - title
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItems
+    FormsEorCreateContractDefinitionsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        countries:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostRequestBodyContentApplicationJsonSchemaDataCountriesItems'
+          description: Array of countries for which to fetch quote forms. Maximum 10 countries per request.
+        start_date:
+          type: string
+          format: date
+          description: The selected start date of the contract in ISO 8601 formatted date string.
+        work_hours_per_week:
+          type: integer
+          description: The selected number of work hours per week.
+        contract_duration_in_days:
+          type: integer
+          description: The contract duration in days for definite contracts.
+      required:
+      - countries
+      title: FormsEorCreateContractDefinitionsPostRequestBodyContentApplicationJsonSchemaData
+    FormsEorCreateContractDefinitionsPostRequestBodyContentApplicationJsonSchemaDataCountriesItems:
+      type: object
+      properties:
+        state:
+          type: string
+          description: The selected state code of the contract. This is only required for countries that specify it.
+        country_code:
+          type: string
+          description: Two-letter country code in ISO 3166-1 alpha-2 format
+      required:
+      - country_code
+      title: FormsEorCreateContractDefinitionsPostRequestBodyContentApplicationJsonSchemaDataCountriesItems
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItems
+    : type: object
+      properties:
+        key:
+          type: string
+          description: Key of the dependent field.
+        value:
+          $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItemsValue'
+          description: Expected value for the condition.
+        operator:
+          type:
+          - string
+          - 'null'
+          description: Comparison operator (e.g., 'eq', 'ne').
+        compare_key:
+          type:
+          - string
+          - 'null'
+          description: Key of the field to compare against.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItems
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItems
+    : type: object
+      properties:
+        title:
+          type: string
+          description: Title of the question.
+        source:
+          oneOf:
+          - $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsSource'
+          - type: 'null'
+          description: Defines dynamic data source for the question.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsOptionsItems'
+          description: List of selectable options for selection-type questions. Value may be of any type.
+        is_range:
+          type: boolean
+          description: Specifies whether a date picker allows range selection.
+        requires:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItems'
+          description: List of conditions that must be met for this rule to apply.
+        max_value:
+          $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsMaxValue'
+          description: Maximum value allowed.
+        min_value:
+          $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsMinValue'
+          description: Minimum value allowed.
+        max_length:
+          type:
+          - integer
+          - 'null'
+          description: Maximum character length for text responses.
+        min_length:
+          type:
+          - integer
+          - 'null'
+          description: Minimum character length for text responses.
+        helper_text:
+          type:
+          - string
+          - 'null'
+          description: Additional information to assist the user.
+        is_disabled:
+          type: boolean
+          description: If true, the field is disabled and cannot be edited.
+        is_required:
+          type: boolean
+          description: Indicates if the question is required.
+        number_type:
+          type: string
+          description: Used for number fields to define the unit or representation.
+        default_value:
+          $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsDefaultValue'
+          description: Default value to pre-fill in the form.
+        is_only_digits:
+          type: boolean
+          description: Restricts input to numeric characters only, for FreeText questions.
+        date_limitation:
+          type:
+          - string
+          - 'null'
+          description: Limits date selection (e.g., blocking past dates). Will always be 'BLOCK_PAST' for now.
+        is_multiple_selection:
+          type: boolean
+          description: Indicates if the user can select multiple values.
+        must_request_validation:
+          type: boolean
+          description: Whether additional validation should be triggered for this field.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItems
+    FetchMultipleEorContractFormsRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: FetchMultipleEorContractFormsRequestBadRequestError
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsMinValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Minimum value allowed.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsMinValue
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsDefaultValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      description: Default value to pre-fill in the form.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsDefaultValue
+    FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItems:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the section.
+        subtitle:
+          type: string
+          description: Additional information shown at the top of the section.
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItems'
+          description: List of questions within the section.
+      required:
+      - title
+      - questions
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItems
+    FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue:
+      oneOf:
+      - type: string
+      - $ref: '#/components/schemas/FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue1'
+      - type: array
+        items:
+          type: string
+      description: Value expected from dependant in order to display field. Can be a plain value or an object with an operator.
+      title: FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue
+    GetWorkerAdditionalFieldsForEorRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetWorkerAdditionalFieldsForEorRequestInternalServerError
+    FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsOptionsItems
+    : type: object
+      properties:
+        title:
+          type: string
+          description: Display text for the option.
+        value:
+          type:
+          - string
+          - 'null'
+          description: Value associated with the option.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsOptionsItems
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsDefaultValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      description: Default value to pre-fill in the form.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsDefaultValue
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsSource
+    : type: object
+      properties:
+        url:
+          type: string
+          description: API endpoint providing dynamic options.
+        definition:
+          type: string
+          description: Reference URL for API documentation.
+        description:
+          type: string
+          description: Description of the data source.
+      description: Defines dynamic data source for the question.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsSource
+    ? FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf1Value
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      title: FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf1Value
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsOptionsItems
+    : type: object
+      properties:
+        title:
+          type: string
+          description: Display text for the option.
+        value:
+          type:
+          - string
+          - 'null'
+          description: Value associated with the option.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsRulesItemsOptionsItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsValidationItems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of the validation
+        value:
+          type: string
+          description: Value to be used in the validation according to the type
+        error_message:
+          type: string
+          description: Error message shown if the validation fails
+      required:
+      - type
+      - error_message
+      description: Validation rules for the field
+      title: FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsValidationItems
+    FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItems:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the form page.
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItems'
+          description: Sections within the page.
+      required:
+      - title
+      - sections
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue1:
+      type: object
+      properties:
+        op:
+          type: string
+          description: Comparison operator (e.g., gt, gte, lt, lte, eq, neq)
+        value:
+          $ref: '#/components/schemas/FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf1Value'
+      required:
+      - op
+      - value
+      title: FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue1
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsSource
+    : type: object
+      properties:
+        url:
+          type: string
+          description: API endpoint providing dynamic options.
+        definition:
+          type: string
+          description: Reference URL for API documentation.
+        description:
+          type: string
+          description: Description of the data source.
+      description: Defines dynamic data source for the question.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsSource
+    ? FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsMinValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Minimum value allowed.
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItemsSectionsItemsQuestionsItemsMinValue
+    FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItemsPagesItems'
+          description: List of pages in the form.
+        state:
+          type:
+          - string
+          - 'null'
+          description: State or province code if applicable
+        country:
+          type: string
+          description: Two-letter country code in ISO 3166-1 alpha-2 format
+      required:
+      - pages
+      - country
+      title: FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItems
+    FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Unique identifier for the dependant field
+        value:
+          $ref: '#/components/schemas/FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue'
+          description: Value expected from dependant in order to display field. Can be a plain value or an object with an operator.
+      required:
+      - key
+      - value
+      title: FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems
+    GetWorkerAdditionalFieldsForEorRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetWorkerAdditionalFieldsForEorRequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsUiGuide:
+      type: object
+      properties:
+        label:
+          type: string
+          description: The primary label for the field
+        order:
+          type: integer
+          description: Display order of the field in the UI
+        field_type:
+          type: string
+          description: Type of the input field in the UI
+        description:
+          type: string
+          description: Additional description for the field UI
+        helper_text:
+          type: string
+          description: Helper text to guide user input
+        local_label:
+          type: string
+          description: Localized version of the field label
+      required:
+      - label
+      - order
+      - field_type
+      - description
+      description: UI guidelines for rendering the field
+      title: FormsEorWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsUiGuide
+    Forms_fetchMultipleEorContractForms_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractDefinitionsPostResponsesContentApplicationJsonSchemaDataItems'
+          description: Array of quote forms for the requested countries.
+        has_more:
+          type: boolean
+          description: Indicates if there are more results available beyond the current page.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for fetching the next page of results. Null if no more results.
+        total_count:
+          type: integer
+          description: Total number of countries in the request.
+      required:
+      - data
+      - has_more
+      - total_count
+      title: Forms_fetchMultipleEorContractForms_Response_200
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

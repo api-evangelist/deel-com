@@ -1,0 +1,1218 @@
+# x-archived-from: deel-subpackage-timetracking-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Time Tracking API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_timeTracking
+paths:
+  /time_tracking/shift_rates:
+    post:
+      operationId: create-time-tracking-shift-rate
+      summary: Create a New Shift Rate
+      description: "Create a new shift rate with the specified attributes such as name, type, value, and a unique external identifier.\n **Token scopes**: `time-tracking:write`"
+      tags:
+      - subpackage_timeTracking
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Shift rate created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking_createTimeTrackingShiftRate_Response_201'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Details of the shift rate to create.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+    get:
+      operationId: get-time-tracking-shift-rates
+      summary: Retrieve a Paginated List of Shift Rates
+      description: "Retrieve a paginated list of shift rates, including details such as rate name, type, value, and timestamps. Pagination parameters can be used to control the size and position of the result set.\n **Token scopes**: `time-tracking:read`"
+      tags:
+      - subpackage_timeTracking
+      parameters:
+      - name: limit
+        in: query
+        description: The maximum number of records to return per page. For example, '10' to return up to 10 records.
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: The starting index for the records to retrieve. For example, '0' for the first page or '10' for the second page when limit=10.
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated list of shift rates retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking_getTimeTrackingShiftRates_Response_200'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /time_tracking/shift_rates/{external_id}:
+    delete:
+      operationId: delete-time-tracking-shift-rate-by-external-id
+      summary: Delete a Shift Rate by external ID
+      description: "Delete a Shift Rate using its external ID, which is the custom ID provided when the shift rate is created. A ShiftRate can only be deleted if it is not currently associated with any active shift.\n **Token scopes**: `time-tracking:write`"
+      tags:
+      - subpackage_timeTracking
+      parameters:
+      - name: external_id
+        in: path
+        description: external ID
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking_deleteTimeTrackingShiftRateByExternalId_Response_204'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    get:
+      operationId: get-time-tracking-shift-rate-by-external-id
+      summary: Retrieve a Shift Rate by External ID
+      description: "Retrieve details of a specific shift rate using its external ID. The response includes information such as the name, type, value, and unique identifier of the shift rate.\n **Token scopes**: `time-tracking:read`"
+      tags:
+      - subpackage_timeTracking
+      parameters:
+      - name: external_id
+        in: path
+        description: The unique external identifier of the shift rate to retrieve.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Shift rate retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking_getTimeTrackingShiftRateByExternalId_Response_200'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    patch:
+      operationId: update-time-tracking-shift-rate-by-external-id
+      summary: Update a shift rate
+      description: "Update specific fields of an existing shift rate.\n **Token scopes**: `time-tracking:write`"
+      tags:
+      - subpackage_timeTracking
+      parameters:
+      - name: external_id
+        in: path
+        description: Unique identifier of the shift rate to be updated.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Shift rate updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking_updateTimeTrackingShiftRateByExternalId_Response_200'
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAShiftRateRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /time-tracking/timesheets/upload-url:
+    post:
+      operationId: get-time-tracking-timesheets-upload-url
+      summary: Generate timesheet upload url
+      description: "Receives timesheet file metadata and generates a link to upload timesheet file. Please note that this endpoint supports EOR contracts as of now\n **Token scopes**: `time-tracking:write`"
+      tags:
+      - subpackage_timeTracking
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Timesheet created successfully. Returns upload URL, upload form fields, and timesheet ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking_getTimeTrackingTimesheetsUploadUrl_Response_201'
+        '400':
+          description: Bad request. Validation or business rule violation (e.g., non-EOR contract, invalid date range).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateTimesheetUploadUrl-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateTimesheetUploadUrl-v2026-01-01RequestNotFoundError'
+        '422':
+          description: Unprocessable entity. Business logic constraint violation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateTimesheetUploadUrl-v2026-01-01RequestUnprocessableEntityError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: timesheet information needed for uploading timesheet file
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /time-tracking/timesheets/{timesheet_id}:
+    get:
+      operationId: get-time-tracking-timesheet-by-id
+      summary: Retrieve a timesheet
+      description: "Retrieves a timesheet by ID, including its submission, review, and processing status. When expand=file_data is provided, the response also includes file-related details such as the file name, download URL.\n **Token scopes**: `time-tracking:read`"
+      tags:
+      - subpackage_timeTracking
+      parameters:
+      - name: timesheet_id
+        in: path
+        description: ID of the timesheet to fetch file for
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: extend
+        in: query
+        description: Optional list of fields to extend in the response. Currently only `file_data` is supported, which includes file details (file_id, file_name) and download URL.
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Timesheet retrieved successfully. Returns timesheet details including validation errors if applicable. When extend=file_data, also includes file_data object with file details and download URL.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking_getTimeTrackingTimesheetById_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Timesheet not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveATimesheet-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /time-tracking/timesheets/{timesheet_id}/review:
+    post:
+      operationId: review-time-tracking-timesheet
+      summary: Review a submitted timesheet
+      description: "Review a successfully submitted timesheet. Only PENDING_REVIEW timesheets can be reviewed, and all associated hours will be approved/rejected at once.\n **Token scopes**: `time-tracking:write`"
+      tags:
+      - subpackage_timeTracking
+      parameters:
+      - name: timesheet_id
+        in: path
+        description: ID of the timesheet to review
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Timesheet reviewed successfully. Returns updated timesheet details with review status and review timestamp.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking_reviewTimeTrackingTimesheet_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Timesheet not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewASubmittedTimesheetRequestNotFoundError'
+        '422':
+          description: Unprocessable entity. Timesheet cannot be reviewed in its current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewASubmittedTimesheetRequestUnprocessableEntityError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Review information for the timesheet. review_reason is required when review_status is REJECTED.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+components:
+  schemas:
+    TimeTrackingTimesheetsUploadUrlPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        end_date:
+          type: string
+          format: date
+          description: End date of the timesheet period. Must be equal to or later than start_date.
+        file_name:
+          type: string
+          description: Name of the timesheet file. Must end with .csv extension.
+        start_date:
+          type: string
+          format: date
+          description: Start date of the timesheet period. Must be equal to or earlier than end_date.
+        contract_id:
+          type: string
+          description: Id of the worker's contract associated with the timesheet
+      required:
+      - end_date
+      - file_name
+      - start_date
+      - contract_id
+      title: TimeTrackingTimesheetsUploadUrlPostRequestBodyContentApplicationJsonSchemaData
+    TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the created timesheet
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the timesheet was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the timesheet was last updated
+        upload_url:
+          type: string
+          format: uri
+          description: Pre-signed S3 URL for uploading the timesheet file
+        upload_fields:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Form fields required for the multipart POST upload to S3. Include these fields alongside the file in the upload request.
+      required:
+      - id
+      - created_at
+      - updated_at
+      - upload_url
+      - upload_fields
+      title: TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaData
+    TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Name of the field causing the error (for validation issues)
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      required:
+      - code
+      - field
+      - message
+      title: TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems
+    TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - MULTIPLIER_PERCENTAGE
+      - PER_HOUR_FLAT_RATE
+      - PER_UNIT_FLAT_RATE
+      description: The updated type of shift rate.
+      title: TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaDataType
+    TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The updated name of the shift rate.
+        type:
+          type: string
+          description: The type of shift rate, e.g., MULTIPLIER_PERCENTAGE.
+        value:
+          type: number
+          format: double
+          description: The updated value of the shift rate.
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the shift rate was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the shift rate was last updated.
+        external_id:
+          type: string
+          description: The unique identifier of the updated shift rate.
+      title: TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaData
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItems:
+      type: object
+      properties:
+        row:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Row number in the timesheet file where the error occurred
+        type:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItemsType'
+          description: Type of validation error
+        column:
+          type:
+          - string
+          - 'null'
+          description: Column name in the timesheet file where the error occurred
+        context:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            description: Any type
+          description: Additional context information about the error
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - type
+      - message
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItems
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Name of the field causing the error (for validation issues)
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      required:
+      - code
+      - field
+      - message
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    GenerateTimesheetUploadUrl-v2026-01-01RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GenerateTimesheetUploadUrl-v2026-01-01RequestUnprocessableEntityError
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewStatus:
+      type: string
+      enum:
+      - PENDING_CREATION
+      - PENDING_REVIEW
+      - APPROVED
+      - REJECTED
+      description: Current status of the timesheet review
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewStatus
+    time-tracking_deleteTimeTrackingShiftRateByExternalId_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: time-tracking_deleteTimeTrackingShiftRateByExternalId_Response_204
+    time-tracking_reviewTimeTrackingTimesheet_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaData'
+          description: Updated timesheet details after review
+      required:
+      - data
+      title: time-tracking_reviewTimeTrackingTimesheet_Response_201
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaDataReviewStatus:
+      type: string
+      enum:
+      - PENDING_CREATION
+      - PENDING_REVIEW
+      - APPROVED
+      - REJECTED
+      description: Current status of the timesheet review
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaDataReviewStatus
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetReviewStatus:
+      type: string
+      enum:
+      - PENDING_CREATION
+      - PENDING_REVIEW
+      - APPROVED
+      - REJECTED
+      description: Current status of the timesheet review
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetReviewStatus
+    ReviewASubmittedTimesheetRequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ReviewASubmittedTimesheetRequestNotFoundError
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataSubmissionStatus:
+      type: string
+      enum:
+      - UPLOADING
+      - UPLOAD_FAILED
+      - PROCESSING
+      - SUBMITTED
+      - INVALID
+      - FAILED
+      description: Current status of the timesheet submission
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataSubmissionStatus
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataFileData:
+      type: object
+      properties:
+        file_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the timesheet file
+        file_name:
+          type: string
+          description: Name of the timesheet file
+        download_url:
+          type: string
+          format: uri
+          description: Pre-signed S3 URL for downloading the timesheet file
+      required:
+      - file_id
+      - file_name
+      - download_url
+      description: Present only when `extend=file_data` is provided. Contains file details and download URL.
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataFileData
+    time-tracking_getTimeTrackingShiftRates_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaPage'
+      required:
+      - data
+      - page
+      title: time-tracking_getTimeTrackingShiftRates_Response_200
+    time-tracking_updateTimeTrackingShiftRateByExternalId_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaData'
+      title: time-tracking_updateTimeTrackingShiftRateByExternalId_Response_200
+    time-tracking_getTimeTrackingShiftRateByExternalId_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: time-tracking_getTimeTrackingShiftRateByExternalId_Response_200
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItemsType:
+      type: string
+      enum:
+      - EMPTY_TIMESHEET
+      - INVALID_TIMESHEET_FORMAT
+      - FILE_TOO_LARGE
+      - INVALID_FILE_TYPE
+      - INVALID_SHIFT_TIME_ORDER
+      - INVALID_BREAK_TIME_ORDER
+      - BREAK_OUTSIDE_SHIFT
+      - OVERLAPPING_BREAKS
+      - CANNOT_SUBMIT_SHIFTS
+      - WORK_DURATION_MISMATCH
+      - NON_WORKING_DAY_VIOLATION
+      - PUBLIC_HOLIDAY_VIOLATION
+      - TIME_OFF_VIOLATION
+      - SHIFT_OUT_OF_CYCLE
+      - DAY_UNAVAILABLE
+      - INVALID_SHIFT_SUBMIT_TYPE
+      - INVALID_SHIFT_ORIGIN
+      - INVALID_SHIFT_TYPE
+      - INVALID_SHIFT_KEEP_IN_TOUCH_DATE_INTERVAL
+      - OVERLAPPING_SHIFT
+      - SHIFT_CONTRACT_IN_RESTRICTED_STATUS
+      - SHIFT_CONTRACT_IN_TERMINATION_STATUS
+      - SHIFT_CONTRACT_COMPLETION_DATE
+      - SHIFT_CONTRACT_START_DATE
+      - SHIFT_MAX_SATURDAYS_PER_YEAR_VIOLATION
+      - INVALID_DAY_TRACKING_DATA
+      - SHIFT_MAX_WORKING_DAYS_PER_YEAR_VIOLATION
+      - SHIFT_MAX_CONSECUTIVE_DAYS_STREAK_VIOLATION
+      - BREAK_TYPE_NOT_AVAILABLE
+      - BREAK_MISSED_OR_WAIVED
+      - BREAK_DURATION_MISMATCH
+      - BREAK_MAX_DURATION_EXCEEDED
+      - WORK_LOCATION_VIOLATION
+      - WORK_LOCATION_MISMATCH_BETWEEN_TIME_CLOCK_EVENTS_FOR_SHIFT
+      - MISSING_WORK_DESCRIPTION
+      description: Type of validation error
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItemsType
+    TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - MULTIPLIER_PERCENTAGE
+      - PER_HOUR_FLAT_RATE
+      - PER_UNIT_FLAT_RATE
+      description: The type of the shift rate.
+      title: TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaDataType
+    time-tracking_getTimeTrackingTimesheetsUploadUrl_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: time-tracking_getTimeTrackingTimesheetsUploadUrl_Response_201
+    TimeTrackingShiftRatesExternalIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the shift rate.
+        type:
+          type: string
+          description: The type of the shift rate (e.g., MULTIPLIER_PERCENTAGE or FLAT_RATE).
+        value:
+          type: number
+          format: double
+          description: The value of the shift rate.
+        external_id:
+          type: string
+          description: The unique external identifier of the shift rate.
+      title: TimeTrackingShiftRatesExternalIdGetResponsesContentApplicationJsonSchemaData
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type:
+          - string
+          - 'null'
+          description: Name of the field causing the error (for validation issues)
+        details:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          description: Additional details about the error, including the current timesheet state
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      required:
+      - code
+      - details
+      - message
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems
+    time-tracking_getTimeTrackingTimesheetById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaData'
+          description: Timesheet data including validation errors if applicable. When extend=file_data, also includes file_data object with file details and download URL.
+      required:
+      - data
+      title: time-tracking_getTimeTrackingTimesheetById_Response_200
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the timesheet
+        end_date:
+          type: string
+          format: date
+          description: End date of the timesheet period
+        file_data:
+          oneOf:
+          - $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataFileData'
+          - type: 'null'
+          description: Present only when `extend=file_data` is provided. Contains file details and download URL.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the timesheet was created
+        start_date:
+          type: string
+          format: date
+          description: Start date of the timesheet period
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the timesheet was last updated
+        contract_id:
+          type: string
+          description: External id of the worker's contract associated with the timesheet
+        review_status:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewStatus'
+          description: Current status of the timesheet review
+        submission_status:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataSubmissionStatus'
+          description: Current status of the timesheet submission
+        validation_errors:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItems'
+          description: Array of validation errors found during timesheet processing. Null if no errors found.
+      required:
+      - id
+      - end_date
+      - created_at
+      - start_date
+      - updated_at
+      - contract_id
+      - review_status
+      - submission_status
+      - validation_errors
+      description: Timesheet data including validation errors if applicable. When extend=file_data, also includes file_data object with file details and download URL.
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaData
+    UpdateAShiftRateRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaError'
+      title: UpdateAShiftRateRequestBadRequestError
+    TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The updated name of the shift rate.
+        type:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaDataType'
+          description: The updated type of shift rate.
+        value:
+          type: number
+          format: double
+          description: The updated value of the shift rate.
+      title: TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaData
+    TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        review_reason:
+          type:
+          - string
+          - 'null'
+          description: Reason for rejecting the timesheet. Required when review_status is REJECTED, optional when APPROVED.
+        review_status:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaDataReviewStatus'
+          description: The review status for the timesheet. Must be APPROVED or REJECTED.
+      required:
+      - review_status
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaData
+    TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the shift rate.
+        type:
+          type: string
+          description: Type of the shift rate (e.g., MULTIPLIER_PERCENTAGE or FLAT_RATE).
+        value:
+          type: number
+          format: double
+          description: The value associated with the shift rate.
+        created_at:
+          type: string
+          description: Timestamp indicating when the shift rate was created.
+        updated_at:
+          type: string
+          description: Timestamp indicating when the shift rate was last updated.
+        external_id:
+          type: string
+          description: External identifier of the shift rate.
+      required:
+      - name
+      - type
+      - value
+      - created_at
+      - updated_at
+      - external_id
+      title: TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaDataItems
+    TimeTrackingShiftRatesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the created shift rate.
+        type:
+          type: string
+          description: The type of the created shift rate.
+        value:
+          type: number
+          format: double
+          description: The value of the created shift rate.
+        external_id:
+          type: string
+          description: The unique identifier of the created shift rate.
+      title: TimeTrackingShiftRatesPostResponsesContentApplicationJsonSchemaData
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the timesheet
+        contract_id:
+          type: string
+          description: External id of the worker's contract associated with the timesheet
+        reviewed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the timesheet was reviewed (if already reviewed)
+        review_status:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetReviewStatus'
+          description: Current status of the timesheet review
+        submission_status:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetSubmissionStatus'
+          description: Current status of the timesheet submission
+      required:
+      - id
+      - contract_id
+      - review_status
+      - submission_status
+      description: Current state of the timesheet that cannot be reviewed
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheet
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties:
+        timesheet:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheet'
+          description: Current state of the timesheet that cannot be reviewed
+      required:
+      - timesheet
+      description: Additional details about the error, including the current timesheet state
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    ReviewASubmittedTimesheetRequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ReviewASubmittedTimesheetRequestUnprocessableEntityError
+    GenerateTimesheetUploadUrl-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GenerateTimesheetUploadUrl-v2026-01-01RequestNotFoundError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ? TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetSubmissionStatus
+    : type: string
+      enum:
+      - UPLOADING
+      - UPLOAD_FAILED
+      - PROCESSING
+      - SUBMITTED
+      - INVALID
+      - FAILED
+      description: Current status of the timesheet submission
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetSubmissionStatus
+    RetrieveATimesheet-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveATimesheet-v2026-01-01RequestNotFoundError
+    TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        offset:
+          type: integer
+          description: The offset/index for the current page of records.
+        total_rows:
+          type: integer
+          description: Total number of shift rates available in the dataset.
+        items_per_page:
+          type: integer
+          description: The number of items returned per page.
+      required:
+      - offset
+      - total_rows
+      - items_per_page
+      title: TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaPage
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the timesheet
+        reviewed_at:
+          type: string
+          format: date-time
+          description: Timestamp when the timesheet was reviewed
+        review_reason:
+          type:
+          - string
+          - 'null'
+          description: Reason provided by the reviewer when rejecting the timesheet. Only present when review_status is REJECTED.
+        review_status:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaDataReviewStatus'
+          description: Current status of the timesheet review
+      required:
+      - id
+      - reviewed_at
+      - review_status
+      description: Updated timesheet details after review
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaData
+    TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Description of the error.
+      title: TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaError
+    TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaDataReviewStatus:
+      type: string
+      enum:
+      - APPROVED
+      - REJECTED
+      description: The review status for the timesheet. Must be APPROVED or REJECTED.
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaDataReviewStatus
+    GenerateTimesheetUploadUrl-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GenerateTimesheetUploadUrl-v2026-01-01RequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    time-tracking_createTimeTrackingShiftRate_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: time-tracking_createTimeTrackingShiftRate_Response_201
+    TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the shift rate.
+        type:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaDataType'
+          description: The type of the shift rate.
+        value:
+          type: number
+          format: double
+          description: The value of the shift rate.
+        external_id:
+          type: string
+          description: A unique identifier for the shift rate.
+      required:
+      - name
+      - external_id
+      title: TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaData
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

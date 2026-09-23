@@ -1,0 +1,479 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Knowledge Hub API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_knowledgeHub
+paths:
+  /knowledge-hub/country-guide/{country_code}:
+    get:
+      operationId: get-knowledge-hub-country-guides-by-country-code
+      summary: Get Knowledge Hub Country Guides by Country Code
+      description: 'Retrieve country guide for different audience and contract type by the country code
+
+        **Token scopes**: `knowledge-hub:read`'
+      tags:
+      - subpackage_knowledgeHub
+      parameters:
+      - name: country_code
+        in: path
+        description: Country code for which we need to fetch the country guides
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response containing audiences, their contract types, and associated categories, fields, and articles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Knowledge_Hub_getKnowledgeHubCountryGuidesByCountryCode_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetKnowledgeHubCountryGuidesByCountryCodeRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetKnowledgeHubCountryGuidesByCountryCodeRequestInternalServerError'
+components:
+  schemas:
+    KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsArticlesItemsTagsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID for the tag
+        tag:
+          type: string
+          description: Slug for the tag
+        title:
+          type: string
+          description: Title of the tag
+      required:
+      - id
+      - tag
+      - title
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsArticlesItemsTagsItems
+    KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID for the category
+        icon:
+          type: string
+          description: Icon aligning with the category
+        name:
+          type: string
+          description: Display name of the category
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsFieldsItems'
+          description: An array of informative fields and it's value that the category contains
+        articles:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsArticlesItems'
+          description: An array of articles that are connected to this category
+      required:
+      - id
+      - icon
+      - name
+      - fields
+      - articles
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItems
+    KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsFieldsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the field
+        name:
+          type: string
+          description: Title of the field
+        type:
+          $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsFieldsItemsType'
+          description: Type of the field, can contain text, link or html
+        value:
+          type:
+          - string
+          - 'null'
+          description: The value associated for the field
+      required:
+      - id
+      - name
+      - type
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsFieldsItems
+    KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsArticlesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID for the article
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsArticlesItemsTagsItems'
+          description: Array of tags inside an article
+        type:
+          $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsArticlesItemsType'
+          description: The type of the article, can contain knowledge or compliance
+        title:
+          type: string
+          description: Title of the article
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the article was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the article was last updated
+        description:
+          type: string
+          description: An excerpt for the article
+        effective_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date when the article will be effective, meaning the content inside it becomes effective in the real world)
+        featured_image:
+          type: string
+          format: uri
+          description: The featured image for the article
+      required:
+      - id
+      - tags
+      - type
+      - title
+      - created_at
+      - updated_at
+      - description
+      - featured_image
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsArticlesItems
+    Knowledge_Hub_getKnowledgeHubCountryGuidesByCountryCode_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of different audiences with associated categories and contract types.
+        has_more:
+          type: boolean
+          description: Indicates if there are more items to fetch.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page of results
+        total_count:
+          type: number
+          format: double
+          description: Total number of audiences
+      title: Knowledge Hub_getKnowledgeHubCountryGuidesByCountryCode_Response_200
+    KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsFieldsItemsType:
+      type: string
+      enum:
+      - TEXT
+      - LINK
+      - HTML
+      description: Type of the field, can contain text, link or html
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsFieldsItemsType
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ? KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsArticlesItems
+    : type: object
+      properties:
+        id:
+          type: string
+          description: ID for the article
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsArticlesItemsTagsItems'
+          description: Array of tags inside an article
+        type:
+          $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsArticlesItemsType'
+          description: The type of the article, can contain knowledge or compliance
+        title:
+          type: string
+          description: Title of the article
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the article was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the article was last updated
+        description:
+          type: string
+          description: An excerpt for the article
+        effective_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date when the article will be effective, meaning the content inside it becomes effective in the real world)
+        featured_image:
+          type: string
+          format: uri
+          description: The featured image for the article
+      required:
+      - id
+      - tags
+      - type
+      - title
+      - created_at
+      - updated_at
+      - description
+      - featured_image
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsArticlesItems
+    KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name of the audience.
+        value:
+          type: string
+          description: Identifier or key representing the audience in lowercase.
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItems'
+          description: List of categories applicable to this audience.
+        contract_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItems'
+          description: List of contract types available for this audience.
+      required:
+      - name
+      - value
+      description: Represents a specific audience such as Contractor, Client, or Employee.
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItems
+    ? KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsFieldsItems
+    : type: object
+      properties:
+        id:
+          type: string
+          description: ID of the field
+        name:
+          type: string
+          description: Title of the field
+        type:
+          $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsFieldsItemsType'
+          description: Type of the field, can contain text, link or html
+        value:
+          type:
+          - string
+          - 'null'
+          description: The value associated for the field
+      required:
+      - id
+      - name
+      - type
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsFieldsItems
+    KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems
+    GetKnowledgeHubCountryGuidesByCountryCodeRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetKnowledgeHubCountryGuidesByCountryCodeRequestInternalServerError
+    ? KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsFieldsItemsType
+    : type: string
+      enum:
+      - TEXT
+      - LINK
+      - HTML
+      description: Type of the field, can contain text, link or html
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsFieldsItemsType
+    ? KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsArticlesItemsType
+    : type: string
+      enum:
+      - KNOWLEDGE
+      - COMPLIANCE
+      description: The type of the article, can contain knowledge or compliance
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsArticlesItemsType
+    ? KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsArticlesItemsTagsItems
+    : type: object
+      properties:
+        id:
+          type: string
+          description: ID for the tag
+        tag:
+          type: string
+          description: Slug for the tag
+        title:
+          type: string
+          description: Title of the tag
+      required:
+      - id
+      - tag
+      - title
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItemsArticlesItemsTagsItems
+    KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsArticlesItemsType:
+      type: string
+      enum:
+      - KNOWLEDGE
+      - COMPLIANCE
+      description: The type of the article, can contain knowledge or compliance
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsArticlesItemsType
+    KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The user friendly name of the contract type
+        value:
+          type: string
+          description: Identifier or key representing the contract type in lowercase.
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItemsCategoriesItems'
+          description: List of categories applicable to this audience.
+      required:
+      - name
+      - value
+      - categories
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsContractTypesItems
+    KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID for the category
+        icon:
+          type: string
+          description: Icon aligning with the category
+        name:
+          type: string
+          description: Display name of the category
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsFieldsItems'
+          description: An array of informative fields and it's value that the category contains
+        articles:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItemsArticlesItems'
+          description: An array of articles that are connected to this category
+      required:
+      - id
+      - icon
+      - name
+      - fields
+      - articles
+      title: KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsCategoriesItems
+    GetKnowledgeHubCountryGuidesByCountryCodeRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeHubCountryGuideCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetKnowledgeHubCountryGuidesByCountryCodeRequestBadRequestError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

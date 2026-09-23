@@ -1,0 +1,210 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Candidates API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_candidates
+paths:
+  /candidates:
+    post:
+      operationId: add-candidate
+      summary: Add Candidate
+      description: 'Add a candidate to Deel.
+
+        **Token scopes**: `candidates:write`'
+      tags:
+      - subpackage_candidates
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidates_addCandidate_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Add a candidate to Deel
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/CandidatesPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Details of candidate to create
+              required:
+              - data
+components:
+  schemas:
+    CandidatesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of candidate in your ATS.
+        link:
+          type: string
+          description: Link to candidate's profile in ATS.
+        email:
+          type: string
+          format: email
+          description: Worker's work email address.
+        state:
+          type: string
+          description: Job location state.
+        status:
+          $ref: '#/components/schemas/CandidatesPostRequestBodyContentApplicationJsonSchemaDataStatus'
+          description: Offer status
+        country:
+          type: string
+          description: Country code.
+        job_title:
+          type: string
+          description: Job Title.
+        last_name:
+          type: string
+          description: Candidate's last name.
+        first_name:
+          type: string
+          description: Candidate's first name.
+        start_date:
+          type: string
+          format: date
+          description: Short date in format ISO-8601 (YYYY-MM-DD).
+        nationality:
+          type: string
+          description: Nationality of the worker.
+        personal_email:
+          type: string
+          format: email
+          description: Worker's personal email address.
+      required:
+      - id
+      - link
+      - status
+      - last_name
+      - first_name
+      - start_date
+      description: Details of candidate to create
+      title: CandidatesPostRequestBodyContentApplicationJsonSchemaData
+    CandidatesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+          description: Indicates if the candidate was created successfully.
+      required:
+      - created
+      title: CandidatesPostResponsesContentApplicationJsonSchemaData
+    CandidatesPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - offer-accepted
+      - offer-sent
+      - offer-declined
+      - offer-deleted
+      description: Offer status
+      title: CandidatesPostRequestBodyContentApplicationJsonSchemaDataStatus
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    Candidates_addCandidate_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CandidatesPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Candidates_addCandidate_Response_201
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

@@ -1,0 +1,464 @@
+# x-archived-from: deel-subpackage-managers-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Managers API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_managers
+paths:
+  /managers:
+    post:
+      operationId: create-manager
+      summary: Create a Manager
+      description: "Create a new manager for the organization by providing the required user details. This endpoint returns the newly created manager's information.\n **Token scopes**: `organizations:write`"
+      tags:
+      - subpackage_managers
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Manager created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/managers_createManager_Response_201'
+        '400':
+          description: Invalid request. The input data did not meet the required validation rules.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateManagerRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '409':
+          description: Conflict. A manager with the provided email already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateManagerRequestConflictError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Details of the new manager to be created.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ManagersPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+    get:
+      operationId: get-managers
+      summary: Retrieve List of Managers
+      description: "Retrieve a list of all managers in the organization along with pagination details.\n **Token scopes**: `organizations:read`"
+      tags:
+      - subpackage_managers
+      parameters:
+      - name: limit
+        in: query
+        description: The number of records to return in the response.
+        required: false
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        description: The offset or starting point for pagination.
+        required: false
+        schema:
+          type: integer
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/managers_getManagers_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /managers/magic-links:
+    post:
+      operationId: generate-magic-link-for-manager-login
+      summary: Generate magic link for manager login
+      description: "Generate a one-time magic link that allows a manager to log in to Deel without entering credentials. The target manager must belong to the requesting organization and cannot be an organization admin. Only available for White Label enabled organizations or Partners or Child organizations. The magic link expires after 5 minutes and can only be used once. After clicking the link, the manager will be automatically authenticated and redirected to Deel.\n **Token scopes**: `auth:write`"
+      tags:
+      - subpackage_managers
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Magic link generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Managers_generateMagicLinkForManagerLogin_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateMagicLinkForManagerLoginRequestUnauthorizedError'
+        '403':
+          description: Forbidden - Not allowed to generate magic link for this manager
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateMagicLinkForManagerLoginRequestForbiddenError'
+        '404':
+          description: Not Found - Manager does not exist or is not in organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateMagicLinkForManagerLoginRequestNotFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateMagicLinkForManagerLoginRequestInternalServerError'
+      requestBody:
+        description: Details for magic link for managers generation.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ManagersMagicLinksPostRequestBodyContentApplicationJsonSchemaData'
+components:
+  schemas:
+    ManagersMagicLinksPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        manager_id:
+          type: string
+          description: Manager id.
+      title: ManagersMagicLinksPostRequestBodyContentApplicationJsonSchemaData
+    ManagersMagicLinksPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: When the magic link was created (ISO 8601 format)
+        expires_at:
+          type: string
+          format: date-time
+          description: When the magic link expires (ISO 8601 format)
+        magic_link:
+          type: string
+          description: The magic link URL that users can click and log in to Deel automatically
+      required:
+      - created_at
+      - expires_at
+      - magic_link
+      title: ManagersMagicLinksPostResponsesContentApplicationJsonSchemaData
+    ManagersPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the created manager.
+        email:
+          type: string
+          format: email
+          description: The email address of the created manager.
+        last_name:
+          type: string
+          description: The last name of the created manager.
+        first_name:
+          type: string
+          description: The first name of the created manager.
+      required:
+      - id
+      - email
+      - last_name
+      - first_name
+      title: ManagersPostResponsesContentApplicationJsonSchemaData
+    GenerateMagicLinkForManagerLoginRequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GenerateMagicLinkForManagerLoginRequestForbiddenError
+    GenerateMagicLinkForManagerLoginRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GenerateMagicLinkForManagerLoginRequestInternalServerError
+    ManagersGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the manager.
+        email:
+          type: string
+          format: email
+          description: The email address of the manager.
+        last_name:
+          type: string
+          description: The last name of the manager.
+        first_name:
+          type: string
+          description: The first name of the manager.
+      required:
+      - id
+      title: ManagersGetResponsesContentApplicationJsonSchemaDataItems
+    CreateManagerRequestConflictError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Explanation of the conflict error.
+      title: CreateManagerRequestConflictError
+    CreateManagerRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the validation error.
+      title: CreateManagerRequestBadRequestError
+    GenerateMagicLinkForManagerLoginRequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GenerateMagicLinkForManagerLoginRequestNotFoundError
+    managers_createManager_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ManagersPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: managers_createManager_Response_201
+    managers_getManagers_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagersGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of managers in the organization.
+        page:
+          $ref: '#/components/schemas/ManagersGetResponsesContentApplicationJsonSchemaPage'
+          description: Pagination details for the response.
+      required:
+      - data
+      - page
+      title: managers_getManagers_Response_200
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    Managers_generateMagicLinkForManagerLogin_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ManagersMagicLinksPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Managers_generateMagicLinkForManagerLogin_Response_201
+    ManagersPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: The email address of the manager.
+        last_name:
+          type: string
+          description: The last name of the manager.
+        first_name:
+          type: string
+          description: The first name of the manager.
+      required:
+      - email
+      - last_name
+      - first_name
+      title: ManagersPostRequestBodyContentApplicationJsonSchemaData
+    GenerateMagicLinkForManagerLoginRequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GenerateMagicLinkForManagerLoginRequestUnauthorizedError
+    ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: The field that caused the error
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - field
+      - message
+      title: ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems
+    ManagersGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        offset:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The offset/index of the current page.
+        total_rows:
+          type: number
+          format: double
+          description: Total number of rows available for this resource.
+        items_per_page:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of items returned per page.
+      required:
+      - total_rows
+      description: Pagination details for the response.
+      title: ManagersGetResponsesContentApplicationJsonSchemaPage
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

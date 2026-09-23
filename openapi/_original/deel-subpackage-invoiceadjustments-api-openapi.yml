@@ -1,0 +1,2094 @@
+# x-archived-from: deel-subpackage-invoiceadjustments-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Invoice Adjustments API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_invoiceAdjustments
+paths:
+  /invoice-adjustments:
+    post:
+      operationId: create-invoice-adjustment
+      summary: Create an invoice adjustment
+      description: "Create an invoice adjustment using this endpoint. For example, you can add a bonus, commission, VAT %, deduction etc. to an invoice.\n **Token scopes**: `invoice-adjustments:write`, `worker:write`"
+      tags:
+      - subpackage_invoiceAdjustments
+      parameters:
+      - name: recurring
+        in: query
+        description: Add this invoice adjustment as recurring
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invoice-adjustments_createInvoiceAdjustment_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: InvoiceAdjustment object that needs to be created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/InvoiceAdjustmentsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Details of invoice adjustment to create.
+              required:
+              - data
+    get:
+      operationId: get-invoice-adjustments
+      summary: List invoice adjustments
+      description: "Retrieve invoice adjustments. You can filter the list by providing additional parameters e.g. contract_id, contract_type etc.\n **Token scopes**: `invoice-adjustments:read`"
+      tags:
+      - subpackage_invoiceAdjustments
+      parameters:
+      - name: contract_id
+        in: query
+        description: Id of an Deel contract.
+        required: false
+        schema:
+          type: string
+      - name: contract_types
+        in: query
+        description: types of contracts to filter
+        required: false
+        schema:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersContractTypes'
+      - name: types
+        in: query
+        description: types of invoice adjustments to filter
+        required: false
+        schema:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersTypes'
+      - name: statuses
+        in: query
+        description: statuses of invoice adjustment to filter
+        required: false
+        schema:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersStatuses'
+      - name: invoice_id
+        in: query
+        description: ID of an existing invoice
+        required: false
+        schema:
+          type: string
+      - name: reporter_id
+        in: query
+        description: ID of an existing profile
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: date_from
+        in: query
+        description: 'To get invoice adjustments submitted on or after given start date (inclusive). Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: 'To get invoice adjustments submitted before given end date (excludes records submitted on this date). Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        description: 'Return a page of results with given number of records; NOTE: technically ALL query parameters are strings or array of strings'
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: 'Return a page of results after given index of row; NOTE: technically ALL query parameters are strings or array of strings'
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invoice-adjustments_getInvoiceAdjustments_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListInvoiceAdjustments-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /invoice-adjustments/{id}:
+    delete:
+      operationId: delete-invoice-adjustment
+      summary: Delete adjustment
+      description: "Delete an adjustment.\n **Token scopes**: `invoice-adjustments:write`"
+      tags:
+      - subpackage_invoiceAdjustments
+      parameters:
+      - name: id
+        in: path
+        description: Invoice adjustment id.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invoice-adjustments_deleteInvoiceAdjustment_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    get:
+      operationId: get-invoice-adjustment-by-id
+      summary: Invoice line item by Id
+      description: "Use this endpoint to retrieve the details of a specific invoice adjustment (line item) by its id. Call it when you need to display or audit a charge, deduction, or expense on an invoice, or to reconcile a payment discrepancy. Provide the adjustment id in the path parameter. This operation is read-only.\n **Token scopes**: `invoice-adjustments:read`, `worker:read`"
+      tags:
+      - subpackage_invoiceAdjustments
+      parameters:
+      - name: id
+        in: path
+        description: ID of an existing invoice
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invoice-adjustments_getInvoiceAdjustmentById_Response_200'
+        '400':
+          description: Fetch failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceLineItemById-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    patch:
+      operationId: update-invoice-adjustment
+      summary: Update an invoice adjustment
+      description: "Update an invoice adjustment.\n **Token scopes**: `invoice-adjustments:write`, `worker:write`"
+      tags:
+      - subpackage_invoiceAdjustments
+      parameters:
+      - name: id
+        in: path
+        description: Invoice adjustment id.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invoice-adjustments_updateInvoiceAdjustment_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/InvoiceAdjustmentsIdPatchRequestBodyContentApplicationJsonSchemaData'
+                  description: Details of adjustment to update
+              required:
+              - data
+  /contracts/{contract_id}/invoice-adjustments:
+    get:
+      operationId: get-contract-invoice-adjustments
+      summary: Invoice line items by contract
+      description: "Retrieve invoice line items for a given contract id.\n **Token scopes**: `invoice-adjustments:read`"
+      tags:
+      - subpackage_invoiceAdjustments
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: contract_types
+        in: query
+        description: types of contracts to filter
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersContractTypes'
+      - name: types
+        in: query
+        description: types of invoice adjustments to filter
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersTypes'
+      - name: statuses
+        in: query
+        description: statuses of invoice adjustment to filter
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersStatuses'
+      - name: invoice_id
+        in: query
+        description: ID of an existing invoice
+        required: false
+        schema:
+          type: string
+      - name: reporter_id
+        in: query
+        description: ID of an existing profile
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: date_from
+        in: query
+        description: 'To get invoice adjustments submitted on or after given start date (inclusive).    Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: 'To get invoice adjustments submitted before given end date (excludes records submitted on this date).    Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        description: 'Return a page of results with given number of records; NOTE: technically ALL query parameters are strings or array of strings'
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: 'Return a page of results after given index of row; NOTE: technically ALL query parameters are strings or array of strings'
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invoice-adjustments_getContractInvoiceAdjustments_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /invoice-adjustments/{id}/reviews:
+    post:
+      operationId: create-invoice-adjustment-review
+      summary: Review a single invoice adjustment
+      description: "Review a single invoice adjustment to approve or decline it.\n **Token scopes**: `invoice-adjustments:write`"
+      tags:
+      - subpackage_invoiceAdjustments
+      parameters:
+      - name: id
+        in: path
+        description: ID of an existing invoice adjustment.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invoice-adjustments_createInvoiceAdjustmentReview_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/InvoiceAdjustmentsIdReviewsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+components:
+  schemas:
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        offset:
+          type: number
+          format: double
+          description: Index of the first row in this page
+        total_rows:
+          type: number
+          format: double
+          description: Total number of rows in the result set
+        items_per_page:
+          type: number
+          format: double
+          description: Number of items per page
+      required:
+      - offset
+      - total_rows
+      - items_per_page
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaPage
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedById
+    ContractsContractIdInvoiceAdjustmentsGetParametersStatuses0:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersStatusesSchemaOneOf0Items'
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersStatuses0
+    InvoiceAdjustmentsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/InvoiceAdjustmentsPostRequestBodyContentApplicationJsonSchemaDataType'
+          description: Type of invoice adjustment.
+        amount:
+          type: number
+          format: double
+          description: Amount to be paid. Must be a positive number.
+        contract_id:
+          type: string
+          description: Id of a Deel contract.
+        description:
+          type: string
+          description: Description of the adjustment.
+        date_submitted:
+          type: string
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        paymentCycleId:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: ID of an existing active payment cycle - required if type is "vat"
+        is_auto_approved:
+          type: boolean
+          description: If true, the invoice adjustment will be automatically approved as part of the request.
+        hourly_report_preset_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Id of an existing preset.
+      required:
+      - type
+      - amount
+      - contract_id
+      - description
+      - date_submitted
+      description: Details of invoice adjustment to create.
+      title: InvoiceAdjustmentsPostRequestBodyContentApplicationJsonSchemaData
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataContract:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the contract.
+        type:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataContractType'
+          description: Type of a contract
+        title:
+          type: string
+          description: The display title of the contract.
+      required:
+      - id
+      - type
+      - title
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataContract
+    InvoiceAdjustmentsPostRequestBodyContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - bonus
+      - commission
+      - deduction
+      - expense
+      - other
+      - overtime
+      - time_off
+      - vat
+      description: Type of invoice adjustment.
+      title: InvoiceAdjustmentsPostRequestBodyContentApplicationJsonSchemaDataType
+    InvoiceAdjustmentsGetParametersStatuses0:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersStatusesSchemaOneOf0Items'
+      title: InvoiceAdjustmentsGetParametersStatuses0
+    ListInvoiceAdjustments-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
+      title: ListInvoiceAdjustments-v2026-01-01RequestBadRequestError
+    ContractsContractIdInvoiceAdjustmentsGetParametersStatusesSchemaOneOf0Items:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: status of invoice adjustment
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersStatusesSchemaOneOf0Items
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataApproversItems:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email address of the approver.
+        approved:
+          type: boolean
+          description: Whether the specific approver has approved the adjustment.
+        full_name:
+          type: string
+          description: Full name of the approver.
+      required:
+      - approved
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataApproversItems
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContract:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType'
+          description: Type of a contract
+        title:
+          type: string
+      required:
+      - id
+      - type
+      - title
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContract
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      description: Unique identifier of the reporting user.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedById
+    InvoiceAdjustmentsGetParametersStatuses1:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      title: InvoiceAdjustmentsGetParametersStatuses1
+    InvoiceAdjustmentsGetParametersContractTypes1:
+      type: string
+      enum:
+      - ongoing_time_based
+      - pay_as_you_go_time_based
+      - payg_milestones
+      - payg_tasks
+      title: InvoiceAdjustmentsGetParametersContractTypes1
+    invoice-adjustments_updateInvoiceAdjustment_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: invoice-adjustments_updateInvoiceAdjustment_Response_200
+    ContractsContractIdInvoiceAdjustmentsGetParametersContractTypesSchemaOneOf0Items:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersContractTypesSchemaOneOf0Items
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        offset:
+          type: number
+          format: double
+          description: Index of the first record in the current page.
+        total_rows:
+          type: number
+          format: double
+          description: Total number of records available.
+        items_per_page:
+          type: number
+          format: double
+          description: Number of records returned per page.
+      required:
+      - offset
+      - total_rows
+      - items_per_page
+      description: Pagination metadata for the response.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaPage
+    ContractsContractIdInvoiceAdjustmentsGetParametersStatuses1:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersStatuses1
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdInvoiceAdjustmentsGetParametersTypes0:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersTypesSchemaOneOf0Items'
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersTypes0
+    InvoiceAdjustmentsIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of adjustment.
+        amount:
+          type: number
+          format: double
+          description: Amount of adjustment.
+        description:
+          type: string
+          description: Description of adjustment.
+      description: Details of adjustment to update
+      title: InvoiceAdjustmentsIdPatchRequestBodyContentApplicationJsonSchemaData
+    InvoiceAdjustmentsIdReviewsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        reason:
+          type:
+          - string
+          - 'null'
+          description: The reason for the adjustment update.
+        status:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus'
+          description: The status of the adjustment.
+      required:
+      - status
+      title: InvoiceAdjustmentsIdReviewsPostRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedById'
+        remarks:
+          type: string
+        full_name:
+          type: string
+        reviewed_at:
+          type: string
+      required:
+      - id
+      - remarks
+      - reviewed_at
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedById
+    InvoiceAdjustmentsPostResponsesContentApplicationJsonSchemaDataId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: InvoiceAdjustmentsPostResponsesContentApplicationJsonSchemaDataId
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsAttachment:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Storage key returned from the attachments endpoint, can be used as a unique identifier for the file
+        filename:
+          type: string
+          description: Original filename of the uploaded attachment, download link can be found on the individual invoice adjustment endpoint
+      required:
+      - key
+      - filename
+      description: File attachment linked to the invoice adjustment.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsAttachment
+    ContractsContractIdInvoiceAdjustmentsGetParametersContractTypes0:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersContractTypesSchemaOneOf0Items'
+      description: List of contract types
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersContractTypes0
+    invoice-adjustments_getInvoiceAdjustments_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of invoice adjustments returned for the request.
+        page:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaPage'
+          description: Pagination metadata for the response.
+      required:
+      - data
+      - page
+      title: invoice-adjustments_getInvoiceAdjustments_Response_200
+    InvoiceLineItemById-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: InvoiceLineItemById-v2026-01-01RequestBadRequestError
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      description: Unique identifier of the reviewer.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedById
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of this resource.
+        type:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataType'
+          description: Type of invoice adjustment.
+        scale:
+          type:
+          - string
+          - 'null'
+          description: The scale used for calculation (e.g., hourly, daily).
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: status of invoice adjustment
+        contract:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataContract'
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The quantity/number of units applied.
+        approvers:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataApproversItems'
+        worksheet:
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataWorksheet'
+          - type: 'null'
+          description: Breakdown of the time/effort involved in the adjustment.
+        attachment:
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataAttachment'
+          - type: 'null'
+          description: File attachment linked to the invoice adjustment.
+        created_at:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+        invoice_id:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Deprecated. No longer used
+        description:
+          type: string
+          description: Details or notes regarding the adjustment.
+        reported_by:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy'
+          description: The user who reported/submitted the adjustment.
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReviewedBy'
+          - type: 'null'
+          description: The user who reviewed the adjustment.
+        custom_scale:
+          type:
+          - string
+          - 'null'
+          description: A custom unit of measurement if the standard 'scale' is not applicable.
+        total_amount:
+          type: string
+          description: The total monetary value of the adjustment.
+        currency_code:
+          type: string
+          description: Three-letter ISO-4217 currency code.
+        payment_cycle:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataPaymentCycle'
+        date_submitted:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+        invoice_public_id:
+          type:
+          - string
+          - 'null'
+          description: Public Identifier for the associated invoice.
+      required:
+      - id
+      - type
+      - status
+      - contract
+      - quantity
+      - worksheet
+      - attachment
+      - created_at
+      - description
+      - reported_by
+      - reviewed_by
+      - total_amount
+      - currency_code
+      - payment_cycle
+      - date_submitted
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaData
+    InvoiceAdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: status of invoice adjustment
+      title: InvoiceAdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - accrued_holiday
+      - additional_fee
+      - allowance
+      - bonus
+      - commission
+      - deduction
+      - deposit
+      - deposit_refund
+      - employer_cost
+      - expense
+      - health_allowance
+      - health_benefit
+      - health_insurance_fee
+      - legal_fee
+      - management_fee
+      - milestone
+      - offcycle
+      - other
+      - overtime
+      - pension
+      - pro_rata
+      - setup_fee
+      - severance
+      - shield_service
+      - signing_bonus
+      - signing_bonus_employer_cost
+      - refund
+      - task
+      - time_off
+      - vat
+      - withholding_tax
+      - work
+      description: Type of invoice adjustment.
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataType
+    InvoiceAdjustmentsIdReviewsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+      required:
+      - created
+      title: InvoiceAdjustmentsIdReviewsPostResponsesContentApplicationJsonSchemaData
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContract:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the contract.
+        type:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType'
+          description: Type of the contract.
+        title:
+          type: string
+          description: Human-readable contract title.
+      required:
+      - id
+      - type
+      - title
+      description: Contract associated with this invoice adjustment.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContract
+    InvoiceAdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms the deletion.
+      required:
+      - deleted
+      title: InvoiceAdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData
+    invoice-adjustments_createInvoiceAdjustmentReview_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdReviewsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: invoice-adjustments_createInvoiceAdjustmentReview_Response_201
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of assigned preset
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Assigned preset rate
+        title:
+          type: string
+          description: Description of assigned preset
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset
+    InvoiceAdjustmentsGetParametersContractTypes:
+      oneOf:
+      - $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersContractTypes0'
+      - $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersContractTypes1'
+      title: InvoiceAdjustmentsGetParametersContractTypes
+    InvoiceAdjustmentsGetParametersTypesSchemaOneOf0Items:
+      type: string
+      enum:
+      - accrued_holiday
+      - additional_fee
+      - allowance
+      - bonus
+      - commission
+      - deduction
+      - deposit
+      - deposit_refund
+      - employer_cost
+      - expense
+      - health_allowance
+      - health_benefit
+      - health_insurance_fee
+      - legal_fee
+      - management_fee
+      - milestone
+      - offcycle
+      - other
+      - overtime
+      - pension
+      - pro_rata
+      - setup_fee
+      - severance
+      - shield_service
+      - signing_bonus
+      - signing_bonus_employer_cost
+      - refund
+      - task
+      - time_off
+      - vat
+      - withholding_tax
+      - work
+      description: Type of invoice adjustment.
+      title: InvoiceAdjustmentsGetParametersTypesSchemaOneOf0Items
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataPaymentCycle:
+      type: object
+      properties:
+        end_date:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+        start_date:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+      required:
+      - end_date
+      - start_date
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataPaymentCycle
+    InvoiceAdjustmentsGetParametersTypes1:
+      type: string
+      enum:
+      - accrued_holiday
+      - additional_fee
+      - allowance
+      - bonus
+      - commission
+      - deduction
+      - deposit
+      - deposit_refund
+      - employer_cost
+      - expense
+      - health_allowance
+      - health_benefit
+      - health_insurance_fee
+      - legal_fee
+      - management_fee
+      - milestone
+      - offcycle
+      - other
+      - overtime
+      - pension
+      - pro_rata
+      - setup_fee
+      - severance
+      - shield_service
+      - signing_bonus
+      - signing_bonus_employer_cost
+      - refund
+      - task
+      - time_off
+      - vat
+      - withholding_tax
+      - work
+      title: InvoiceAdjustmentsGetParametersTypes1
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: status of invoice adjustment
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ContractsContractIdInvoiceAdjustmentsGetParametersTypes:
+      oneOf:
+      - $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersTypes0'
+      - $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersTypes1'
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersTypes
+    invoice-adjustments_getInvoiceAdjustmentById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: invoice-adjustments_getInvoiceAdjustmentById_Response_200
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of the contract.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType
+    InvoiceAdjustmentsGetParametersTypes0:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersTypesSchemaOneOf0Items'
+      title: InvoiceAdjustmentsGetParametersTypes0
+    ContractsContractIdInvoiceAdjustmentsGetParametersTypesSchemaOneOf0Items:
+      type: string
+      enum:
+      - accrued_holiday
+      - additional_fee
+      - allowance
+      - bonus
+      - commission
+      - deduction
+      - deposit
+      - deposit_refund
+      - employer_cost
+      - expense
+      - health_allowance
+      - health_benefit
+      - health_insurance_fee
+      - legal_fee
+      - management_fee
+      - milestone
+      - offcycle
+      - other
+      - overtime
+      - pension
+      - pro_rata
+      - setup_fee
+      - severance
+      - shield_service
+      - signing_bonus
+      - signing_bonus_employer_cost
+      - refund
+      - task
+      - time_off
+      - vat
+      - withholding_tax
+      - work
+      description: Type of invoice adjustment.
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersTypesSchemaOneOf0Items
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsType:
+      type: string
+      enum:
+      - accrued_holiday
+      - additional_fee
+      - allowance
+      - bonus
+      - commission
+      - deduction
+      - deposit
+      - deposit_refund
+      - employer_cost
+      - expense
+      - health_allowance
+      - health_benefit
+      - health_insurance_fee
+      - legal_fee
+      - management_fee
+      - milestone
+      - offcycle
+      - other
+      - overtime
+      - pension
+      - pro_rata
+      - setup_fee
+      - severance
+      - shield_service
+      - signing_bonus
+      - signing_bonus_employer_cost
+      - refund
+      - task
+      - time_off
+      - vat
+      - withholding_tax
+      - work
+      description: Type of invoice adjustment.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsType
+    ContractsContractIdInvoiceAdjustmentsGetParametersContractTypes:
+      oneOf:
+      - $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersContractTypes0'
+      - $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersContractTypes1'
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersContractTypes
+    InvoiceAdjustmentsIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        updated:
+          type: boolean
+          description: Confirms the update.
+      required:
+      - updated
+      title: InvoiceAdjustmentsIdPatchResponsesContentApplicationJsonSchemaData
+    InvoiceAdjustmentsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceAdjustmentsPostResponsesContentApplicationJsonSchemaDataId'
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceAdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: status of invoice adjustment
+        created:
+          type: boolean
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+      required:
+      - created
+      description: Details of invoice adjustment created.
+      title: InvoiceAdjustmentsPostResponsesContentApplicationJsonSchemaData
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedById'
+          description: Unique identifier of the reporting user.
+        full_name:
+          type: string
+          description: Full name of the reporting user.
+      required:
+      - id
+      description: User who reported the invoice adjustment.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+    ContractsContractIdInvoiceAdjustmentsGetParametersStatuses:
+      oneOf:
+      - $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersStatuses0'
+      - $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetParametersStatuses1'
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersStatuses
+    ContractsContractIdInvoiceAdjustmentsGetParametersContractTypes1:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersContractTypes1
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: status of invoice adjustment
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of this resource.
+        type:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsType'
+          description: Type of invoice adjustment.
+        scale:
+          type:
+          - string
+          - 'null'
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          - type: 'null'
+          description: status of invoice adjustment
+        contract:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContract'
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+        worksheet:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet'
+          - type: 'null'
+        attachment:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsAttachment'
+          - type: 'null'
+          description: This object is used for linking file attachments to your records.
+        created_at:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+        invoice_id:
+          type:
+          - number
+          - 'null'
+          format: double
+        description:
+          type: string
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy'
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy'
+          - type: 'null'
+        custom_scale:
+          type:
+          - string
+          - 'null'
+        total_amount:
+          type: string
+        currency_code:
+          type: string
+        payment_cycle:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle'
+        date_submitted:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+      required:
+      - id
+      - type
+      - status
+      - contract
+      - quantity
+      - worksheet
+      - attachment
+      - created_at
+      - description
+      - reported_by
+      - reviewed_by
+      - total_amount
+      - currency_code
+      - payment_cycle
+      - date_submitted
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems
+    invoice-adjustments_getContractInvoiceAdjustments_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaPage'
+      required:
+      - data
+      - page
+      title: invoice-adjustments_getContractInvoiceAdjustments_Response_200
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet:
+      type: object
+      properties:
+        days:
+          type: number
+          format: double
+          description: Number of days reported.
+        hours:
+          type: number
+          format: double
+          description: Number of hours reported.
+        weeks:
+          type: number
+          format: double
+          description: Number of weeks reported.
+        minutes:
+          type: number
+          format: double
+          description: Number of minutes reported.
+      required:
+      - days
+      - hours
+      - weeks
+      - minutes
+      description: Breakdown of time used for time-based calculations.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet
+    invoice-adjustments_createInvoiceAdjustment_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InvoiceAdjustmentsPostResponsesContentApplicationJsonSchemaData'
+          description: Details of invoice adjustment created.
+      required:
+      - data
+      title: invoice-adjustments_createInvoiceAdjustment_Response_201
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    invoice-adjustments_deleteInvoiceAdjustment_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: invoice-adjustments_deleteInvoiceAdjustment_Response_200
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReportedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReportedById
+    InvoiceAdjustmentsGetParametersContractTypes0:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersContractTypesSchemaOneOf0Items'
+      description: List of contract types
+      title: InvoiceAdjustmentsGetParametersContractTypes0
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataAttachment:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Storage key returned from the attachments endpoint, can be used as a unique identifier for the file
+        filename:
+          type: string
+          description: Original filename of the uploaded attachment
+        download_url:
+          type:
+          - string
+          - 'null'
+          description: URL used to download the uploaded attachment file.
+      required:
+      - key
+      - filename
+      description: File attachment linked to the invoice adjustment.
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataAttachment
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Name of the field causing the error (for validation issues)
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReviewedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReviewedById'
+        remarks:
+          type: string
+          description: Comments or notes left by the reviewer.
+        full_name:
+          type: string
+          description: Full name of the reviewer.
+        reviewed_at:
+          type: string
+          description: The timestamp when the review occurred.
+      required:
+      - id
+      - remarks
+      - reviewed_at
+      description: The user who reviewed the adjustment.
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReviewedBy
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedById'
+        full_name:
+          type: string
+      required:
+      - id
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+    InvoiceAdjustmentsGetParametersTypes:
+      oneOf:
+      - $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersTypes0'
+      - $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersTypes1'
+      title: InvoiceAdjustmentsGetParametersTypes
+    InvoiceAdjustmentsGetParametersStatuses:
+      oneOf:
+      - $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersStatuses0'
+      - $ref: '#/components/schemas/InvoiceAdjustmentsGetParametersStatuses1'
+      title: InvoiceAdjustmentsGetParametersStatuses
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReviewedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReviewedById
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle:
+      type: object
+      properties:
+        end:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: End date of the payment cycle.
+        start:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Start date of the payment cycle.
+      description: Payment cycle associated with this adjustment.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReportedById'
+        full_name:
+          type: string
+          description: Full name of the reporter.
+      required:
+      - id
+      description: The user who reported/submitted the adjustment.
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy
+    ContractsContractIdInvoiceAdjustmentsGetParametersTypes1:
+      type: string
+      enum:
+      - accrued_holiday
+      - additional_fee
+      - allowance
+      - bonus
+      - commission
+      - deduction
+      - deposit
+      - deposit_refund
+      - employer_cost
+      - expense
+      - health_allowance
+      - health_benefit
+      - health_insurance_fee
+      - legal_fee
+      - management_fee
+      - milestone
+      - offcycle
+      - other
+      - overtime
+      - pension
+      - pro_rata
+      - setup_fee
+      - severance
+      - shield_service
+      - signing_bonus
+      - signing_bonus_employer_cost
+      - refund
+      - task
+      - time_off
+      - vat
+      - withholding_tax
+      - work
+      title: ContractsContractIdInvoiceAdjustmentsGetParametersTypes1
+    InvoiceAdjustmentsGetParametersContractTypesSchemaOneOf0Items:
+      type: string
+      enum:
+      - ongoing_time_based
+      - pay_as_you_go_time_based
+      - payg_milestones
+      - payg_tasks
+      description: Type of a contract
+      title: InvoiceAdjustmentsGetParametersContractTypesSchemaOneOf0Items
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedById'
+          description: Unique identifier of the reviewer.
+        remarks:
+          type:
+          - string
+          - 'null'
+          description: Reviewer remarks or decision notes.
+        full_name:
+          type: string
+          description: Full name of the reviewer.
+        reviewed_at:
+          type:
+          - string
+          - 'null'
+          description: Timestamp when the review occurred.
+      required:
+      - id
+      - remarks
+      - reviewed_at
+      description: Reviewer information if the adjustment has been reviewed.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle:
+      type: object
+      properties:
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+      required:
+      - end_date
+      - start_date
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle
+    InvoiceAdjustmentsGetParametersStatusesSchemaOneOf0Items:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: status of invoice adjustment
+      title: InvoiceAdjustmentsGetParametersStatusesSchemaOneOf0Items
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Current processing status of the invoice adjustment.
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataContractType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataContractType
+    InvoiceAdjustmentsIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      description: The status of the adjustment.
+      title: InvoiceAdjustmentsIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsAttachment:
+      type: object
+      properties:
+        key:
+          type: string
+          description: You can call attachments end-point, get key and URL to upload your file.
+        filename:
+          type: string
+          description: Original filename you used to upload using attachments end-point.
+      required:
+      - key
+      - filename
+      description: This object is used for linking file attachments to your records.
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsAttachment
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsType:
+      type: string
+      enum:
+      - accrued_holiday
+      - additional_fee
+      - allowance
+      - bonus
+      - commission
+      - deduction
+      - deposit
+      - deposit_refund
+      - employer_cost
+      - expense
+      - health_allowance
+      - health_benefit
+      - health_insurance_fee
+      - legal_fee
+      - management_fee
+      - milestone
+      - offcycle
+      - other
+      - overtime
+      - pension
+      - pro_rata
+      - setup_fee
+      - severance
+      - shield_service
+      - signing_bonus
+      - signing_bonus_employer_cost
+      - refund
+      - task
+      - time_off
+      - vat
+      - withholding_tax
+      - work
+      description: Type of invoice adjustment.
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsType
+    InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataWorksheet:
+      type: object
+      properties:
+        days:
+          type: number
+          format: double
+          description: Number of days.
+        hours:
+          type: number
+          format: double
+          description: Number of hours.
+        weeks:
+          type: number
+          format: double
+          description: Number of weeks.
+        minutes:
+          type: number
+          format: double
+          description: Number of minutes.
+      required:
+      - days
+      - hours
+      - weeks
+      - minutes
+      description: Breakdown of the time/effort involved in the adjustment.
+      title: InvoiceAdjustmentsIdGetResponsesContentApplicationJsonSchemaDataWorksheet
+    ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet:
+      type: object
+      properties:
+        days:
+          type: number
+          format: double
+        hours:
+          type: number
+          format: double
+        weeks:
+          type: number
+          format: double
+        minutes:
+          type: number
+          format: double
+      required:
+      - days
+      - hours
+      - weeks
+      - minutes
+      title: ContractsContractIdInvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet
+    InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of this invoice adjustment.
+        type:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsType'
+          description: Type of invoice adjustment.
+        scale:
+          type:
+          - string
+          - 'null'
+          description: Predefined scale used to calculate the adjustment amount.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          - type: 'null'
+          description: Current processing status of the invoice adjustment.
+        contract:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsContract'
+          description: Contract associated with this invoice adjustment.
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Quantity used to calculate the total amount.
+        worksheet:
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet'
+          - type: 'null'
+          description: Breakdown of time used for time-based calculations.
+        attachment:
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsAttachment'
+          - type: 'null'
+          description: File attachment linked to the invoice adjustment.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the adjustment was created (ISO-8601).
+        invoice_id:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Identifier of the generated invoice this adjustment belongs to.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Human-readable explanation of the invoice adjustment.
+        reported_by:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy'
+          description: User who reported the invoice adjustment.
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy'
+          - type: 'null'
+          description: Reviewer information if the adjustment has been reviewed.
+        custom_scale:
+          type:
+          - string
+          - 'null'
+          description: Custom scale label defined by the client.
+        total_amount:
+          type: string
+          description: Total monetary value of the invoice adjustment.
+        currency_code:
+          type: string
+          description: ISO 4217 currency code used for the amount.
+        payment_cycle:
+          $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle'
+          description: Payment cycle associated with this adjustment.
+        date_submitted:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the adjustment was submitted for review.
+        hourlyReportPreset:
+          oneOf:
+          - $ref: '#/components/schemas/InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset'
+          - type: 'null'
+      required:
+      - id
+      - type
+      - status
+      - contract
+      - quantity
+      - worksheet
+      - attachment
+      - created_at
+      - description
+      - reported_by
+      - reviewed_by
+      - total_amount
+      - currency_code
+      - payment_cycle
+      title: InvoiceAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

@@ -1,0 +1,307 @@
+# x-archived-from: deel-subpackage-employeeinformation-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Employee Information API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_employeeInformation
+paths:
+  /employee-info/contract-types/{type}/countries/{country}:
+    get:
+      operationId: employee-additional-info-template-v-2026-01-01
+      summary: Employee additional info template
+      description: "Lists employee additional info template by the contract type and the employment country\n **Token scopes**: `contracts:read`"
+      tags:
+      - subpackage_employeeInformation
+      parameters:
+      - name: type
+        in: path
+        description: The contract type. Must be 'eor' (Employer of Record) or 'gp' (Global Payroll).
+        required: true
+        schema:
+          $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetParametersType'
+      - name: country
+        in: path
+        description: ISO 3166-1 alpha-2 country code.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee_Information_employeeAdditionalInfoTemplate-v2026-01-01_Response_200'
+        '400':
+          description: Invalid country code or contract type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeAdditionalInfoTemplate-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Authentication failed. The access token is missing, expired, or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeAdditionalInfoTemplate-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Access denied. The authenticated user does not have the required contracts:read scope or contracts.view permission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeAdditionalInfoTemplate-v2026-01-01RequestForbiddenError'
+        '404':
+          description: No additional info template exists for the given country and contract type combination in the Employee Data Management system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeAdditionalInfoTemplate-v2026-01-01RequestNotFoundError'
+        '429':
+          description: Rate limit exceeded. The client has sent too many requests in a given time window.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeAdditionalInfoTemplate-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal server error. Returned when the Employee Data Management service is unreachable or an unexpected error occurs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeAdditionalInfoTemplate-v2026-01-01RequestInternalServerError'
+components:
+  schemas:
+    EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsInputConfigurationFormat:
+      type: object
+      properties:
+        pattern:
+          type: string
+          description: Date format pattern
+        separator:
+          type: string
+          description: Separator character for the format
+      description: Format configuration for the input
+      title: EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsInputConfigurationFormat
+    EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsInputConfiguration:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The configuration type matching the input type
+        format:
+          $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsInputConfigurationFormat'
+          description: Format configuration for the input
+      description: Configuration object for the input field. Present for input types that require additional format or display configuration, such as date fields.
+      title: EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsInputConfiguration
+    EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsDependencyConditionMatchMode:
+      type: string
+      enum:
+      - ALL
+      - ANY
+      description: Condition match mode for dependencies
+      title: EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsDependencyConditionMatchMode
+    EmployeeInfoContractTypesTypeCountriesCountryGetParametersType:
+      type: string
+      enum:
+      - eor
+      - gp
+      title: EmployeeInfoContractTypesTypeCountriesCountryGetParametersType
+    EmployeeAdditionalInfoTemplate-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: EmployeeAdditionalInfoTemplate-v2026-01-01RequestNotFoundError
+    EmployeeAdditionalInfoTemplate-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: EmployeeAdditionalInfoTemplate-v2026-01-01RequestUnauthorizedError
+    EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the field
+        name:
+          type: string
+          description: Name of the field
+        alias:
+          type: string
+          description: Alias for the field
+        label:
+          type: string
+          description: Label for the field
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: Options for select input type
+        footnote:
+          type:
+          - string
+          - 'null'
+          description: Footnote for the field
+        input_type:
+          type: string
+          description: Type of input for the field
+        local_name:
+          type:
+          - string
+          - 'null'
+          description: Local name for the field
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description of the field
+        is_optional:
+          type: boolean
+          description: Indicates if the field is optional
+        required_by:
+          type: string
+          description: Specifies when the field is required
+        dependencies:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems'
+          description: Dependencies for the field
+        display_order:
+          type:
+          - string
+          - 'null'
+          description: Display order of the field
+        how_to_obtain:
+          type:
+          - string
+          - 'null'
+          description: Instructions on how to obtain the field value
+        can_be_skipped:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates if the field can be skipped
+        link_to_obtain:
+          type:
+          - string
+          - 'null'
+          description: Link to obtain the field value
+        validation_rule:
+          type:
+          - string
+          - 'null'
+          description: Validation rule for the field
+        input_configuration:
+          oneOf:
+          - $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsInputConfiguration'
+          - type: 'null'
+          description: Configuration object for the input field. Present for input types that require additional format or display configuration, such as date fields.
+        link_to_obtain_label:
+          type:
+          - string
+          - 'null'
+          description: Label for the link to obtain the field value
+        validation_error_message:
+          type:
+          - string
+          - 'null'
+          description: Validation error message for the field
+        dependency_condition_match_mode:
+          oneOf:
+          - $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsDependencyConditionMatchMode'
+          - type: 'null'
+          description: Condition match mode for dependencies
+      title: EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItems
+    EmployeeAdditionalInfoTemplate-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: EmployeeAdditionalInfoTemplate-v2026-01-01RequestInternalServerError
+    EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the dependency
+        value:
+          type: string
+          description: Value of the dependency
+      title: EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems
+    Employee_Information_employeeAdditionalInfoTemplate-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaDataItems'
+      title: Employee Information_employeeAdditionalInfoTemplate-v2026-01-01_Response_200
+    EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Use this message for logging and debugging purposes. Contains a general error description.
+      required:
+      - message
+      title: EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaErrorsItems
+    EmployeeAdditionalInfoTemplate-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: EmployeeAdditionalInfoTemplate-v2026-01-01RequestTooManyRequestsError
+    EmployeeAdditionalInfoTemplate-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeInfoContractTypesTypeCountriesCountryGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: EmployeeAdditionalInfoTemplate-v2026-01-01RequestForbiddenError
+    EmployeeAdditionalInfoTemplate-v2026-01-01RequestBadRequestError:
+      type: object
+      properties: {}
+      title: EmployeeAdditionalInfoTemplate-v2026-01-01RequestBadRequestError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

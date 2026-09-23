@@ -1,0 +1,1648 @@
+# x-archived-from: deel-subpackage-timesheets-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Timesheets API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_timesheets
+paths:
+  /timesheets:
+    post:
+      operationId: create-timesheet
+      summary: Create a timesheet entry
+      description: "Submit work for a contractor.\n **Token scopes**: `timesheets:write`"
+      tags:
+      - subpackage_timesheets
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timesheets_createTimesheet_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Timesheet object that needs to be created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimesheetsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Details of the timesheet to create. Both a client or a contractor may create a timesheet.
+              required:
+              - data
+    get:
+      operationId: get-timesheets
+      summary: List of timesheets
+      description: "Retrieve a list of timesheets in your Deel account. You can filter the list by providing additional paramters e.g. contract_id, contract_type etc.\n **Token scopes**: `timesheets:read`"
+      tags:
+      - subpackage_timesheets
+      parameters:
+      - name: contract_id
+        in: query
+        description: Id of an Deel contract.
+        required: false
+        schema:
+          type: string
+      - name: contract_types
+        in: query
+        description: types of contracts to filter
+        required: false
+        schema:
+          $ref: '#/components/schemas/TimesheetsGetParametersContractTypes'
+      - name: statuses
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/TimesheetsGetParametersStatuses'
+      - name: reporter_id
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: date_from
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timesheets_getTimesheets_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /contracts/{contract_id}/timesheets:
+    get:
+      operationId: get-contract-timesheets
+      summary: List of timesheets by contract
+      description: "Retrieve a list of timesheets found for a contract.\n **Token scopes**: `timesheets:read`"
+      tags:
+      - subpackage_timesheets
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: contract_types
+        in: query
+        description: Types of contracts to filter.
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetParametersContractTypes'
+      - name: statuses
+        in: query
+        description: Statuses of timesheets to filter.
+        required: false
+        schema:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetParametersStatuses'
+      - name: reporter_id
+        in: query
+        description: ID of an existing profile
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: date_from
+        in: query
+        description: 'Filtered results will include records created on or after the provided date. Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: 'Filtered results will include records created before the provided date. Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        description: 'Return a page of results with given number of records; NOTE: technically ALL query parameters are strings or array of strings'
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: Return a page of results after given index of row
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timesheets_getContractTimesheets_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /timesheets/{id}:
+    get:
+      operationId: get-timesheet-by-id
+      summary: Retrieve a single timesheet entry
+      description: "Retrieve a single timesheet entry by Id.\n **Token scopes**: `timesheets:read`"
+      tags:
+      - subpackage_timesheets
+      parameters:
+      - name: id
+        in: path
+        description: ID of an existing timesheet
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timesheets_getTimesheetById_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    patch:
+      operationId: update-timesheet
+      summary: Update a timesheet entry
+      description: "Use this endpoint to update an existing timesheet entry by its id when correcting logged hours or refining the work note. Send a PATCH request to /timesheets/:id with a data object containing fields to change, such as quantity, description, or hourly_report_preset_id. Both clients and contractors can perform this update.\n **Token scopes**: `timesheets:write`"
+      tags:
+      - subpackage_timesheets
+      parameters:
+      - name: id
+        in: path
+        description: ID of an existing timesheet.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timesheets_updateTimesheet_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimesheetsIdPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+    delete:
+      operationId: delete-timesheet-by-id
+      summary: Delete a timesheet entry
+      description: "Delete a single timesheet entry.\n **Token scopes**: `timesheets:write`"
+      tags:
+      - subpackage_timesheets
+      parameters:
+      - name: id
+        in: path
+        description: ID of an existing timesheet
+        required: true
+        schema:
+          type: string
+      - name: reason
+        in: query
+        description: Reason for deleting an existing task
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheets_deleteTimesheetById_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /timesheets/{id}/reviews:
+    post:
+      operationId: create-timesheet-review
+      summary: Review a single timesheet
+      description: "Review a timesheet to approve or decline submitted work.\n **Token scopes**: `timesheets:write`"
+      tags:
+      - subpackage_timesheets
+      parameters:
+      - name: id
+        in: path
+        description: ID of an existing timesheet
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timesheets_createTimesheetReview_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimesheetsIdReviewsPostRequestBodyContentApplicationJsonSchemaData'
+components:
+  schemas:
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataAttachment:
+      type: object
+      properties:
+        key:
+          type: string
+          description: You can call attachments end-point, get key and URL to upload your file.
+        filename:
+          type: string
+          description: Original filename you used to upload using attachments end-point.
+      required:
+      - key
+      - filename
+      description: This object is used for linking file attachments to your records.
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataAttachment
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataPaymentCycle:
+      type: object
+      properties:
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataPaymentCycle
+    TimesheetsIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      title: TimesheetsIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: unique identifier of the related timesheet preset
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: the hourly rate of the related timesheet preset
+        title:
+          type:
+          - string
+          - 'null'
+          description: the title of the related timesheet preset
+        description:
+          type:
+          - string
+          - 'null'
+          description: the description of the related timesheet preset
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset
+    timesheets_createTimesheet_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsPostResponsesContentApplicationJsonSchemaData'
+          description: Details of invoice adjustment created.
+      required:
+      - data
+      title: timesheets_createTimesheet_Response_201
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataApproversItems:
+      type: object
+      properties:
+        email:
+          type: string
+        approved:
+          type: boolean
+        full_name:
+          type: string
+      required:
+      - approved
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataApproversItems
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet:
+      type: object
+      properties:
+        days:
+          type: number
+          format: double
+        hours:
+          type: number
+          format: double
+        weeks:
+          type: number
+          format: double
+        minutes:
+          type: number
+          format: double
+      required:
+      - days
+      - hours
+      - weeks
+      - minutes
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet
+    TimesheetsGetParametersStatusesSchemaOneOf0Items:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: status of invoice adjustment
+      title: TimesheetsGetParametersStatusesSchemaOneOf0Items
+    TimesheetsIdReviewsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        reason:
+          type:
+          - string
+          - 'null'
+        status:
+          $ref: '#/components/schemas/TimesheetsIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus'
+      required:
+      - status
+      title: TimesheetsIdReviewsPostRequestBodyContentApplicationJsonSchemaData
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Status of this entry.
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataStatus
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReportedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReportedById
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType'
+          description: Type of a contract
+        title:
+          type: string
+      required:
+      - id
+      - type
+      - title
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Status of this entry.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReviewedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReviewedById'
+        remarks:
+          type: string
+        full_name:
+          type: string
+        reviewed_at:
+          type: string
+      required:
+      - id
+      - remarks
+      - reviewed_at
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReviewedBy
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: status of invoice adjustment
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        remarks:
+          type: string
+        full_name:
+          type: string
+        reviewed_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - remarks
+      - reviewed_at
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy
+    TimesheetsGetParametersContractTypes1:
+      type: string
+      enum:
+      - ongoing_time_based
+      - pay_as_you_go_time_based
+      - payg_milestones
+      - payg_tasks
+      title: TimesheetsGetParametersContractTypes1
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReportedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReportedById'
+        full_name:
+          type: string
+      required:
+      - id
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReportedBy
+    ContractsContractIdTimesheetsGetParametersStatuses:
+      oneOf:
+      - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetParametersStatuses0'
+      - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetParametersStatuses1'
+      title: ContractsContractIdTimesheetsGetParametersStatuses
+    TimesheetsIdReviewsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+      required:
+      - created
+      title: TimesheetsIdReviewsPostResponsesContentApplicationJsonSchemaData
+    TimesheetsGetParametersStatuses:
+      oneOf:
+      - $ref: '#/components/schemas/TimesheetsGetParametersStatuses0'
+      - $ref: '#/components/schemas/TimesheetsGetParametersStatuses1'
+      title: TimesheetsGetParametersStatuses
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataId
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        remarks:
+          type: string
+        full_name:
+          type: string
+        reviewed_at:
+          type: string
+      required:
+      - id
+      - remarks
+      - reviewed_at
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy
+    TimesheetsIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        quantity:
+          type: number
+          format: double
+        description:
+          type: string
+        hourly_report_preset_id:
+          type:
+          - string
+          - 'null'
+          description: Id of an existing timesheets preset. Created through /rest/v2/timesheets/presets
+      required:
+      - quantity
+      - description
+      title: TimesheetsIdPatchRequestBodyContentApplicationJsonSchemaData
+    timesheets_updateTimesheet_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsIdPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: timesheets_updateTimesheet_Response_201
+    timesheets_getTimesheets_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaPage'
+      required:
+      - data
+      - page
+      title: timesheets_getTimesheets_Response_200
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        total_rows:
+          type: number
+          format: double
+      required:
+      - total_rows
+      description: This object is used for pagination.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaPage
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataContractType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataContractType
+    TimesheetsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        total_rows:
+          type: number
+          format: double
+      required:
+      - total_rows
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaPage
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        full_name:
+          type: string
+      required:
+      - id
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+    ContractsContractIdTimesheetsGetParametersStatuses1:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      title: ContractsContractIdTimesheetsGetParametersStatuses1
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataId'
+        type:
+          type: string
+          description: Deprecated - it is always "work"
+        scale:
+          type:
+          - string
+          - 'null'
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: Status of this entry.
+        contract:
+          $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataContract'
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+        worksheet:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataWorksheet'
+          - type: 'null'
+        attachment:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataAttachment'
+          - type: 'null'
+          description: This object is used for linking file attachments to your records.
+        created_at:
+          type: string
+        description:
+          type: string
+        reported_by:
+          $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReportedBy'
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReviewedBy'
+          - type: 'null'
+        custom_scale:
+          type:
+          - string
+          - 'null'
+        total_amount:
+          type: string
+          description: is equal to quantity times rate of active work statement + bonus in this record
+        currency_code:
+          type: string
+        payment_cycle:
+          $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataPaymentCycle'
+        date_submitted:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+        hourly_report_preset:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataHourlyReportPreset'
+          - type: 'null'
+        approvers:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataApproversItems'
+      required:
+      - id
+      - type
+      - status
+      - contract
+      - quantity
+      - worksheet
+      - attachment
+      - created_at
+      - description
+      - reported_by
+      - reviewed_by
+      - total_amount
+      - currency_code
+      - date_submitted
+      - approvers
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaData
+    TimesheetsGetParametersStatuses1:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      title: TimesheetsGetParametersStatuses1
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet:
+      type: object
+      properties:
+        days:
+          type: number
+          format: double
+        hours:
+          type: number
+          format: double
+        weeks:
+          type: number
+          format: double
+        minutes:
+          type: number
+          format: double
+      required:
+      - days
+      - hours
+      - weeks
+      - minutes
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet
+    TimesheetsIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        updated:
+          type: boolean
+      required:
+      - updated
+      title: TimesheetsIdPatchResponsesContentApplicationJsonSchemaData
+    TimesheetsGetParametersContractTypes0:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimesheetsGetParametersContractTypesSchemaOneOf0Items'
+      description: List of contract types
+      title: TimesheetsGetParametersContractTypes0
+    TimesheetsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of this resource.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsPostResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: status of invoice adjustment
+        created:
+          type: boolean
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+      required:
+      - created
+      description: Details of invoice adjustment created.
+      title: TimesheetsPostResponsesContentApplicationJsonSchemaData
+    TimesheetsGetParametersContractTypesSchemaOneOf0Items:
+      type: string
+      enum:
+      - ongoing_time_based
+      - pay_as_you_go_time_based
+      - payg_milestones
+      - payg_tasks
+      description: Type of a contract
+      title: TimesheetsGetParametersContractTypesSchemaOneOf0Items
+    ContractsContractIdTimesheetsGetParametersContractTypesSchemaOneOf0Items:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: ContractsContractIdTimesheetsGetParametersContractTypesSchemaOneOf0Items
+    TimesheetsGetParametersContractTypes:
+      oneOf:
+      - $ref: '#/components/schemas/TimesheetsGetParametersContractTypes0'
+      - $ref: '#/components/schemas/TimesheetsGetParametersContractTypes1'
+      title: TimesheetsGetParametersContractTypes
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType'
+          description: Type of a contract
+        title:
+          type: string
+      required:
+      - id
+      - type
+      - title
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract
+    TimesheetsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        quantity:
+          type: number
+          format: double
+          description: This is based on the scale of work statement of the associated contract
+        contract_id:
+          type: string
+          description: Id of a Deel contract.
+        description:
+          type: string
+          default: ''
+        date_submitted:
+          type: string
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        is_auto_approved:
+          type: boolean
+          description: If true, the timesheet will be automatically approved as part of the request.
+        hourly_report_preset_id:
+          type:
+          - string
+          - 'null'
+          description: Id of an existing timesheets preset. Created through /rest/v2/timesheets/presets
+      required:
+      - quantity
+      - contract_id
+      - description
+      - date_submitted
+      description: Details of the timesheet to create. Both a client or a contractor may create a timesheet.
+      title: TimesheetsPostRequestBodyContentApplicationJsonSchemaData
+    timesheets_getTimesheetById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: timesheets_getTimesheetById_Response_200
+    TimesheetsIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms the deletion.
+      required:
+      - deleted
+      title: TimesheetsIdDeleteResponsesContentApplicationJsonSchemaData
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        type:
+          type: string
+          description: Deprecated - it is always "work"
+        scale:
+          type:
+          - string
+          - 'null'
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          - type: 'null'
+          description: status of invoice adjustment
+        contract:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract'
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+        worksheet:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet'
+          - type: 'null'
+        attachment:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment'
+          - type: 'null'
+          description: This object is used for linking file attachments to your records.
+        created_at:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+        description:
+          type: string
+        reported_by:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy'
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy'
+          - type: 'null'
+        custom_scale:
+          type:
+          - string
+          - 'null'
+        total_amount:
+          type: string
+          description: is equal to quantity times rate of active work statement + bonus in this record
+        currency_code:
+          type: string
+        payment_cycle:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle'
+        date_submitted:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+        hourly_report_preset:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset'
+          - type: 'null'
+      required:
+      - id
+      - type
+      - status
+      - contract
+      - quantity
+      - worksheet
+      - created_at
+      - description
+      - reported_by
+      - total_amount
+      - currency_code
+      - date_submitted
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItems
+    ContractsContractIdTimesheetsGetParametersStatuses0:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContractsContractIdTimesheetsGetParametersStatusesSchemaOneOf0Items'
+      title: ContractsContractIdTimesheetsGetParametersStatuses0
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReviewedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataReviewedById
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    timesheets_createTimesheetReview_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsIdReviewsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: timesheets_createTimesheetReview_Response_201
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType
+    TimesheetsPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: status of invoice adjustment
+      title: TimesheetsPostResponsesContentApplicationJsonSchemaDataStatus
+    timesheets_getContractTimesheets_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaPage'
+          description: This object is used for pagination.
+      required:
+      - data
+      - page
+      title: timesheets_getContractTimesheets_Response_200
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: unique identifier of the related timesheet preset
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: the hourly rate of the related timesheet preset
+        title:
+          type:
+          - string
+          - 'null'
+          description: the title of the related timesheet preset
+        description:
+          type:
+          - string
+          - 'null'
+          description: the description of the related timesheet preset
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset
+    ContractsContractIdTimesheetsGetParametersContractTypes1:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      title: ContractsContractIdTimesheetsGetParametersContractTypes1
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle:
+      type: object
+      properties:
+        end_date:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+        start_date:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        type:
+          type: string
+          description: Deprecated - it is always "work"
+        scale:
+          type:
+          - string
+          - 'null'
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          - type: 'null'
+          description: Status of this entry.
+        contract:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract'
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+        worksheet:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet'
+          - type: 'null'
+        attachment:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment'
+          - type: 'null'
+          description: This object is used for linking file attachments to your records.
+        created_at:
+          type: string
+        description:
+          type: string
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy'
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy'
+          - type: 'null'
+        custom_scale:
+          type:
+          - string
+          - 'null'
+        total_amount:
+          type: string
+          description: is equal to quantity times rate of active work statement + bonus in this record
+        currency_code:
+          type: string
+        payment_cycle:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle'
+        date_submitted:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+        hourly_report_preset:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset'
+          - type: 'null'
+      required:
+      - id
+      - type
+      - status
+      - contract
+      - quantity
+      - worksheet
+      - created_at
+      - description
+      - reported_by
+      - total_amount
+      - currency_code
+      - date_submitted
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdTimesheetsGetParametersContractTypes0:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContractsContractIdTimesheetsGetParametersContractTypesSchemaOneOf0Items'
+      description: List of contract types
+      title: ContractsContractIdTimesheetsGetParametersContractTypes0
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataContract:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          $ref: '#/components/schemas/TimesheetsIdGetResponsesContentApplicationJsonSchemaDataContractType'
+          description: Type of a contract
+        title:
+          type: string
+      required:
+      - id
+      - type
+      - title
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataContract
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataHourlyReportPreset:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: unique identifier of the related timesheet preset
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: the hourly rate of the related timesheet preset
+        title:
+          type:
+          - string
+          - 'null'
+          description: the title of the related timesheet preset
+        description:
+          type:
+          - string
+          - 'null'
+          description: the description of the related timesheet preset
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataHourlyReportPreset
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment:
+      type: object
+      properties:
+        key:
+          type: string
+          description: You can call attachments end-point, get key and URL to upload your file.
+        filename:
+          type: string
+          description: Original filename you used to upload using attachments end-point.
+      required:
+      - key
+      - filename
+      description: This object is used for linking file attachments to your records.
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment
+    ContractsContractIdTimesheetsGetParametersStatusesSchemaOneOf0Items:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Status of this entry.
+      title: ContractsContractIdTimesheetsGetParametersStatusesSchemaOneOf0Items
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle:
+      type: object
+      properties:
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle
+    ContractsContractIdTimesheetsGetParametersContractTypes:
+      oneOf:
+      - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetParametersContractTypes0'
+      - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetParametersContractTypes1'
+      title: ContractsContractIdTimesheetsGetParametersContractTypes
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment:
+      type: object
+      properties:
+        key:
+          type: string
+          description: You can call attachments end-point, get key and URL to upload your file.
+        filename:
+          type: string
+          description: Original filename you used to upload using attachments end-point.
+      required:
+      - key
+      - filename
+      description: This object is used for linking file attachments to your records.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    TimesheetsGetParametersStatuses0:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimesheetsGetParametersStatusesSchemaOneOf0Items'
+      title: TimesheetsGetParametersStatuses0
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        full_name:
+          type: string
+      required:
+      - id
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+    Timesheets_deleteTimesheetById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsIdDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Timesheets_deleteTimesheetById_Response_200
+    TimesheetsIdGetResponsesContentApplicationJsonSchemaDataWorksheet:
+      type: object
+      properties:
+        days:
+          type: number
+          format: double
+        hours:
+          type: number
+          format: double
+        weeks:
+          type: number
+          format: double
+        minutes:
+          type: number
+          format: double
+      required:
+      - days
+      - hours
+      - weeks
+      - minutes
+      title: TimesheetsIdGetResponsesContentApplicationJsonSchemaDataWorksheet
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

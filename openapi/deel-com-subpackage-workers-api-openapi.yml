@@ -1,0 +1,1172 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Workers API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_workers
+paths:
+  /ic/workers/invoices/{invoice_id}/pdf:
+    get:
+      operationId: ic-workers-invoices-invoice-id-pdf-v-2026-04-20
+      summary: /ic/workers/invoices/:invoice_id/pdf
+      description: 'This endpoint provides embedded worker flows access to download a pdf of a specific invoice while using a worker:PAT token.
+
+        **Token scopes**: `accounting:read`'
+      tags:
+      - subpackage_workers
+      parameters:
+      - name: invoice_id
+        in: path
+        description: Public invoice identifier (UUID) for the invoice whose PDF URL is returned.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Signed PDF URL for download.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_icWorkersInvoicesInvoiceIdPdf-v2026-04-20_Response_200'
+        '400':
+          description: Bad request (invalid query parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestBadRequestError'
+        '401':
+          description: Unauthorized (missing or invalid worker token).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestUnauthorizedError'
+        '403':
+          description: Forbidden (invoice not found or not accessible to this worker).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '412':
+          description: Precondition failed (e.g. icEmbeddedWorkerSetup is not enabled for the organization).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestPreconditionFailedError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestInternalServerError'
+  /worker:
+    post:
+      operationId: create-worker
+      summary: Create a new worker
+      description: Creates a new worker account with the specified profile type
+      tags:
+      - subpackage_workers
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Worker created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_createWorker_Response_201'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWorkerRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWorkerRequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/WorkerPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /ic/workers/invoices/{invoice_id}:
+    get:
+      operationId: get-invoice-details-by-id-v-2026-04-27
+      summary: Get invoice details by ID
+      description: 'This endpoint retrieves invoice information by ID. Use it to access detailed invoice data for reference or verification.
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - subpackage_workers
+      parameters:
+      - name: invoice_id
+        in: path
+        description: Public invoice id for the invoice to return.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Invoice detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_getInvoiceDetailsById-v2026-04-27_Response_200'
+        '400':
+          description: Bad request (invalid query or path parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceDetailsById-v2026-04-27RequestBadRequestError'
+        '401':
+          description: Unauthorized (missing or invalid worker token).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceDetailsById-v2026-04-27RequestUnauthorizedError'
+        '403':
+          description: Forbidden (invoice not found or not accessible to this worker).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceDetailsById-v2026-04-27RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '412':
+          description: Precondition failed (e.g. `icEmbeddedWorkerSetup` is not enabled for the organization).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceDetailsById-v2026-04-27RequestPreconditionFailedError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceDetailsById-v2026-04-27RequestInternalServerError'
+  /workers/compliance-documents:
+    get:
+      operationId: list-of-worker-compliance-documents-v-2026-04-23
+      summary: List of worker compliance documents
+      description: 'Retrieve the list of compliance document requirements for a worker, grouped by country. Returns all required and optional documents with their current submission status. Applicable for both independent contractors and EOR employees.
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - subpackage_workers
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_listOfWorkerComplianceDocuments-v2026-04-23_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. The caller does not have the required profile type (employee or contractor).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfWorkerComplianceDocuments-v2026-04-23RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfWorkerComplianceDocuments-v2026-04-23RequestInternalServerError'
+  /ic/workers/transactions:
+    get:
+      operationId: retrieve-worker-transaction-history-v-2026-04-30
+      summary: Retrieve worker transaction history
+      description: 'Use this endpoint to access a worker''s transaction history quickly. This integration works with white-label clients and ensures compliance by not following the generic contractor route
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - subpackage_workers
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of transactions to return in this page (page size).
+        required: false
+        schema:
+          type: integer
+          default: 100
+      - name: filter
+        in: query
+        description: Subset of transactions by processing state. Public enum is UPPER_SNAKE; the server lowercases for validation (legacy lowercase query values are still accepted).
+        required: false
+        schema:
+          $ref: '#/components/schemas/IcWorkersTransactionsGetParametersFilter'
+      - name: from
+        in: query
+        description: Lower bound on transaction `created_at` (inclusive), ISO-8601 date-time.
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        description: Upper bound on transaction `created_at` (inclusive), ISO-8601 date-time.
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: cursor
+        in: query
+        description: Opaque pagination cursor from the previous response field `next_cursor`. Omit on the first page; pass the last `next_cursor` value as `cursor` to fetch the next page.
+        required: false
+        schema:
+          type: string
+      - name: statuses
+        in: query
+        description: Filter listed transactions to these mapped status values (applied after fetch; may affect how rows align with `total_count`).
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: amount_from
+        in: query
+        description: Minimum transaction amount to include.
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: amount_to
+        in: query
+        description: Maximum transaction amount to include.
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: currencies
+        in: query
+        description: Only include transactions in one of these currency codes.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: transaction_type
+        in: query
+        description: Restrict to pay-in or pay-out. Public enum is UPPER_SNAKE; the server lowercases for validation (legacy lowercase query values are still accepted).
+        required: false
+        schema:
+          $ref: '#/components/schemas/IcWorkersTransactionsGetParametersTransactionType'
+      - name: withdrawal_methods
+        in: query
+        description: Filter by withdrawal / payout method identifiers.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: last_days
+        in: query
+        description: Only include transactions created in the last N days.
+        required: false
+        schema:
+          type: integer
+      - name: type
+        in: query
+        description: Additional transaction type filter (backend-specific string).
+        required: false
+        schema:
+          type: string
+      - name: include_running_total
+        in: query
+        description: When true, each row may include a running total over the result set.
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation — paginated contractor transactions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_retrieveWorkerTransactionHistory-v2026-04-30_Response_200'
+        '400':
+          description: Bad request (invalid query parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWorkerTransactionHistory-v2026-04-30RequestBadRequestError'
+        '401':
+          description: Unauthorized (missing or invalid worker token).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWorkerTransactionHistory-v2026-04-30RequestUnauthorizedError'
+        '403':
+          description: Forbidden (not allowed for this worker or token).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWorkerTransactionHistory-v2026-04-30RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '412':
+          description: Precondition failed (e.g. icEmbeddedWorkerSetup is not enabled for the organization).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWorkerTransactionHistory-v2026-04-30RequestPreconditionFailedError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWorkerTransactionHistory-v2026-04-30RequestInternalServerError'
+components:
+  schemas:
+    WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItems'
+          description: List of compliance documents required for the worker.
+      required:
+      - documents
+      title: WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData
+    RetrieveWorkerTransactionHistory-v2026-04-30RequestPreconditionFailedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveWorkerTransactionHistory-v2026-04-30RequestPreconditionFailedError
+    IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: HTTPS URL to download the invoice PDF.
+      required:
+      - url
+      description: Payload with the signed download URL.
+      title: IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaData
+    CreateWorkerRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateWorkerRequestBadRequestError
+    WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the compliance document requirement.
+        name:
+          type: string
+          description: Display name of the compliance document.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus'
+          - type: 'null'
+          description: Review status of the uploaded document, null if no document has been uploaded yet.
+        country:
+          type: string
+          description: ISO 3166-1 alpha-2 country code where the document is required.
+        fillable:
+          type: boolean
+          description: Whether the document can be filled through the Deel platform.
+        filenames:
+          type: array
+          items:
+            type: string
+          description: List of uploaded file names. Empty array when no files have been uploaded.
+        description:
+          type: string
+          description: Description of the document requirement. Empty string when no description exists.
+        is_optional:
+          type: boolean
+          description: Whether the document is optional for the worker. Also true when the document is required within 30 days.
+        uploaded_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: ISO 8601 timestamp when the document was uploaded, null if no document has been uploaded.
+        has_template:
+          type: boolean
+          description: Whether a template is available for this document.
+        rejection_message:
+          type: string
+          description: Plain text message explaining why the document was rejected. Empty string when no rejection message exists.
+        is_consent_required:
+          type: boolean
+          description: Whether consent is required for acknowledgement-only documents. Only present when is_acknowledgement_only_document is true.
+        required_in_30_days:
+          type: boolean
+          description: Whether the document is required within 30 days of employment start.
+        is_acknowledgement_only_document:
+          type: boolean
+          description: Whether this document only requires acknowledgement without file upload.
+      required:
+      - id
+      - name
+      - status
+      - country
+      - fillable
+      - filenames
+      - description
+      - is_optional
+      - uploaded_at
+      - has_template
+      - rejection_message
+      - required_in_30_days
+      - is_acknowledgement_only_document
+      title: WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItems
+    WorkerPostRequestBodyContentApplicationJsonSchemaDataCompany:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyType'
+          description: Type of company registration
+        personal:
+          $ref: '#/components/schemas/WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyPersonal'
+      required:
+      - type
+      - personal
+      title: WorkerPostRequestBodyContentApplicationJsonSchemaDataCompany
+    GetInvoiceDetailsById-v2026-04-27RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetInvoiceDetailsById-v2026-04-27RequestUnauthorizedError
+    WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        field:
+          type: string
+          description: Name of the field causing the error, if applicable.
+        message:
+          type: string
+          description: Human-readable error message.
+      required:
+      - code
+      - message
+      title: WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    IcWorkersTransactionsGetParametersTransactionType:
+      type: string
+      enum:
+      - PAY_IN
+      - PAY_OUT
+      title: IcWorkersTransactionsGetParametersTransactionType
+    IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaRequest'
+          description: Present for some public API responses (e.g. when x-is-api-call is set).
+      required:
+      - errors
+      title: IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestForbiddenError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ListOfWorkerComplianceDocuments-v2026-04-23RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListOfWorkerComplianceDocuments-v2026-04-23RequestForbiddenError
+    RetrieveWorkerTransactionHistory-v2026-04-30RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaRequest'
+          description: Present for some public API responses (e.g. when x-is-api-call is set).
+      required:
+      - errors
+      title: RetrieveWorkerTransactionHistory-v2026-04-30RequestForbiddenError
+    Workers_retrieveWorkerTransactionHistory-v2026-04-30_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Transaction rows for this page.
+        has_more:
+          type: boolean
+          description: Whether another page exists after this one.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Opaque cursor for the next page; null when there is no next page. Pass this value as the `cursor` query parameter to request the following page.
+        total_count:
+          type: integer
+          description: Total number of transactions matching server-side filters for this request (ignores pagination). If `statuses` is provided, that filter is applied in memory to listed rows only, so this count may be higher than the rows returned across all pages.
+      required:
+      - data
+      - has_more
+      - total_count
+      title: Workers_retrieveWorkerTransactionHistory-v2026-04-30_Response_200
+    IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        field:
+          type: string
+          description: JSON pointer to the invalid field, when applicable.
+        details:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Optional structured context for the error.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Public invoice id.
+        title:
+          type: string
+          description: Display title.
+        total:
+          type:
+          - string
+          - 'null'
+          description: Total including fees.
+        amount:
+          type:
+          - string
+          - 'null'
+          description: Amount before fees.
+        status:
+          type: string
+          description: Invoice workflow status.
+        currency:
+          type: string
+          description: Three-letter currency code.
+        issued_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the invoice was issued, if applicable.
+        created_at:
+          type: string
+          format: date-time
+          description: When the invoice record was created (ISO-8601).
+        payment_display_status:
+          $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataPaymentDisplayStatus'
+          description: Derived payment display state for the invoice.
+      required:
+      - id
+      - status
+      - currency
+      - created_at
+      description: Invoice summary (snake_case; display card fields, amounts, and payment display).
+      title: IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData
+    WorkerPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: Worker's email address
+        company:
+          $ref: '#/components/schemas/WorkerPostRequestBodyContentApplicationJsonSchemaDataCompany'
+        timezone:
+          type: string
+          description: Worker's timezone
+        last_name:
+          type: string
+          description: Worker's last name
+        first_name:
+          type: string
+          description: Worker's first name
+        contract_id:
+          type: string
+          description: Associated contract ID
+        middle_name:
+          type:
+          - string
+          - 'null'
+          description: Worker's middle name
+        profile_type:
+          $ref: '#/components/schemas/WorkerPostRequestBodyContentApplicationJsonSchemaDataProfileType'
+          description: Type of worker profile
+        preferred_name:
+          type:
+          - string
+          - 'null'
+          description: Worker's preferred name
+        preferred_lastName:
+          type:
+          - string
+          - 'null'
+          description: Worker's preferred last name
+        preferred_firstname:
+          type:
+          - string
+          - 'null'
+          description: Worker's preferred first name
+      required:
+      - email
+      - company
+      - timezone
+      - last_name
+      - first_name
+      - contract_id
+      - profile_type
+      title: WorkerPostRequestBodyContentApplicationJsonSchemaData
+    WorkerPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: Created user ID
+        profile_id:
+          type: string
+          description: Created profile ID
+        contract_id:
+          type: string
+          description: Associated contract ID
+      required:
+      - user_id
+      - profile_id
+      - contract_id
+      title: WorkerPostResponsesContentApplicationJsonSchemaData
+    GetInvoiceDetailsById-v2026-04-27RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetInvoiceDetailsById-v2026-04-27RequestInternalServerError
+    GetInvoiceDetailsById-v2026-04-27RequestPreconditionFailedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetInvoiceDetailsById-v2026-04-27RequestPreconditionFailedError
+    IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+        method:
+          type: string
+        status:
+          type: integer
+      description: Present for some public API responses (e.g. when x-is-api-call is set).
+      title: IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaRequest
+    IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataPaymentDisplayStatus:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Stable machine key.
+        label:
+          type: string
+          description: Human-readable label.
+      required:
+      - key
+      - label
+      description: Derived payment display state for the invoice.
+      title: IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataPaymentDisplayStatus
+    Workers_createWorker_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WorkerPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Workers_createWorker_Response_201
+    RetrieveWorkerTransactionHistory-v2026-04-30RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveWorkerTransactionHistory-v2026-04-30RequestBadRequestError
+    IcWorkersTransactionsGetParametersFilter:
+      type: string
+      enum:
+      - ALL
+      - ONLY_PROCESSING
+      - WITHOUT_PROCESSING
+      default: ALL
+      title: IcWorkersTransactionsGetParametersFilter
+    Workers_icWorkersInvoicesInvoiceIdPdf-v2026-04-20_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaData'
+          description: Payload with the signed download URL.
+      required:
+      - data
+      description: Envelope containing a time-limited signed URL to the invoice PDF.
+      title: Workers_icWorkersInvoicesInvoiceIdPdf-v2026-04-20_Response_200
+    WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus:
+      type: string
+      enum:
+      - AWAITING_EX_REVIEW
+      - AWAITING_EXTERNAL_REVIEW
+      - REJECTED
+      - APPROVED
+      - ON_HOLD
+      description: Review status of the uploaded document, null if no document has been uploaded yet.
+      title: WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus
+    IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+        method:
+          type: string
+        status:
+          type: integer
+      description: Present for some public API responses (e.g. when `x-is-api-call` is set).
+      title: IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaRequest
+    Workers_listOfWorkerComplianceDocuments-v2026-04-23_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Workers_listOfWorkerComplianceDocuments-v2026-04-23_Response_200
+    GetInvoiceDetailsById-v2026-04-27RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetInvoiceDetailsById-v2026-04-27RequestBadRequestError
+    IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        details:
+          type: object
+          additionalProperties:
+            description: Any type
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems
+    IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestInternalServerError
+    GetInvoiceDetailsById-v2026-04-27RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaRequest'
+          description: Present for some public API responses (e.g. when `x-is-api-call` is set).
+      required:
+      - errors
+      title: GetInvoiceDetailsById-v2026-04-27RequestForbiddenError
+    IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestBadRequestError
+    ListOfWorkerComplianceDocuments-v2026-04-23RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListOfWorkerComplianceDocuments-v2026-04-23RequestInternalServerError
+    IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+        method:
+          type: string
+        status:
+          type: integer
+      description: Present for some public API responses (e.g. when x-is-api-call is set).
+      title: IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaRequest
+    CreateWorkerRequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateWorkerRequestInternalServerError
+    IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of this resource (public transaction id).
+        amount:
+          type:
+          - string
+          - 'null'
+          description: Transaction amount.
+        status:
+          type: string
+          description: Transaction status.
+        currency:
+          type: string
+          description: Three-letter currency code.
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the transaction was created (ISO-8601).
+      required:
+      - id
+      - created_at
+      description: One contractor transaction; `id` is the public transaction UUID.
+      title: IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaDataItems
+    RetrieveWorkerTransactionHistory-v2026-04-30RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveWorkerTransactionHistory-v2026-04-30RequestInternalServerError
+    IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestUnauthorizedError
+    IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: JSON pointer to the invalid field
+        details:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Optional structured details
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      required:
+      - code
+      - message
+      title: IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveWorkerTransactionHistory-v2026-04-30RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersTransactionsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveWorkerTransactionHistory-v2026-04-30RequestUnauthorizedError
+    WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyType:
+      type: string
+      enum:
+      - COMPANY
+      - INDIVIDUAL
+      description: Type of company registration
+      title: WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyType
+    IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestPreconditionFailedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: IcWorkersInvoicesInvoiceIdPdf-v2026-04-20RequestPreconditionFailedError
+    WorkerPostRequestBodyContentApplicationJsonSchemaDataProfileType:
+      type: string
+      enum:
+      - CONTRACTOR
+      - EOR
+      description: Type of worker profile
+      title: WorkerPostRequestBodyContentApplicationJsonSchemaDataProfileType
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    Workers_getInvoiceDetailsById-v2026-04-27_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData'
+          description: Invoice summary (snake_case; display card fields, amounts, and payment display).
+      required:
+      - data
+      title: Workers_getInvoiceDetailsById-v2026-04-27_Response_200
+    WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyPersonal:
+      type: object
+      properties:
+        zip:
+          type: number
+          format: double
+          description: Zip/Postal code
+        city:
+          type: string
+          description: City
+        phone:
+          type: number
+          format: double
+          description: Phone number
+        street:
+          type: string
+          description: Street address
+        citizen:
+          type: string
+          description: Citizenship country code
+        country:
+          type: string
+          description: Country code
+        id_type:
+          type: string
+          description: Type of identification
+        province:
+          type:
+          - string
+          - 'null'
+          description: Province/State
+        timezone:
+          type: string
+          description: Personal timezone
+        personal_id:
+          type: number
+          format: double
+          description: Personal identification number
+        legal_status:
+          type: string
+          description: Legal status (required only when type is INDIVIDUAL)
+        tax_residence:
+          type: string
+          description: Tax residence country code
+        entity_tax_residence:
+          type: string
+          description: Entity tax residence (only applicable for company type)
+      required:
+      - zip
+      - city
+      - phone
+      - street
+      - citizen
+      - personal_id
+      title: WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyPersonal
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

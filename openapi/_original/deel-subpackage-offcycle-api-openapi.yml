@@ -1,0 +1,419 @@
+# x-archived-from: deel-subpackage-offcycle-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Off Cycle API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_offCycle
+paths:
+  /contracts/{contract_id}/off-cycle-payments:
+    post:
+      operationId: create-contract-off-cycle-payment
+      summary: Add off-cycle payment
+      description: "Add a new invoice line-item for the purpose of an off-cycle payment associated with a specific contract. This is typically used for exceptional payments outside the regular payment schedule.\n **Token scopes**: `off-cycle-payments:write`"
+      tags:
+      - subpackage_offCycle
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier (ID) of the Deel contract for which the off-cycle payment is being created.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: The off-cycle payment was successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/off-cycle_createContractOffCyclePayment_Response_201'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Details of the off-cycle payment to be created.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsPostRequestBodyContentApplicationJsonSchemaData'
+    get:
+      operationId: get-contract-off-cycle-payments
+      summary: List of off-cycle payments
+      description: "Retrieve a list of off-cycle payments for the specified contract ID. Off-cycle payments are payments made outside the regular payment schedule, often for exceptional or one-time expenses.\n **Token scopes**: `off-cycle-payments:read`"
+      tags:
+      - subpackage_offCycle
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier (ID) of the Deel contract for which to retrieve off-cycle payments.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful retrieval of off-cycle payments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/off-cycle_getContractOffCyclePayments_Response_200'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /contracts/{contract_id}/off-cycle-payments/{id}:
+    get:
+      operationId: get-contract-off-cycle-payment-by-id
+      summary: Retrieve a single off-cycle payment
+      description: "Retrieve a single off-cycle payment.\n **Token scopes**: `off-cycle-payments:read`"
+      tags:
+      - subpackage_offCycle
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: Deel off-cycle payment id.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/off-cycle_getContractOffCyclePaymentById_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    off-cycle_getContractOffCyclePayments_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: off-cycle_getContractOffCyclePayments_Response_200
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdOffCyclePaymentsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+          description: The amount of the off-cycle payment.
+        description:
+          type: string
+          description: A description or reason for the off-cycle payment.
+        date_submitted:
+          type: string
+          format: date
+          description: The date the off-cycle payment is submitted, in ISO-8601 format (YYYY-MM-DD).
+        is_auto_approved:
+          type: boolean
+          description: If true, the off-cycle payment will be automatically approved as part of the request.
+        hourly_report_preset_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Id of an existing preset.
+      required:
+      - amount
+      - description
+      - date_submitted
+      title: ContractsContractIdOffCyclePaymentsPostRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdOffCyclePaymentsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the created off-cycle payment.
+        created:
+          type: boolean
+          description: Indicates whether the off-cycle payment was successfully created.
+      required:
+      - created
+      title: ContractsContractIdOffCyclePaymentsPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the off-cycle payment.
+        amount:
+          type: string
+          description: The amount of the off-cycle payment.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          - type: 'null'
+          description: The current status of the off-cycle payment.
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the off-cycle payment was created.
+        description:
+          type: string
+          description: A description or reason for the off-cycle payment.
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy'
+          description: Details of the person who reported the off-cycle payment.
+        currency_code:
+          type: string
+          description: The three-letter ISO currency code for the payment amount.
+        date_submitted:
+          type: string
+          format: date-time
+          description: The timestamp when the off-cycle payment was submitted.
+      required:
+      - id
+      - amount
+      - status
+      - created_at
+      - description
+      - reported_by
+      - currency_code
+      - date_submitted
+      title: ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItems
+    ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: The current status of the off-cycle payment.
+      title: ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the reporter.
+        full_name:
+          type: string
+          description: Full name of the person who reported the payment.
+      required:
+      - id
+      title: ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy
+    ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the reporter.
+        full_name:
+          type: string
+          description: Full name of the individual who reported the payment.
+      required:
+      - id
+      description: Details of the person who reported the off-cycle payment.
+      title: ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    off-cycle_getContractOffCyclePaymentById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: off-cycle_getContractOffCyclePaymentById_Response_200
+    off-cycle_createContractOffCyclePayment_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: off-cycle_createContractOffCyclePayment_Response_201
+    ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the off-cycle payment.
+        amount:
+          type: string
+          description: Amount of the off-cycle payment.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: Current status of the off-cycle payment.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the off-cycle payment was created.
+        description:
+          type: string
+          description: Description of the off-cycle payment.
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy'
+        currency_code:
+          type: string
+          description: ISO 4217 currency code of the payment.
+        date_submitted:
+          type: string
+          format: date-time
+          description: Timestamp of when the payment was submitted.
+      required:
+      - id
+      - amount
+      - status
+      - created_at
+      - description
+      - reported_by
+      - currency_code
+      - date_submitted
+      title: ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaData
+    ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Current status of the off-cycle payment.
+      title: ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataStatus
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

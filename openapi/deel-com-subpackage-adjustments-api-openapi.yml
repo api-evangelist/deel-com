@@ -1,0 +1,955 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Adjustments API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_adjustments
+paths:
+  /adjustments:
+    post:
+      operationId: create-contract-adjustment
+      summary: Create a new adjustment
+      description: 'Generates a new adjustment entry attributed to a specific worker
+
+        **Token scopes**: `adjustments:write`'
+      tags:
+      - subpackage_adjustments
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_createContractAdjustment_Response_201'
+        '400':
+          description: Bad Request – failed to create adjustments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateANewAdjustment-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Creation data for a new adjustment
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File of adjustment.
+                title:
+                  type: string
+                  description: Title of adjustment.
+                amount:
+                  $ref: '#/components/schemas/AdjustmentsPostRequestBodyContentMultipartFormDataSchemaAmount'
+                  description: Amount of adjustment.
+                vendor:
+                  type: string
+                  description: Vendor of adjustment.
+                country:
+                  type: string
+                  description: Country code.
+                contract_id:
+                  type: string
+                  description: The identifier of the contract associated with the adjustment
+                description:
+                  type: string
+                  description: Description of adjustment.
+                cycle_reference:
+                  type: string
+                  description: Cycle reference of adjustment.
+                move_next_cycle:
+                  type:
+                  - boolean
+                  - 'null'
+                  description: If an adjustments can belong to another payroll cycle.
+                date_of_adjustment:
+                  type:
+                  - string
+                  - 'null'
+                  format: date
+                  description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+                adjustment_category_id:
+                  type: string
+                  description: Adjustment category id.
+              required:
+              - file
+              - title
+              - amount
+              - vendor
+              - country
+              - contract_id
+              - description
+              - adjustment_category_id
+  /adjustments/{id}:
+    delete:
+      operationId: delete-contract-adjustment
+      summary: Delete an adjustment
+      description: 'Delete an adjustment.
+
+        **Token scopes**: `adjustments:write`'
+      tags:
+      - subpackage_adjustments
+      parameters:
+      - name: id
+        in: path
+        description: Deel adjustment id.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_deleteContractAdjustment_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    get:
+      operationId: get-contract-adjustment
+      summary: Retrieve an adjustment
+      description: 'Use this endpoint to retrieve details of a specific adjustment by its id. You can view its amount, status, dates, and related contract_id
+
+        **Token scopes**: `adjustments:read`'
+      tags:
+      - subpackage_adjustments
+      parameters:
+      - name: id
+        in: path
+        description: Deel adjustment id.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_getContractAdjustment_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnAdjustmentRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    patch:
+      operationId: update-contract-adjustment
+      summary: Update an adjustment
+      description: 'Update an adjustment.
+
+        **Token scopes**: `adjustments:write`'
+      tags:
+      - subpackage_adjustments
+      parameters:
+      - name: id
+        in: path
+        description: Deel adjustment id.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_updateContractAdjustment_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Adjustment object that needs to be updated
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaData'
+                  description: Details of adjustment to update
+              required:
+              - data
+  /contracts/{contract_id}/adjustments:
+    get:
+      operationId: get-contract-adjustments
+      summary: Retrieve adjustments
+      description: 'Get all adjustments for the specific contract.
+
+        **Token scopes**: `adjustments:read`'
+      tags:
+      - subpackage_adjustments
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel adjustment id.
+        required: true
+        schema:
+          type: string
+      - name: from
+        in: query
+        description: Filter adjustments by start date.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        description: Filter adjustments by end date.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_getContractAdjustments_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdjustmentsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /adjustments/categories:
+    get:
+      operationId: get-adjustment-categories
+      summary: Retrieve categories
+      description: 'Get all categories for your organization.
+
+        **Token scopes**: `adjustments:read`'
+      tags:
+      - subpackage_adjustments
+      parameters:
+      - name: contract_types
+        in: query
+        description: array of contract types to filter categories
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdjustmentsCategoriesGetParametersContractTypesSchemaItems'
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_getAdjustmentCategories_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    RetrieveAdjustmentsRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveAdjustmentsRequestBadRequestError
+    AdjustmentsPostRequestBodyContentMultipartFormDataSchemaAmount:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Amount of adjustment.
+      title: AdjustmentsPostRequestBodyContentMultipartFormDataSchemaAmount
+    CreateANewAdjustment-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateANewAdjustment-v2026-01-01RequestBadRequestError
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: You must have access to the contract sent
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    AdjustmentsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the adjustment
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataFile'
+          - type: 'null'
+          description: '''Adjustment attachement'
+        title:
+          type: string
+          description: The title of the adjustment
+        amount:
+          type: string
+          description: The amount of the adjustment
+        status:
+          $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: The status of the adjustments
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was last updated
+        contract_id:
+          type: string
+          description: The identifier of the contract associated with the adjustment
+        description:
+          type: string
+          description: The description of the adjustment
+        cycle_reference:
+          type:
+          - string
+          - 'null'
+          description: The reference to the cycle associated with the adjustment
+        move_next_cycle:
+          type: boolean
+          description: If an adjustments can belong to another payroll cycle
+        date_of_adjustment:
+          type: string
+          format: date-time
+          description: The date of the adjustment
+        actual_end_cycle_date:
+          type: string
+          description: The date of the actual end cycle date
+        adjustment_category_id:
+          type: string
+          description: The identifier of the adjustment category associated with the adjustment
+        actual_start_cycle_date:
+          type: string
+          description: The date of the actual start cycle date
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaData
+    adjustments_getAdjustmentCategories_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdjustmentsCategoriesGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: adjustments_getAdjustmentCategories_Response_200
+    AdjustmentsIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        updated:
+          type: boolean
+      required:
+      - updated
+      title: AdjustmentsIdPatchResponsesContentApplicationJsonSchemaData
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0:
+      type: string
+      enum:
+      - OPEN
+      - PENDING_APPROVAL
+      - OVERWRITTEN
+      - FAILED
+      - SUCCESS
+      - AI_CHECK_IN_PROGRESS
+      description: Adjustment status (when contract type is GP)
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    RetrieveAnAdjustmentRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveAnAdjustmentRequestBadRequestError
+    AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaData:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: File of adjustment.
+        title:
+          type: string
+          description: Title of adjustment.
+        amount:
+          $ref: '#/components/schemas/AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount'
+          description: Amount of adjustment.
+        description:
+          type: string
+          description: Description of adjustment.
+      description: Details of adjustment to update
+      title: AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaData
+    adjustments_createContractAdjustment_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: adjustments_createContractAdjustment_Response_201
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1:
+      type: string
+      enum:
+      - DRAFT
+      - PENDING
+      - ERRORS_FOUND
+      - APPROVED
+      - DENIED
+      - DISBURSE_SCHEDULED
+      - REIMBURSED
+      - UNDER_REVIEW
+      - PENDING_DEEL_REVIEW
+      description: Adjustment status (when contract type is EOR)
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - open
+      - pending_approval
+      - overwritten
+      - failed
+      - success
+      - DRAFT
+      - PENDING
+      - APPROVED
+      - DENIED
+      - DISBURSE_SCHEDULED
+      - REIMBURSED
+      - UNDER_REVIEW
+      - ERRORS_FOUND
+      - PENDING_DEEL_REVIEW
+      - AI_CHECK_IN_PROGRESS
+      description: Adjustment status
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus
+    adjustments_getContractAdjustments_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: adjustments_getContractAdjustments_Response_200
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: You must have access to the contract sent
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems
+    adjustments_getContractAdjustment_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AdjustmentsIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: adjustments_getContractAdjustment_Response_200
+    adjustments_deleteContractAdjustment_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: adjustments_deleteContractAdjustment_Response_200
+    AdjustmentsCategoriesGetParametersContractTypesSchemaItems:
+      type: string
+      enum:
+      - peo
+      - global_payroll
+      - hris_direct_employee
+      - eor
+      - employee
+      - independent_contractor
+      title: AdjustmentsCategoriesGetParametersContractTypesSchemaItems
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - open
+      - pending_approval
+      - overwritten
+      - failed
+      - success
+      - DRAFT
+      - PENDING
+      - APPROVED
+      - DENIED
+      - DISBURSE_SCHEDULED
+      - REIMBURSED
+      - UNDER_REVIEW
+      - ERRORS_FOUND
+      - PENDING_DEEL_REVIEW
+      - AI_CHECK_IN_PROGRESS
+      description: Adjustment status
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Amount of adjustment.
+      title: AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the adjustment
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile'
+          - type: 'null'
+          description: Info for the attachment of adjustment
+        title:
+          type: string
+          description: The title of the adjustment
+        amount:
+          type: string
+          description: The amount of the adjustment
+        status:
+          $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Adjustment status
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was last updated
+        contract_id:
+          type: string
+          description: The identifier of the contract associated with the adjustment
+        description:
+          type: string
+          description: The description of the adjustment
+        cycle_reference:
+          type:
+          - string
+          - 'null'
+          description: The reference to the cycle associated with the adjustment
+        move_next_cycle:
+          type: boolean
+          description: If an adjustments can belong to another payroll cycle
+        date_of_adjustment:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date of the adjustment
+        actual_end_cycle_date:
+          type: string
+          description: The date of the actual end cycle date
+        adjustment_category_id:
+          type: string
+          description: The identifier of the adjustment category associated with the adjustment
+        actual_start_cycle_date:
+          type: string
+          description: The date of the actual start cycle date
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus:
+      oneOf:
+      - $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0'
+      - $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1'
+      description: The status of the adjustments
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the adjustment
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataFile'
+          - type: 'null'
+          description: Info about the attachment of adjustment
+        title:
+          type: string
+          description: The title of the adjustment
+        amount:
+          type: string
+          description: The amount of the adjustment
+        status:
+          $ref: '#/components/schemas/AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Adjustment status
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was last updated
+        contract_id:
+          type: string
+          description: The identifier of the contract associated with the adjustment
+        description:
+          type: string
+          description: The description of the adjustment
+        cycle_reference:
+          type:
+          - string
+          - 'null'
+          description: The reference to the cycle associated with the adjustment
+        move_next_cycle:
+          type: boolean
+          description: If an adjustments can belong to another payroll cycle
+        date_of_adjustment:
+          type: string
+          format: date-time
+          description: The date of the adjustment
+        actual_end_cycle_date:
+          type: string
+          description: The date of the actual end cycle date
+        adjustment_category_id:
+          type: string
+          description: The identifier of the adjustment category associated with the adjustment
+        actual_start_cycle_date:
+          type: string
+          description: The date of the actual start cycle date
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaData
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        fileType:
+          type: string
+          description: The type of the file
+      description: '''Adjustment attachement'
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataFile
+    AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms the deletion.
+      required:
+      - deleted
+      title: AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        fileType:
+          type: string
+          description: The type of the file
+      description: Info about the attachment of adjustment
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataFile
+    AdjustmentsCategoriesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of an adjustment category.
+        name:
+          type: string
+          description: The name of the adjustment category.
+        label:
+          type: string
+          description: The label of the adjustment category.
+        unit_type:
+          type: string
+          description: The unit type of the adjustment category.
+      title: AdjustmentsCategoriesGetResponsesContentApplicationJsonSchemaDataItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    adjustments_updateContractAdjustment_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AdjustmentsIdPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: adjustments_updateContractAdjustment_Response_200
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        fileType:
+          type: string
+          description: The type of the file
+      description: Info for the attachment of adjustment
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

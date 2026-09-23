@@ -1,0 +1,609 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Contractor Amendments API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_contractorAmendments
+paths:
+  /contracts/{contract_id}/amendments:
+    post:
+      operationId: create-contract-amendment
+      summary: Amend contract
+      description: 'Amend the details of a contract. Please note that if the contract is already signed or active, then the update will have to be approved and re-signed for to take effect.
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - subpackage_contractorAmendments
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/contractor-amendments_createContractAmendment_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Contract object that needs to be amended
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: You can specify any combination of data points that need changing.
+              required:
+              - data
+    get:
+      operationId: get-contract-amendments
+      summary: List contract amendments
+      description: 'Retrieve amendments of a contract
+
+        **Token scopes**: `contracts:read`, `contracts:write`'
+      tags:
+      - subpackage_contractorAmendments
+      parameters:
+      - name: contract_id
+        in: path
+        description: Unique identifier of the contract
+        required: true
+        schema:
+          type: string
+      - name: statuses
+        in: query
+        description: Filter by work statement status.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsGetParametersStatusesSchemaItems'
+      - name: sign_statuses
+        in: query
+        description: Filter by work statement sign status.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsGetParametersSignStatusesSchemaItems'
+      - name: limit
+        in: query
+        description: Maximum number of work statements to return.
+        required: false
+        schema:
+          type: integer
+          default: 20
+      - name: cursor
+        in: query
+        description: Cursor for pagination.
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/contractor-amendments_getContractAmendments_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListContractAmendments-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListContractAmendments-v2026-01-01RequestInternalServerError'
+components:
+  schemas:
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataPaymentDueType:
+      type: string
+      enum:
+      - REGULAR
+      - WITHIN_MONTH
+      default: REGULAR
+      description: Type of payment due. If the payment is due on the last day of month, enter 'WITHIN_MONTH'.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataPaymentDueType
+    ListContractAmendments-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListContractAmendments-v2026-01-01RequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataSeniorityId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataSeniorityId
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsScale:
+      type: string
+      enum:
+      - hourly
+      - daily
+      - weekly
+      - monthly
+      - biweekly
+      - semimonthly
+      - custom
+      description: Payment frequency/scale that defines how often the rate is paid.
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsScale
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - INITIAL
+      - PENDING
+      - ACTIVE
+      - OUTDATED
+      - APPROVED
+      - DECLINED
+      description: Current status of the work statement.
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ContractsContractIdAmendmentsGetParametersSignStatusesSchemaItems:
+      type: string
+      enum:
+      - PENDING
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - DECLINED
+      title: ContractsContractIdAmendmentsGetParametersSignStatusesSchemaItems
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataJobTitleId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataJobTitleId
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataFrequency:
+      type: string
+      enum:
+      - weekly
+      - monthly
+      - biweekly
+      - semimonthly
+      - calendar-month
+      description: Scale of the invoice cycle.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataFrequency
+    ContractsContractIdAmendmentsGetParametersStatusesSchemaItems:
+      type: string
+      enum:
+      - INITIAL
+      - PENDING
+      - ACTIVE
+      - OUTDATED
+      - APPROVED
+      - DECLINED
+      title: ContractsContractIdAmendmentsGetParametersStatusesSchemaItems
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsSignStatus:
+      type: string
+      enum:
+      - PENDING
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - DECLINED
+      description: Current sign status of the work statement.
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsSignStatus
+    contractor-amendments_createContractAmendment_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: contractor-amendments_createContractAmendment_Response_201
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataScale:
+      type: string
+      enum:
+      - hourly
+      - daily
+      - weekly
+      - monthly
+      - biweekly
+      - semimonthly
+      - custom
+      description: Defines the scale at which the amount is paid. For example, enter 'hourly' to define the amount per hour. This field can be excluded when creating a Pay-as-you-go task-based or Milestone contracts.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataScale
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - initial
+      - pending
+      - active
+      - outdated
+      - approved
+      - declined
+      description: Status of the amended work statement.
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataStatus
+    contractor-amendments_getContractAmendments_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of work statements (amendments).
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page of results.
+        has_more:
+          type: boolean
+          description: Indicates if there are more work statements available.
+        total_count:
+          type: integer
+          description: Total number of work statements matching the filters.
+      required:
+      - data
+      - cursor
+      - has_more
+      - total_count
+      title: contractor-amendments_getContractAmendments_Response_200
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        scale:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataScale'
+          description: Defines the scale at which the amount is paid. For example, enter 'hourly' to define the amount per hour. This field can be excluded when creating a Pay-as-you-go task-based or Milestone contracts.
+        amount:
+          type: number
+          format: double
+          description: Amount to be paid per scale.
+        cycle_end:
+          type: number
+          format: double
+          description: Day of the month when the cycle ends.
+        frequency:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataFrequency'
+          description: Scale of the invoice cycle.
+        start_date:
+          type: string
+          format: date
+          description: The contract start date in ISO-8601 format (YYYY-MM-DD). Updates the contract's effective date.
+        job_title_id:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataJobTitleId'
+        seniority_id:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataSeniorityId'
+        currency_code:
+          type: string
+          description: Currency code in ISO 4217 format.
+        first_payment:
+          type: number
+          format: double
+          description: Amount to be paid as the first payment.
+        scope_of_work:
+          type: string
+          description: Text to describe the scope of work of the contract.
+        cycle_end_type:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataCycleEndType'
+          description: Cycle end can be weekly 1-7 (Monday = 1) or monthly 1-31.
+        effective_date:
+          type: string
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        job_title_name:
+          type: string
+          description: You can enter new job title.
+        special_clause:
+          type: string
+          description: Text to describe any special clause in contract.
+        payment_due_days:
+          type: number
+          format: double
+          description: Number of days after the invoice is sent that the payment is due.
+        payment_due_type:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataPaymentDueType'
+          description: Type of payment due. If the payment is due on the last day of month, enter 'WITHIN_MONTH'.
+        first_payment_date:
+          type: string
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        pay_before_weekends:
+          type: boolean
+          description: If the payment due is on a weekend, pay on Friday.
+      description: You can specify any combination of data points that need changing.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the work statement.
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Compensation rate per scale. The amount paid according to the specified scale (e.g., 5000 per month).
+        scale:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsScale'
+          - type: 'null'
+          description: Payment frequency/scale that defines how often the rate is paid.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Current status of the work statement.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the work statement was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the work statement was last updated.
+        sign_status:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsSignStatus'
+          description: Current sign status of the work statement.
+        contract_name:
+          type:
+          - string
+          - 'null'
+          description: Name of the associated contract.
+        contract_type:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType'
+          - type: 'null'
+          description: Type of the associated IC contract.
+        currency_code:
+          type:
+          - string
+          - 'null'
+          description: Currency code in ISO 4217 format (e.g., USD, EUR, GBP).
+        effective_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Effective date when the work statement becomes active.
+      required:
+      - id
+      - status
+      - created_at
+      - updated_at
+      - sign_status
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItems
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the created amendment.
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Rate/amount for the amended work statement.
+        scale:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataScale'
+          - type: 'null'
+          description: Payment scale for the amended work statement.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Status of the amended work statement.
+        created:
+          type: boolean
+          description: Contract has been successfully amended.
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title for the amended work statement.
+        worker_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the worker.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the work statement was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the work statement was last updated.
+        currency_code:
+          type: string
+          description: Currency code for the amended work statement.
+        scope_of_work:
+          type:
+          - string
+          - 'null'
+          description: Scope of work for the amended work statement.
+        special_clause:
+          type:
+          - string
+          - 'null'
+          description: Special clause for the amended work statement.
+        termination_notice_days:
+          type: integer
+          description: Number of days notice required for termination. Defaults to 10 if not provided.
+      required:
+      - id
+      - status
+      - created
+      - worker_id
+      - created_at
+      - updated_at
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataCycleEndType:
+      type: string
+      enum:
+      - DAY_OF_WEEK
+      - DAY_OF_LAST_WEEK
+      - DAY_OF_MONTH
+      description: Cycle end can be weekly 1-7 (Monday = 1) or monthly 1-31.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataCycleEndType
+    ListContractAmendments-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListContractAmendments-v2026-01-01RequestInternalServerError
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType:
+      type: string
+      enum:
+      - milestones
+      - time_based
+      - ongoing_time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      description: Type of the associated IC contract.
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataScale:
+      type: string
+      enum:
+      - hourly
+      - daily
+      - weekly
+      - monthly
+      - biweekly
+      - semimonthly
+      - custom
+      description: Payment scale for the amended work statement.
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataScale
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

@@ -1,0 +1,119 @@
+# x-archived-from: deel-subpackage-serviceproviderconfig-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Service Provider Config API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_serviceProviderConfig
+paths:
+  /ServiceProviderConfig:
+    get:
+      operationId: get-service-provider-config
+      summary: Get service provider config
+      tags:
+      - subpackage_serviceProviderConfig
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceProviderConfig'
+components:
+  schemas:
+    BulkSupported:
+      type: object
+      properties:
+        maxOperations:
+          type: integer
+        maxPayloadSize:
+          type: integer
+        supported:
+          type: boolean
+          default: false
+      title: BulkSupported
+    ServiceProviderConfigSchemasItems:
+      type: string
+      enum:
+      - urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig
+      title: ServiceProviderConfigSchemasItems
+    FilterSupported:
+      type: object
+      properties:
+        maxResults:
+          type: integer
+        supported:
+          type: boolean
+          default: false
+      title: FilterSupported
+    ServiceProviderConfig:
+      type: object
+      properties:
+        authenticationSchemes:
+          $ref: '#/components/schemas/AuthenticationSchemes'
+        bulk:
+          $ref: '#/components/schemas/BulkSupported'
+        changePassword:
+          $ref: '#/components/schemas/Supported'
+        etag:
+          $ref: '#/components/schemas/Supported'
+        filter:
+          $ref: '#/components/schemas/FilterSupported'
+        patch:
+          $ref: '#/components/schemas/Supported'
+        schemas:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceProviderConfigSchemasItems'
+        sort:
+          $ref: '#/components/schemas/Supported'
+        xmlDataFormat:
+          $ref: '#/components/schemas/Supported'
+      title: ServiceProviderConfig
+    AuthenticationScheme:
+      type: object
+      properties:
+        description:
+          type: string
+        documentationUrl:
+          type: string
+        name:
+          type: string
+        specUrl:
+          type: string
+      title: AuthenticationScheme
+    Supported:
+      type: object
+      properties:
+        supported:
+          type: boolean
+          default: false
+      title: Supported
+    AuthenticationSchemes:
+      type: object
+      properties:
+        authenticationSchemes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthenticationScheme'
+      title: AuthenticationSchemes
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

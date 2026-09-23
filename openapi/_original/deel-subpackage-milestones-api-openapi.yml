@@ -1,0 +1,603 @@
+# x-archived-from: deel-subpackage-milestones-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Milestones API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_milestones
+paths:
+  /contracts/{contract_id}/milestones:
+    post:
+      operationId: create-contract-milestone
+      summary: Create a Milestone
+      description: "Add a new milestone to a specific contract. Milestones represent distinct deliverables or phases in the contract and can include additional details such as attachments.\n **Token scopes**: `milestones:write`"
+      tags:
+      - subpackage_milestones
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the Deel contract where the milestone will be added.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Milestone created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/milestones_createContractMilestone_Response_201'
+        '400':
+          description: Invalid request. The input data did not meet the required validation rules.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMilestoneRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: The specified contract ID does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMilestoneRequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: The milestone object containing the required details to be added to the contract.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+    get:
+      operationId: get-contract-milestones
+      summary: Retrieve Milestones by Contract
+      description: "Retrieve a list of milestones associated with a specific contract. Each milestone includes details such as its title, amount, status, and relevant dates, along with information about the creator and reviewer.\n **Token scopes**: `milestones:read`"
+      tags:
+      - subpackage_milestones
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the Deel contract for which milestones are being retrieved.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A list of milestones for the specified contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/milestones_getContractMilestones_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /contracts/{contract_id}/milestones/{milestone_id}:
+    delete:
+      operationId: delete-contract-milestone
+      summary: Delete a Milestone
+      description: "Delete a specific milestone associated with a contract. This operation removes the milestone and its data permanently from the system.\n **Token scopes**: `milestones:write`"
+      tags:
+      - subpackage_milestones
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the Deel contract from which the milestone will be deleted.
+        required: true
+        schema:
+          type: string
+      - name: milestone_id
+        in: path
+        description: The unique identifier of the milestone that is to be deleted.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Milestone successfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/milestones_deleteContractMilestone_Response_200'
+        '400':
+          description: Invalid request. The provided contract or milestone ID is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteMilestoneByIdRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Contract or milestone not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteMilestoneByIdRequestNotFoundError'
+        '500':
+          description: Server error. Something went wrong while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteMilestoneByIdRequestInternalServerError'
+    get:
+      operationId: get-contract-milestone-by-id
+      summary: Retrieve a single milestone
+      description: "Retrieve a single milestone.\n **Token scopes**: `milestones:read`"
+      tags:
+      - subpackage_milestones
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: milestone_id
+        in: path
+        description: ID of milestone to return
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/milestones_getContractMilestoneById_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    milestones_deleteContractMilestone_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: milestones_deleteContractMilestone_Response_200
+    milestones_getContractMilestoneById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: milestones_getContractMilestoneById_Response_200
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataId'
+        title:
+          type: string
+          description: Title of milestone.
+        amount:
+          type: string
+          description: Amount to be paid for the milestone.
+        status:
+          type: string
+          description: Current status of milestone.
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+        description:
+          type: string
+          description: Description of milestone.
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedBy'
+          description: Milestone creator.
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedBy'
+          - type: 'null'
+          description: Reviewer's information.
+        approval_requested:
+          type: boolean
+          description: Indicates if the contractor has requested the approval for the milestone.
+      required:
+      - id
+      - title
+      - amount
+      - status
+      - created_at
+      - description
+      - reported_by
+      - reviewed_by
+      - approval_requested
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaData
+    DeleteMilestoneByIdRequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A general error message for internal server issues.
+      title: DeleteMilestoneByIdRequestInternalServerError
+    ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+          description: Indicates whether the milestone was successfully created.
+      required:
+      - created
+      title: ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaData
+    milestones_createContractMilestone_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: milestones_createContractMilestone_Response_201
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedById'
+        full_name:
+          type: string
+          description: Reviewer's full name.
+      required:
+      - id
+      description: Reviewer's information.
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedBy
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsId'
+        title:
+          type: string
+          description: The title of the milestone.
+        amount:
+          type: string
+          description: The amount to be paid for completing this milestone.
+        status:
+          type: string
+          description: The current status of the milestone, such as 'Pending Approval', 'Approved', or 'Completed'.
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The creation date of the milestone in ISO-8601 format.
+        description:
+          type: string
+          description: A detailed description of the milestone.
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedBy'
+          description: Information about the creator of the milestone.
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy'
+          - type: 'null'
+          description: Information about the person who reviewed the milestone.
+        approval_requested:
+          type: boolean
+          description: Indicates whether approval has been requested for the milestone.
+      required:
+      - id
+      - title
+      - amount
+      - status
+      - created_at
+      - description
+      - reported_by
+      - reviewed_by
+      - approval_requested
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItems
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsId
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedById'
+        full_name:
+          type: string
+          description: Reporter's full name.
+      required:
+      - id
+      description: Milestone creator.
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedBy
+    ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the milestone.
+        amount:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaDataAmount'
+        description:
+          type: string
+          description: A detailed description of the milestone.
+      required:
+      - title
+      - amount
+      - description
+      title: ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaData
+    CreateMilestoneRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A message indicating the contract was not found.
+      title: CreateMilestoneRequestNotFoundError
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataId
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedById
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedById
+    milestones_getContractMilestones_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: An array of milestone objects associated with the contract.
+      required:
+      - data
+      title: milestones_getContractMilestones_Response_200
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedById
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedById'
+        full_name:
+          type: string
+          description: The full name of the person who reported the milestone.
+      required:
+      - id
+      description: Information about the creator of the milestone.
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+    ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaDataAmount:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      title: ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaDataAmount
+    CreateMilestoneRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A detailed error message explaining the validation issue.
+      title: CreateMilestoneRequestBadRequestError
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms that the milestone was successfully deleted.
+      required:
+      - deleted
+      title: ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaData
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedById'
+        full_name:
+          type: string
+          description: The full name of the person who reviewed the milestone.
+      required:
+      - id
+      description: Information about the person who reviewed the milestone.
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedById
+    DeleteMilestoneByIdRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A message indicating that the specified contract or milestone does not exist.
+      title: DeleteMilestoneByIdRequestNotFoundError
+    DeleteMilestoneByIdRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A message indicating the provided contract or milestone ID is not valid.
+      title: DeleteMilestoneByIdRequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

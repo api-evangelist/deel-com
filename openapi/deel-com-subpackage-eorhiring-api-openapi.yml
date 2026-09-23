@@ -1,0 +1,1943 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Eor Hiring API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_eorHiring
+paths:
+  /eor/contract/{oid}/cancel:
+    post:
+      operationId: cancel-contract
+      summary: Cancel EOR Contract
+      description: 'Cancel EOR Contract
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - subpackage_eorHiring
+      parameters:
+      - name: oid
+        in: path
+        description: Contract oid
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Contract cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-hiring_cancelContract_Response_204'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelEorContractRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Contract not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelEorContractRequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Cancel EOR Contract
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorContractOidCancelPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /eor/contract/{oid}/delay-onboarding:
+    patch:
+      operationId: delay-onboarding
+      summary: Delay EOR employee onboarding
+      description: 'Delay EOR employee onboarding
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - subpackage_eorHiring
+      parameters:
+      - name: oid
+        in: path
+        description: Contract oid
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Employee onboarding delay status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-hiring_delayOnboarding_Response_200'
+        '400':
+          description: Bad Request - Contract not found or invalid status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DelayEorEmployeeOnboardingRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Indicates if the employee onboarding is delayed
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorContractOidDelayOnboardingPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /forms/eor/create-contract/{country_code}:
+    get:
+      operationId: get-create-contract-form
+      summary: Fetch EOR Contract form
+      description: 'Returns a formulary for creating EOR Contracts
+
+        **Token scopes**: `forms:read`'
+      tags:
+      - subpackage_eorHiring
+      parameters:
+      - name: country_code
+        in: path
+        description: Two-letter country code in ISO 3166-1 alpha-2 format
+        required: true
+        schema:
+          type: string
+      - name: state
+        in: query
+        description: The selected state code of the contract. This is only required for countries that specify it.
+        required: false
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: The selected start date of the contract in ISO 8601 formatted date string.
+        required: false
+        schema:
+          type: string
+      - name: work_hours_per_week
+        in: query
+        description: The selected number of work hours per week.
+        required: false
+        schema:
+          type: integer
+      - name: contract_duration_in_days
+        in: query
+        description: The contract duration in days for definite contracts.
+        required: false
+        schema:
+          type: integer
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response containing form configuration data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-hiring_getCreateContractForm_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchEorContractFormRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /eor/start-date:
+    get:
+      operationId: get-start-date
+      summary: Fetch Start Date for EOR Contracts
+      description: 'Returns the earliest allowed start date for a new EOR contract quote based on employment parameters.
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - subpackage_eorHiring
+      parameters:
+      - name: employment_country
+        in: query
+        description: Employment country in ISO 3166-1 alpha-2 format
+        required: true
+        schema:
+          type: string
+      - name: employee_nationality
+        in: query
+        description: Employee nationality in ISO 3166-1 alpha-2 format
+        required: false
+        schema:
+          type: string
+      - name: work_visa
+        in: query
+        description: Whether a work visa is required
+        required: false
+        schema:
+          type: boolean
+      - name: team_id
+        in: query
+        description: Team ID
+        required: true
+        schema:
+          type: string
+      - name: legal_entity_id
+        in: query
+        description: Legal entity ID
+        required: false
+        schema:
+          type: string
+      - name: employment_state
+        in: query
+        description: State or province of employment
+        required: false
+        schema:
+          type: string
+      - name: special_job_id
+        in: query
+        description: Special job ID (if applicable)
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Start date details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-hiring_getStartDate_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchStartDateForEorContractsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /eor/additional-costs/{country}:
+    get:
+      operationId: get-additional-costs
+      summary: Get EOR Additional Costs
+      description: 'Retrieve all additional costs to eor quote flow by country
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - subpackage_eorHiring
+      parameters:
+      - name: country
+        in: path
+        description: The two-letter ISO code of the country for which to retrieve the EOR additional costs.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-hiring_getAdditionalCosts_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEorAdditionalCostsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /eor/benefits:
+    get:
+      operationId: get-benefits
+      summary: Retrieve Benefits by Country
+      description: 'Retrieves list of benefits available in a specific country based work visa requirement, work hours, employment type, team, and legal entity.
+
+        **Token scopes**: `benefits:read`'
+      tags:
+      - subpackage_eorHiring
+      parameters:
+      - name: country_code
+        in: query
+        description: Country code.
+        required: true
+        schema:
+          type: string
+      - name: work_visa
+        in: query
+        description: Indicates if work visa is required.
+        required: true
+        schema:
+          type: boolean
+      - name: work_hours_per_week
+        in: query
+        description: Working hours per week
+        required: true
+        schema:
+          type: number
+          format: double
+      - name: employment_type
+        in: query
+        description: Type of employment
+        required: true
+        schema:
+          $ref: '#/components/schemas/EorBenefitsGetParametersEmploymentType'
+      - name: team_id
+        in: query
+        description: The ID of the team the worker belongs to.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: legal_entity_id
+        in: query
+        description: The ID of the legal entity.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-hiring_getBenefits_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveBenefitsByCountryRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /eor/validations/{country_code}:
+    get:
+      operationId: get-eor-hiring-guide-by-country
+      summary: Retrieve detailed hiring guide for a country
+      description: 'Retrieve comprehensive hiring guide data for a specific country. This data can be used in creation and validation of Employee of Record (EOR) contract quotes, providing details on salaries, holidays, insurance, and other employment specifics.
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - subpackage_eorHiring
+      parameters:
+      - name: country_code
+        in: path
+        description: The two-letter ISO code of the country for which to retrieve the hiring guide.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The hiring guide data was successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-hiring_getEORHiringGuideByCountry_Response_200'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /eor/contracts/{contract_id}/documents/{type}/sign:
+    post:
+      operationId: sign-contract-document
+      summary: Sign EOR contract document
+      description: 'Signs a document with the provided signature and title
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - subpackage_eorHiring
+      parameters:
+      - name: contract_id
+        in: path
+        description: EOR contract ID
+        required: true
+        schema:
+          type: string
+      - name: type
+        in: path
+        description: The type of document. Currently only FRAMEWORK_AGREEMENT is supported.
+        required: true
+        schema:
+          $ref: '#/components/schemas/EorContractsContractIdDocumentsTypeSignPostParametersType'
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The document has been signed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-hiring_signContractDocument_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignEorContractDocumentRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorContractsContractIdDocumentsTypeSignPostRequestBodyContentApplicationJsonSchemaData'
+  /eor/contracts/{contract_id}/employee-information:
+    patch:
+      operationId: update-contract-employee-information
+      summary: Update Employee Information for EOR Contract
+      description: 'Updates employee information related to an EOR Contract. This endpoint supports partial updates. Attempting to update any undocumented fields will result in a validation error. This endpoint will only work for contracts with status `new`, `under_review`, `waiting_for_client_sign`, `waiting_for_eor_sign`, `waiting_for_employee_contract`, `waiting_for_employee_sign`, `awaiting_deposit_payment`, or `rejected`.
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - subpackage_eorHiring
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Employee information updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-hiring_updateContractEmployeeInformation_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEmployeeInformationForEorContractRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Contract not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEmployeeInformationForEorContractRequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEmployeeInformationForEorContractRequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorContractsContractIdEmployeeInformationPatchRequestBodyContentApplicationJsonSchemaData'
+components:
+  schemas:
+    EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsContributionOptionsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique ID of the contribution.
+        amount:
+          type: number
+          format: double
+          description: Amount.
+      required:
+      - id
+      - amount
+      title: EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsContributionOptionsItems
+    EorStartDateGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: EorStartDateGetResponsesContentApplicationJsonSchemaErrorsItems
+    EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaErrorsItems
+    EorStartDateGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: EorStartDateGetResponsesContentApplicationJsonSchemaRequest
+    EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHoliday:
+      type: object
+      properties:
+        max:
+          type:
+          - string
+          - 'null'
+          description: Maximum holidays.
+        min:
+          type:
+          - string
+          - 'null'
+          description: Minimum holidays.
+        mostCommon:
+          type:
+          - string
+          - 'null'
+          description: Most common holiday period.
+      title: EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHoliday
+    ? FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsDefaultValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      description: Default value to pre-fill in the form.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsDefaultValue
+    EorContractsContractIdEmployeeInformationPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        employee_last_name:
+          type: string
+          description: The last name of the employee.
+        employee_first_name:
+          type: string
+          description: The first name of the employee.
+      title: EorContractsContractIdEmployeeInformationPatchRequestBodyContentApplicationJsonSchemaData
+    FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItems:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the form page.
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItems'
+          description: Sections within the page.
+      required:
+      - title
+      - sections
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItems
+    EorContractOidCancelPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        cancellation_reason:
+          $ref: '#/components/schemas/EorContractOidCancelPostRequestBodyContentApplicationJsonSchemaDataCancellationReason'
+          description: Reason for contract termination
+        cancellation_message:
+          type: string
+          description: Message for contract termination
+      required:
+      - cancellation_reason
+      title: EorContractOidCancelPostRequestBodyContentApplicationJsonSchemaData
+    eor-hiring_getCreateContractForm_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-hiring_getCreateContractForm_Response_200
+    EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataSalaryFrequency:
+      type: string
+      enum:
+      - monthly
+      - quarterly
+      - annually
+      - specific_month
+      - specific_date
+      description: Frequency of the salary payment.
+      title: EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataSalaryFrequency
+    RetrieveBenefitsByCountryRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorBenefitsGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/EorBenefitsGetResponsesContentApplicationJsonSchemaRequest'
+      title: RetrieveBenefitsByCountryRequestBadRequestError
+    EorBenefitsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the benefit.
+        providers:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItems'
+        description:
+          type: string
+          description: The description of the benefit.
+        is_mandatory:
+          type: boolean
+          description: Indicates if the benefit is mandatory.
+        is_discriminatory:
+          type: boolean
+          description: Indicates if the benefit is discriminatory.
+      required:
+      - name
+      - providers
+      - description
+      - is_mandatory
+      - is_discriminatory
+      title: EorBenefitsGetResponsesContentApplicationJsonSchemaDataItems
+    eor-hiring_cancelContract_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: eor-hiring_cancelContract_Response_204
+    eor-hiring_getStartDate_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorStartDateGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-hiring_getStartDate_Response_200
+    EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaRequest
+    ? FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsMaxValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Maximum value allowed.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsMaxValue
+    UpdateEmployeeInformationForEorContractRequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateEmployeeInformationForEorContractRequestNotFoundError
+    eor-hiring_delayOnboarding_Response_200:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Operation success status
+        contractOid:
+          type: string
+          description: Contract OID
+        is_employee_onboarding_delayed:
+          type: boolean
+          description: Current onboarding delay status
+      required:
+      - success
+      title: eor-hiring_delayOnboarding_Response_200
+    EorBenefitsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: EorBenefitsGetResponsesContentApplicationJsonSchemaErrorsItems
+    eor-hiring_getEORHiringGuideByCountry_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaData'
+      title: eor-hiring_getEORHiringGuideByCountry_Response_200
+    EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataSalary:
+      type: object
+      properties:
+        max:
+          type:
+          - string
+          - 'null'
+          description: Maximum salary.
+        min:
+          type:
+          - string
+          - 'null'
+          description: Minimum salary.
+        frequency:
+          $ref: '#/components/schemas/EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataSalaryFrequency'
+          description: Frequency of the salary payment.
+      title: EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataSalary
+    DelayEorEmployeeOnboardingRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+      required:
+      - error
+      title: DelayEorEmployeeOnboardingRequestBadRequestError
+    ? FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsOptionsItems
+    : type: object
+      properties:
+        title:
+          type: string
+          description: Display text for the option.
+        value:
+          type:
+          - string
+          - 'null'
+          description: Value associated with the option.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsOptionsItems
+    EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the employee contract.
+        status:
+          $ref: '#/components/schemas/EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current status of the contract
+        scope_of_work:
+          type: string
+          description: Scope of work description.
+        employee_last_name:
+          type: string
+          description: The last name of the contract employee.
+        employee_first_name:
+          type: string
+          description: The first name of the contract employee.
+      required:
+      - id
+      - status
+      title: EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaData
+    EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        allowances:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaDataAllowancesItems'
+        non_statutory:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaDataNonStatutoryItems'
+      title: EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaData
+    EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaDataNonStatutoryItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Allowance name.
+        value:
+          type: number
+          format: double
+          description: Allowance value.
+        currency:
+          type: string
+          description: Currency
+        description:
+          type: string
+          description: Allowance description.
+        is_recurring:
+          type: boolean
+          description: Indicates if the allowance is recurring.
+        rule_cost_id:
+          type: string
+          description: Unique identifier for the allowance.
+        use_contract_currency:
+          type: boolean
+          description: Indicates if the allowance uses the contract currency.
+      title: EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaDataNonStatutoryItems
+    EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        salary:
+          $ref: '#/components/schemas/EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataSalary'
+        holiday:
+          $ref: '#/components/schemas/EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHoliday'
+        currency:
+          type: string
+          description: Country currency.
+        probation:
+          $ref: '#/components/schemas/EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataProbation'
+        health_insurance:
+          oneOf:
+          - $ref: '#/components/schemas/EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHealthInsurance'
+          - type: 'null'
+      title: EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaData
+    EorStartDateGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        min_start_date:
+          type: string
+          format: date-time
+          description: The earliest possible employment start date
+        start_date_buffer:
+          type: integer
+          description: Number of business days to buffer from today
+        first_payroll_lock:
+          type: integer
+          description: Day of month when payroll gets locked
+        is_same_month_payment_country:
+          type: boolean
+          description: Whether the employment country requires start date within the same month
+      required:
+      - min_start_date
+      - start_date_buffer
+      - first_payroll_lock
+      - is_same_month_payment_country
+      title: EorStartDateGetResponsesContentApplicationJsonSchemaData
+    ? FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsSource
+    : type: object
+      properties:
+        url:
+          type: string
+          description: API endpoint providing dynamic options.
+        definition:
+          type: string
+          description: Reference URL for API documentation.
+        description:
+          type: string
+          description: Description of the data source.
+      description: Defines dynamic data source for the question.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsSource
+    UpdateEmployeeInformationForEorContractRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateEmployeeInformationForEorContractRequestBadRequestError
+    FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItems:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the section.
+        subtitle:
+          type: string
+          description: Additional information shown at the top of the section.
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItems'
+          description: List of questions within the section.
+      required:
+      - title
+      - questions
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItems
+    FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsMaxValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Maximum value allowed.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsMaxValue
+    EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsPlansItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ID of the plan.
+        name:
+          type: string
+          description: The name of the plan.
+        price:
+          type: number
+          format: double
+          description: The price of the plan.
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsPlansItemsAttachmentsItems'
+      required:
+      - id
+      - name
+      - price
+      - attachments
+      title: EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsPlansItems
+    EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaErrorsItems
+    FetchEorContractFormRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaRequest'
+      title: FetchEorContractFormRequestBadRequestError
+    ? FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItems
+    : type: object
+      properties:
+        title:
+          type: string
+          description: Title of the question.
+        source:
+          oneOf:
+          - $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsSource'
+          - type: 'null'
+          description: Defines dynamic data source for the question.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsOptionsItems'
+          description: List of selectable options for selection-type questions. Value may be of any type.
+        is_range:
+          type: boolean
+          description: Specifies whether a date picker allows range selection.
+        requires:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItems'
+          description: List of conditions that must be met for this rule to apply.
+        max_value:
+          $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsMaxValue'
+          description: Maximum value allowed.
+        min_value:
+          $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsMinValue'
+          description: Minimum value allowed.
+        max_length:
+          type:
+          - integer
+          - 'null'
+          description: Maximum character length for text responses.
+        min_length:
+          type:
+          - integer
+          - 'null'
+          description: Minimum character length for text responses.
+        helper_text:
+          type:
+          - string
+          - 'null'
+          description: Additional information to assist the user.
+        is_disabled:
+          type: boolean
+          description: If true, the field is disabled and cannot be edited.
+        is_required:
+          type: boolean
+          description: Indicates if the question is required.
+        number_type:
+          type: string
+          description: Used for number fields to define the unit or representation.
+        default_value:
+          $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsDefaultValue'
+          description: Default value to pre-fill in the form.
+        is_only_digits:
+          type: boolean
+          description: Restricts input to numeric characters only, for FreeText questions.
+        date_limitation:
+          type:
+          - string
+          - 'null'
+          description: Limits date selection (e.g., blocking past dates). Will always be 'BLOCK_PAST' for now.
+        is_multiple_selection:
+          type: boolean
+          description: Indicates if the user can select multiple values.
+        must_request_validation:
+          type: boolean
+          description: Whether additional validation should be triggered for this field.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItems
+    SignEorContractDocumentRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaRequest'
+      title: SignEorContractDocumentRequestBadRequestError
+    eor-hiring_getAdditionalCosts_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaData'
+      title: eor-hiring_getAdditionalCosts_Response_200
+    EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataProbation:
+      type: object
+      properties:
+        max:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Maximum probation period.
+        min:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Minimum probation period.
+      title: EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataProbation
+    FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems
+    EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        signature:
+          type:
+          - string
+          - 'null'
+          description: The signature of the client if the document is signed.
+        signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time the client signed the document if it is signed.
+        document_type:
+          $ref: '#/components/schemas/EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaDataDocumentType'
+          description: The type of document. Currently only FRAMEWORK_AGREEMENT is supported.
+        eor_signature:
+          type:
+          - string
+          - 'null'
+          description: The signature of the EOR if the document is signed.
+        eor_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time the EOR signed the document if it is signed.
+        client_job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title of the client if the document is signed.
+      required:
+      - document_type
+      title: EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaData
+    EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - new
+      - under_review
+      - waiting_for_client_sign
+      - waiting_for_eor_sign
+      - waiting_for_employee_contract
+      - waiting_for_employee_sign
+      - awaiting_deposit_payment
+      - rejected
+      description: Current status of the contract
+      title: EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaDataStatus
+    eor-hiring_getBenefits_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorBenefitsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: eor-hiring_getBenefits_Response_200
+    FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsMinValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Minimum value allowed.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsMinValue
+    EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID of the benefit provider.
+        name:
+          type: string
+          description: The name of the benefit provider.
+        type:
+          type: string
+          description: Benefit type.
+        plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsPlansItems'
+        country:
+          type: string
+          description: Country code.
+        currency:
+          type: string
+          description: Currency.
+        is_unisure:
+          type: boolean
+          description: Indicates if Unisure.
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsAttachmentsItems'
+        client_info:
+          type:
+          - string
+          - 'null'
+          description: Client information.
+        employee_info:
+          type:
+          - string
+          - 'null'
+          description: Employee information.
+        home_page_url:
+          type: string
+          description: The home page URL of the benefit provider.
+        max_contribution:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Maximum contribution.
+        min_contribution:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Minimum contribution.
+        contribution_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsContributionOptionsItems'
+      required:
+      - id
+      - name
+      - type
+      - plans
+      - country
+      - currency
+      - is_unisure
+      - attachments
+      - home_page_url
+      - contribution_options
+      title: EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItems
+    eor-hiring_signContractDocument_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-hiring_signContractDocument_Response_200
+    ? FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItemsValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      description: Expected value for the condition.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItemsValue
+    EorContractOidDelayOnboardingPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        is_employee_onboarding_delayed:
+          type: boolean
+          description: Indicates if the employee onboarding is delayed
+      required:
+      - is_employee_onboarding_delayed
+      title: EorContractOidDelayOnboardingPatchRequestBodyContentApplicationJsonSchemaData
+    FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Unique key identifier for the question.
+        type:
+          $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsType'
+          description: Type of the question.
+        rules:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItems'
+          description: Validation rules for the question.
+        title:
+          type: string
+          description: Title of the question.
+        source:
+          oneOf:
+          - $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsSource'
+          - type: 'null'
+          description: Defines dynamic data source for the question.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsOptionsItems'
+          description: List of selectable options for selection-type questions. Value may be of any type.
+        is_range:
+          type: boolean
+          description: Specifies whether a date picker allows range selection.
+        max_value:
+          $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsMaxValue'
+          description: Maximum value allowed.
+        min_value:
+          $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsMinValue'
+          description: Minimum value allowed.
+        max_length:
+          type:
+          - integer
+          - 'null'
+          description: Maximum character length for text responses.
+        min_length:
+          type:
+          - integer
+          - 'null'
+          description: Minimum character length for text responses.
+        helper_text:
+          type:
+          - string
+          - 'null'
+          description: Additional information to assist the user.
+        is_disabled:
+          type: boolean
+          description: If true, the field is disabled and cannot be edited.
+        is_required:
+          type: boolean
+          description: Indicates if the question is required.
+        number_type:
+          type: string
+          description: Used for number fields to define the unit or representation.
+        default_value:
+          $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsDefaultValue'
+          description: Default value to pre-fill in the form.
+        is_only_digits:
+          type: boolean
+          description: Restricts input to numeric characters only, for FreeText questions.
+        date_limitation:
+          type:
+          - string
+          - 'null'
+          description: Limits date selection (e.g., blocking past dates). Will always be 'BLOCK_PAST' for now.
+        is_multiple_selection:
+          type: boolean
+          description: Indicates if the user can select multiple values.
+        must_request_validation:
+          type: boolean
+          description: Whether additional validation should be triggered for this field.
+      required:
+      - key
+      - type
+      - title
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItems
+    EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsAttachmentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ID of the attachment.
+        url:
+          type: string
+          description: The url of the attachment.
+        label:
+          type: string
+          description: The label of the attachment.
+      required:
+      - id
+      - url
+      - label
+      title: EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsAttachmentsItems
+    EorContractsContractIdDocumentsTypeSignPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        signature:
+          type: string
+          description: The signature of the client signing the document.
+        client_job_title:
+          type: string
+          description: The job title of the client signing the document.
+      required:
+      - signature
+      - client_job_title
+      title: EorContractsContractIdDocumentsTypeSignPostRequestBodyContentApplicationJsonSchemaData
+    FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItems'
+          description: List of pages in the form.
+      required:
+      - pages
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaData
+    FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaRequest
+    FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsSource:
+      type: object
+      properties:
+        url:
+          type: string
+          description: API endpoint providing dynamic options.
+        definition:
+          type: string
+          description: Reference URL for API documentation.
+        description:
+          type: string
+          description: Description of the data source.
+      description: Defines dynamic data source for the question.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsSource
+    EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsPlansItemsAttachmentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ID of the attachment.
+        url:
+          type: string
+          description: The url of the attachment.
+        label:
+          type: string
+          description: The label of the attachment.
+      required:
+      - id
+      - url
+      - label
+      title: EorBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvidersItemsPlansItemsAttachmentsItems
+    EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaErrorsItems
+    EorContractOidCancelPostRequestBodyContentApplicationJsonSchemaDataCancellationReason:
+      type: string
+      enum:
+      - INTERNAL_DECISION
+      - UNSATISFACTORY_EXPERIENCE
+      - EXPLORING_ALTERNATIVE
+      - OFFER_CHANGES
+      description: Reason for contract termination
+      title: EorContractOidCancelPostRequestBodyContentApplicationJsonSchemaDataCancellationReason
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHealthInsuranceStatus:
+      type: string
+      enum:
+      - REQUIRED
+      - ENABLED
+      - DISABLED
+      description: Health insurance status.
+      title: EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHealthInsuranceStatus
+    GetEorAdditionalCostsRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaRequest'
+      title: GetEorAdditionalCostsRequestBadRequestError
+    EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHealthInsurance:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHealthInsuranceStatus'
+          description: Health insurance status.
+        providers:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHealthInsuranceProvidersItems'
+      title: EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHealthInsurance
+    EorContractsContractIdDocumentsTypeSignPostParametersType:
+      type: string
+      enum:
+      - FRAMEWORK_AGREEMENT
+      title: EorContractsContractIdDocumentsTypeSignPostParametersType
+    CancelEorContractRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message details
+      title: CancelEorContractRequestNotFoundError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ? FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsOptionsItems
+    : type: object
+      properties:
+        title:
+          type: string
+          description: Display text for the option.
+        value:
+          type:
+          - string
+          - 'null'
+          description: Value associated with the option.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsOptionsItems
+    eor-hiring_updateContractEmployeeInformation_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaData'
+      title: eor-hiring_updateContractEmployeeInformation_Response_200
+    CancelEorContractRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message details
+      title: CancelEorContractRequestBadRequestError
+    EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHealthInsuranceProvidersItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Provider ID.
+        name:
+          type: string
+          description: Provider name.
+      title: EorValidationsCountryCodeGetResponsesContentApplicationJsonSchemaDataHealthInsuranceProvidersItems
+    FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsType:
+      type: string
+      enum:
+      - FreeText
+      - Paragraph
+      - SingleSelection
+      - MultiSelection
+      - Address
+      - PhoneNumber
+      - DocumentUpload
+      - Number
+      - Dropdown
+      - DatePicker
+      - Email
+      - CustomDropdown
+      - PresetDropdown
+      - Nested
+      description: Type of the question.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsType
+    UpdateEmployeeInformationForEorContractRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdEmployeeInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateEmployeeInformationForEorContractRequestInternalServerError
+    EorBenefitsGetParametersEmploymentType:
+      type: string
+      enum:
+      - Full-time
+      - Part-time
+      title: EorBenefitsGetParametersEmploymentType
+    EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaDataDocumentType:
+      type: string
+      enum:
+      - FRAMEWORK_AGREEMENT
+      description: The type of document. Currently only FRAMEWORK_AGREEMENT is supported.
+      title: EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaDataDocumentType
+    EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaDataAllowancesItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Allowance name.
+        value:
+          type: number
+          format: double
+          description: Allowance value.
+        optional:
+          type: boolean
+          description: Indicates if the allowance is optional.
+        description:
+          type: string
+          description: Allowance description.
+        is_recurring:
+          type: boolean
+          description: Indicates if the allowance is recurring.
+        rule_cost_id:
+          type: string
+          description: Unique identifier for the allowance.
+        use_contract_currency:
+          type: boolean
+          description: Indicates if the allowance uses the contract currency.
+        skipping_confirmation_text:
+          type:
+          - string
+          - 'null'
+          description: Confirmation text for opting out of the allowance.
+      title: EorAdditionalCostsCountryGetResponsesContentApplicationJsonSchemaDataAllowancesItems
+    ? FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsMinValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Minimum value allowed.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsMinValue
+    EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: EorContractsContractIdDocumentsTypeSignPostResponsesContentApplicationJsonSchemaRequest
+    FetchStartDateForEorContractsRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorStartDateGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/EorStartDateGetResponsesContentApplicationJsonSchemaRequest'
+      title: FetchStartDateForEorContractsRequestBadRequestError
+    ? FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItems
+    : type: object
+      properties:
+        key:
+          type: string
+          description: Key of the dependent field.
+        value:
+          $ref: '#/components/schemas/FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItemsValue'
+          description: Expected value for the condition.
+        operator:
+          type:
+          - string
+          - 'null'
+          description: Comparison operator (e.g., 'eq', 'ne').
+        compare_key:
+          type:
+          - string
+          - 'null'
+          description: Key of the field to compare against.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsRequiresItems
+    EorBenefitsGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: EorBenefitsGetResponsesContentApplicationJsonSchemaRequest
+    ? FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsDefaultValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      description: Default value to pre-fill in the form.
+      title: FormsEorCreateContractCountryCodeGetResponsesContentApplicationJsonSchemaDataPagesItemsSectionsItemsQuestionsItemsRulesItemsDefaultValue
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

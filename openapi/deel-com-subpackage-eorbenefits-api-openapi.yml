@@ -1,0 +1,207 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Eor Benefits API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_eorBenefits
+paths:
+  /eor/{contract_id}/benefits:
+    get:
+      operationId: get-eor-benefits-by-contract-id
+      summary: Retrieve Benefits for EOR Contract
+      description: 'Fetch detailed information about benefits associated with a specific Employee of Record (EOR) contract. The benefits include plan details, provider information, and enrollment statuses.
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - subpackage_eorBenefits
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract ID.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved the list of EOR contract benefits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-benefits_getEORBenefitsByContractId_Response_200'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsOfferStatus:
+      type: string
+      enum:
+      - Offered
+      - Not offered
+      description: Indicates whether the benefit is offered.
+      title: EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsOfferStatus
+    EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetailsCurrentCycle:
+      type: object
+      properties:
+        monthly_cost:
+          type: string
+          description: The monthly cost of the current enrollment.
+        employee_monthly_contribution:
+          type: string
+          description: The employer's monthly contribution for the current enrollment.
+      title: EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetailsCurrentCycle
+    EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvider:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the benefit provider.
+      title: EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvider
+    EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetailsPlan:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the enrolled plan.
+      title: EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetailsPlan
+    EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ID of the benefit.
+        name:
+          type: string
+          description: The name of the benefit.
+        plan:
+          $ref: '#/components/schemas/EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsPlan'
+        provider:
+          $ref: '#/components/schemas/EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsProvider'
+        offer_status:
+          $ref: '#/components/schemas/EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsOfferStatus'
+          description: Indicates whether the benefit is offered.
+        enrollment_details:
+          $ref: '#/components/schemas/EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetails'
+      title: EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetailsStandard:
+      type: object
+      properties:
+        monthly_cost:
+          type:
+          - string
+          - 'null'
+          description: The standard monthly cost of the benefit.
+        employee_monthly_contribution:
+          type:
+          - string
+          - 'null'
+          description: The standard monthly employer contribution.
+      title: EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetailsStandard
+    EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsPlan:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the associated plan.
+      title: EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsPlan
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetails:
+      type: object
+      properties:
+        plan:
+          $ref: '#/components/schemas/EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetailsPlan'
+        status:
+          type: string
+          description: The current enrollment status of the benefit.
+        standard:
+          $ref: '#/components/schemas/EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetailsStandard'
+        current_cycle:
+          $ref: '#/components/schemas/EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetailsCurrentCycle'
+      title: EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItemsEnrollmentDetails
+    eor-benefits_getEORBenefitsByContractId_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractIdBenefitsGetResponsesContentApplicationJsonSchemaDataItems'
+      title: eor-benefits_getEORBenefitsByContractId_Response_200
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

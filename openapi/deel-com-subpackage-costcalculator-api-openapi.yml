@@ -1,0 +1,244 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Cost Calculator API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_costCalculator
+paths:
+  /eor/employment_cost:
+    post:
+      operationId: get-employment-cost
+      summary: Calculate Employee Costs Globally
+      description: Determine the total employment costs for an Employee of Record (EOR) arrangement across different countries, including salary, employer costs, benefits, and additional fees.
+      tags:
+      - subpackage_costCalculator
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully calculated employee costs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cost-calculator_getEmploymentCost_Response_200'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaData'
+components:
+  schemas:
+    EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaDataBenefitsItems:
+      type: object
+      properties:
+        plan_id:
+          type:
+          - string
+          - 'null'
+          description: The ID of the benefits plan, if applicable.
+        provider_id:
+          type: string
+          description: The ID of the benefits provider.
+      required:
+      - provider_id
+      title: EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaDataBenefitsItems
+    EorEmploymentCostPostResponsesContentApplicationJsonSchemaCostsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the cost item.
+        amount:
+          type: string
+          description: Cost amount.
+        country:
+          type: string
+          description: The country of the cost item.
+        frequency:
+          type: string
+          description: The frequency of the cost (e.g., monthly, annually).
+        country_code:
+          type: string
+          description: ISO Alpha-2 code of the country.
+      title: EorEmploymentCostPostResponsesContentApplicationJsonSchemaCostsItems
+    EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        state:
+          type: string
+          description: The state or region within the country, if applicable.
+        salary:
+          type: number
+          format: double
+          description: The base salary for the employee.
+        country:
+          type: string
+          description: The full name of the country where the employee is based.
+        benefits:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaDataBenefitsItems'
+          description: A list of selected benefit plans for the employee.
+        currency:
+          type: string
+          description: The currency in which the costs are calculated.
+        country_code:
+          type: string
+          description: The two-letter country code where the employee is based.
+      required:
+      - salary
+      - country
+      - currency
+      title: EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaData
+    cost-calculator_getEmploymentCost_Response_200:
+      type: object
+      properties:
+        costs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorEmploymentCostPostResponsesContentApplicationJsonSchemaCostsItems'
+        salary:
+          type: string
+          description: The base salary for the employee.
+        country:
+          type: string
+          description: The country where the employee is based.
+        currency:
+          type: string
+          description: The currency used for cost calculation.
+        deel_fee:
+          type: string
+          description: The Deel fee for managing the employee.
+        frequency:
+          type: string
+          description: Frequency of the salary payment (e.g., monthly).
+        total_costs:
+          type: string
+          description: Total employment costs.
+        country_code:
+          type: string
+          description: ISO Alpha-2 code of the country.
+        benefits_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorEmploymentCostPostResponsesContentApplicationJsonSchemaBenefitsDataItems'
+        employer_costs:
+          type: string
+          description: Costs incurred by the employer.
+        additional_data:
+          $ref: '#/components/schemas/EorEmploymentCostPostResponsesContentApplicationJsonSchemaAdditionalData'
+        severance_accural:
+          type: string
+          description: Severance accrual costs.
+      title: cost-calculator_getEmploymentCost_Response_200
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    EorEmploymentCostPostResponsesContentApplicationJsonSchemaBenefitsDataItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Benefit name.
+        plan:
+          type: string
+          description: Benefit plan.
+        amount:
+          type: string
+          description: Benefit cost.
+        fee_amount:
+          type: string
+          description: Fees associated with the benefit.
+      title: EorEmploymentCostPostResponsesContentApplicationJsonSchemaBenefitsDataItems
+    EorEmploymentCostPostResponsesContentApplicationJsonSchemaAdditionalData:
+      type: object
+      properties:
+        additional_notes:
+          type: array
+          items:
+            type: string
+      title: EorEmploymentCostPostResponsesContentApplicationJsonSchemaAdditionalData
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

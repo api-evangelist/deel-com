@@ -1,0 +1,388 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Organization Tasks API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_organizationTasks
+paths:
+  /organizations/tasks:
+    get:
+      operationId: list-organization-tasks-v-2026-03-03
+      summary: List organization tasks
+      description: 'Returns a paginated list of tasks for the current organization. Intended for client users with organization.manage permission (Example: org admins). Use this to see all tasks for the organization, not only those assigned to the caller. Supports filtering by status, category, search, and external ID, and either offset/limit or cursor-based pagination.
+
+        **Token scopes**: `tasks:read`'
+      tags:
+      - subpackage_organizationTasks
+      parameters:
+      - name: statuses
+        in: query
+        description: Filter by task statuses.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetParametersStatusesSchemaItems'
+      - name: category
+        in: query
+        description: Filter by task category.
+        required: false
+        schema:
+          $ref: '#/components/schemas/OrganizationsTasksGetParametersCategory'
+      - name: search
+        in: query
+        description: Search string for task display name or description.
+        required: false
+        schema:
+          type: string
+      - name: external_id
+        in: query
+        description: Filter by external ID (for tasks created with an external reference).
+        required: false
+        schema:
+          type: string
+      - name: cursor
+        in: query
+        description: Opaque cursor for cursor-based pagination. When provided, use with limit only (do not use offset).
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Maximum number of records to return (1-100).
+        required: false
+        schema:
+          type: integer
+          default: 20
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response. Returns tasks for the organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization_Tasks_listOrganizationTasks-v2026-03-03_Response_200'
+        '400':
+          description: Bad request Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOrganizationTasks-v2026-03-03RequestBadRequestError'
+        '401':
+          description: Invalid, expired, or missing API token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOrganizationTasks-v2026-03-03RequestUnauthorizedError'
+        '403':
+          description: User does not have permission Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOrganizationTasks-v2026-03-03RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOrganizationTasks-v2026-03-03RequestUnprocessableEntityError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOrganizationTasks-v2026-03-03RequestInternalServerError'
+components:
+  schemas:
+    OrganizationsTasksGetParametersStatusesSchemaItems:
+      type: string
+      enum:
+      - PENDING
+      - COMPLETED
+      - DISMISSED
+      - FAILED
+      title: OrganizationsTasksGetParametersStatusesSchemaItems
+    OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsAssigneesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Public identifier of the assignee (HRIS profile OID or profile public_id).
+        email:
+          type:
+          - string
+          - 'null'
+          description: Assignee's email address.
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: Assignee's last name.
+        first_name:
+          type:
+          - string
+          - 'null'
+          description: Assignee's first name.
+      required:
+      - id
+      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsAssigneesItems
+    Organization_Tasks_listOrganizationTasks-v2026-03-03_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of task objects for the organization.
+        has_more:
+          type: boolean
+          description: Flag to highlight if there are more items to be fetched.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to request the next page; null if there are no more pages.
+        total_count:
+          type: integer
+          description: Total number of tasks matching the filter.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: Organization Tasks_listOrganizationTasks-v2026-03-03_Response_200
+    ListOrganizationTasks-v2026-03-03RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error entries.
+      required:
+      - errors
+      title: ListOrganizationTasks-v2026-03-03RequestForbiddenError
+    ListOrganizationTasks-v2026-03-03RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error entries.
+      required:
+      - errors
+      title: ListOrganizationTasks-v2026-03-03RequestUnauthorizedError
+    ListOrganizationTasks-v2026-03-03RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of validation errors.
+      required:
+      - errors
+      title: ListOrganizationTasks-v2026-03-03RequestUnprocessableEntityError
+    OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - PENDING
+      - COMPLETED
+      - DISMISSED
+      - FAILED
+      description: Current status of the task.
+      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the task.
+        status:
+          $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Current status of the task.
+        category:
+          type: string
+          description: Category of the task.
+        due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the task is due.
+        assignees:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsAssigneesItems'
+          description: List of users assigned to this task. Each assignee is either an HRIS profile (worker in organization context) or a profile without organization context.
+        created_at:
+          type: string
+          format: date-time
+          description: When the task was created.
+        expired_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the task expires, if set.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Detailed description of the task.
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: External reference ID, if the task was created with one.
+        resolved_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the task was resolved (completed or dismissed).
+        display_name:
+          type: string
+          description: Human-readable title of the task.
+      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItems
+    ListOrganizationTasks-v2026-03-03RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error entries.
+      required:
+      - errors
+      title: ListOrganizationTasks-v2026-03-03RequestBadRequestError
+    ListOrganizationTasks-v2026-03-03RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error entries.
+      required:
+      - errors
+      title: ListOrganizationTasks-v2026-03-03RequestInternalServerError
+    OrganizationsTasksGetParametersCategory:
+      type: string
+      enum:
+      - PAYROLL
+      - PAYMENTS
+      - SETUP
+      - EXPENSE_REQUESTS
+      - TIME_OFF_REQUESTS
+      - TIME_SHEET_SUBMISSIONS
+      - PEOPLE_MANAGEMENT
+      - DOCUMENT_ACTIONS
+      - LEGAL_ENTITY_DOCUMENTS
+      - HIRING
+      - OTHER_TASKS
+      - DEEL_IT
+      - COMPLIANCE
+      - PAYMENT_METHODS
+      - ACCOUNTING
+      title: OrganizationsTasksGetParametersCategory
+    OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties: {}
+      description: Additional error details.
+      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        field:
+          type:
+          - string
+          - 'null'
+          description: Request field that caused the error, if applicable.
+        details:
+          oneOf:
+          - $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          - type: 'null'
+          description: Additional error details.
+        message:
+          type: string
+          description: Human-readable error message.
+      required:
+      - code
+      - message
+      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

@@ -1,0 +1,1172 @@
+# x-archived-from: deel-subpackage-globalpayroll-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Global Payroll API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_globalPayroll
+paths:
+  /gp/workers/{id}/payslips/{payslip_id}/download:
+    get:
+      operationId: download-a-gp-worker-payslip-v-2026-01-01
+      summary: Download a GP worker payslip
+      description: "Returns a pre-signed download URL for a specific Global Payroll (GP) employee payslip PDF. Use this after calling Retrieve employee payslips to obtain the payslipId. Requires the worker id (UUID) and the payslipId from the list response. The returned URL is temporary and should be used promptly to download the file. Supports only GP contract types.\n **Token scopes**: `payslips:read`"
+      tags:
+      - subpackage_globalPayroll
+      parameters:
+      - name: id
+        in: path
+        description: Unique identifier for the worker.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: payslipId
+        in: path
+        description: Unique identifier for the payslip.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: payslip_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_downloadAGpWorkerPayslip-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request - Validation error or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadAGpWorkerPayslip-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /cycles/{cycle_id}/payroll-report:
+    get:
+      operationId: get-payroll-report-v-2026-03-30
+      summary: Get Payroll Report
+      description: "Get payroll report data for a payroll cycle, including available columns, employee row values, and optional previous report items. Use this response to discover payroll_report_column_id and payroll_id before updating entries.\n **Token scopes**: `global-payroll:read`"
+      tags:
+      - subpackage_globalPayroll
+      parameters:
+      - name: cycle_id
+        in: path
+        description: Payroll event/cycle id.
+        required: true
+        schema:
+          type: string
+      - name: contract_oids
+        in: query
+        description: Contract OID(s) to filter report rows.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: search
+        in: query
+        description: Filter by employee name.
+        required: false
+        schema:
+          type: string
+      - name: employee_status
+        in: query
+        description: Employee status filter.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: limit
+        in: query
+        description: Maximum number of report rows.
+        required: false
+        schema:
+          type: integer
+          default: 100
+      - name: cursor
+        in: query
+        description: Cursor for pagination.
+        required: false
+        schema:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetParametersCursor'
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_getPayrollReport-v2026-03-30_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollReport-v2026-03-30RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollReport-v2026-03-30RequestInternalServerError'
+  /forms/gp/worker-additional-fields/{country_code}:
+    get:
+      operationId: retrieve-additional-information-fields-for-gp-workers-by-country-v-2026-01-01
+      summary: Retrieve additional information fields for GP workers by country
+      description: "Retrieves GP workers additional information fields that are required for running payroll depending on the country regulations\n **Token scopes**: `forms:read`"
+      tags:
+      - subpackage_globalPayroll
+      parameters:
+      - name: country_code
+        in: path
+        description: ISO 3166-1 alpha-2 country code for which to retrieve GP worker additional fields.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Use this response to render dynamic form fields for GP worker onboarding. Contains field configuration, validation rules, display metadata, and dependency logic needed to build country-specific additional information forms.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_retrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01_Response_200'
+        '400':
+          description: Returned when the country_code path parameter is not a recognized ISO 3166-1 alpha-2 code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Authentication failed. The access token is missing, expired, or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Access denied. The authenticated user does not have the required forms:read scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestForbiddenError'
+        '404':
+          description: The country_code is a valid ISO code but no additional information template exists for it in the Employee Data Management system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestNotFoundError'
+        '429':
+          description: Rate limit exceeded. The client has sent too many requests in a given time window.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal server error. Returned when the Employee Data Management service is unreachable, or an unexpected error occurs during field retrieval.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestInternalServerError'
+components:
+  schemas:
+    ? CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPreviousPayrollReportItemsItems
+    : type: object
+      properties:
+        id:
+          type: string
+          description: Payroll report item id.
+        value:
+          type:
+          - string
+          - 'null'
+          description: Item value.
+        source:
+          type:
+          - string
+          - 'null'
+          description: Value source.
+        qtd_value:
+          type:
+          - string
+          - 'null'
+          description: Quarter-to-date value.
+        ytd_value:
+          type:
+          - string
+          - 'null'
+          description: Year-to-date value.
+        created_at:
+          type: string
+          format: date-time
+          description: Item creation time.
+        updated_at:
+          type: string
+          format: date-time
+          description: Item update time.
+        is_prorated:
+          type: boolean
+          description: Whether the value is prorated.
+        is_overwritten:
+          type: boolean
+          description: Whether the value was overwritten.
+        last_change_by:
+          type:
+          - integer
+          - 'null'
+          description: Last editor user id.
+        unit_of_measure:
+          type:
+          - string
+          - 'null'
+          description: Unit of measure.
+        payroll_report_column:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPreviousPayrollReportItemsItemsPayrollReportColumn'
+          description: Payroll report column details.
+        payroll_report_column_id:
+          type: string
+          description: Payroll report column id.
+        employment_payroll_event_id:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPreviousPayrollReportItemsItemsEmploymentPayrollEventId'
+          description: Employment payroll event id.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPreviousPayrollReportItemsItems
+    CyclesCycleIdPayrollReportGetParametersCursor:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      title: CyclesCycleIdPayrollReportGetParametersCursor
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Payroll report item id.
+        value:
+          type:
+          - string
+          - 'null'
+          description: Item value.
+        source:
+          type:
+          - string
+          - 'null'
+          description: Value source.
+        qtd_value:
+          type:
+          - string
+          - 'null'
+          description: Quarter-to-date value.
+        ytd_value:
+          type:
+          - string
+          - 'null'
+          description: Year-to-date value.
+        created_at:
+          type: string
+          format: date-time
+          description: Item creation time.
+        updated_at:
+          type: string
+          format: date-time
+          description: Item update time.
+        is_prorated:
+          type: boolean
+          description: Whether the value is prorated.
+        is_recurring:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the item is recurring.
+        is_overwritten:
+          type: boolean
+          description: Whether the value was overwritten.
+        last_change_by:
+          type:
+          - integer
+          - 'null'
+          description: Last editor user id.
+        unit_of_measure:
+          type:
+          - string
+          - 'null'
+          description: Unit of measure.
+        updated_by_profile:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItemsUpdatedByProfile'
+          description: Profile of the user who last updated the item.
+        payroll_report_column:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItemsPayrollReportColumn'
+          description: Payroll report column details.
+        payroll_report_column_id:
+          type: string
+          description: Payroll report column id.
+        employment_payroll_event_id:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItemsEmploymentPayrollEventId'
+          description: Employment payroll event id.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItems
+    GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: Method of the API
+        status:
+          type: number
+          format: double
+          description: Status of API response
+      description: Error request details
+      title: GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaRequest
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue3:
+      type: object
+      properties:
+        op:
+          $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf3Op'
+          description: Use this operator to evaluate the dependency condition against the referenced field's submitted value.
+        value:
+          description: Use this value as the operand for the dependency condition evaluation.
+      required:
+      - op
+      - value
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue3
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsContract:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal contract id.
+        oid:
+          type: string
+          description: Public contract identifier.
+        status:
+          type:
+          - string
+          - 'null'
+          description: Contract status.
+        hris_profile:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsContractHrisProfile'
+          description: HRIS profile details.
+        contract_type:
+          type:
+          - string
+          - 'null'
+          description: Contract type.
+        completion_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Contract completion date.
+      description: Contract details for the employee.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsContract
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf3Op:
+      type: string
+      enum:
+      - eq
+      - ne
+      - gt
+      - lt
+      - notnull
+      - contains
+      description: Use this operator to evaluate the dependency condition against the referenced field's submitted value.
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf3Op
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItems:
+      type: object
+      properties:
+        contract:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsContract'
+          description: Contract details for the employee.
+        employment:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmployment'
+        payroll_report_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItems'
+          description: Current payroll report items.
+        previous_payroll_report_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPreviousPayrollReportItemsItems'
+          description: Previous payroll report items for comparison.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItems
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Use this value to identify the field that this dependency refers to. Contains the snake_case key of the dependency field, matching another field's 'key' property in the same response.
+        value:
+          $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue'
+          description: 'Use this value to evaluate the dependency condition. When the value is a primitive (string, number, or boolean), the condition is satisfied when the referenced field equals this value. When the value is an object with ''op'' and ''value'' properties, apply the specified operator: ''eq'' (equals), ''ne'' (not equals), ''gt'' (greater than), ''lt'' (less than), ''notnull'' (field is not null), ''contains'' (field value contains the specified substring).'
+      required:
+      - key
+      - value
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Use this message to detect rate limiting. Implement exponential backoff before retrying.
+      required:
+      - message
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems
+    GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        url:
+          type: string
+          description: A pre-signed URL to download the payslip PDF.
+      required:
+      - url
+      title: GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaData
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployee:
+      type: object
+      properties:
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: Last name.
+        first_name:
+          type:
+          - string
+          - 'null'
+          description: First name.
+        middle_name:
+          type:
+          - string
+          - 'null'
+          description: Middle name.
+      description: Employee name details.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployee
+    ? CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItemsUpdatedByProfile
+    : type: object
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+          description: User name.
+        email:
+          type:
+          - string
+          - 'null'
+          description: User email.
+        user_id:
+          type:
+          - integer
+          - 'null'
+          description: User id.
+      description: Profile of the user who last updated the item.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItemsUpdatedByProfile
+    GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error response
+      required:
+      - message
+      title: GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems
+    Global_Payroll_getPayrollReport-v2026-03-30_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Global Payroll_getPayrollReport-v2026-03-30_Response_200
+    ? CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItemsPayrollReportColumn
+    : type: object
+      properties:
+        id:
+          type: string
+          description: Column id.
+        type:
+          type: string
+          description: Column type.
+        label:
+          type: string
+          description: Display label.
+        scope:
+          type: string
+          description: Column scope.
+        status:
+          type: string
+          description: Column status.
+        tooltip:
+          type:
+          - string
+          - 'null'
+          description: UI tooltip.
+        countries:
+          type: array
+          items:
+            type: string
+          description: Countries where the column applies.
+        is_global:
+          type: boolean
+          description: Whether the column is global.
+        created_at:
+          type: string
+          format: date-time
+          description: Column creation time.
+        item_order:
+          type: integer
+          description: Column ordering.
+        updated_at:
+          type: string
+          format: date-time
+          description: Column update time.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Column description.
+        system_name:
+          type:
+          - string
+          - 'null'
+          description: System name.
+        deel_enabled:
+          type: boolean
+          description: Whether enabled for Deel.
+        is_adjustable:
+          type: boolean
+          description: Whether the column is adjustable.
+        appears_on_g2n:
+          type: boolean
+          description: Whether it appears on G2N.
+        client_enabled:
+          type: boolean
+          description: Whether enabled for clients.
+        unit_of_measure:
+          type:
+          - string
+          - 'null'
+          description: Unit of measure.
+        can_be_recurring:
+          type: boolean
+          description: Whether the item can recur.
+        employer_cost_type:
+          type:
+          - string
+          - 'null'
+          description: Employer cost type.
+        add_to_employer_cost:
+          type: boolean
+          description: Whether adds to employer cost.
+        included_in_g2n_report:
+          type: boolean
+          description: Whether included in G2N report.
+        payroll_legal_entity_id:
+          type:
+          - integer
+          - 'null'
+          description: Payroll legal entity id.
+        is_recurring_in_offcycle:
+          type: boolean
+          description: Whether recurring in offcycle.
+        appears_on_recurring_items:
+          type: boolean
+          description: Whether appears on recurring items.
+        client_payroll_report_label:
+          type:
+          - string
+          - 'null'
+          description: Client-facing label.
+        supported_in_payroll_report:
+          type: boolean
+          description: Whether the column appears in payroll report.
+        payroll_report_sub_category_id:
+          type:
+          - string
+          - 'null'
+          description: Report sub-category id.
+        adjustment_payroll_report_column_id:
+          type:
+          - string
+          - 'null'
+          description: Adjustment column id.
+      description: Payroll report column details.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItemsPayrollReportColumn
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsType:
+      type: string
+      enum:
+      - string
+      - number
+      - boolean
+      - ''
+      description: 'Use this value to determine the data type expected when submitting field values. Mapped from the raw input type: ''date'', ''text'', ''select'', ''textarea'', ''tel'', ''phone'', and ''string'' map to "string"; ''number'' maps to "number"; ''checkbox'' maps to "boolean". An empty string indicates an unrecognized input type.'
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsType
+    Global_Payroll_retrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Use this array to build the form UI. Each item defines one field with its type, validation, and display configuration. Items are pre-sorted by EDM display order. An empty array means no additional fields are configured for the requested country.
+      required:
+      - data
+      title: Global Payroll_retrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01_Response_200
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataCursor:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Cursor for pagination.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataCursor
+    ? CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployeeRecurringItemsItems
+    : type: object
+      properties:
+        id:
+          type: string
+          description: Recurring item id.
+        amount:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployeeRecurringItemsItemsAmount'
+          description: Recurring item amount.
+        unit_of_measure:
+          type:
+          - string
+          - 'null'
+          description: Unit of measure.
+        payroll_report_column:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployeeRecurringItemsItemsPayrollReportColumn'
+          description: Payroll report column details.
+        payroll_report_column_id:
+          type: string
+          description: Payroll report column id.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployeeRecurringItemsItems
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestTooManyRequestsError
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEventEntityItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Column id.
+        type:
+          type: string
+          description: Column type.
+        label:
+          type: string
+          description: Display label.
+        scope:
+          type: string
+          description: Column scope.
+        status:
+          type: string
+          description: Column status.
+        tooltip:
+          type:
+          - string
+          - 'null'
+          description: Tooltip text.
+        countries:
+          type: array
+          items:
+            type: string
+          description: Countries where column applies.
+        is_global:
+          type: boolean
+          description: Whether column is global.
+        created_at:
+          type: string
+          format: date-time
+          description: Creation time.
+        item_order:
+          type: integer
+          description: Ordering index.
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update time.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Column description.
+        system_name:
+          type:
+          - string
+          - 'null'
+          description: System name.
+        deel_enabled:
+          type: boolean
+          description: Whether enabled for Deel.
+        is_adjustable:
+          type: boolean
+          description: Whether item is adjustable.
+        appears_on_g2n:
+          type: boolean
+          description: Whether appears on G2N.
+        client_enabled:
+          type: boolean
+          description: Whether enabled for clients.
+        unit_of_measure:
+          type:
+          - string
+          - 'null'
+          description: Unit of measure.
+        can_be_recurring:
+          type: boolean
+          description: Whether item can recur.
+        employer_cost_type:
+          type:
+          - string
+          - 'null'
+          description: Employer cost type.
+        add_to_employer_cost:
+          type: boolean
+          description: Whether adds to employer cost.
+        included_in_g2n_report:
+          type: boolean
+          description: Whether included in G2N report.
+        payroll_legal_entity_id:
+          type:
+          - integer
+          - 'null'
+          description: Payroll legal entity id.
+        is_recurring_in_offcycle:
+          type: boolean
+          description: Whether recurring in offcycle.
+        appears_on_recurring_items:
+          type: boolean
+          description: Whether appears on recurring items.
+        client_payroll_report_label:
+          type:
+          - string
+          - 'null'
+          description: Client-facing label.
+        supported_in_payroll_report:
+          type: boolean
+          description: Whether supported in payroll report.
+        payroll_report_sub_category_id:
+          type:
+          - string
+          - 'null'
+          description: Sub-category id.
+        adjustment_payroll_report_column_id:
+          type:
+          - string
+          - 'null'
+          description: Adjustment column id.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEventEntityItemsItems
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestForbiddenError
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      - $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue3'
+      description: 'Use this value to evaluate the dependency condition. When the value is a primitive (string, number, or boolean), the condition is satisfied when the referenced field equals this value. When the value is an object with ''op'' and ''value'' properties, apply the specified operator: ''eq'' (equals), ''ne'' (not equals), ''gt'' (greater than), ''lt'' (less than), ''notnull'' (field is not null), ''contains'' (field value contains the specified substring).'
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue
+    ? CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployeeRecurringItemsItemsPayrollReportColumn
+    : type: object
+      properties: {}
+      description: Payroll report column details.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployeeRecurringItemsItemsPayrollReportColumn
+    ? CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPreviousPayrollReportItemsItemsPayrollReportColumn
+    : type: object
+      properties: {}
+      description: Payroll report column details.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPreviousPayrollReportItemsItemsPayrollReportColumn
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestUnauthorizedError
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Number of rows returned.
+        cursor:
+          oneOf:
+          - $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataCursor'
+          - type: 'null'
+          description: Cursor for pagination.
+        overview:
+          oneOf:
+          - $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataOverview'
+          - type: 'null'
+          description: Optional aggregated overview for the report.
+        event_entity_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEventEntityItemsItems'
+          description: Column definitions available for update.
+        employment_payroll_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItems'
+          description: Employee rows for the cycle.
+      required:
+      - count
+      - event_entity_items
+      - employment_payroll_events
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaData
+    ? CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPreviousPayrollReportItemsItemsEmploymentPayrollEventId
+    : oneOf:
+      - type: integer
+      - type: string
+      description: Employment payroll event id.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPreviousPayrollReportItemsItemsEmploymentPayrollEventId
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsContractHrisProfile:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: HRIS profile identifier.
+      description: HRIS profile details.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsContractHrisProfile
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Use this array to identify each validation failure. Each item describes one parameter that failed validation.
+      required:
+      - errors
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestBadRequestError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    GetPayrollReport-v2026-03-30RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetPayrollReport-v2026-03-30RequestInternalServerError
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Use this message to understand why the request failed. Indicates the country does not have an additional info template configured.
+      required:
+      - message
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestNotFoundError
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    GetPayrollReport-v2026-03-30RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetPayrollReport-v2026-03-30RequestBadRequestError
+    DownloadAGpWorkerPayslip-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Error messages
+        request:
+          $ref: '#/components/schemas/GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details
+      required:
+      - errors
+      title: DownloadAGpWorkerPayslip-v2026-01-01RequestBadRequestError
+    ? CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItemsEmploymentPayrollEventId
+    : oneOf:
+      - type: integer
+      - type: string
+      description: Employment payroll event id.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsPayrollReportItemsItemsEmploymentPayrollEventId
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Use this value as the field identifier when submitting additional information. Represents the snake_case version of the internal field name, generated by the API naming convention service.
+        type:
+          $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsType'
+          description: 'Use this value to determine the data type expected when submitting field values. Mapped from the raw input type: ''date'', ''text'', ''select'', ''textarea'', ''tel'', ''phone'', and ''string'' map to "string"; ''number'' maps to "number"; ''checkbox'' maps to "boolean". An empty string indicates an unrecognized input type.'
+        ui_guide:
+          $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsUiGuide'
+          description: Use this object to control how the field is rendered in the UI. Contains labels, input type, display order, and supplementary text.
+        validation:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsValidationItems'
+          description: Use this array to apply client-side validation before form submission. Contains zero or one validation rule per field. An empty array means no validation is configured.
+        is_required:
+          type: boolean
+          description: Use this flag to determine whether the field must be provided when submitting additional information. For GP workers, the value considers the GP-specific optionality setting when available, falling back to the general optionality flag.
+        required_by:
+          type: string
+          description: 'Use this value to determine at which stage in the payroll lifecycle this field must be collected. Known values: ''before_payroll'' (required before payroll processing), ''after_payroll'' (can be collected after initial payroll), ''contract_signing'' (required at contract signing). Absent from the response when no lifecycle stage is configured.'
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems'
+          description: Use this array to implement conditional field visibility. When non-empty, this field should only be displayed and required when the referenced dependency conditions are met. An empty array means the field has no conditional dependencies.
+        values_allowed:
+          type: array
+          items:
+            type: string
+          description: Use this array to populate dropdown or select options when field_type is 'select'. Only present when the field has predefined options. Absent from the response for free-text, date, number, and other non-select field types.
+      required:
+      - key
+      - type
+      - ui_guide
+      - validation
+      - is_required
+      - dependencies
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItems
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsValidationItems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Use this value to determine which validation strategy to apply. "REGEX" indicates the 'value' field contains a regular expression pattern. Any other value indicates a custom validation type identified by its uppercase name.
+        value:
+          type: string
+          description: Use this value as the validation parameter. For REGEX type, contains the regular expression pattern to validate the field input against. Absent when the validation type is a custom type that does not require a parameter.
+        error_message:
+          type: string
+          description: Use this message to display to the user when the field value fails validation. Defaults to 'Review the value entered' when no custom message is configured.
+      required:
+      - type
+      - error_message
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsValidationItems
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataOverview:
+      type: object
+      properties: {}
+      description: Optional aggregated overview for the report.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataOverview
+    Global_Payroll_downloadAGpWorkerPayslip-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Global Payroll_downloadAGpWorkerPayslip-v2026-01-01_Response_200
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmployment:
+      type: object
+      properties:
+        employee:
+          $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployee'
+          description: Employee name details.
+        employment_id:
+          type:
+          - string
+          - 'null'
+          description: Employment id.
+        employee_status:
+          type:
+          - string
+          - 'null'
+          description: Employee status.
+        employee_recurring_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployeeRecurringItemsItems'
+          description: Recurring payroll items for the employee.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmployment
+    CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaErrorsItems
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsUiGuide:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Use this value as the primary English-language label when rendering the field in the UI.
+        order:
+          type: integer
+          description: Use this value to determine the display position of the field in the form. Starts at 1 and reflects the position in the response array, which is pre-sorted by the configured display order.
+        field_type:
+          type: string
+          description: Use this value to select the appropriate UI input component. Represents the raw input type from the field configuration. Known values include 'text', 'date', 'select', 'textarea', 'tel', 'phone', 'number', 'checkbox', and 'string'. Additional values may exist.
+        description:
+          type: string
+          description: Use this value to display supplementary context about the field below or beside the input. HTML tags are stripped. Returns an empty string when no description is configured.
+        helper_text:
+          type: string
+          description: Use this value to display footnote or instructional text near the field. HTML tags are stripped. Returns an empty string when no helper text is configured.
+        local_label:
+          type: string
+          description: Use this value as the localized field label when rendering the form in the worker's local language.
+      required:
+      - label
+      - order
+      - field_type
+      - description
+      - helper_text
+      - local_label
+      description: Use this object to control how the field is rendered in the UI. Contains labels, input type, display order, and supplementary text.
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsUiGuide
+    ? CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployeeRecurringItemsItemsAmount
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Recurring item amount.
+      title: CyclesCycleIdPayrollReportGetResponsesContentApplicationJsonSchemaDataEmploymentPayrollEventsItemsEmploymentEmployeeRecurringItemsItemsAmount
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Use this message for logging and debugging purposes. Contains a general error description.
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestInternalServerError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

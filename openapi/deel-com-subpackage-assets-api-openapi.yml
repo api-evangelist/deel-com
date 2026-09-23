@@ -1,0 +1,2519 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Assets API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_assets
+paths:
+  /it/assets/{asset_id}:
+    get:
+      operationId: get-it-asset-by-id
+      summary: Retrieve an IT asset
+      description: 'Retrieve the details of a specific IT asset using its unique identifier. This allows you to check information such as the asset''s model, serial number, status, and location. For more info, visit Assets.
+
+        **Token scopes**: `it-assets:read`'
+      tags:
+      - subpackage_assets
+      parameters:
+      - name: asset_id
+        in: path
+        description: Unique identifier of the IT asset
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/assets_getITAssetById_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItAssetRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItAssetRequestInternalServerError'
+  /it/assets:
+    get:
+      operationId: get-it-assets
+      summary: List IT assets
+      description: 'Retrieve a paginated list of all IT assets managed by the organization. This is useful for getting a complete overview of your equipment inventory and understanding the state of each asset. For more info, visit Assets.
+
+        **Token scopes**: `it-assets:read`'
+      tags:
+      - subpackage_assets
+      parameters:
+      - name: cursor
+        in: query
+        description: Indicates where the next page of results starts, as returned in a paginated list response
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records
+        required: false
+        schema:
+          type: integer
+          default: 20
+      - name: hris_profile_id
+        in: query
+        description: Filter assets by assigned worker with given HRIS Profile ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: location
+        in: query
+        description: Filter assets by their location
+        required: false
+        schema:
+          $ref: '#/components/schemas/ItAssetsGetParametersLocation'
+      - name: category
+        in: query
+        description: Filter assets by their product category
+        required: false
+        schema:
+          $ref: '#/components/schemas/ItAssetsGetParametersCategory'
+      - name: status
+        in: query
+        description: Filter assets by their status
+        required: false
+        schema:
+          $ref: '#/components/schemas/ItAssetsGetParametersStatus'
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/assets_getITAssets_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItAssetsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItAssetsRequestInternalServerError'
+components:
+  schemas:
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataProductSpecificationsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Specification name
+        value:
+          type: string
+          description: Specification value
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataProductSpecificationsItems
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      description: Warehouse address details
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseAddress
+    ItAssetsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataOwnership:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Asset owner name
+        type:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataOwnershipType'
+          description: Asset owner type
+      description: Asset owner
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataOwnership
+    assets_getITAssets_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItems'
+        has_more:
+          type: boolean
+          description: Whether there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to the next page
+        total_count:
+          type: integer
+          description: Total number of records
+      title: assets_getITAssets_Response_200
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - DESK
+      - DESK_RISER
+      - DESK_TIDY
+      - DESKTOP
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WIFI_RANGE_EXTENDER
+      - WELCOME_PACK
+      description: Product category
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsProductCategory
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the item
+        grade:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataGrade'
+          description: The condition grade of the asset
+        status:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current state of the asset
+        product:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataProduct'
+          description: Product details
+        location:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataLocation'
+          description: Current location type of the asset
+        ownership:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataOwnership'
+          description: Asset owner
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the asset
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp of the asset
+        assigned_user:
+          oneOf:
+          - $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUser'
+          - type: 'null'
+          description: Details of the user with asset possession
+        purchase_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Purchase date of the asset
+        serial_number:
+          type:
+          - string
+          - 'null'
+          description: Asset serial number
+        purchase_value:
+          oneOf:
+          - $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataPurchaseValue'
+          - type: 'null'
+          description: Purchase value of the asset
+        assigned_warehouse:
+          oneOf:
+          - $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouse'
+          - type: 'null'
+          description: Details of the warehouse with asset possession
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaData
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - SUPPLIER_RETURN
+      - STOLEN
+      - LOST_IN_TRANSIT
+      - WAITING_FOR_CLEARANCE
+      - CLEARED
+      - BINNED
+      - LEFT_WITH_USER
+      - SHRINKAGE
+      - DAMAGED_BY_USER
+      - DAMAGED_IN_TRANSIT
+      - DAMAGED_AT_WAREHOUSE
+      - BEING_REPAIRED
+      - BROKEN_BY_USER
+      - BROKEN_IN_TRANSIT
+      - BROKEN_AT_WAREHOUSE
+      - ADDED_BY_MISTAKE
+      - RETURNED_TO_DEEL
+      description: Current state of the asset
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataStatus
+    ItAssetsGetParametersStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      title: ItAssetsGetParametersStatus
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUserAddressType:
+      type: string
+      enum:
+      - PII
+      - PARTIAL
+      - DELIVERY
+      - COLLECTION
+      - ENTITY
+      - SUPPLIER
+      - BILLING
+      description: Type of the address
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUserAddressType
+    RetrieveAnItAssetRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveAnItAssetRequestBadRequestError
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - XK
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseAddressCountry
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseAddressType:
+      type: string
+      enum:
+      - PII
+      - PARTIAL
+      - DELIVERY
+      - COLLECTION
+      - ENTITY
+      - SUPPLIER
+      - BILLING
+      description: Type of the address
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseAddressType
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsOwnership:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Asset owner name
+        type:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsOwnershipType'
+          description: Asset owner type
+      description: Asset owner
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsOwnership
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUser:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        address:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUserAddress'
+          description: User address details
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      description: Details of the user with asset possession
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUser
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - XK
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseAddressCountry
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataProductCategory'
+          description: Product category
+        specifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataProductSpecificationsItems'
+          description: Specifications of the product
+      description: Product details
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataProduct
+    ItAssetsGetParametersLocation:
+      type: string
+      enum:
+      - WITH_USER
+      - AT_WAREHOUSE
+      - DEEL_WAREHOUSE
+      - ORGANIZATION_WAREHOUSE
+      - CLEARANCE_WAREHOUSE
+      - SUPPLIER
+      - WITH_COURIER
+      - WRITE_OFF
+      title: ItAssetsGetParametersLocation
+    ListItAssetsRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListItAssetsRequestInternalServerError
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - DESK
+      - DESK_RISER
+      - DESK_TIDY
+      - DESKTOP
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WIFI_RANGE_EXTENDER
+      - WELCOME_PACK
+      description: Product category
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataProductCategory
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsGrade:
+      type: string
+      enum:
+      - NEW
+      - A
+      - B
+      - C
+      - D
+      - F
+      description: The condition grade of the asset
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsGrade
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsProductCategory'
+          description: Product category
+      description: Product details
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsProduct
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsLocation:
+      type: string
+      enum:
+      - WITH_USER
+      - AT_WAREHOUSE
+      - DEEL_WAREHOUSE
+      - ORGANIZATION_WAREHOUSE
+      - CLEARANCE_WAREHOUSE
+      - SUPPLIER
+      - WITH_COURIER
+      - WRITE_OFF
+      description: Current location type of the asset
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsLocation
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataLocation:
+      type: string
+      enum:
+      - WITH_USER
+      - AT_WAREHOUSE
+      - DEEL_WAREHOUSE
+      - ORGANIZATION_WAREHOUSE
+      - CLEARANCE_WAREHOUSE
+      - SUPPLIER
+      - WITH_COURIER
+      - WRITE_OFF
+      description: Current location type of the asset
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataLocation
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the warehouse
+        name:
+          type: string
+          description: Warehouse or storage location name
+        address:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseAddress'
+          description: Warehouse address details
+        ownership:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseOwnership'
+          description: Warehouse ownership type
+        warehouse_type:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseWarehouseType'
+          description: Warehouse type
+      description: Details of the warehouse with asset possession
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouse
+    ItAssetsGetParametersCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - DESK
+      - DESK_RISER
+      - DESK_TIDY
+      - DESKTOP
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WIFI_RANGE_EXTENDER
+      - WELCOME_PACK
+      title: ItAssetsGetParametersCategory
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataPurchaseValueCurrency:
+      type: string
+      enum:
+      - EUR
+      - AED
+      - AFN
+      - XCD
+      - ALL
+      - AMD
+      - AOA
+      - ARS
+      - USD
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - XOF
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - SGD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - XAF
+      - CHF
+      - NZD
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - ANG
+      - CZK
+      - DJF
+      - DOP
+      - DZD
+      - EGP
+      - MAD
+      - ERN
+      - ETB
+      - FJD
+      - FKP
+      - DKK
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - WST
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - XPF
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataPurchaseValueCurrency
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - SUPPLIER_RETURN
+      - STOLEN
+      - LOST_IN_TRANSIT
+      - WAITING_FOR_CLEARANCE
+      - CLEARED
+      - BINNED
+      - LEFT_WITH_USER
+      - SHRINKAGE
+      - DAMAGED_BY_USER
+      - DAMAGED_IN_TRANSIT
+      - DAMAGED_AT_WAREHOUSE
+      - BEING_REPAIRED
+      - BROKEN_BY_USER
+      - BROKEN_IN_TRANSIT
+      - BROKEN_AT_WAREHOUSE
+      - ADDED_BY_MISTAKE
+      - RETURNED_TO_DEEL
+      description: Current state of the asset
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUserAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUserAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUserAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      description: User address details
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUserAddress
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsOwnershipType:
+      type: string
+      enum:
+      - DEEL
+      - ORGANIZATION
+      description: Asset owner type
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsOwnershipType
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsPurchaseValue:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsPurchaseValueCurrency'
+          description: Three-letter currency code for the price
+      description: Purchase value of the asset
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsPurchaseValue
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsPurchaseValueCurrency:
+      type: string
+      enum:
+      - EUR
+      - AED
+      - AFN
+      - XCD
+      - ALL
+      - AMD
+      - AOA
+      - ARS
+      - USD
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - XOF
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - SGD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - XAF
+      - CHF
+      - NZD
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - ANG
+      - CZK
+      - DJF
+      - DOP
+      - DZD
+      - EGP
+      - MAD
+      - ERN
+      - ETB
+      - FJD
+      - FKP
+      - DKK
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - WST
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - XPF
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsPurchaseValueCurrency
+    ListItAssetsRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListItAssetsRequestBadRequestError
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      description: Warehouse address details
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseAddress
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseWarehouseType:
+      type: string
+      enum:
+      - DEEL
+      - ORGANIZATION
+      - CLEARANCE
+      description: Warehouse type
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseWarehouseType
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseOwnership:
+      type: string
+      enum:
+      - DEEL
+      - ORGANIZATION
+      description: Warehouse ownership type
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseOwnership
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUser:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        address:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUserAddress'
+          description: User address details
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      description: Details of the user with asset possession
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUser
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUserAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - XK
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUserAddressCountry
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUserAddressType:
+      type: string
+      enum:
+      - PII
+      - PARTIAL
+      - DELIVERY
+      - COLLECTION
+      - ENTITY
+      - SUPPLIER
+      - BILLING
+      description: Type of the address
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUserAddressType
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataGrade:
+      type: string
+      enum:
+      - NEW
+      - A
+      - B
+      - C
+      - D
+      - F
+      description: The condition grade of the asset
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataGrade
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveAnItAssetRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveAnItAssetRequestInternalServerError
+    assets_getITAssetById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaData'
+      title: assets_getITAssetById_Response_200
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataOwnershipType:
+      type: string
+      enum:
+      - DEEL
+      - ORGANIZATION
+      description: Asset owner type
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataOwnershipType
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUserAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUserAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUserAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      description: User address details
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUserAddress
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUserAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - XK
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedUserAddressCountry
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the warehouse
+        name:
+          type: string
+          description: Warehouse or storage location name
+        address:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseAddress'
+          description: Warehouse address details
+        ownership:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseOwnership'
+          description: Warehouse ownership type
+        warehouse_type:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseWarehouseType'
+          description: Warehouse type
+      description: Details of the warehouse with asset possession
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouse
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseOwnership:
+      type: string
+      enum:
+      - DEEL
+      - ORGANIZATION
+      description: Warehouse ownership type
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseOwnership
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseAddressType:
+      type: string
+      enum:
+      - PII
+      - PARTIAL
+      - DELIVERY
+      - COLLECTION
+      - ENTITY
+      - SUPPLIER
+      - BILLING
+      description: Type of the address
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataAssignedWarehouseAddressType
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the item
+        grade:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsGrade'
+          description: The condition grade of the asset
+        status:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Current state of the asset
+        product:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsProduct'
+          description: Product details
+        location:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsLocation'
+          description: Current location type of the asset
+        ownership:
+          $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsOwnership'
+          description: Asset owner
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the asset
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp of the asset
+        assigned_user:
+          oneOf:
+          - $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedUser'
+          - type: 'null'
+          description: Details of the user with asset possession
+        purchase_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Purchase date of the asset
+        serial_number:
+          type:
+          - string
+          - 'null'
+          description: Asset serial number
+        purchase_value:
+          oneOf:
+          - $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsPurchaseValue'
+          - type: 'null'
+          description: Purchase value of the asset
+        assigned_warehouse:
+          oneOf:
+          - $ref: '#/components/schemas/ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouse'
+          - type: 'null'
+          description: Details of the warehouse with asset possession
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItems
+    ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseWarehouseType:
+      type: string
+      enum:
+      - DEEL
+      - ORGANIZATION
+      - CLEARANCE
+      description: Warehouse type
+      title: ItAssetsGetResponsesContentApplicationJsonSchemaDataItemsAssignedWarehouseWarehouseType
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataPurchaseValue:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataPurchaseValueCurrency'
+          description: Three-letter currency code for the price
+      description: Purchase value of the asset
+      title: ItAssetsAssetIdGetResponsesContentApplicationJsonSchemaDataPurchaseValue
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

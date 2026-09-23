@@ -1,0 +1,292 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Terminations API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_terminations
+paths:
+  /contracts/{contract_id}/terminations:
+    delete:
+      operationId: delete-contract-termination
+      summary: Delete Contract Termination Request
+      description: 'Cancels a pending contract termination request for the specified contract.
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - subpackage_terminations
+      parameters:
+      - name: contract_id
+        in: path
+        description: Unique identifier for the contract
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/terminations_deleteContractTermination_Response_204'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteContractTerminationRequestRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteContractTerminationRequestRequestInternalServerError'
+    post:
+      operationId: create-contract-termination
+      summary: Terminate contract
+      description: 'Terminate contract.
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - subpackage_terminations
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the contractor contract
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/terminations_createContractTermination_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: 'Termination data. At minimum, you must provide either terminate_now: true (for immediate termination) OR completion_date (for scheduled termination).'
+              required:
+              - data
+components:
+  schemas:
+    DeleteContractTerminationRequestRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteContractTerminationRequestRequestInternalServerError
+    DeleteContractTerminationRequestRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteContractTerminationRequestRequestBadRequestError
+    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire:
+      type: string
+      enum:
+      - 'YES'
+      - 'NO'
+      - DONT_KNOW
+      description: Indicates whether the contractor is eligible for rehire in the future.
+      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire
+    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType:
+      type: string
+      enum:
+      - RESIGNATION
+      - TERMINATION
+      - END_OF_CONTRACT
+      description: The type of termination. Specifies whether it is a resignation (contractor-initiated), termination (client-initiated), or end of contract (mutual/planned).
+      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType
+    terminations_createContractTermination_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData'
+      title: terminations_createContractTermination_Response_201
+    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Optional message to include with the termination
+        terminate_now:
+          type: boolean
+          default: false
+          description: If true, terminates the contract immediately. If false, completion_date is required.
+        completion_date:
+          type: string
+          format: date
+          description: Contract completion date (YYYY-MM-DD). Required when terminate_now is false or not provided. Since terminate_now defaults to false, this field is required unless you explicitly set terminate_now to true.
+        termination_type:
+          $ref: '#/components/schemas/ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType'
+          description: The type of termination. Specifies whether it is a resignation (contractor-initiated), termination (client-initiated), or end of contract (mutual/planned).
+        eligible_for_rehire:
+          $ref: '#/components/schemas/ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire'
+          description: Indicates whether the contractor is eligible for rehire in the future.
+        termination_reason_id:
+          type: string
+          format: uuid
+          description: The UUID of the termination reason. Use GET /termination_reasons/paginated to retrieve available reasons. Can be provided independently or with termination_reason_description.
+        eligible_for_rehire_reason:
+          type: string
+          description: Provides context when eligible_for_rehire is 'DONT_KNOW'. Should be empty or null for other values.
+        termination_reason_description:
+          type: string
+          description: Free-form text providing additional context about the termination reason. Can be provided independently without termination_reason_id, or used to add context to a selected reason.
+      description: 'Termination data. At minimum, you must provide either terminate_now: true (for immediate termination) OR completion_date (for scheduled termination).'
+      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Contract id
+        completion_date:
+          type: string
+          format: date-time
+          description: Contract completion date
+      title: ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    terminations_deleteContractTermination_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: terminations_deleteContractTermination_Response_204
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

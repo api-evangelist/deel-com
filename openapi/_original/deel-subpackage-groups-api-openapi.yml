@@ -1,0 +1,696 @@
+# x-archived-from: deel-subpackage-groups-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Groups API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_groups
+paths:
+  /groups/{id}/clone:
+    post:
+      operationId: clone-group
+      summary: Clone a Group
+      description: "Clone an existing group within the organization. This creates a new group with the specified name, copying the structure and settings from the source group.\n **Token scopes**: `groups:write`"
+      tags:
+      - subpackage_groups
+      parameters:
+      - name: id
+        in: path
+        description: Unique identifier of the group to be cloned.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Group cloned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/groups_cloneGroup_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloneAGroupRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GroupsIdClonePostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /groups:
+    post:
+      operationId: create-group
+      summary: Create a group
+      description: "Create a new group within your organization.\n **Token scopes**: `groups:read`, `groups:write`"
+      tags:
+      - subpackage_groups
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Group created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/groups_createGroup_Response_200'
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateGroupRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GroupsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+    get:
+      operationId: get-groups
+      summary: Return list of groups
+      description: "List all the groups in your organization.\n **Token scopes**: `groups:read`"
+      tags:
+      - subpackage_groups
+      parameters:
+      - name: limit
+        in: query
+        description: The maximum number of groups to return (between 1 and 100)
+        required: false
+        schema:
+          type: integer
+          default: 100
+      - name: sort_order
+        in: query
+        description: Sort the results in ascending (ASC) or descending (DESC) order based on the group name.
+        required: false
+        schema:
+          $ref: '#/components/schemas/GroupsGetParametersSortOrder'
+      - name: cursor
+        in: query
+        description: The encoded cursor for paginated results. This is an opaque string that allows fetching the next set of results.
+        required: false
+        schema:
+          type: string
+      - name: include_archived_groups
+        in: query
+        description: Include archived groups (soft deleted records). Defaults to `true`.
+        required: false
+        schema:
+          type: boolean
+          default: true
+      - name: external_metadata
+        in: query
+        description: Extra information about the group.
+        required: false
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A list of groups in the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/groups_getGroups_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetGroupsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /groups/{id}:
+    delete:
+      operationId: delete-group
+      summary: Delete a group
+      description: "Archive an existing group.\n **Token scopes**: `groups:write`"
+      tags:
+      - subpackage_groups
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Group archived successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/groups_deleteGroup_Response_200'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteGroupRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteGroupRequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    patch:
+      operationId: update-group
+      summary: Edit a group
+      description: "Edit the details of an existing group.\n **Token scopes**: `groups:read`, `groups:write`"
+      tags:
+      - subpackage_groups
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Group updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/groups_updateGroup_Response_200'
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditGroupRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GroupsIdPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+components:
+  schemas:
+    GroupsIdPatchResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Description of the error.
+      title: GroupsIdPatchResponsesContentApplicationJsonSchemaError
+    GroupsIdClonePostResponsesContentApplicationJsonSchemaDataExternalMetadata:
+      type: object
+      properties: {}
+      description: Extra information of the group.
+      title: GroupsIdClonePostResponsesContentApplicationJsonSchemaDataExternalMetadata
+    GroupsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the created group.
+        name:
+          type: string
+          description: The name of the created group.
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was last updated.
+        external_metadata:
+          $ref: '#/components/schemas/GroupsPostResponsesContentApplicationJsonSchemaDataExternalMetadata'
+          description: Extra information of the group.
+      title: GroupsPostResponsesContentApplicationJsonSchemaData
+    GroupsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the group.
+        name:
+          type: string
+          description: The name of the group.
+        status:
+          $ref: '#/components/schemas/GroupsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: The current status of the group (active or archived).
+        managers:
+          type: number
+          format: double
+          description: The number of managers associated with the group.
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was last updated.
+        archived_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The timestamp when the group was archived (if applicable).
+        external_metadata:
+          $ref: '#/components/schemas/GroupsGetResponsesContentApplicationJsonSchemaDataItemsExternalMetadata'
+          description: Extra information about the group.
+      title: GroupsGetResponsesContentApplicationJsonSchemaDataItems
+    groups_createGroup_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GroupsPostResponsesContentApplicationJsonSchemaData'
+      title: groups_createGroup_Response_200
+    GroupsPostRequestBodyContentApplicationJsonSchemaDataExternalMetadata:
+      type: object
+      properties: {}
+      description: The extra information of the group to be created.
+      title: GroupsPostRequestBodyContentApplicationJsonSchemaDataExternalMetadata
+    CreateGroupRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/GroupsPostResponsesContentApplicationJsonSchemaError'
+      title: CreateGroupRequestBadRequestError
+    GroupsPostResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Description of the error.
+      title: GroupsPostResponsesContentApplicationJsonSchemaError
+    GroupsIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the updated group.
+        name:
+          type: string
+          description: The updated name of the group.
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was last updated.
+        external_metadata:
+          $ref: '#/components/schemas/GroupsIdPatchResponsesContentApplicationJsonSchemaDataExternalMetadata'
+          description: Extra information of the group.
+      title: GroupsIdPatchResponsesContentApplicationJsonSchemaData
+    GroupsIdClonePostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the created group.
+        name:
+          type: string
+          description: The name of the created group.
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was last updated.
+        external_metadata:
+          $ref: '#/components/schemas/GroupsIdClonePostResponsesContentApplicationJsonSchemaDataExternalMetadata'
+          description: Extra information of the group.
+      title: GroupsIdClonePostResponsesContentApplicationJsonSchemaData
+    GroupsIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The updated name of the group.
+      required:
+      - name
+      title: GroupsIdPatchRequestBodyContentApplicationJsonSchemaData
+    GetGroupsRequestBadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message explaining what went wrong.
+      title: GetGroupsRequestBadRequestError
+    GroupsIdPatchResponsesContentApplicationJsonSchemaDataExternalMetadata:
+      type: object
+      properties: {}
+      description: Extra information of the group.
+      title: GroupsIdPatchResponsesContentApplicationJsonSchemaDataExternalMetadata
+    GroupsIdClonePostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the group to be created.
+        external_metadata:
+          $ref: '#/components/schemas/GroupsIdClonePostRequestBodyContentApplicationJsonSchemaDataExternalMetadata'
+          description: The extra information of the group to be created.
+      required:
+      - name
+      title: GroupsIdClonePostRequestBodyContentApplicationJsonSchemaData
+    DeleteGroupRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/GroupsIdDeleteResponsesContentApplicationJsonSchemaError'
+      title: DeleteGroupRequestBadRequestError
+    GroupsGetParametersSortOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      default: ASC
+      title: GroupsGetParametersSortOrder
+    groups_getGroups_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupsGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/GroupsGetResponsesContentApplicationJsonSchemaPage'
+      title: groups_getGroups_Response_200
+    GroupsIdClonePostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+      title: GroupsIdClonePostResponsesContentApplicationJsonSchemaErrorsItems
+    groups_cloneGroup_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GroupsIdClonePostResponsesContentApplicationJsonSchemaData'
+      title: groups_cloneGroup_Response_201
+    CloneAGroupRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupsIdClonePostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CloneAGroupRequestBadRequestError
+    GroupsPostResponsesContentApplicationJsonSchemaDataExternalMetadata:
+      type: object
+      properties: {}
+      description: Extra information of the group.
+      title: GroupsPostResponsesContentApplicationJsonSchemaDataExternalMetadata
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    GroupsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the group to be created.
+        external_metadata:
+          $ref: '#/components/schemas/GroupsPostRequestBodyContentApplicationJsonSchemaDataExternalMetadata'
+          description: The extra information of the group to be created.
+      required:
+      - name
+      title: GroupsPostRequestBodyContentApplicationJsonSchemaData
+    groups_deleteGroup_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GroupsIdDeleteResponsesContentApplicationJsonSchemaData'
+      title: groups_deleteGroup_Response_200
+    GroupsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - active
+      - archived
+      description: The current status of the group (active or archived).
+      title: GroupsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    DeleteGroupRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/GroupsIdDeleteResponsesContentApplicationJsonSchemaError'
+      title: DeleteGroupRequestNotFoundError
+    GroupsIdClonePostRequestBodyContentApplicationJsonSchemaDataExternalMetadata:
+      type: object
+      properties: {}
+      description: The extra information of the group to be created.
+      title: GroupsIdClonePostRequestBodyContentApplicationJsonSchemaDataExternalMetadata
+    GroupsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type: string
+          description: An opaque cursor to fetch the next set of results.
+        total_rows:
+          type: integer
+          description: The total number of groups available for the current query (including pagination).
+      title: GroupsGetResponsesContentApplicationJsonSchemaPage
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    groups_updateGroup_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GroupsIdPatchResponsesContentApplicationJsonSchemaData'
+      title: groups_updateGroup_Response_200
+    GroupsIdDeleteResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Group not found error message.
+      title: GroupsIdDeleteResponsesContentApplicationJsonSchemaError
+    EditGroupRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/GroupsIdPatchResponsesContentApplicationJsonSchemaError'
+      title: EditGroupRequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    GroupsGetResponsesContentApplicationJsonSchemaDataItemsExternalMetadata:
+      type: object
+      properties: {}
+      description: Extra information about the group.
+      title: GroupsGetResponsesContentApplicationJsonSchemaDataItemsExternalMetadata
+    GroupsIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        archived_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was archived.
+      title: GroupsIdDeleteResponsesContentApplicationJsonSchemaData
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

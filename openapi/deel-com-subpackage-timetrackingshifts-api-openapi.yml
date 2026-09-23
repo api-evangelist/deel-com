@@ -1,0 +1,1832 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Time Tracking Shifts API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_timeTrackingShifts
+paths:
+  /time_tracking/shifts/raw:
+    post:
+      operationId: create-time-tracking-shifts-raw
+      summary: Create raw time tracking shifts
+      description: 'Create raw shifts for the specified contract ID. “Raw shifts” refers to uncategorized entries—simply submit the clock-in and clock-out times. The classification of those hours (e.g., regular or overtime) will be handled by the Deel platform.
+
+        **Token scopes**: `time-tracking:write`'
+      tags:
+      - subpackage_timeTrackingShifts
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking-shifts_createTimeTrackingShiftsRaw_Response_201'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Request body to create time tracking raw shifts.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Request data containing contract ID and shifts to be created.
+              required:
+              - data
+  /time_tracking/shifts:
+    post:
+      operationId: create-time-tracking-shifts
+      summary: Create shifts
+      description: 'Creates multiple time tracking shifts for a contract, supporting both regular shift submissions and corrections that adjust hours for previously processed shifts.
+
+        **Token scopes**: `time-tracking:write`'
+      tags:
+      - subpackage_timeTrackingShifts
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking-shifts_createTimeTrackingShifts_Response_201'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Request body to create time tracking shifts supporting regular shifts and correction shifts.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Request data containing contract ID and shifts to be created.
+              required:
+              - data
+    get:
+      operationId: get-time-tracking-shifts
+      summary: List of shifts
+      description: 'Retrieve a paginated list of shifts with details such as start and end times, breaks, metadata, and summary metrics. Supports pagination through `limit` and `offset` query parameters and filtering by `contractId`, date range (`fromDate` and `toDate`).
+
+        **Token scopes**: `time-tracking:read`'
+      tags:
+      - subpackage_timeTrackingShifts
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of records to return.
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: Offset/index of record for the next page of records to return.
+        required: false
+        schema:
+          type: string
+      - name: from_date
+        in: query
+        description: Filter shifts from this date (YYYY-MM-DD).
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: to_date
+        in: query
+        description: Filter shifts until this date (YYYY-MM-DD).
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: contract_id[]
+        in: query
+        description: Filter shifts by one or more contract IDs.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response with paginated shifts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking-shifts_getTimeTrackingShifts_Response_200'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /time_tracking/shifts/{external_id}:
+    delete:
+      operationId: delete-time-tracking-shift-by-external-id
+      summary: Delete a Shift by External ID
+      description: 'This endpoint deletes a shift using its external ID. Once deleted, the shift will no longer be retrievable or editable.
+
+        **Token scopes**: `time-tracking:write`'
+      tags:
+      - subpackage_timeTrackingShifts
+      parameters:
+      - name: external_id
+        in: path
+        description: The unique external identifier of the shift to be deleted.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Shift deleted successfully. No content is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking-shifts_deleteTimeTrackingShiftByExternalId_Response_204'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    get:
+      operationId: get-time-tracking-shift-by-external-id
+      summary: Get shift details
+      description: 'Retrieve details of a specific shift by external ID.
+
+        **Token scopes**: `time-tracking:read`'
+      tags:
+      - subpackage_timeTrackingShifts
+      parameters:
+      - name: external_id
+        in: path
+        description: Unique identifier of the shift to retrieve.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Shift details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking-shifts_getTimeTrackingShiftByExternalId_Response_200'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetShiftDetailsRequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+    patch:
+      operationId: update-time-tracking-shift-by-external-id
+      summary: Update a shift
+      description: 'Update specific fields of an existing shift by its unique `external_id`. This includes shift summary details, description etc.
+
+        **Token scopes**: `time-tracking:write`'
+      tags:
+      - subpackage_timeTrackingShifts
+      parameters:
+      - name: external_id
+        in: path
+        description: Unique identifier of the shift to be updated.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Shift updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/time-tracking-shifts_updateTimeTrackingShiftByExternalId_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaData'
+                  description: Shift update request data.
+              required:
+              - data
+  /time_tracking/shifts/bulk-delete:
+    post:
+      operationId: delete-multiple-shifts-by-external-id
+      summary: Delete multiple shifts by External ID
+      description: 'This endpoint deletes shifts using external IDs. Once deleted, the shifts will no longer be retrievable or editable.
+
+        **Token scopes**: `time-tracking:write`'
+      tags:
+      - subpackage_timeTrackingShifts
+      parameters:
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Shifts deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Time_Tracking_Shifts_deleteMultipleShiftsByExternalId_Response_200'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Request body to bulk delete shifts by their external IDs.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimeTrackingShiftsBulkDeletePostRequestBodyContentApplicationJsonSchemaData'
+                  description: Request data containing the external IDs of shifts to be deleted.
+              required:
+              - data
+components:
+  schemas:
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        shifts:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems'
+          description: Array of shift records to be created, supporting regular shifts and correction shifts.
+        contract_id:
+          type: string
+          description: The unique identifier of the employee contract.
+      required:
+      - shifts
+      - contract_id
+      description: Request data containing contract ID and shifts to be created.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaData
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0PayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0PayrollCycleRef
+    TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsPayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsPayrollCycleRef
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf1ShiftType:
+      type: string
+      enum:
+      - CORRECTION_ABSOLUTE
+      description: Type of the shift
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf1ShiftType
+    TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaStart:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Start date
+        time:
+          type: string
+          description: Start time
+        is_rest_day:
+          type: boolean
+          description: Is rest day
+        is_public_holiday:
+          type: boolean
+          description: Is public holiday
+      description: Start time details of the shift.
+      title: TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaStart
+    TimeTrackingShiftsBulkDeletePostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        external_ids:
+          type: array
+          items:
+            type: string
+          description: Array of shift external IDs to delete.
+      required:
+      - external_ids
+      description: Request data containing the external IDs of shifts to be deleted.
+      title: TimeTrackingShiftsBulkDeletePostRequestBodyContentApplicationJsonSchemaData
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf4ShiftType:
+      type: string
+      enum:
+      - CORRECTION_ABSOLUTE
+      description: Type of the shift
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf4ShiftType
+    TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItems:
+      type: object
+      properties:
+        end:
+          $ref: '#/components/schemas/TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsEnd'
+          description: End time details of the break.
+        start:
+          $ref: '#/components/schemas/TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsStart'
+          description: Start time details of the break.
+        is_paid:
+          type: boolean
+          description: Is break paid
+      title: TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItems
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf4Summary:
+      type: object
+      properties:
+        total_break_hours:
+          type: number
+          format: double
+          description: Absolute total break hours
+        payable_break_hours:
+          type: number
+          format: double
+          description: Absolute payable break hours
+        total_payable_hours:
+          type: number
+          format: double
+          description: Absolute total payable hours
+        shift_duration_hours:
+          type: number
+          format: double
+          description: Absolute shift duration hours
+      required:
+      - total_payable_hours
+      description: Summary of calculated hours and rates for the correction shift.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf4Summary
+    TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        shifts:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItems'
+          description: Array of shift records to be created.
+        contract_id:
+          type: string
+          description: Contract ID associated with the shifts.
+      required:
+      - shifts
+      - contract_id
+      description: Request data containing contract ID and shifts to be created.
+      title: TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaData
+    TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaDataSummary:
+      type: object
+      properties:
+        time_unit:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaDataSummaryTimeUnit'
+          description: Time unit
+        time_amount:
+          type: number
+          format: double
+          description: Time amount
+        total_break_hours:
+          type: number
+          format: double
+          description: Total break hours.
+        payable_break_hours:
+          type: number
+          format: double
+          description: Payable break hours.
+        total_payable_hours:
+          type: number
+          format: double
+          description: Total payable hours.
+        shift_duration_hours:
+          type: number
+          format: double
+          description: Shift duration hours.
+        shift_rate_external_id:
+          type: string
+          description: ShiftRate external ID.
+      description: Summary of calculated time and rates for the shift.
+      title: TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaDataSummary
+    TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaEnd:
+      type: object
+      properties:
+        date:
+          type: string
+          description: End date of the shift.
+        time:
+          type: string
+          description: End time of the shift.
+        is_rest_day:
+          type: boolean
+          description: Indicates if the shift end day is a rest day.
+        is_public_holiday:
+          type: boolean
+          description: Indicates if the shift end day is a public holiday.
+      description: End time details of the shift.
+      title: TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaEnd
+    TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMeta:
+      type: object
+      properties:
+        end:
+          $ref: '#/components/schemas/TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaEnd'
+          description: End time details of the shift.
+        start:
+          $ref: '#/components/schemas/TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaStart'
+          description: Start time details of the shift.
+        breaks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItems'
+          description: List of break periods within the shift.
+        approval_date:
+          type: string
+          description: Approval date of the shift.
+      description: Metadata containing detailed information about the shift timing, breaks, and approval status.
+      title: TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMeta
+    TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaDataSummary'
+          description: Summary of calculated time and rates for the shift.
+        description:
+          type: string
+          description: Description of the shift.
+        date_of_work:
+          type: string
+          description: The date of the shift.
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaDataPayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+      description: Shift update request data.
+      title: TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaData
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems2:
+      type: object
+      properties:
+        shift_type:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2ShiftType'
+          description: Type of the shift
+        corrections:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2CorrectionsItems'
+          description: Array of correction adjustments to apply to the original shift.
+        description:
+          type: string
+          description: Description of the correction shift.
+        external_id:
+          type: string
+          description: External ID of the correction shift.
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2PayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+        shift_reference_id:
+          type: string
+          description: External ID of the original shift being corrected
+      required:
+      - shift_type
+      - corrections
+      - description
+      - external_id
+      - shift_reference_id
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems2
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf5ShiftType:
+      type: string
+      enum:
+      - CORRECTION_DELTA
+      description: Type of the shift
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf5ShiftType
+    GetShiftDetailsRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaError'
+      title: GetShiftDetailsRequestBadRequestError
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf3ShiftType:
+      type: string
+      enum:
+      - REGULAR
+      description: Type of the shift
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf3ShiftType
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf3Summary:
+      type: object
+      properties:
+        total_break_hours:
+          type: number
+          format: double
+          description: Total break hours
+        payable_break_hours:
+          type: number
+          format: double
+          description: Payable break hours
+        total_payable_hours:
+          type: number
+          format: double
+          description: Total payable hours
+        shift_duration_hours:
+          type: number
+          format: double
+          description: Shift duration hours
+        shift_rate_external_id:
+          type: string
+          description: Shift Rate external ID
+      required:
+      - total_payable_hours
+      - shift_rate_external_id
+      description: Summary of calculated hours and rates for the shift.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf3Summary
+    TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsPayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsPayrollCycleRef
+    TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMeta'
+          description: Metadata containing detailed information about the shift timing, breaks, and approval status.
+        summary:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataSummary'
+          description: Summary of calculated hours and rates for the shift.
+        created_at:
+          type: string
+          description: Timestamp when the shift was created.
+        updated_at:
+          type: string
+          description: Timestamp when the shift was last updated.
+        contract_id:
+          type: string
+          description: Contract ID associated with the shift.
+        description:
+          type: string
+          description: Description of the shift.
+        external_id:
+          type: string
+          description: Unique identifier of the shift.
+        date_of_work:
+          type: string
+          description: The date of work for the shift.
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataPayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+      description: Shift record details.
+      title: TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaData
+    TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMeta'
+          description: Metadata containing detailed information about the shift timing, breaks, and approval status.
+        summary:
+          $ref: '#/components/schemas/TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsSummary'
+          description: Summary of calculated hours and rates for the shift.
+        created_at:
+          type: string
+          description: Timestamp when the shift was created.
+        updated_at:
+          type: string
+          description: Timestamp when the shift was last updated.
+        contract_id:
+          type: string
+          description: Contract ID associated with the shift.
+        description:
+          type: string
+          description: Description of the shift.
+        external_id:
+          type: string
+          description: Unique identifier of the shift.
+        date_of_work:
+          type: string
+          description: The date of work for the shift.
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsPayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+      required:
+      - created_at
+      - updated_at
+      - contract_id
+      - description
+      - external_id
+      - date_of_work
+      title: TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItems
+    TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsSummaryTimeUnit:
+      type: string
+      enum:
+      - HOUR
+      - DAY
+      - WEEK
+      - MONTH
+      description: Time unit
+      title: TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsSummaryTimeUnit
+    TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaBreaksItemsStart:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Break start date.
+        time:
+          type: string
+          description: Break start time.
+      description: Start time details of the break.
+      title: TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaBreaksItemsStart
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2CorrectionsItemsType:
+      type: string
+      enum:
+      - SUBTRACTION
+      - ADDITION
+      description: Type of correction
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2CorrectionsItemsType
+    TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaStart:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Start date of the shift.
+        time:
+          type: string
+          description: Start time of the shift.
+        is_rest_day:
+          type: boolean
+          description: Indicates if the shift start day is a rest day.
+        is_public_holiday:
+          type: boolean
+          description: Indicates if the shift start day is a public holiday.
+      description: Start time details of the shift.
+      title: TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaStart
+    TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaBreaksItemsStart:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Break start date
+        time:
+          type: string
+          description: Break start time
+      description: Start time details of the break.
+      title: TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaBreaksItemsStart
+    time-tracking-shifts_updateTimeTrackingShiftByExternalId_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaData'
+          description: Updated shift record details.
+      title: time-tracking-shifts_updateTimeTrackingShiftByExternalId_Response_200
+    TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItems:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMeta'
+          description: Metadata containing detailed information about the shift timing, breaks, and approval status.
+        description:
+          type: string
+          description: Description of the shift.
+        external_id:
+          type: string
+          description: Extrenal ID of the shift.
+        date_of_work:
+          type: string
+          description: Date of shift work
+      required:
+      - meta
+      - external_id
+      - date_of_work
+      title: TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItems
+    TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaDataPayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaDataPayrollCycleRef
+    TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaEnd:
+      type: object
+      properties:
+        date:
+          type: string
+          description: End date of the shift.
+        time:
+          type: string
+          description: End time of the shift.
+        is_rest_day:
+          type: boolean
+          description: Indicates if the shift end day is a rest day.
+        is_public_holiday:
+          type: boolean
+          description: Indicates if the shift end day is a public holiday.
+      description: End time details of the shift.
+      title: TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaEnd
+    time-tracking-shifts_getTimeTrackingShiftByExternalId_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaData'
+          description: Shift record details.
+      required:
+      - data
+      title: time-tracking-shifts_getTimeTrackingShiftByExternalId_Response_200
+    TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaDataSummary:
+      type: object
+      properties:
+        time_unit:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaDataSummaryTimeUnit'
+          description: Time unit
+        time_amount:
+          type: number
+          format: double
+          description: Time amount
+        total_break_hours:
+          type: number
+          format: double
+          description: Total break hours
+        payable_break_hours:
+          type: number
+          format: double
+          description: Payable break hours
+        total_payable_hours:
+          type: number
+          format: double
+          description: Total payable hours
+        shift_duration_hours:
+          type: number
+          format: double
+          description: Shift duration hours
+        shift_rate_external_id:
+          type: string
+          description: Shift Rate external ID
+      description: Summary of calculated time and rates for the shift.
+      title: TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaDataSummary
+    Time_Tracking_Shifts_deleteMultipleShiftsByExternalId_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingShiftsBulkDeletePostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Time Tracking Shifts_deleteMultipleShiftsByExternalId_Response_200
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0SummaryTimeUnit:
+      type: string
+      enum:
+      - HOUR
+      - MONTH
+      - DAY
+      - WEEK
+      description: Time unit
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0SummaryTimeUnit
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2CorrectionsItems:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2CorrectionsItemsType'
+          description: Type of correction
+        time_amount:
+          type: number
+          format: double
+          description: Time amount
+      required:
+      - type
+      - time_amount
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2CorrectionsItems
+    TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataPayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataPayrollCycleRef
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems4:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf4Summary'
+          description: Summary of calculated hours and rates for the correction shift.
+        shift_type:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf4ShiftType'
+          description: Type of the shift
+        description:
+          type: string
+          description: Description of the correction shift.
+        external_id:
+          type: string
+          description: External ID of the correction shift.
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf4PayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+        shift_reference_id:
+          type: string
+          description: External ID of the original shift being corrected
+      required:
+      - summary
+      - shift_type
+      - description
+      - external_id
+      - shift_reference_id
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems4
+    TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaStart:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Start date
+        time:
+          type: string
+          description: Start time
+        is_rest_day:
+          type: boolean
+          description: Is rest day
+        is_public_holiday:
+          type: boolean
+          description: Is public holiday
+      description: Start time details of the shift.
+      title: TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaStart
+    time-tracking-shifts_deleteTimeTrackingShiftByExternalId_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: time-tracking-shifts_deleteTimeTrackingShiftByExternalId_Response_204
+    TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaDataSummary'
+          description: Summary of calculated time and rates for the shift.
+        created_at:
+          type: string
+          description: Timestamp when the shift was created.
+        updated_at:
+          type: string
+          description: Timestamp when the shift was last updated.
+        contract_id:
+          type: string
+          description: The contract ID associated with the shift.
+        description:
+          type: string
+          description: The description of the shift.
+        external_id:
+          type: string
+          description: Unique identifier of the shift.
+        date_of_work:
+          type: string
+          description: The date of the shift.
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaDataPayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+      description: Updated shift record details.
+      title: TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaData
+    time-tracking-shifts_createTimeTrackingShifts_Response_201:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItems'
+          description: List of created shift records.
+      required:
+      - data
+      title: time-tracking-shifts_createTimeTrackingShifts_Response_201
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf4PayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf4PayrollCycleRef
+    TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMeta:
+      type: object
+      properties:
+        end:
+          $ref: '#/components/schemas/TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaEnd'
+          description: End time details of the shift.
+        start:
+          $ref: '#/components/schemas/TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaStart'
+          description: Start time details of the shift.
+        breaks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItems'
+          description: List of break periods within the shift.
+        approval_date:
+          type: string
+          description: Approval date of the shift.
+      description: Metadata containing detailed information about the shift timing, breaks, and approval status.
+      title: TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMeta
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems1:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf1Summary'
+          description: Summary of calculated time and rates for the correction shift.
+        shift_type:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf1ShiftType'
+          description: Type of the shift
+        description:
+          type: string
+          description: Description of the correction shift.
+        external_id:
+          type: string
+          description: External ID of the correction shift.
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf1PayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+        shift_reference_id:
+          type: string
+          description: External ID of the original shift being corrected
+      required:
+      - summary
+      - shift_type
+      - description
+      - external_id
+      - shift_reference_id
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems1
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf3PayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf3PayrollCycleRef
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems3:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf3Summary'
+          description: Summary of calculated hours and rates for the shift.
+        shift_type:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf3ShiftType'
+          description: Type of the shift
+        description:
+          type: string
+          description: Description of the shift.
+        external_id:
+          type: string
+          description: External ID of the shift.
+        date_of_work:
+          type: string
+          format: date
+          description: Date of shift work
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf3PayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+      required:
+      - summary
+      - description
+      - external_id
+      - date_of_work
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems3
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf1Summary:
+      type: object
+      properties:
+        time_amount:
+          type: number
+          format: double
+          description: Time amount
+      required:
+      - time_amount
+      description: Summary of calculated time and rates for the correction shift.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf1Summary
+    TimeTrackingShiftsBulkDeletePostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success message indicating the number of shifts deleted
+      required:
+      - message
+      title: TimeTrackingShiftsBulkDeletePostResponsesContentApplicationJsonSchemaData
+    TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaBreaksItems:
+      type: object
+      properties:
+        end:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaBreaksItemsEnd'
+          description: End time details of the break.
+        start:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaBreaksItemsStart'
+          description: Start time details of the break.
+        is_paid:
+          type: boolean
+          description: Indicates if the break is paid.
+      title: TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaBreaksItems
+    TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsStart:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Break start date
+        time:
+          type: string
+          description: Break start time
+      description: Start time details of the break.
+      title: TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsStart
+    TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataSummary:
+      type: object
+      properties:
+        total_break_hours:
+          type: number
+          format: double
+          description: Total break hours within the shift.
+        payable_break_hours:
+          type: number
+          format: double
+          description: Total payable break hours.
+        total_payable_hours:
+          type: number
+          format: double
+          description: Total payable hours for the shift.
+        shift_duration_hours:
+          type: number
+          format: double
+          description: Total duration of the shift in hours.
+        shift_rate_external_id:
+          type: string
+          description: External ID of the shift rate associated with the shift.
+      description: Summary of calculated hours and rates for the shift.
+      title: TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataSummary
+    TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsSummary'
+          description: Summary of calculated time and rates for the shift.
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the shift.
+        shift_type:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsShiftType'
+          description: Type of the shift
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp of the shift.
+        contract_id:
+          type: string
+          description: The unique identifier of the employee contract.
+        description:
+          type: string
+          description: Description of the shift.
+        external_id:
+          type: string
+          description: Unique identifier of the shift.
+        date_of_work:
+          type: string
+          format: date
+          description: Date of the shift.
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsPayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+        shift_reference_id:
+          type: string
+          description: Reference ID for the shift
+      required:
+      - summary
+      - shift_type
+      - contract_id
+      - description
+      - external_id
+      - date_of_work
+      title: TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItems
+    TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsSummary:
+      type: object
+      properties:
+        total_break_hours:
+          type: number
+          format: double
+          description: Total break hours within the shift.
+        payable_break_hours:
+          type: number
+          format: double
+          description: Total payable break hours.
+        total_payable_hours:
+          type: number
+          format: double
+          description: Total payable hours for the shift.
+        shift_duration_hours:
+          type: number
+          format: double
+          description: Total duration of the shift in hours.
+        shift_rate_external_id:
+          type: string
+          description: External ID of the shift rate associated with the shift.
+      description: Summary of calculated hours and rates for the shift.
+      title: TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsSummary
+    TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaDataSummaryTimeUnit:
+      type: string
+      enum:
+      - HOUR
+      - DAY
+      - WEEK
+      - MONTH
+      description: Time unit
+      title: TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaDataSummaryTimeUnit
+    TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaBreaksItemsEnd:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Break end date.
+        time:
+          type: string
+          description: Break end time.
+      description: End time details of the break.
+      title: TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaBreaksItemsEnd
+    TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaStart:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Start date of the shift.
+        time:
+          type: string
+          description: Start time of the shift.
+        is_rest_day:
+          type: boolean
+          description: Indicates if the shift start day is a rest day.
+        is_public_holiday:
+          type: boolean
+          description: Indicates if the shift start day is a public holiday.
+      description: Start time details of the shift.
+      title: TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaStart
+    TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMeta:
+      type: object
+      properties:
+        end:
+          $ref: '#/components/schemas/TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaEnd'
+          description: End time details of the shift.
+        start:
+          $ref: '#/components/schemas/TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaStart'
+          description: Start time details of the shift.
+        breaks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaBreaksItems'
+          description: List of break periods within the shift.
+        approval_date:
+          type: string
+          description: Approval date
+      description: Metadata containing detailed information about the shift timing, breaks, and approval status.
+      title: TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMeta
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems5:
+      type: object
+      properties:
+        shift_type:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf5ShiftType'
+          description: Type of the shift
+        corrections:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf5CorrectionsItems'
+          description: Array of correction adjustments to apply to the original shift.
+        description:
+          type: string
+          description: Description of the correction shift.
+        external_id:
+          type: string
+          description: External ID of the correction shift.
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf5PayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+        shift_reference_id:
+          type: string
+          description: External ID of the original shift being corrected
+      required:
+      - shift_type
+      - corrections
+      - description
+      - external_id
+      - shift_reference_id
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems5
+    TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsStart:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Break start date.
+        time:
+          type: string
+          description: Break start time.
+      description: Start time details of the break.
+      title: TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsStart
+    TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMeta'
+          description: Metadata containing detailed information about the shift timing, breaks, and approval status.
+        created_at:
+          type: string
+          description: Creation timestamp of the shift.
+        updated_at:
+          type: string
+          description: Last update timestamp of the shift.
+        contract_id:
+          type: string
+          description: Contract identifier.
+        description:
+          type: string
+          description: Description of the shift.
+        external_id:
+          type: string
+          description: Unique identifier of the shift.
+        date_of_work:
+          type: string
+          description: Date of the shift.
+      required:
+      - meta
+      - contract_id
+      - external_id
+      - date_of_work
+      title: TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItems
+    TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItems:
+      type: object
+      properties:
+        end:
+          $ref: '#/components/schemas/TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsEnd'
+          description: End time details of the break.
+        start:
+          $ref: '#/components/schemas/TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsStart'
+          description: Start time details of the break.
+        is_paid:
+          type: boolean
+          description: Indicates if the break is paid.
+      title: TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItems
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems0:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0Summary'
+          description: Summary of calculated time and rates for the shift.
+        shift_type:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0ShiftType'
+          description: Type of the shift
+        description:
+          type: string
+          description: Description of the shift.
+        external_id:
+          type: string
+          description: External ID of the shift.
+        date_of_work:
+          type: string
+          format: date
+          description: Date of shift work
+        payroll_cycle_ref:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0PayrollCycleRef'
+          description: Reference to the payroll cycle associated with this shift.
+      required:
+      - summary
+      - description
+      - external_id
+      - date_of_work
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems0
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf5CorrectionsItems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of correction
+        total_break_hours:
+          type: number
+          format: double
+          description: Break hours to add or subtract
+        payable_break_hours:
+          type: number
+          format: double
+          description: Payable break hours to add or subtract
+        total_payable_hours:
+          type: number
+          format: double
+          description: Payable hours to add or subtract
+        shift_duration_hours:
+          type: number
+          format: double
+          description: Shift duration hours to add or subtract
+      required:
+      - type
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf5CorrectionsItems
+    TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaDataPayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsExternalIdPatchResponsesContentApplicationJsonSchemaDataPayrollCycleRef
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaBreaksItems:
+      type: object
+      properties:
+        end:
+          $ref: '#/components/schemas/TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaBreaksItemsEnd'
+          description: End time details of the break.
+        start:
+          $ref: '#/components/schemas/TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaBreaksItemsStart'
+          description: Start time details of the break.
+        is_paid:
+          type: boolean
+          description: Is break paid
+      title: TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaBreaksItems
+    TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        offset:
+          type: integer
+          description: Offset used for pagination.
+        total_rows:
+          type: integer
+          description: Total number of shifts available.
+        items_per_page:
+          type: integer
+          description: Number of items returned per page.
+      required:
+      - offset
+      - total_rows
+      - items_per_page
+      description: Pagination information for the response.
+      title: TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaPage
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaBreaksItemsEnd:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Break end date
+        time:
+          type: string
+          description: Break end time
+      description: End time details of the break.
+      title: TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaBreaksItemsEnd
+    time-tracking-shifts_createTimeTrackingShiftsRaw_Response_201:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItems'
+          description: List of created shift records.
+      required:
+      - data
+      title: time-tracking-shifts_createTimeTrackingShiftsRaw_Response_201
+    TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsSummary:
+      type: object
+      properties:
+        time_unit:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsSummaryTimeUnit'
+          description: Time unit
+        time_amount:
+          type: number
+          format: double
+          description: Time amount
+        total_break_hours:
+          type: number
+          format: double
+          description: Total break hours
+        payable_break_hours:
+          type: number
+          format: double
+          description: Payable break hours
+        total_payable_hours:
+          type: number
+          format: double
+          description: Total payable hours
+        shift_duration_hours:
+          type: number
+          format: double
+          description: Shift duration hours
+        shift_rate_external_id:
+          type: string
+          description: Shift rate external ID
+      required:
+      - shift_rate_external_id
+      description: Summary of calculated time and rates for the shift.
+      title: TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsSummary
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2ShiftType:
+      type: string
+      enum:
+      - CORRECTION_DELTA
+      description: Type of the shift
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2ShiftType
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems:
+      oneOf:
+      - $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems0'
+      - $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems1'
+      - $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems2'
+      - $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems3'
+      - $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems4'
+      - $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems5'
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItems
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2PayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf2PayrollCycleRef
+    TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Description of the error.
+      title: TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaError
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf1PayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf1PayrollCycleRef
+    TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaEnd:
+      type: object
+      properties:
+        date:
+          type: string
+          description: End date
+        time:
+          type: string
+          description: End time
+        is_rest_day:
+          type: boolean
+          description: Is rest day
+        is_public_holiday:
+          type: boolean
+          description: Is public holiday
+      description: End time details of the shift.
+      title: TimeTrackingShiftsRawPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsMetaEnd
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0ShiftType:
+      type: string
+      enum:
+      - REGULAR
+      description: Type of the shift
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0ShiftType
+    time-tracking-shifts_getTimeTrackingShifts_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of shift records.
+        page:
+          $ref: '#/components/schemas/TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaPage'
+          description: Pagination information for the response.
+      required:
+      - data
+      - page
+      title: time-tracking-shifts_getTimeTrackingShifts_Response_200
+    TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsShiftType:
+      type: string
+      enum:
+      - REGULAR
+      - CORRECTION_ABSOLUTE
+      - CORRECTION_DELTA
+      description: Type of the shift
+      title: TimeTrackingShiftsPostResponsesContentApplicationJsonSchemaDataItemsShiftType
+    TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsEnd:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Break end date
+        time:
+          type: string
+          description: Break end time
+      description: End time details of the break.
+      title: TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsEnd
+    TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMeta:
+      type: object
+      properties:
+        end:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaEnd'
+          description: End time details of the shift.
+        start:
+          $ref: '#/components/schemas/TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaStart'
+          description: Start time details of the shift.
+        breaks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMetaBreaksItems'
+          description: List of break periods within the shift.
+        approval_date:
+          type: string
+          description: Approval date of the shift.
+      description: Metadata containing detailed information about the shift timing, breaks, and approval status.
+      title: TimeTrackingShiftsExternalIdGetResponsesContentApplicationJsonSchemaDataMeta
+    TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsEnd:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Break end date.
+        time:
+          type: string
+          description: Break end time.
+      description: End time details of the break.
+      title: TimeTrackingShiftsGetResponsesContentApplicationJsonSchemaDataItemsMetaBreaksItemsEnd
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf5PayrollCycleRef:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Date in ISO 8601 format that helps referencing a payroll cycle
+      required:
+      - date
+      description: Reference to the payroll cycle associated with this shift.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf5PayrollCycleRef
+    TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaDataSummaryTimeUnit:
+      type: string
+      enum:
+      - HOUR
+      - DAY
+      - WEEK
+      - MONTH
+      description: Time unit
+      title: TimeTrackingShiftsExternalIdPatchRequestBodyContentApplicationJsonSchemaDataSummaryTimeUnit
+    TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0Summary:
+      type: object
+      properties:
+        time_unit:
+          $ref: '#/components/schemas/TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0SummaryTimeUnit'
+          description: Time unit
+        time_amount:
+          type: number
+          format: double
+          description: Time amount
+        shift_rate_external_id:
+          type: string
+          description: Shift Rate external ID
+      required:
+      - time_unit
+      - time_amount
+      - shift_rate_external_id
+      description: Summary of calculated time and rates for the shift.
+      title: TimeTrackingShiftsPostRequestBodyContentApplicationJsonSchemaDataShiftsItemsOneOf0Summary
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaEnd:
+      type: object
+      properties:
+        date:
+          type: string
+          description: End date
+        time:
+          type: string
+          description: End time
+        is_rest_day:
+          type: boolean
+          description: Is rest day
+        is_public_holiday:
+          type: boolean
+          description: Is public holiday
+      description: End time details of the shift.
+      title: TimeTrackingShiftsRawPostResponsesContentApplicationJsonSchemaDataItemsMetaEnd
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

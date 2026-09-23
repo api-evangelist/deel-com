@@ -1,0 +1,2119 @@
+# x-archived-from: deel-subpackage-eorworkeroffboarding-api-openapi.yml
+# x-archived-on: 2026-09-16
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Eor Worker Offboarding API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_eorWorkerOffboarding
+paths:
+  /eor/workers/contracts/{contract_id}/offboarding/resignation-letter:
+    get:
+      operationId: download-employee-resignation-letter
+      summary: Preview Resignation Letter
+      description: "This endpoint allows workers to preview a resignation letter for an EOR Contract.\n **Token scopes**: `worker:read`"
+      tags:
+      - subpackage_eorWorkerOffboarding
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: File download successful
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResignationLetterRequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResignationLetterRequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResignationLetterRequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResignationLetterRequestInternalServerError'
+  /eor/contracts/{contract_id}/offboarding/resignation:
+    post:
+      operationId: create-employee-resignation
+      summary: Request contract resignation
+      description: "Enable clients to initiate a resignation request for an Employee of Record (EOR) contract within their team\n **Token scopes**: `contracts:write`"
+      tags:
+      - subpackage_eorWorkerOffboarding
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Resignation request submitted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-worker-offboarding_createEmployeeResignation_Response_201'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestContractResignationRequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestContractResignationRequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestContractResignationRequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestContractResignationRequestInternalServerError'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaData'
+              required:
+              - data
+  /eor/workers/resignations:
+    get:
+      operationId: get-employee-resignations
+      summary: Retrieve worker resignations
+      description: "Use this endpoint to retrieve resignations submitted by Employer of Record (EOR) workers. Use it when you need to review resignation progress, confirm desired and confirmed end dates, and access resignation letter details. Filter results by resignation letter status using the query parameter\n **Token scopes**: `worker:read`"
+      tags:
+      - subpackage_eorWorkerOffboarding
+      parameters:
+      - name: status
+        in: query
+        description: Filter by resignation letter status
+        required: false
+        schema:
+          $ref: '#/components/schemas/EorWorkersResignationsGetParametersStatus'
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-worker-offboarding_getEmployeeResignations_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWorkerResignationsRequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWorkerResignationsRequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWorkerResignationsRequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveWorkerResignationsRequestInternalServerError'
+  /eor/workers/contracts/{contract_id}/offboarding/resignation-letter/sign:
+    post:
+      operationId: sign-employee-resignation-letter
+      summary: Sign Resignation Letter
+      description: "This endpoint allows workers to provide their signature for a resignation letter. The signature is required to finalize the resignation process. Upon successful submission, the resignation letter is queued for PDF generation and further processing.\n **Token scopes**: `worker:write`"
+      tags:
+      - subpackage_eorWorkerOffboarding
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Resignation signed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-worker-offboarding_signEmployeeResignationLetter_Response_201'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignResignationLetterRequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignResignationLetterRequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignResignationLetterRequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignResignationLetterRequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+  /eor/workers/contracts/{contract_id}/offboarding:
+    post:
+      operationId: submit-eor-worker-resignation
+      summary: Submit EOR Worker Resignation
+      description: "This endpoint allows workers to formally request the resignation of their EOR contract\n **Token scopes**: `worker:write`"
+      tags:
+      - subpackage_eorWorkerOffboarding
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Ok response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-worker-offboarding_submitEORWorkerResignation_Response_201'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitEorWorkerResignationRequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitEorWorkerResignationRequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitEorWorkerResignationRequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitEorWorkerResignationRequestInternalServerError'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostRequestBodyContentMultipartFormDataSchemaData'
+              required:
+              - data
+components:
+  schemas:
+    RetrieveWorkerResignationsRequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersResignationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveWorkerResignationsRequestForbiddenError
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOff:
+      type: object
+      properties:
+        time_offs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItems'
+        additional_details:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffAdditionalDetails'
+          - type: 'null'
+        is_deel_pto_confirmed:
+          type: boolean
+          description: Indicates whether the PTO allocation has been confirmed by Deel's system
+      required:
+      - time_offs
+      - is_deel_pto_confirmed
+      description: Time-off usage data including policy information and tracking periods
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOff
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsReviewerType
+    : type: string
+      enum:
+      - CLIENT
+      - EMPLOYEE
+      description: The type of reviewer for this document
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsReviewerType
+    EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOff:
+      type: object
+      properties:
+        time_offs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItems'
+        additional_details:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffAdditionalDetails'
+          - type: 'null'
+        is_deel_pto_confirmed:
+          type: boolean
+          description: Indicates whether the PTO allocation has been confirmed by Deel's system
+      required:
+      - time_offs
+      - is_deel_pto_confirmed
+      description: Time-off usage data including policy information and tracking periods
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOff
+    RetrieveWorkerResignationsRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersResignationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveWorkerResignationsRequestBadRequestError
+    SignResignationLetterRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SignResignationLetterRequestBadRequestError
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsStatus
+    : type: string
+      enum:
+      - AWAITING_REVIEW
+      - AWAITING_FEEDBACK
+      - FEEDBACK_PROVIDED
+      - APPROVED
+      - CHANGES_REQUESTED_BY_CLIENT
+      - CHANGES_REQUESTED_BY_EMPLOYEE
+      - WAIVED_REVIEW
+      - NOT_RESPONDED
+      - CANCELLED
+      description: The current status of the document review
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsStatus
+    PreviewResignationLetterRequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: PreviewResignationLetterRequestUnauthorizedError
+    EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the offboarding request
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The definitive contract end date
+        documents:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocuments'
+          description: Document management structure for termination workflow including review processes and supporting documents
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the offboarding request was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the offboarding request was updated
+        contract_id:
+          type: string
+          description: The unique identifier of the employee contract.
+        is_sensitive:
+          type: boolean
+          description: Indicates if the offboarding request is sensitive. This is used to restrict access to the request only to the requester and the HRX team.
+        request_data:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestData'
+          - type: 'null'
+        desired_end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The desired end date. If the date is not provided, it will be selected by HRX the closest date possible
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaData
+    EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestData:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataReason'
+          description: The reason for the termination
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The definitive contract end date
+        reason_detail:
+          type:
+          - string
+          - 'null'
+          description: Optional field to describe the reason behind the resignation request
+        used_time_off:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOff'
+          description: Time-off usage data including policy information and tracking periods
+        desired_end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The desired end date. If the date is not provided, it will be selected by HRX the closest date possible
+        eligible_for_rehire:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataEligibleForRehire'
+          - type: 'null'
+          description: Parameter to inform whether it would be possible for the client to hire the employee again
+        eligible_for_rehire_reason:
+          type:
+          - string
+          - 'null'
+          description: Describe if the option DONT_KNOW was selected on eligible_for_rehire
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestData
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestData:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataReason'
+          description: The reason for the termination
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The definitive contract end date
+        reason_detail:
+          type:
+          - string
+          - 'null'
+          description: Optional field to describe the reason behind the resignation request
+        used_time_off:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOff'
+          description: Time-off usage data including policy information and tracking periods
+        desired_end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The desired end date. If the date is not provided, it will be selected by HRX the closest date possible
+        eligible_for_rehire:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataEligibleForRehire'
+          - type: 'null'
+          description: Parameter to inform whether it would be possible for the client to hire the employee again
+        eligible_for_rehire_reason:
+          type:
+          - string
+          - 'null'
+          description: Describe if the option DONT_KNOW was selected on eligible_for_rehire
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestData
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where error occurred (null for server errors)
+        message:
+          type: string
+          description: Description of the returned error
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaErrorsItems
+    EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffTrackingType:
+      type: string
+      enum:
+      - ON_PLATFORM
+      - OFF_PLATFORM
+      description: Type of time off tracking - whether it's tracked on Deel platform or off platform
+      title: EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffTrackingType
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocuments:
+      type: object
+      properties:
+        supporting:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsSupportingItems'
+        offboarding:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItems'
+          description: Document set shared that requires client or employee review
+      required:
+      - supporting
+      - offboarding
+      description: Document management structure for termination workflow including review processes and supporting documents
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocuments
+    PreviewResignationLetterRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: PreviewResignationLetterRequestInternalServerError
+    ? EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffOffPlatformUsedTimeOffEntitlementsItems
+    : type: object
+      properties:
+        used:
+          type: number
+          format: double
+          description: Amount of time off used in the period
+        tracking_period:
+          type: string
+          format: date
+          description: Start date of the tracking period
+        tracking_period_end_date:
+          type: string
+          format: date
+          description: End date of the tracking period
+      required:
+      - used
+      - tracking_period
+      - tracking_period_end_date
+      title: EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffOffPlatformUsedTimeOffEntitlementsItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestData:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataReason'
+          description: The reason for the termination
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The definitive contract end date
+        reason_detail:
+          type:
+          - string
+          - 'null'
+          description: Optional field to describe the reason behind the resignation request
+        used_time_off:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOff'
+          description: Time-off usage data including policy information and tracking periods
+        desired_end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The desired end date. If the date is not provided, it will be selected by HRX the closest date possible
+        eligible_for_rehire:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataEligibleForRehire'
+          - type: 'null'
+          description: Parameter to inform whether it would be possible for the client to hire the employee again
+        eligible_for_rehire_reason:
+          type:
+          - string
+          - 'null'
+          description: Describe if the option DONT_KNOW was selected on eligible_for_rehire
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestData
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsStatus:
+      type: string
+      enum:
+      - AWAITING_REVIEW
+      - AWAITING_FEEDBACK
+      - FEEDBACK_PROVIDED
+      - APPROVED
+      - CHANGES_REQUESTED_BY_CLIENT
+      - CHANGES_REQUESTED_BY_EMPLOYEE
+      - WAIVED_REVIEW
+      - NOT_RESPONDED
+      - CANCELLED
+      description: The current status of the document review
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsStatus
+    EorWorkersContractsContractIdOffboardingPostRequestBodyContentMultipartFormDataSchemaDataReason:
+      type: string
+      enum:
+      - EMPLOYEE_IS_MOVING_TO_ANOTHER_COUNTRY
+      - MOVING_EMPLOYEE_TO_INTERNAL_ENTITY
+      - MOVING_EMPLOYEE_TO_DEEL_PEO
+      - EMPLOYEE_FOUND_ANOTHER_JOB
+      - EMPLOYEE_NOT_HAPPY_WITH_BENEFITS
+      - EMPLOYEE_NOT_HAPPY_WITH_SALARY
+      - EMPLOYEE_NOT_HAPPY_WITH_THE_ROLE
+      - EMPLOYEE_NOT_HAPPY_WITH_COMPANY_CULTURE
+      - EMPLOYEE_NOT_HAPPY_WITH_DEEL
+      - EMPLOYEE_PROJECT_ENDED
+      - EMPLOYEE_SWITCHING_TO_OTHER_EOR_PROVIDER
+      - EMPLOYEE_LEFT_ROLE_FOR_PERSONAL_MATTERS
+      - EMPLOYEE_MOVING_FROM_EOR_TO_CONTRACTOR_OR_FREELANCE
+      - WORKER_TYPE_CHANGE
+      - PREFERRED_NOT_TO_SAY
+      description: The reason for the employee's resignation
+      title: EorWorkersContractsContractIdOffboardingPostRequestBodyContentMultipartFormDataSchemaDataReason
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsSupportingItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type/extension of the file
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the file was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the file was updated
+        is_additional_supporting_document:
+          type: boolean
+          description: Indicates if this is an additional supporting document added after the initial submission
+      required:
+      - id
+      - name
+      - type
+      - created_at
+      - updated_at
+      - is_additional_supporting_document
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsSupportingItems
+    ? EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsTrackingPeriodsItems
+    : type: object
+      properties:
+        used:
+          type: number
+          format: double
+          description: The amount of time off used in this tracking period
+        end_date:
+          type: string
+          format: date-time
+          description: The end date of the tracking period
+        start_date:
+          type: string
+          format: date-time
+          description: The start date of the tracking period
+      required:
+      - used
+      - end_date
+      - start_date
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsTrackingPeriodsItems
+    SignResignationLetterRequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SignResignationLetterRequestForbiddenError
+    EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocuments:
+      type: object
+      properties:
+        supporting:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsSupportingItems'
+        offboarding:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItems'
+          description: Document set shared that requires client or employee review
+      required:
+      - supporting
+      - offboarding
+      description: Document management structure for termination workflow including review processes and supporting documents
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocuments
+    ? EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsTrackingPeriodsItems
+    : type: object
+      properties:
+        used:
+          type: number
+          format: double
+          description: The amount of time off used in this tracking period
+        end_date:
+          type: string
+          format: date-time
+          description: The end date of the tracking period
+        start_date:
+          type: string
+          format: date-time
+          description: The start date of the tracking period
+      required:
+      - used
+      - end_date
+      - start_date
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsTrackingPeriodsItems
+    RequestContractResignationRequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RequestContractResignationRequestUnauthorizedError
+    EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsSupportingItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type/extension of the file
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the file was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the file was updated
+        is_additional_supporting_document:
+          type: boolean
+          description: Indicates if this is an additional supporting document added after the initial submission
+      required:
+      - id
+      - name
+      - type
+      - created_at
+      - updated_at
+      - is_additional_supporting_document
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsSupportingItems
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsResignationLetter
+    : type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the resignation letter
+        signature:
+          type:
+          - string
+          - 'null'
+          description: The signature of the resignation letter
+        signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the resignation letter was signed
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the resignation letter was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the resignation letter was updated
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsResignationLetter
+    eor-worker-offboarding_signEmployeeResignationLetter_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-worker-offboarding_signEmployeeResignationLetter_Response_201
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataEligibleForRehire
+    : type: string
+      enum:
+      - 'YES'
+      - 'NO'
+      - DONT_KNOW
+      description: Parameter to inform whether it would be possible for the client to hire the employee again
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataEligibleForRehire
+    ? EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffOffPlatformUsedTimeOff
+    : type: object
+      properties:
+        entitlements:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffOffPlatformUsedTimeOffEntitlementsItems'
+          description: Array of time off entitlements for different tracking periods
+        total_scheduled:
+          type: number
+          format: double
+          description: Total amount of time off scheduled until the end date
+        entitlement_unit:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffOffPlatformUsedTimeOffEntitlementUnit'
+          description: Unit of measurement for the time off entitlements
+      required:
+      - entitlements
+      - total_scheduled
+      - entitlement_unit
+      description: Required when tracking_type is OFF_PLATFORM, null otherwise
+      title: EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffOffPlatformUsedTimeOff
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOff
+    : type: object
+      properties:
+        time_offs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItems'
+        additional_details:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffAdditionalDetails'
+          - type: 'null'
+        is_deel_pto_confirmed:
+          type: boolean
+          description: Indicates whether the PTO allocation has been confirmed by Deel's system
+      required:
+      - time_offs
+      - is_deel_pto_confirmed
+      description: Time-off usage data including policy information and tracking periods
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOff
+    ? EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffOffPlatformUsedTimeOffEntitlementUnit
+    : type: string
+      enum:
+      - BUSINESS_DAY
+      - CALENDAR_DAY
+      - HOUR
+      - WEEK
+      - MONTH
+      - YEAR
+      description: Unit of measurement for the time off entitlements
+      title: EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffOffPlatformUsedTimeOffEntitlementUnit
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItems:
+      type: object
+      properties:
+        unit:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsUnit'
+          description: The unit of measurement for time off tracking
+        policy_type:
+          type: string
+          description: The type of time-off policy
+        tracking_periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsTrackingPeriodsItems'
+        scheduled_until_end_date:
+          type: number
+          format: double
+          description: The amount of time off scheduled until the end date of the current tracking period
+      required:
+      - unit
+      - policy_type
+      - tracking_periods
+      - scheduled_until_end_date
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItems
+    EorWorkersContractsContractIdOffboardingPostRequestBodyContentMultipartFormDataSchemaData:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostRequestBodyContentMultipartFormDataSchemaDataReason'
+          description: The reason for the employee's resignation
+        signature:
+          type: string
+          description: Employee signature
+        reason_detail:
+          type: string
+          description: Additional details explaining the resignation reason
+        desired_end_date:
+          type: string
+          format: date
+          description: The employee's desired last day of work in YYYY-MM-DD format
+        supporting_documents:
+          type: string
+          format: binary
+          description: This field allows for uploading multiple files at once. Includes common image formats (JPG, JPEG, PNG, HEIC) and PDF documents.
+      required:
+      - reason
+      - signature
+      - desired_end_date
+      title: EorWorkersContractsContractIdOffboardingPostRequestBodyContentMultipartFormDataSchemaData
+    ? EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsReviewerType
+    : type: string
+      enum:
+      - CLIENT
+      - EMPLOYEE
+      description: The type of reviewer for this document
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsReviewerType
+    EorWorkersContractsContractIdOffboardingResignationLetterGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where error occurred (null for server errors)
+        message:
+          type: string
+          description: Description of the returned error
+      title: EorWorkersContractsContractIdOffboardingResignationLetterGetResponsesContentApplicationJsonSchemaErrorsItems
+    EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - COMPLETED
+      - AWAITING_REFUND
+      - PROCESSING
+      - AWAITING_TRIAGE
+      - AWAITING_PROCESSING
+      - CANCELLED
+      - AWAITING_PTO
+      description: The status of the resignation
+      title: EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataAdditionalReason:
+      type: string
+      enum:
+      - MOVING_TO_INTERNAL_ENTITY_WITH_DEEL_GLOBAL_PAYROLL
+      - MOVING_TO_INTERNAL_ENTITY_WITH_OTHER_PROVIDER
+      description: An additional reason can be provided in case the reason selected is MOVING_EMPLOYEE_TO_INTERNAL_ENTITY
+      title: EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataAdditionalReason
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsReviewerType:
+      type: string
+      enum:
+      - CLIENT
+      - EMPLOYEE
+      description: The type of reviewer for this document
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsReviewerType
+    eor-worker-offboarding_getEmployeeResignations_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: eor-worker-offboarding_getEmployeeResignations_Response_200
+    PreviewResignationLetterRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: PreviewResignationLetterRequestBadRequestError
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffAdditionalDetails
+    : type: object
+      properties:
+        notes:
+          type:
+          - string
+          - 'null'
+          description: Additional notes or comments about the time-off data
+        updated_by:
+          type:
+          - string
+          - 'null'
+          description: The person or system that last updated the time-off data
+        last_updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the time-off data was last updated
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffAdditionalDetails
+    ? EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsUnit
+    : type: string
+      enum:
+      - BUSINESS_DAY
+      - CALENDAR_DAY
+      - HOUR
+      description: The unit of measurement for time off tracking
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsUnit
+    EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataSeveranceType:
+      type: string
+      enum:
+      - DAYS
+      - WEEKS
+      - MONTHS
+      - CASH
+      description: The type of severance selected by the client. It's an optional field
+      title: EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataSeveranceType
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the offboarding request
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The definitive contract end date
+        documents:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocuments'
+          description: Document management structure for termination workflow including review processes and supporting documents
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the offboarding request was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the offboarding request was updated
+        contract_id:
+          type: string
+          description: The unique identifier of the employee contract.
+        is_sensitive:
+          type: boolean
+          description: Indicates if the offboarding request is sensitive. This is used to restrict access to the request only to the requester and the HRX team.
+        request_data:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestData'
+          - type: 'null'
+        desired_end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The desired end date. If the date is not provided, it will be selected by HRX the closest date possible
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaData
+    eor-worker-offboarding_submitEORWorkerResignation_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-worker-offboarding_submitEORWorkerResignation_Response_201
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsTrackingPeriodsItems
+    : type: object
+      properties:
+        used:
+          type: number
+          format: double
+          description: The amount of time off used in this tracking period
+        end_date:
+          type: string
+          format: date-time
+          description: The end date of the tracking period
+        start_date:
+          type: string
+          format: date-time
+          description: The start date of the tracking period
+      required:
+      - used
+      - end_date
+      - start_date
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsTrackingPeriodsItems
+    RetrieveWorkerResignationsRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersResignationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveWorkerResignationsRequestInternalServerError
+    PreviewResignationLetterRequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: PreviewResignationLetterRequestForbiddenError
+    RetrieveWorkerResignationsRequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersResignationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveWorkerResignationsRequestUnauthorizedError
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItems
+    : type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the document set shared with the employee.
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsFilesItems'
+        status:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsStatus'
+          description: The current status of the document review
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the document set was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the document set was updated
+        reviewed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the document was reviewed
+        reviewed_by:
+          type:
+          - string
+          - 'null'
+          description: The name of the reviewer for this document. If the reviewer is not an employee, it will be the name of the client
+        reviewer_type:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsReviewerType'
+          description: The type of reviewer for this document
+        reviewer_feedback:
+          type:
+          - string
+          - 'null'
+          description: Feedback provided by the reviewer
+        notification_instructions:
+          type:
+          - string
+          - 'null'
+          description: HTML instructions for the reviewer notification
+        is_employee_notification_required:
+          type: boolean
+          description: Indicates if the employee should be notified about this document review
+      required:
+      - files
+      - status
+      - reviewer_type
+      - is_employee_notification_required
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItems
+    EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataReason:
+      type: string
+      enum:
+      - STATUS_CHANGE
+      - RELOCATION
+      - COMPENSATION
+      - RETIREMENT
+      - JOB_ABANDONMENT
+      - WORK_RELATED
+      - PERSONAL
+      - OTHER_OPPORTUNITY
+      - NON_RENEWAL
+      - PROBATION
+      - ASSIGNMENT_ENDED
+      - POSITION_ELIMINATION
+      - FORCE_REDUCTION
+      - DEATH
+      - FOR_CAUSE
+      - PERFORMANCE
+      - MEDICAL
+      - PERFORMANCE_ISSUES
+      - ATTENDANCE_ISSUES
+      - REORGANIZATION_DOWNSIZING_BUDGET_OR_REDUCTION_OF_WORKFORCE
+      - ROLE_BECAME_REDUNDANT_OR_ROLE_CHANGED
+      - OFFER_WAS_REVOKED
+      - EXITING_THE_MARKET
+      - NO_LONGER_WISH_TO_WORK_WITH_DEEL
+      - COMPANY_ACQUIRED
+      - STEALING
+      - MISCONDUCT
+      - FALSIFYING
+      - HARASSMENT
+      - VIOLENCE
+      - REORGANIZATION_DOWNSIZING_BUDGET_OR_REDUCTION_OF_WORKFORCE_OR_ROLE_BECAME_REDUNDANT_OR_ROLE_CHANGED
+      - UNAUTHORIZED_ABSENCES_OR_LACK_OF_ATTENDANCE
+      - STANDARD_RESELLER_PRACTICE
+      - MOVING_EMPLOYEE_TO_INTERNAL_ENTITY
+      - MOVING_EMPLOYEE_TO_DEEL_PEO
+      - OTHER
+      description: The reason for the termination
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataReason
+    SubmitEorWorkerResignationRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SubmitEorWorkerResignationRequestBadRequestError
+    EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataReason:
+      type: string
+      enum:
+      - EMPLOYEE_IS_MOVING_TO_ANOTHER_COUNTRY
+      - MOVING_EMPLOYEE_TO_INTERNAL_ENTITY
+      - MOVING_EMPLOYEE_TO_DEEL_PEO
+      - EMPLOYEE_FOUND_ANOTHER_JOB
+      - EMPLOYEE_NOT_HAPPY_WITH_BENEFITS
+      - EMPLOYEE_NOT_HAPPY_WITH_SALARY
+      - EMPLOYEE_NOT_HAPPY_WITH_THE_ROLE
+      - EMPLOYEE_NOT_HAPPY_WITH_COMPANY_CULTURE
+      - EMPLOYEE_NOT_HAPPY_WITH_DEEL
+      - EMPLOYEE_PROJECT_ENDED
+      - EMPLOYEE_SWITCHING_TO_OTHER_EOR_PROVIDER
+      - EMPLOYEE_LEFT_ROLE_FOR_PERSONAL_MATTERS
+      - EMPLOYEE_MOVING_FROM_EOR_TO_CONTRACTOR_OR_FREELANCE
+      - WORKER_TYPE_CHANGE
+      - DEEL_COLLECTIONS
+      - EMPLOYEE_DID_NOT_TAKE_THE_OFFER
+      - EMPLOYEE_PROVIDED_NO_REASON
+      - OTHER_BUSINESS_REASONS
+      description: Reason why the contract is being terminated
+      title: EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataReason
+    EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaData:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataReason'
+          description: Reason why the contract is being terminated
+        attachments:
+          type: string
+          format: binary
+          description: This field allows for uploading multiple files at once. Attach any document that is important for the request to terminate the contract. Includes common image formats (JPG, JPEG, PNG, HEIC) and PDF documents
+        is_sensitive:
+          type: boolean
+          description: Defines whether the termination is sensitive. In this case, only the person requesting the termination will be able to view the termination, receive emails or notifications.
+        reason_detail:
+          type: string
+          description: Optional field to describe the reason behind the resignation request
+        used_time_off:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOff'
+        severance_type:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataSeveranceType'
+          description: The type of severance selected by the client. It's an optional field
+        desired_end_date:
+          type: string
+          format: date
+          description: The desired end date. If the date is not provided, it will be selected by HRX the closest date possible
+        severance_amount:
+          type: number
+          format: double
+          description: The amount of severance needed
+        additional_reason:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataAdditionalReason'
+          - type: 'null'
+          description: An additional reason can be provided in case the reason selected is MOVING_EMPLOYEE_TO_INTERNAL_ENTITY
+        termination_notes:
+          type: array
+          items:
+            type: string
+          description: Additional notes can be provided regarding the termination for Deel, like questions and doubts
+        eligible_for_rehire:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataEligibleForRehire'
+          - type: 'null'
+          description: Parameter to inform whether it would be possible for the client to hire the employee again
+        eligible_for_rehire_reason:
+          type:
+          - string
+          - 'null'
+          description: Describe if the option DONT_KNOW was selected on eligible_for_rehire
+        is_employee_staying_with_deel:
+          type:
+          - boolean
+          - 'null'
+          description: Defines if employee will keep using Deel as provider
+      required:
+      - reason
+      - used_time_off
+      - is_employee_staying_with_deel
+      title: EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaData
+    EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataEligibleForRehire:
+      type: string
+      enum:
+      - 'YES'
+      - 'NO'
+      - DONT_KNOW
+      description: Parameter to inform whether it would be possible for the client to hire the employee again
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataEligibleForRehire
+    EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocuments:
+      type: object
+      properties:
+        supporting:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsSupportingItems'
+        offboarding:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItems'
+          description: Document set shared that requires client or employee review
+        resignation_letter:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsResignationLetter'
+          - type: 'null'
+      required:
+      - supporting
+      - offboarding
+      description: Document management structure for termination workflow including review processes and supporting documents
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocuments
+    ? EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsFilesItems
+    : type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type/extension of the file
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the file was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the file was updated
+      required:
+      - id
+      - name
+      - type
+      - created_at
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsFilesItems
+    EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where error occurred (null for server errors)
+        message:
+          type: string
+          description: Description of the returned error
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaErrorsItems
+    SubmitEorWorkerResignationRequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SubmitEorWorkerResignationRequestUnauthorizedError
+    EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOff:
+      type: object
+      properties:
+        tracking_type:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffTrackingType'
+          description: Type of time off tracking - whether it's tracked on Deel platform or off platform
+        off_platform_used_time_off:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOffOffPlatformUsedTimeOff'
+          - type: 'null'
+          description: Required when tracking_type is OFF_PLATFORM, null otherwise
+      title: EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataUsedTimeOff
+    eor-worker-offboarding_createEmployeeResignation_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-worker-offboarding_createEmployeeResignation_Response_201
+    ? EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffAdditionalDetails
+    : type: object
+      properties:
+        notes:
+          type:
+          - string
+          - 'null'
+          description: Additional notes or comments about the time-off data
+        updated_by:
+          type:
+          - string
+          - 'null'
+          description: The person or system that last updated the time-off data
+        last_updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the time-off data was last updated
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffAdditionalDetails
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    RequestContractResignationRequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RequestContractResignationRequestForbiddenError
+    RequestContractResignationRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RequestContractResignationRequestInternalServerError
+    SignResignationLetterRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SignResignationLetterRequestInternalServerError
+    EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the document set shared with the employee.
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsFilesItems'
+        status:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsStatus'
+          description: The current status of the document review
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the document set was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the document set was updated
+        reviewed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the document was reviewed
+        reviewed_by:
+          type:
+          - string
+          - 'null'
+          description: The name of the reviewer for this document. If the reviewer is not an employee, it will be the name of the client
+        reviewer_type:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsReviewerType'
+          description: The type of reviewer for this document
+        reviewer_feedback:
+          type:
+          - string
+          - 'null'
+          description: Feedback provided by the reviewer
+        notification_instructions:
+          type:
+          - string
+          - 'null'
+          description: HTML instructions for the reviewer notification
+        is_employee_notification_required:
+          type: boolean
+          description: Indicates if the employee should be notified about this document review
+      required:
+      - files
+      - status
+      - reviewer_type
+      - is_employee_notification_required
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItems
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataReason:
+      type: string
+      enum:
+      - STATUS_CHANGE
+      - RELOCATION
+      - COMPENSATION
+      - RETIREMENT
+      - JOB_ABANDONMENT
+      - WORK_RELATED
+      - PERSONAL
+      - OTHER_OPPORTUNITY
+      - NON_RENEWAL
+      - PROBATION
+      - ASSIGNMENT_ENDED
+      - POSITION_ELIMINATION
+      - FORCE_REDUCTION
+      - DEATH
+      - FOR_CAUSE
+      - PERFORMANCE
+      - MEDICAL
+      - PERFORMANCE_ISSUES
+      - ATTENDANCE_ISSUES
+      - REORGANIZATION_DOWNSIZING_BUDGET_OR_REDUCTION_OF_WORKFORCE
+      - ROLE_BECAME_REDUNDANT_OR_ROLE_CHANGED
+      - OFFER_WAS_REVOKED
+      - EXITING_THE_MARKET
+      - NO_LONGER_WISH_TO_WORK_WITH_DEEL
+      - COMPANY_ACQUIRED
+      - STEALING
+      - MISCONDUCT
+      - FALSIFYING
+      - HARASSMENT
+      - VIOLENCE
+      - REORGANIZATION_DOWNSIZING_BUDGET_OR_REDUCTION_OF_WORKFORCE_OR_ROLE_BECAME_REDUNDANT_OR_ROLE_CHANGED
+      - UNAUTHORIZED_ABSENCES_OR_LACK_OF_ATTENDANCE
+      - STANDARD_RESELLER_PRACTICE
+      - MOVING_EMPLOYEE_TO_INTERNAL_ENTITY
+      - MOVING_EMPLOYEE_TO_DEEL_PEO
+      - OTHER
+      description: The reason for the termination
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataReason
+    EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItemsResignationLetter:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the resignation letter
+        status:
+          $ref: '#/components/schemas/EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItemsResignationLetterStatus'
+          description: The status of the resignation letter
+        signature:
+          type:
+          - string
+          - 'null'
+          description: The signature of the resignation letter
+        signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time the resignation letter was signed
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the resignation letter was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the resignation letter was updated
+      required:
+      - id
+      - status
+      - signature
+      - signed_at
+      - created_at
+      - updated_at
+      title: EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItemsResignationLetter
+    ? EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItems
+    : type: object
+      properties:
+        unit:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsUnit'
+          description: The unit of measurement for time off tracking
+        policy_type:
+          type: string
+          description: The type of time-off policy
+        tracking_periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsTrackingPeriodsItems'
+        scheduled_until_end_date:
+          type: number
+          format: double
+          description: The amount of time off scheduled until the end date of the current tracking period
+      required:
+      - unit
+      - policy_type
+      - tracking_periods
+      - scheduled_until_end_date
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItems
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataEligibleForRehire:
+      type: string
+      enum:
+      - 'YES'
+      - 'NO'
+      - DONT_KNOW
+      description: Parameter to inform whether it would be possible for the client to hire the employee again
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataRequestDataEligibleForRehire
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsFilesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type/extension of the file
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the file was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the file was updated
+      required:
+      - id
+      - name
+      - type
+      - created_at
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsFilesItems
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsSupportingItems
+    : type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type/extension of the file
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the file was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the file was updated
+        is_additional_supporting_document:
+          type: boolean
+          description: Indicates if this is an additional supporting document added after the initial submission
+      required:
+      - id
+      - name
+      - type
+      - created_at
+      - updated_at
+      - is_additional_supporting_document
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsSupportingItems
+    EorWorkersResignationsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where error occurred (null for server errors)
+        message:
+          type: string
+          description: Description of the returned error
+      title: EorWorkersResignationsGetResponsesContentApplicationJsonSchemaErrorsItems
+    EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsStatus:
+      type: string
+      enum:
+      - AWAITING_REVIEW
+      - AWAITING_FEEDBACK
+      - FEEDBACK_PROVIDED
+      - APPROVED
+      - CHANGES_REQUESTED_BY_CLIENT
+      - CHANGES_REQUESTED_BY_EMPLOYEE
+      - WAIVED_REVIEW
+      - NOT_RESPONDED
+      - CANCELLED
+      description: The current status of the document review
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsStatus
+    ? EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsUnit
+    : type: string
+      enum:
+      - BUSINESS_DAY
+      - CALENDAR_DAY
+      - HOUR
+      description: The unit of measurement for time off tracking
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsUnit
+    EorWorkersResignationsGetParametersStatus:
+      type: string
+      enum:
+      - AWAITING_SIGNATURE
+      - SIGNED
+      title: EorWorkersResignationsGetParametersStatus
+    EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the resignation
+        status:
+          $ref: '#/components/schemas/EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: The status of the resignation
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The confirmed end date of the resignation
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the resignation was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the resignation was updated
+        contract_id:
+          type: string
+          description: The unique identifier of the employee contract.
+        desired_end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The desired end date of the resignation
+        resignation_letter:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItemsResignationLetter'
+          - type: 'null'
+      required:
+      - id
+      - status
+      - end_date
+      - created_at
+      - updated_at
+      - contract_id
+      - desired_end_date
+      - resignation_letter
+      title: EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItems
+    EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where error occurred (null for server errors)
+        message:
+          type: string
+          description: Description of the returned error
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaErrorsItems
+    SubmitEorWorkerResignationRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SubmitEorWorkerResignationRequestInternalServerError
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsUnit
+    : type: string
+      enum:
+      - BUSINESS_DAY
+      - CALENDAR_DAY
+      - HOUR
+      description: The unit of measurement for time off tracking
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsUnit
+    EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItemsResignationLetterStatus:
+      type: string
+      enum:
+      - AWAITING_SIGNATURE
+      - SIGNED
+      description: The status of the resignation letter
+      title: EorWorkersResignationsGetResponsesContentApplicationJsonSchemaDataItemsResignationLetterStatus
+    SignResignationLetterRequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SignResignationLetterRequestUnauthorizedError
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItems
+    : type: object
+      properties:
+        unit:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsUnit'
+          description: The unit of measurement for time off tracking
+        policy_type:
+          type: string
+          description: The type of time-off policy
+        tracking_periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItemsTrackingPeriodsItems'
+        scheduled_until_end_date:
+          type: number
+          format: double
+          description: The amount of time off scheduled until the end date of the current tracking period
+      required:
+      - unit
+      - policy_type
+      - tracking_periods
+      - scheduled_until_end_date
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffTimeOffsItems
+    EorWorkersContractsContractIdOffboardingResignationLetterSignPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        signature:
+          type: string
+          description: Employee signature
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostRequestBodyContentApplicationJsonSchemaData
+    SubmitEorWorkerResignationRequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SubmitEorWorkerResignationRequestForbiddenError
+    RequestContractResignationRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RequestContractResignationRequestBadRequestError
+    ? EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffAdditionalDetails
+    : type: object
+      properties:
+        notes:
+          type:
+          - string
+          - 'null'
+          description: Additional notes or comments about the time-off data
+        updated_by:
+          type:
+          - string
+          - 'null'
+          description: The person or system that last updated the time-off data
+        last_updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the time-off data was last updated
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestDataUsedTimeOffAdditionalDetails
+    EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the document set shared with the employee.
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsFilesItems'
+        status:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsStatus'
+          description: The current status of the document review
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the document set was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the document set was updated
+        reviewed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time when the document was reviewed
+        reviewed_by:
+          type:
+          - string
+          - 'null'
+          description: The name of the reviewer for this document. If the reviewer is not an employee, it will be the name of the client
+        reviewer_type:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsReviewerType'
+          description: The type of reviewer for this document
+        reviewer_feedback:
+          type:
+          - string
+          - 'null'
+          description: Feedback provided by the reviewer
+        notification_instructions:
+          type:
+          - string
+          - 'null'
+          description: HTML instructions for the reviewer notification
+        is_employee_notification_required:
+          type: boolean
+          description: Indicates if the employee should be notified about this document review
+      required:
+      - files
+      - status
+      - reviewer_type
+      - is_employee_notification_required
+      title: EorWorkersContractsContractIdOffboardingPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItems
+    EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the offboarding request
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The definitive contract end date
+        documents:
+          $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataDocuments'
+          description: Document management structure for termination workflow including review processes and supporting documents
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the offboarding request was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the offboarding request was updated
+        contract_id:
+          type: string
+          description: The unique identifier of the employee contract.
+        is_sensitive:
+          type: boolean
+          description: Indicates if the offboarding request is sensitive. This is used to restrict access to the request only to the requester and the HRX team.
+        request_data:
+          oneOf:
+          - $ref: '#/components/schemas/EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaDataRequestData'
+          - type: 'null'
+        desired_end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The desired end date. If the date is not provided, it will be selected by HRX the closest date possible
+      title: EorContractsContractIdOffboardingResignationPostResponsesContentApplicationJsonSchemaData
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataReason
+    : type: string
+      enum:
+      - STATUS_CHANGE
+      - RELOCATION
+      - COMPENSATION
+      - RETIREMENT
+      - JOB_ABANDONMENT
+      - WORK_RELATED
+      - PERSONAL
+      - OTHER_OPPORTUNITY
+      - NON_RENEWAL
+      - PROBATION
+      - ASSIGNMENT_ENDED
+      - POSITION_ELIMINATION
+      - FORCE_REDUCTION
+      - DEATH
+      - FOR_CAUSE
+      - PERFORMANCE
+      - MEDICAL
+      - PERFORMANCE_ISSUES
+      - ATTENDANCE_ISSUES
+      - REORGANIZATION_DOWNSIZING_BUDGET_OR_REDUCTION_OF_WORKFORCE
+      - ROLE_BECAME_REDUNDANT_OR_ROLE_CHANGED
+      - OFFER_WAS_REVOKED
+      - EXITING_THE_MARKET
+      - NO_LONGER_WISH_TO_WORK_WITH_DEEL
+      - COMPANY_ACQUIRED
+      - STEALING
+      - MISCONDUCT
+      - FALSIFYING
+      - HARASSMENT
+      - VIOLENCE
+      - REORGANIZATION_DOWNSIZING_BUDGET_OR_REDUCTION_OF_WORKFORCE_OR_ROLE_BECAME_REDUNDANT_OR_ROLE_CHANGED
+      - UNAUTHORIZED_ABSENCES_OR_LACK_OF_ATTENDANCE
+      - STANDARD_RESELLER_PRACTICE
+      - MOVING_EMPLOYEE_TO_INTERNAL_ENTITY
+      - MOVING_EMPLOYEE_TO_DEEL_PEO
+      - OTHER
+      description: The reason for the termination
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataRequestDataReason
+    EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataEligibleForRehire:
+      type: string
+      enum:
+      - 'YES'
+      - 'NO'
+      - DONT_KNOW
+      description: Parameter to inform whether it would be possible for the client to hire the employee again
+      title: EorContractsContractIdOffboardingResignationPostRequestBodyContentMultipartFormDataSchemaDataEligibleForRehire
+    ? EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsFilesItems
+    : type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type/extension of the file
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the file was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the file was updated
+      required:
+      - id
+      - name
+      - type
+      - created_at
+      title: EorWorkersContractsContractIdOffboardingResignationLetterSignPostResponsesContentApplicationJsonSchemaDataDocumentsOffboardingItemsFilesItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

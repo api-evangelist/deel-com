@@ -1,0 +1,856 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Subpackage Offboarding API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest/v2
+- url: https://api-staging.letsdeel.com/rest/v2
+tags:
+- name: subpackage_offboarding
+paths:
+  /offboarding/tracker:
+    get:
+      operationId: retrieve-offboarding-list
+      summary: Retrieve offboarding list
+      description: 'Retrieve offboarding list
+
+        **Token scopes**: `contracts:read`, `people:read`'
+      tags:
+      - subpackage_offboarding
+      parameters:
+      - name: search
+        in: query
+        description: Search term to filter contracts by name or other attributes
+        required: false
+        schema:
+          type: string
+      - name: hiring_types
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/OffboardingTrackerGetParametersHiringTypesSchemaItems'
+      - name: progress_statuses
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/OffboardingTrackerGetParametersProgressStatusesSchemaItems'
+      - name: limit
+        in: query
+        description: Number of results to return per page
+        required: false
+        schema:
+          type: integer
+          default: 20
+      - name: sort_by
+        in: query
+        description: Field to sort by
+        required: false
+        schema:
+          $ref: '#/components/schemas/OffboardingTrackerGetParametersSortBy'
+      - name: sort_order
+        in: query
+        description: Sorting order
+        required: false
+        schema:
+          $ref: '#/components/schemas/OffboardingTrackerGetParametersSortOrder'
+      - name: pagination
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/OffboardingTrackerGetParametersPagination'
+      - name: include_overview
+        in: query
+        description: Include an overview of the contract
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: ignore_date_range
+        in: query
+        description: Ignore the default 45-day date range and retrieve all terminations
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved list of offboarding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offboarding_retrieveOffboardingList_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+  /offboarding/tracker/{id}:
+    get:
+      operationId: retrieve-termination-details
+      summary: Retrieve termination details
+      description: 'Retrieve termination details by tracker id
+
+        **Token scopes**: `contracts:read`, `people:read`'
+      tags:
+      - subpackage_offboarding
+      parameters:
+      - name: id
+        in: path
+        description: Unique onboarding tracker identifier
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved offboarding details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offboarding_retrieveTerminationDetails_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTerminationDetailsRequestInternalServerError'
+  /offboarding/tracker/hris_profile/{oid}:
+    get:
+      operationId: retrieve-termination-details-by-hris-profile-identifier
+      summary: Retrieve termination details by HRIS profile identifier
+      description: 'Retrieve termination details by hris profile oid
+
+        **Token scopes**: `contracts:read`, `people:read`'
+      tags:
+      - subpackage_offboarding
+      parameters:
+      - name: oid
+        in: path
+        description: Unique hris profile oid
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved offboarding details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offboarding_retrieveTerminationDetailsByHrisProfileIdentifier_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+components:
+  schemas:
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEorProbationPeriod:
+      type: object
+      properties:
+        status:
+          type: string
+          description: probation status
+        period_end_at:
+          type: string
+          description: Period end date
+        period_in_days:
+          type: integer
+          description: total of days of period
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEorProbationPeriod
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataAppExperience:
+      type: object
+      properties:
+        is_minimal_requirements:
+          type: boolean
+          description: Indicates whether the individual meets the minimal experience requirements for the role.
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataAppExperience
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        summary:
+          type: array
+          items:
+            $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataSummaryItems'
+        contract:
+          $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataContract'
+        progress:
+          $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataProgress'
+        hiring_type:
+          type: string
+          description: The hiring type for the contract (e.g., contractor).
+        termination:
+          $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataTermination'
+        hris_profile:
+          $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataHrisProfile'
+        app_experience:
+          $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataAppExperience'
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaData
+    OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the individual associated with the offboarding.
+        contract:
+          $ref: '#/components/schemas/OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContract'
+        progress:
+          $ref: '#/components/schemas/OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgress'
+        unique_id:
+          type: string
+          description: A unique identifier for the offboarding item.
+        hiring_type:
+          type: string
+          description: The hiring type for the individual (e.g., contractor).
+        hris_profile:
+          $ref: '#/components/schemas/OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsHrisProfile'
+        app_experience:
+          $ref: '#/components/schemas/OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsAppExperience'
+        termination_id:
+          type:
+          - string
+          - 'null'
+          description: The termination ID if the individual has been terminated.
+        offboarding_type:
+          type: string
+          description: The type of offboarding (e.g., ENDING_CONTRACT, TERMINATION).
+      title: OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItems
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataProgress:
+      type: object
+      properties:
+        status:
+          type: string
+          description: The current status of the offboarding process (e.g., OFFBOARDING_IN_PROGRESS).
+        reference_date:
+          type: string
+          description: The reference date for the offboarding status (e.g., the termination date).
+        reference_date_type:
+          type: string
+          description: The type of reference date (e.g., END_DATE).
+        reference_date_timezone:
+          type: string
+          description: The timezone of the reference date.
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataProgress
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataTerminationInitiatedBy:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of individual
+        profile_type:
+          type:
+          - string
+          - 'null'
+          description: individual's type
+      description: The individual that initiated the termination.
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataTerminationInitiatedBy
+    OffboardingTrackerGetParametersSortOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      default: ASC
+      title: OffboardingTrackerGetParametersSortOrder
+    Offboarding_retrieveTerminationDetails_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaData'
+      title: Offboarding_retrieveTerminationDetails_Response_200
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataAppExperience:
+      type: object
+      properties:
+        is_minimal_requirements:
+          type: boolean
+          description: Indicates whether the individual meets the minimal experience requirements for the role.
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataAppExperience
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsData:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsDataId'
+          description: The unique identifier for the contract associated with the summary item.
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsData
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataProgress:
+      type: object
+      properties:
+        status:
+          type: string
+          description: The current status of the offboarding process (e.g., OFFBOARDING_IN_PROGRESS).
+        reference_date:
+          type:
+          - string
+          - 'null'
+          description: The reference date for the offboarding status (e.g., the termination date).
+        reference_date_type:
+          type: string
+          description: The type of reference date (e.g., END_DATE).
+        reference_date_timezone:
+          type: string
+          description: The timezone of the reference date.
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataProgress
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataContract:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the contract.
+        eor:
+          oneOf:
+          - $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEor'
+          - type: 'null'
+          description: Employer of Record (EOR) for the contract, if applicable.
+        oid:
+          type: string
+          description: The object ID for the contract, which might be the same as the contract ID.
+        name:
+          type: string
+          description: The name or title of the contract.
+        timezone:
+          type: string
+          description: The timezone associated with the contract (e.g., Europe/Belgrade).
+        contract_type:
+          type: string
+          description: The type of the contract (e.g., payg_tasks).
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataContract
+    OffboardingTrackerGetParametersPagination:
+      type: object
+      properties:
+        contractId:
+          type: string
+          description: Contract ID for pagination
+        effectiveDate:
+          type: string
+          format: date-time
+          description: Effective date for pagination
+        referenceDate:
+          type: string
+          format: date-time
+          description: Reference date for pagination
+        progressStatusWeight:
+          type: integer
+          description: Progress status weight for pagination
+      title: OffboardingTrackerGetParametersPagination
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEor:
+      type: object
+      properties:
+        probation_period:
+          $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEorProbationPeriod'
+      description: Employer of Record (EOR) for the contract, if applicable.
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEor
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataSummaryItems:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataSummaryItemsData'
+        name:
+          type: string
+          description: The name of the summary item (e.g., Contract ending details).
+        type:
+          type: string
+          description: The type of summary information (e.g., CONTRACT_ENDING_DETAILS).
+        value:
+          type: string
+          description: The value or status associated with the summary item.
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataSummaryItems
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsDataId:
+      oneOf:
+      - type: string
+      - type: integer
+      description: The unique identifier for the contract associated with the summary item.
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsDataId
+    OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsHrisProfile:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: The object ID for the HRIS profile of the individual.
+      title: OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsHrisProfile
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataHrisProfile:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: The unique object ID for the HRIS profile.
+        name:
+          type: string
+          description: The name of the individual in the HRIS profile.
+        work_email:
+          type: string
+          description: The work email address of the individual in the HRIS profile.
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataHrisProfile
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        summary:
+          type: array
+          items:
+            $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItems'
+        contract:
+          $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataContract'
+        progress:
+          $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataProgress'
+        hiring_type:
+          type: string
+          description: The hiring type for the contract (e.g., contractor).
+        termination:
+          $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataTermination'
+        hris_profile:
+          $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfile'
+        app_experience:
+          $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataAppExperience'
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaData
+    OffboardingTrackerGetParametersSortBy:
+      type: string
+      enum:
+      - progressStatusWeight
+      default: progressStatusWeight
+      title: OffboardingTrackerGetParametersSortBy
+    OffboardingTrackerGetParametersProgressStatusesSchemaItems:
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
+      - ONBOARDING
+      description: Progress status of the contract
+      title: OffboardingTrackerGetParametersProgressStatusesSchemaItems
+    OffboardingTrackerGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for pagination to fetch the next page of contractors
+        total_rows:
+          type: integer
+          description: The total number of contractors available
+      title: OffboardingTrackerGetResponsesContentApplicationJsonSchemaPage
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataTermination:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: The termination ID
+        end_date:
+          type: string
+          description: The end date of the contract termination.
+        ending_type:
+          type: string
+          description: The type of termination (e.g., ENDING_CONTRACT).
+        initiated_at:
+          type:
+          - string
+          - 'null'
+          description: The date and time when the termination was initiated.
+        initiated_by:
+          oneOf:
+          - $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataTerminationInitiatedBy'
+          - type: 'null'
+          description: The individual that initiated the termination.
+        public_message:
+          type:
+          - string
+          - 'null'
+          description: A public message regarding the termination.
+        termination_impact:
+          oneOf:
+          - $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataTerminationTerminationImpact'
+          - type: 'null'
+          description: The impact of the termination, if applicable.
+        eligible_for_rehire:
+          type:
+          - string
+          - 'null'
+          description: Indicates whether the individual is eligible for rehire.
+        eligible_for_rehire_reason:
+          type:
+          - string
+          - 'null'
+          description: The reason why the individual is or is not eligible for rehire.
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataTermination
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataSummaryItemsData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the contract associated with the summary item.
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataSummaryItemsData
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataContract:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the contract.
+        eor:
+          oneOf:
+          - $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataContractEor'
+          - type: 'null'
+          description: Employer of Record (EOR) for the contract, if applicable.
+        oid:
+          type: string
+          description: The object ID for the contract, which might be the same as the contract ID.
+        name:
+          type: string
+          description: The name or title of the contract.
+        timezone:
+          type: string
+          description: The timezone associated with the contract (e.g., Europe/Belgrade).
+        contract_type:
+          type: string
+          description: The type of the contract (e.g., payg_tasks).
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataContract
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataTerminationTerminationImpact:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of termination impact
+        description:
+          type: string
+          description: Description of termination impact
+      description: The impact of the termination, if applicable.
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataTerminationTerminationImpact
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfile:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: The unique object ID for the HRIS profile.
+        name:
+          type: string
+          description: The name of the individual in the HRIS profile.
+        work_email:
+          type: string
+          description: The work email address of the individual in the HRIS profile.
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfile
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataContractEorProbationPeriod:
+      type: object
+      properties:
+        status:
+          type: string
+          description: probation status
+        period_end_at:
+          type: string
+          description: Period end date
+        period_in_days:
+          type: integer
+          description: total of days of period
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataContractEorProbationPeriod
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataContractEor:
+      type: object
+      properties:
+        probation_period:
+          $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataContractEorProbationPeriod'
+      description: Employer of Record (EOR) for the contract, if applicable.
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataContractEor
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataTerminationInitiatedBy:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of individual
+        profile_type:
+          type: string
+          description: individual's type
+      description: The individual that initiated the termination.
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataTerminationInitiatedBy
+    OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsAppExperience:
+      type: object
+      properties:
+        is_minimal_requirements:
+          type: boolean
+          description: Indicates whether the individual meets the minimal experience requirements for the role.
+      title: OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsAppExperience
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItems:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsData'
+        name:
+          type: string
+          description: The name of the summary item (e.g., Contract ending details).
+        type:
+          type: string
+          description: The type of summary information (e.g., CONTRACT_ENDING_DETAILS).
+        value:
+          type:
+          - string
+          - 'null'
+          description: The value or status associated with the summary item.
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItems
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataTermination:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: The termination ID
+        end_date:
+          type: string
+          description: The end date of the contract termination.
+        ending_type:
+          type: string
+          description: The type of termination (e.g., ENDING_CONTRACT).
+        initiated_at:
+          type:
+          - string
+          - 'null'
+          description: The date and time when the termination was initiated.
+        initiated_by:
+          oneOf:
+          - $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataTerminationInitiatedBy'
+          - type: 'null'
+          description: The individual that initiated the termination.
+        public_message:
+          type:
+          - string
+          - 'null'
+          description: A public message regarding the termination.
+        termination_impact:
+          oneOf:
+          - $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataTerminationTerminationImpact'
+          - type: 'null'
+          description: The impact of the termination, if applicable.
+        eligible_for_rehire:
+          type:
+          - string
+          - 'null'
+          description: Indicates whether the individual is eligible for rehire.
+        eligible_for_rehire_reason:
+          type:
+          - string
+          - 'null'
+          description: The reason why the individual is or is not eligible for rehire.
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataTermination
+    OffboardingTrackerGetParametersHiringTypesSchemaItems:
+      type: string
+      enum:
+      - contractor
+      - employee
+      description: Hiring type (e.g., contractor, employee)
+      title: OffboardingTrackerGetParametersHiringTypesSchemaItems
+    OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataTerminationTerminationImpact:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of termination impact
+        description:
+          type: string
+          description: Description of termination impact
+      description: The impact of the termination, if applicable.
+      title: OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaDataTerminationTerminationImpact
+    OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgress:
+      type: object
+      properties:
+        status:
+          type: string
+          description: The current status of the offboarding process (e.g., OFFBOARDING_IN_PROGRESS).
+        reference_date:
+          type: string
+          description: The reference date for the offboarding status (e.g., the termination date).
+        reference_date_type:
+          type: string
+          description: The type of reference date (e.g., END_DATE).
+        reference_date_timezone:
+          type:
+          - string
+          - 'null'
+          description: The timezone of the reference date.
+      title: OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgress
+    OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    Offboarding_retrieveOffboardingList_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItems'
+          description: A list of offboarding items.
+        page:
+          $ref: '#/components/schemas/OffboardingTrackerGetResponsesContentApplicationJsonSchemaPage'
+      title: Offboarding_retrieveOffboardingList_Response_200
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    RetrieveTerminationDetailsRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OffboardingTrackerIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveTerminationDetailsRequestInternalServerError
+    OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContract:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The contract ID associated with the individual.
+      title: OffboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContract
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    Offboarding_retrieveTerminationDetailsByHrisProfileIdentifier_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OffboardingTrackerHrisProfileOidGetResponsesContentApplicationJsonSchemaData'
+      title: Offboarding_retrieveTerminationDetailsByHrisProfileIdentifier_Response_200
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)\n"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

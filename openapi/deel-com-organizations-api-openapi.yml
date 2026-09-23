@@ -1,19 +1,26 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Deel ATS Adjustments Organizations API
-  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
+  title: Deel Core Organizations API
+  description: 'Core organizational, contract, and people APIs for Deel. Covers organizations,
 
-    job postings, candidates, applications, attachments, offers, departments, locations,
+    legal entities, departments, groups, managers, cost centers, contracts (IC, EOR,
 
-    email templates, hiring members, employment types, application sources, tags, and
+    Global Payroll), invoice adjustments, lookups, magic links, tasks, and custom fields.
 
-    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.
 
-    '
+    Authentication uses bearer Organization or Personal API tokens generated from the
+
+    Deel Developer Center. Production base URL is https://api.letsdeel.com/rest/v2 and
+
+    the sandbox is https://api-sandbox.demo.deel.com/rest/v2.'
   version: '2026-05-25'
   contact:
     name: Deel Developer Support
-    url: https://developer.deel.com/api/ats-guides/introduction
+    url: https://developer.deel.com/
+  termsOfService: https://www.deel.com/legal/terms-of-service/
+  license:
+    name: Deel Developer Terms
+    url: https://www.deel.com/legal/
 servers:
 - url: https://api.letsdeel.com/rest/v2
   description: Production
@@ -59,6 +66,22 @@ paths:
                 $ref: '#/components/schemas/OrganizationStructure'
 components:
   schemas:
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+    OrganizationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organization'
     Department:
       type: object
       properties:
@@ -84,29 +107,6 @@ components:
           format: date-time
         external_id:
           type: string
-    Error:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: object
-            properties:
-              code:
-                type: string
-              message:
-                type: string
-              field:
-                type: string
-    Group:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        type:
-          type: string
     OrganizationStructure:
       type: object
       properties:
@@ -121,22 +121,29 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Group'
-    OrganizationListResponse:
+    Error:
       type: object
       properties:
-        data:
+        errors:
           type: array
           items:
-            $ref: '#/components/schemas/Organization'
+            type: object
+            properties:
+              code:
+                type: string
+              message:
+                type: string
+              field:
+                type: string
   responses:
-    RateLimited:
-      description: Rate limit exceeded (5 requests/second per organization)
+    Unauthorized:
+      description: Missing or invalid bearer token
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Missing or invalid bearer token
+    RateLimited:
+      description: Rate limit exceeded (5 requests/second per organization)
       content:
         application/json:
           schema:
@@ -146,3 +153,4 @@ components:
       type: http
       scheme: bearer
       bearerFormat: opaque
+      description: Deel Organization or Personal API token issued from the Developer Center.
