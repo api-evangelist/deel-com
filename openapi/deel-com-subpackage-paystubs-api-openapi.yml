@@ -102,6 +102,69 @@ paths:
                 $ref: '#/components/schemas/ApiErrorContainer'
 components:
   schemas:
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ? BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItems
+    : type: object
+      properties:
+        name:
+          type: string
+          description: The contribution name.
+        type:
+          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItemsType'
+          description: The type of contribution.
+        amount:
+          type: number
+          format: double
+          description: The contribution amount.
+      description: Details about the contributions.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItems
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItems'
+          description: List of paystubs
+        page:
+          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataPage'
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaData
     ? BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsContributionsItems
     : type: object
       properties:
@@ -117,17 +180,60 @@ components:
           description: The contribution amount.
       description: Details about the contributions.
       title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsContributionsItems
-    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollType:
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetParametersStatesSchemaItems:
       type: string
       enum:
-      - CORRECTION
-      - RECONCILIATION
-      - PARALLEL
-      - HISTORICAL
-      - OFFCYCLE
-      - REGULAR
-      description: Payroll type.
-      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollType
+      - OPEN
+      - LOCKED
+      - CLOSED
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetParametersStatesSchemaItems
+    Paystubs_getPaystubsFromLegalEntityIntegratedWithExternalBenefitsVendor-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaData'
+      title: Paystubs_getPaystubsFromLegalEntityIntegratedWithExternalBenefitsVendor-v2026-01-01_Response_200
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollSchedule:
+      type: string
+      enum:
+      - MONTHLY
+      - BIMONTHLY
+      - BIWEEKLY
+      - WEEKLY
+      description: Payroll cycle type.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollSchedule
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataPage:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: The last fetched id to start querying from
+        total_rows:
+          type: integer
+          description: Total number of rows
+        items_per_page:
+          type: integer
+          description: Items per page
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataPage
+    ? BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItemsType
+    : type: string
+      enum:
+      - Match Rate
+      - Non Elective
+      - Safe Harbor Type 1
+      - Safe Harbor Type 2
+      description: The type of contribution.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItemsType
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollState:
+      type: string
+      enum:
+      - OPEN
+      - LOCKED
+      - CLOSED
+      description: Payroll state.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollState
     ? BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsContributionsItemsType
     : type: string
       enum:
@@ -168,21 +274,6 @@ components:
             $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItems'
           description: List of employeer's contributions.
       title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItems
-    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataPage:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: The last fetched id to start querying from
-        total_rows:
-          type: integer
-          description: Total number of rows
-        items_per_page:
-          type: integer
-          description: Items per page
-      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataPage
     BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItems:
       type: object
       properties:
@@ -213,49 +304,17 @@ components:
           type: string
           description: Payroll start date.
       title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItems
-    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItems'
-          description: List of paystubs
-        page:
-          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataPage'
-      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaData
-    ? BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItems
-    : type: object
-      properties:
-        name:
-          type: string
-          description: The contribution name.
-        type:
-          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItemsType'
-          description: The type of contribution.
-        amount:
-          type: number
-          format: double
-          description: The contribution amount.
-      description: Details about the contributions.
-      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItems
-    ? BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItemsType
-    : type: string
-      enum:
-      - Match Rate
-      - Non Elective
-      - Safe Harbor Type 1
-      - Safe Harbor Type 2
-      description: The type of contribution.
-      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsEmployeesItemsEmployerContributionsItemsType
-    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollState:
+    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollType:
       type: string
       enum:
-      - OPEN
-      - LOCKED
-      - CLOSED
-      description: Payroll state.
-      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollState
+      - CORRECTION
+      - RECONCILIATION
+      - PARALLEL
+      - HISTORICAL
+      - OFFCYCLE
+      - REGULAR
+      description: Payroll type.
+      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollType
     ApiErrorContainer:
       type: object
       properties:
@@ -266,65 +325,6 @@ components:
           items:
             $ref: '#/components/schemas/ApiError'
       title: ApiErrorContainer
-    BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollSchedule:
-      type: string
-      enum:
-      - MONTHLY
-      - BIMONTHLY
-      - BIWEEKLY
-      - WEEKLY
-      description: Payroll cycle type.
-      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaDataDataItemsPayrollSchedule
-    Paystubs_getPaystubsFromLegalEntityIntegratedWithExternalBenefitsVendor-v2026-01-01_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/BenefitsLegalEntitiesLegalEntityIdPaystubsGetResponsesContentApplicationJsonSchemaData'
-      title: Paystubs_getPaystubsFromLegalEntityIntegratedWithExternalBenefitsVendor-v2026-01-01_Response_200
-    ApiErrorRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    BenefitsLegalEntitiesLegalEntityIdPaystubsGetParametersStatesSchemaItems:
-      type: string
-      enum:
-      - OPEN
-      - LOCKED
-      - CLOSED
-      title: BenefitsLegalEntitiesLegalEntityIdPaystubsGetParametersStatesSchemaItems
   securitySchemes:
     deelToken:
       type: http

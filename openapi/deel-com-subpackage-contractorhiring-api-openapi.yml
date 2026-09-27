@@ -445,22 +445,36 @@ paths:
                   $ref: '#/components/schemas/ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaData'
 components:
   schemas:
-    contractor-hiring_createContractSignature_Response_201:
+    contractor-hiring_getContractInvitations_Response_200:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/ContractsContractIdSignaturesPostResponsesContentApplicationJsonSchemaData'
+          $ref: '#/components/schemas/ContractsContractIdInvitationsDeleteResponsesContentApplicationJsonSchemaData'
       required:
       - data
-      title: contractor-hiring_createContractSignature_Response_201
-    ContractsContractIdInvitationsPostResponsesContentApplicationJsonSchemaData:
+      title: contractor-hiring_getContractInvitations_Response_200
+    contractor-hiring_getContractInvite_Response_200:
       type: object
       properties:
-        created:
-          type: boolean
+        data:
+          type: string
       required:
-      - created
-      title: ContractsContractIdInvitationsPostResponsesContentApplicationJsonSchemaData
+      - data
+      title: contractor-hiring_getContractInvite_Response_200
+    ContractsContractIdDocumentsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        key:
+          type: string
+          description: You can call attachments end-point, get key and URL to upload your file.
+        filename:
+          type: string
+          description: Original filename you used to upload using attachments end-point.
+      required:
+      - key
+      - filename
+      description: This object is used for linking file attachments to your records.
+      title: ContractsContractIdDocumentsPostResponsesContentApplicationJsonSchemaData
     ContractsContractIdSignaturesPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -469,15 +483,50 @@ components:
       required:
       - created
       title: ContractsContractIdSignaturesPostResponsesContentApplicationJsonSchemaData
-    ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItemsStatus:
-      type: string
-      enum:
-      - active
-      - upcoming
-      - awaiting_payment
-      - overdue
-      description: The current status of the payment cycle.
-      title: ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    contractor-hiring_createContractDocument_Response_201:
+      type: object
+      properties:
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdDocumentsPostResponsesContentApplicationJsonSchemaData'
+          - type: 'null'
+          description: This object is used for linking file attachments to your records.
+      required:
+      - data
+      title: contractor-hiring_createContractDocument_Response_201
+    ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaDataContractTemplateId:
+      oneOf:
+      - type: number
+        format: double
+      - type: string
+      description: Please use null to use default Deel contract template; otherwise you can use the template you created and customized. If template ID is not in payload, template stays unchanged.
+      title: ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaDataContractTemplateId
+    contractor-hiring_createContractInvitation_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdInvitationsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: contractor-hiring_createContractInvitation_Response_201
+    ContractsContractIdInvitationsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+      required:
+      - created
+      title: ContractsContractIdInvitationsPostResponsesContentApplicationJsonSchemaData
     ApiErrorRequest:
       type: object
       properties:
@@ -514,47 +563,26 @@ components:
       required:
       - deleted
       title: ContractsContractIdInvitationsDeleteResponsesContentApplicationJsonSchemaData
-    ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItems:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier for the payment.
-        status:
-          $ref: '#/components/schemas/ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItemsStatus'
-          description: The current status of the payment cycle.
-        due_date:
-          type: string
-          format: date-time
-          description: The date and time when the payment is due.
-      required:
-      - id
-      - status
-      - due_date
-      title: ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItems
-    ContractsContractIdDocumentsPostResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        key:
-          type: string
-          description: You can call attachments end-point, get key and URL to upload your file.
-        filename:
-          type: string
-          description: Original filename you used to upload using attachments end-point.
-      required:
-      - key
-      - filename
-      description: This object is used for linking file attachments to your records.
-      title: ContractsContractIdDocumentsPostResponsesContentApplicationJsonSchemaData
-    contractor-hiring_getContractInvitations_Response_200:
+    contractor-hiring_getContractPaymentCycles_Response_200:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/ContractsContractIdInvitationsDeleteResponsesContentApplicationJsonSchemaData'
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItems'
       required:
       - data
-      title: contractor-hiring_getContractInvitations_Response_200
+      title: contractor-hiring_getContractPaymentCycles_Response_200
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
     ContractsContractIdInvitationsPostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -569,72 +597,6 @@ components:
           type: string
           description: Message to the worker
       title: ContractsContractIdInvitationsPostRequestBodyContentApplicationJsonSchemaData
-    ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaDataContractTemplateId:
-      oneOf:
-      - type: number
-        format: double
-      - type: string
-      description: Please use null to use default Deel contract template; otherwise you can use the template you created and customized. If template ID is not in payload, template stays unchanged.
-      title: ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaDataContractTemplateId
-    contractor-hiring_createContractDocument_Response_201:
-      type: object
-      properties:
-        data:
-          oneOf:
-          - $ref: '#/components/schemas/ContractsContractIdDocumentsPostResponsesContentApplicationJsonSchemaData'
-          - type: 'null'
-          description: This object is used for linking file attachments to your records.
-      required:
-      - data
-      title: contractor-hiring_createContractDocument_Response_201
-    contractor-hiring_getContractPaymentCycles_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItems'
-      required:
-      - data
-      title: contractor-hiring_getContractPaymentCycles_Response_200
-    contractor-hiring_getContractInvite_Response_200:
-      type: object
-      properties:
-        data:
-          type: string
-      required:
-      - data
-      title: contractor-hiring_getContractInvite_Response_200
-    contractor-hiring_createContractInvitation_Response_201:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ContractsContractIdInvitationsPostResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: contractor-hiring_createContractInvitation_Response_201
-    ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        client_signature:
-          type: string
-          description: Signature of client.
-        contract_template_id:
-          $ref: '#/components/schemas/ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaDataContractTemplateId'
-          description: Please use null to use default Deel contract template; otherwise you can use the template you created and customized. If template ID is not in payload, template stays unchanged.
-      required:
-      - client_signature
-      title: ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaData
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
     ContractsContractIdInvitationsPostRequestBodyContentApplicationJsonSchemaDataLocale:
       type: string
       enum:
@@ -656,16 +618,54 @@ components:
       default: en
       description: Locale of the email
       title: ContractsContractIdInvitationsPostRequestBodyContentApplicationJsonSchemaDataLocale
-    ApiError:
+    ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
-        message:
+        client_signature:
           type: string
-          description: A description of the returned error
-        path:
+          description: Signature of client.
+        contract_template_id:
+          $ref: '#/components/schemas/ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaDataContractTemplateId'
+          description: Please use null to use default Deel contract template; otherwise you can use the template you created and customized. If template ID is not in payload, template stays unchanged.
+      required:
+      - client_signature
+      title: ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
           type: string
-          description: The JSON path where input validation failed
-      title: ApiError
+          format: uuid
+          description: Unique identifier for the payment.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: The current status of the payment cycle.
+        due_date:
+          type: string
+          format: date-time
+          description: The date and time when the payment is due.
+      required:
+      - id
+      - status
+      - due_date
+      title: ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItems
+    contractor-hiring_createContractSignature_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdSignaturesPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: contractor-hiring_createContractSignature_Response_201
+    ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - active
+      - upcoming
+      - awaiting_payment
+      - overdue
+      description: The current status of the payment cycle.
+      title: ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItemsStatus
   securitySchemes:
     deelToken:
       type: http

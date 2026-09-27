@@ -352,15 +352,52 @@ paths:
               - data
 components:
   schemas:
-    GroupsIdPatchRequestBodyContentApplicationJsonSchemaData:
+    CreateGroupRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/GroupsPostResponsesContentApplicationJsonSchemaError'
+      title: CreateGroupRequestBadRequestError
+    GroupsIdClonePostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+      title: GroupsIdClonePostResponsesContentApplicationJsonSchemaErrorsItems
+    GroupsIdClonePostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
         name:
           type: string
-          description: The updated name of the group.
+          description: The name of the group to be created.
+        external_metadata:
+          $ref: '#/components/schemas/GroupsIdClonePostRequestBodyContentApplicationJsonSchemaDataExternalMetadata'
+          description: The extra information of the group to be created.
       required:
       - name
-      title: GroupsIdPatchRequestBodyContentApplicationJsonSchemaData
+      title: GroupsIdClonePostRequestBodyContentApplicationJsonSchemaData
+    GroupsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type: string
+          description: An opaque cursor to fetch the next set of results.
+        total_rows:
+          type: integer
+          description: The total number of groups available for the current query (including pagination).
+      title: GroupsGetResponsesContentApplicationJsonSchemaPage
+    groups_deleteGroup_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GroupsIdDeleteResponsesContentApplicationJsonSchemaData'
+      title: groups_deleteGroup_Response_200
+    GroupsPostRequestBodyContentApplicationJsonSchemaDataExternalMetadata:
+      type: object
+      properties: {}
+      description: The extra information of the group to be created.
+      title: GroupsPostRequestBodyContentApplicationJsonSchemaDataExternalMetadata
     GroupsGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -395,21 +432,77 @@ components:
           $ref: '#/components/schemas/GroupsGetResponsesContentApplicationJsonSchemaDataItemsExternalMetadata'
           description: Extra information about the group.
       title: GroupsGetResponsesContentApplicationJsonSchemaDataItems
-    GroupsGetResponsesContentApplicationJsonSchemaDataItemsExternalMetadata:
-      type: object
-      properties: {}
-      description: Extra information about the group.
-      title: GroupsGetResponsesContentApplicationJsonSchemaDataItemsExternalMetadata
-    GroupsGetResponsesContentApplicationJsonSchemaPage:
+    GroupsGetParametersSortOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      default: ASC
+      title: GroupsGetParametersSortOrder
+    GroupsIdPatchResponsesContentApplicationJsonSchemaError:
       type: object
       properties:
-        cursor:
+        message:
           type: string
-          description: An opaque cursor to fetch the next set of results.
-        total_rows:
-          type: integer
-          description: The total number of groups available for the current query (including pagination).
-      title: GroupsGetResponsesContentApplicationJsonSchemaPage
+          description: Description of the error.
+      title: GroupsIdPatchResponsesContentApplicationJsonSchemaError
+    GroupsIdClonePostResponsesContentApplicationJsonSchemaDataExternalMetadata:
+      type: object
+      properties: {}
+      description: Extra information of the group.
+      title: GroupsIdClonePostResponsesContentApplicationJsonSchemaDataExternalMetadata
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    groups_createGroup_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GroupsPostResponsesContentApplicationJsonSchemaData'
+      title: groups_createGroup_Response_200
+    GroupsIdClonePostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the created group.
+        name:
+          type: string
+          description: The name of the created group.
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was last updated.
+        external_metadata:
+          $ref: '#/components/schemas/GroupsIdClonePostResponsesContentApplicationJsonSchemaDataExternalMetadata'
+          description: Extra information of the group.
+      title: GroupsIdClonePostResponsesContentApplicationJsonSchemaData
+    DeleteGroupRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/GroupsIdDeleteResponsesContentApplicationJsonSchemaError'
+      title: DeleteGroupRequestBadRequestError
+    CloneAGroupRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupsIdClonePostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CloneAGroupRequestBadRequestError
     ApiErrorRequest:
       type: object
       properties:
@@ -437,86 +530,12 @@ components:
           format: double
           description: The code of the source handler which produced the returned error
       title: ApiErrorRequest
-    groups_deleteGroup_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GroupsIdDeleteResponsesContentApplicationJsonSchemaData'
-      title: groups_deleteGroup_Response_200
-    GroupsIdClonePostRequestBodyContentApplicationJsonSchemaDataExternalMetadata:
-      type: object
-      properties: {}
-      description: The extra information of the group to be created.
-      title: GroupsIdClonePostRequestBodyContentApplicationJsonSchemaDataExternalMetadata
-    DeleteGroupRequestBadRequestError:
+    EditGroupRequestBadRequestError:
       type: object
       properties:
         error:
-          $ref: '#/components/schemas/GroupsIdDeleteResponsesContentApplicationJsonSchemaError'
-      title: DeleteGroupRequestBadRequestError
-    GroupsPostResponsesContentApplicationJsonSchemaDataExternalMetadata:
-      type: object
-      properties: {}
-      description: Extra information of the group.
-      title: GroupsPostResponsesContentApplicationJsonSchemaDataExternalMetadata
-    DeleteGroupRequestNotFoundError:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/GroupsIdDeleteResponsesContentApplicationJsonSchemaError'
-      title: DeleteGroupRequestNotFoundError
-    GroupsPostResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique identifier of the created group.
-        name:
-          type: string
-          description: The name of the created group.
-        created_at:
-          type: string
-          format: date-time
-          description: The timestamp when the group was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The timestamp when the group was last updated.
-        external_metadata:
-          $ref: '#/components/schemas/GroupsPostResponsesContentApplicationJsonSchemaDataExternalMetadata'
-          description: Extra information of the group.
-      title: GroupsPostResponsesContentApplicationJsonSchemaData
-    groups_cloneGroup_Response_201:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GroupsIdClonePostResponsesContentApplicationJsonSchemaData'
-      title: groups_cloneGroup_Response_201
-    GroupsGetParametersSortOrder:
-      type: string
-      enum:
-      - ASC
-      - DESC
-      default: ASC
-      title: GroupsGetParametersSortOrder
-    CreateGroupRequestBadRequestError:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/GroupsPostResponsesContentApplicationJsonSchemaError'
-      title: CreateGroupRequestBadRequestError
-    GroupsPostResponsesContentApplicationJsonSchemaError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Description of the error.
-      title: GroupsPostResponsesContentApplicationJsonSchemaError
-    GroupsIdPatchResponsesContentApplicationJsonSchemaDataExternalMetadata:
-      type: object
-      properties: {}
-      description: Extra information of the group.
-      title: GroupsIdPatchResponsesContentApplicationJsonSchemaDataExternalMetadata
+          $ref: '#/components/schemas/GroupsIdPatchResponsesContentApplicationJsonSchemaError'
+      title: EditGroupRequestBadRequestError
     GetGroupsRequestBadRequestError:
       type: object
       properties:
@@ -524,47 +543,6 @@ components:
           type: string
           description: Error message explaining what went wrong.
       title: GetGroupsRequestBadRequestError
-    GroupsPostRequestBodyContentApplicationJsonSchemaDataExternalMetadata:
-      type: object
-      properties: {}
-      description: The extra information of the group to be created.
-      title: GroupsPostRequestBodyContentApplicationJsonSchemaDataExternalMetadata
-    CloneAGroupRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/GroupsIdClonePostResponsesContentApplicationJsonSchemaErrorsItems'
-      title: CloneAGroupRequestBadRequestError
-    groups_getGroups_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/GroupsGetResponsesContentApplicationJsonSchemaDataItems'
-        page:
-          $ref: '#/components/schemas/GroupsGetResponsesContentApplicationJsonSchemaPage'
-      title: groups_getGroups_Response_200
-    groups_createGroup_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GroupsPostResponsesContentApplicationJsonSchemaData'
-      title: groups_createGroup_Response_200
-    GroupsIdClonePostRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The name of the group to be created.
-        external_metadata:
-          $ref: '#/components/schemas/GroupsIdClonePostRequestBodyContentApplicationJsonSchemaDataExternalMetadata'
-          description: The extra information of the group to be created.
-      required:
-      - name
-      title: GroupsIdClonePostRequestBodyContentApplicationJsonSchemaData
     GroupsIdPatchResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -593,57 +571,32 @@ components:
       - archived
       description: The current status of the group (active or archived).
       title: GroupsGetResponsesContentApplicationJsonSchemaDataItemsStatus
-    GroupsIdDeleteResponsesContentApplicationJsonSchemaError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Group not found error message.
-      title: GroupsIdDeleteResponsesContentApplicationJsonSchemaError
-    GroupsIdClonePostResponsesContentApplicationJsonSchemaDataExternalMetadata:
+    GroupsIdClonePostRequestBodyContentApplicationJsonSchemaDataExternalMetadata:
       type: object
       properties: {}
-      description: Extra information of the group.
-      title: GroupsIdClonePostResponsesContentApplicationJsonSchemaDataExternalMetadata
-    GroupsPostRequestBodyContentApplicationJsonSchemaData:
+      description: The extra information of the group to be created.
+      title: GroupsIdClonePostRequestBodyContentApplicationJsonSchemaDataExternalMetadata
+    ApiErrorContainer:
       type: object
       properties:
-        name:
-          type: string
-          description: The name of the group to be created.
-        external_metadata:
-          $ref: '#/components/schemas/GroupsPostRequestBodyContentApplicationJsonSchemaDataExternalMetadata'
-          description: The extra information of the group to be created.
-      required:
-      - name
-      title: GroupsPostRequestBodyContentApplicationJsonSchemaData
-    GroupsIdDeleteResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        archived_at:
-          type: string
-          format: date-time
-          description: The timestamp when the group was archived.
-      title: GroupsIdDeleteResponsesContentApplicationJsonSchemaData
-    GroupsIdPatchResponsesContentApplicationJsonSchemaError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Description of the error.
-      title: GroupsIdPatchResponsesContentApplicationJsonSchemaError
-    EditGroupRequestBadRequestError:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    DeleteGroupRequestNotFoundError:
       type: object
       properties:
         error:
-          $ref: '#/components/schemas/GroupsIdPatchResponsesContentApplicationJsonSchemaError'
-      title: EditGroupRequestBadRequestError
-    GroupsIdClonePostResponsesContentApplicationJsonSchemaData:
+          $ref: '#/components/schemas/GroupsIdDeleteResponsesContentApplicationJsonSchemaError'
+      title: DeleteGroupRequestNotFoundError
+    GroupsPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
         id:
           type: string
-          format: uuid
           description: The unique identifier of the created group.
         name:
           type: string
@@ -657,42 +610,89 @@ components:
           format: date-time
           description: The timestamp when the group was last updated.
         external_metadata:
-          $ref: '#/components/schemas/GroupsIdClonePostResponsesContentApplicationJsonSchemaDataExternalMetadata'
+          $ref: '#/components/schemas/GroupsPostResponsesContentApplicationJsonSchemaDataExternalMetadata'
           description: Extra information of the group.
-      title: GroupsIdClonePostResponsesContentApplicationJsonSchemaData
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    ApiError:
+      title: GroupsPostResponsesContentApplicationJsonSchemaData
+    GroupsPostResponsesContentApplicationJsonSchemaError:
       type: object
       properties:
         message:
           type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    GroupsIdClonePostResponsesContentApplicationJsonSchemaErrorsItems:
+          description: Description of the error.
+      title: GroupsPostResponsesContentApplicationJsonSchemaError
+    GroupsIdPatchResponsesContentApplicationJsonSchemaDataExternalMetadata:
       type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-      title: GroupsIdClonePostResponsesContentApplicationJsonSchemaErrorsItems
+      properties: {}
+      description: Extra information of the group.
+      title: GroupsIdPatchResponsesContentApplicationJsonSchemaDataExternalMetadata
     groups_updateGroup_Response_200:
       type: object
       properties:
         data:
           $ref: '#/components/schemas/GroupsIdPatchResponsesContentApplicationJsonSchemaData'
       title: groups_updateGroup_Response_200
+    GroupsPostResponsesContentApplicationJsonSchemaDataExternalMetadata:
+      type: object
+      properties: {}
+      description: Extra information of the group.
+      title: GroupsPostResponsesContentApplicationJsonSchemaDataExternalMetadata
+    GroupsIdDeleteResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Group not found error message.
+      title: GroupsIdDeleteResponsesContentApplicationJsonSchemaError
+    GroupsIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        archived_at:
+          type: string
+          format: date-time
+          description: The timestamp when the group was archived.
+      title: GroupsIdDeleteResponsesContentApplicationJsonSchemaData
+    groups_cloneGroup_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GroupsIdClonePostResponsesContentApplicationJsonSchemaData'
+      title: groups_cloneGroup_Response_201
+    groups_getGroups_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupsGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/GroupsGetResponsesContentApplicationJsonSchemaPage'
+      title: groups_getGroups_Response_200
+    GroupsIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The updated name of the group.
+      required:
+      - name
+      title: GroupsIdPatchRequestBodyContentApplicationJsonSchemaData
+    GroupsGetResponsesContentApplicationJsonSchemaDataItemsExternalMetadata:
+      type: object
+      properties: {}
+      description: Extra information about the group.
+      title: GroupsGetResponsesContentApplicationJsonSchemaDataItemsExternalMetadata
+    GroupsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the group to be created.
+        external_metadata:
+          $ref: '#/components/schemas/GroupsPostRequestBodyContentApplicationJsonSchemaDataExternalMetadata'
+          description: The extra information of the group to be created.
+      required:
+      - name
+      title: GroupsPostRequestBodyContentApplicationJsonSchemaData
   securitySchemes:
     deelToken:
       type: http

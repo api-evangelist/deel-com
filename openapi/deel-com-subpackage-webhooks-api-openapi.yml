@@ -410,14 +410,43 @@ paths:
                 $ref: '#/components/schemas/ApiErrorContainer'
 components:
   schemas:
-    WebhookItemResponse:
+    ApiError:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/WebhookItem'
-      required:
-      - data
-      title: WebhookItemResponse
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
     WebhookEventTypeResponse:
       type: object
       properties:
@@ -455,6 +484,101 @@ components:
       - name
       - description
       title: WebhookEventTypeResponse
+    WebhookItemStatus:
+      type: string
+      enum:
+      - enabled
+      - disabled
+      description: Status of webhook.
+      title: WebhookItemStatus
+    WebhookItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of this resource.
+        name:
+          type:
+          - string
+          - 'null'
+          description: Webhook subscription name.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Webhook subscription description.
+        status:
+          $ref: '#/components/schemas/WebhookItemStatus'
+          description: Status of webhook.
+        url:
+          type: string
+          description: Endpoint to receive webhook.
+        signing_key:
+          type:
+          - string
+          - 'null'
+          description: The webhook's signing key, used to generate webhook signatures.
+        api_version:
+          type: string
+          default: v2
+          description: Deel API version. Currently Deel accepts v1 or v2 version.
+        events:
+          type: array
+          items:
+            type: string
+          description: The list of events to enable for this subscription.
+        created_at:
+          type: string
+          description: Time at which the webhook was created.
+        updated_at:
+          type: string
+          description: Time at which the webhook was updated.
+        hidden:
+          type:
+          - boolean
+          - 'null'
+          description: Property to hide the webhook from frontend view. Commonly by Dell 3rd party apps
+        internal:
+          type: boolean
+        deleted_at:
+          type: string
+          description: Time at which the webhook was deleted.
+      required:
+      - id
+      - name
+      - description
+      - status
+      - url
+      - signing_key
+      - api_version
+      - events
+      - created_at
+      - updated_at
+      title: WebhookItem
+    CreateWebhookRequestStatus:
+      type: string
+      enum:
+      - enabled
+      - disabled
+      description: Status of webhook.
+      title: CreateWebhookRequestStatus
+    GenericResultDeletedData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms the deletion.
+      required:
+      - deleted
+      title: GenericResultDeletedData
+    GenericResultDeleted:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GenericResultDeletedData'
+      required:
+      - data
+      title: GenericResultDeleted
     WebhookListResponse:
       type: object
       properties:
@@ -465,13 +589,22 @@ components:
       required:
       - data
       title: WebhookListResponse
-    WebhookItemStatus:
-      type: string
-      enum:
-      - enabled
-      - disabled
-      description: Status of webhook.
-      title: WebhookItemStatus
+    WebhookEventTypeListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookEventTypeResponse'
+      title: WebhookEventTypeListResponse
+    WebhookItemResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WebhookItem'
+      required:
+      - data
+      title: WebhookItemResponse
     CreateWebhookRequest:
       type: object
       properties:
@@ -555,22 +688,6 @@ components:
       - signing_key
       - events
       title: PatchWebhookRequest
-    CreateWebhookRequestStatus:
-      type: string
-      enum:
-      - enabled
-      - disabled
-      description: Status of webhook.
-      title: CreateWebhookRequestStatus
-    GenericResultDeletedData:
-      type: object
-      properties:
-        deleted:
-          type: boolean
-          description: Confirms the deletion.
-      required:
-      - deleted
-      title: GenericResultDeletedData
     ApiErrorContainer:
       type: object
       properties:
@@ -581,123 +698,6 @@ components:
           items:
             $ref: '#/components/schemas/ApiError'
       title: ApiErrorContainer
-    GenericResultDeleted:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GenericResultDeletedData'
-      required:
-      - data
-      title: GenericResultDeleted
-    WebhookItem:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of this resource.
-        name:
-          type:
-          - string
-          - 'null'
-          description: Webhook subscription name.
-        description:
-          type:
-          - string
-          - 'null'
-          description: Webhook subscription description.
-        status:
-          $ref: '#/components/schemas/WebhookItemStatus'
-          description: Status of webhook.
-        url:
-          type: string
-          description: Endpoint to receive webhook.
-        signing_key:
-          type:
-          - string
-          - 'null'
-          description: The webhook's signing key, used to generate webhook signatures.
-        api_version:
-          type: string
-          default: v2
-          description: Deel API version. Currently Deel accepts v1 or v2 version.
-        events:
-          type: array
-          items:
-            type: string
-          description: The list of events to enable for this subscription.
-        created_at:
-          type: string
-          description: Time at which the webhook was created.
-        updated_at:
-          type: string
-          description: Time at which the webhook was updated.
-        hidden:
-          type:
-          - boolean
-          - 'null'
-          description: Property to hide the webhook from frontend view. Commonly by Dell 3rd party apps
-        internal:
-          type: boolean
-        deleted_at:
-          type: string
-          description: Time at which the webhook was deleted.
-      required:
-      - id
-      - name
-      - description
-      - status
-      - url
-      - signing_key
-      - api_version
-      - events
-      - created_at
-      - updated_at
-      title: WebhookItem
-    ApiErrorRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    WebhookEventTypeListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebhookEventTypeResponse'
-      title: WebhookEventTypeListResponse
     PatchWebhookRequestStatus:
       type: string
       enum:

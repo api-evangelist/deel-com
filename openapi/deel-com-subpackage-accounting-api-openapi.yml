@@ -444,6 +444,668 @@ paths:
                 $ref: '#/components/schemas/RetrievePaymentReceipts-v2026-01-01RequestInternalServerError'
 components:
   schemas:
+    PaymentsGetParametersEntities:
+      oneOf:
+      - $ref: '#/components/schemas/PaymentsGetParametersEntities0'
+      - $ref: '#/components/schemas/PaymentsGetParametersEntities1'
+      title: PaymentsGetParametersEntities
+    Accounting_retrieveDeelInvoices_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/InvoicesDeelGetResponsesContentApplicationJsonSchemaPage'
+      required:
+      - data
+      - page
+      title: Accounting_retrieveDeelInvoices_Response_200
+    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsDeelGrantedCreditsUsed:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount deducted from Deel-granted credits, in the payment currency. '0.00' if not used.
+        original_amount:
+          type:
+          - string
+          - 'null'
+          description: Amount deducted from Deel-granted credits, in the original currency they were held in. Null if not used.
+        original_currency:
+          type:
+          - string
+          - 'null'
+          description: Currency in which the Deel-granted credits were held, following ISO 4217. Null if not used.
+      description: Amount paid using Deel-granted credits.
+      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsDeelGrantedCreditsUsed
+    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+          description: Date associated with the payment breakdown.
+        work:
+          type: string
+          description: Base payment amount for work performed, including regular salary/wages and off-cycle payments.
+        bonus:
+          type: string
+          description: Additional bonus payment amount awarded to the worker.
+        total:
+          type: string
+          description: Total payment due for this breakdown item.
+        others:
+          type: string
+          description: Other payment amounts.
+        currency:
+          type: string
+          description: Currency code for this payment.
+        expenses:
+          type: string
+          description: Expenses related to the payment.
+        group_id:
+          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId'
+          description: Unique identifier for the group associated with this payment. Empty for organization-level payments, individual payments, and standalone service fees that are not associated with a specific group.
+        overtime:
+          type: string
+          description: Overtime payment amount.
+        pro_rata:
+          type: string
+          description: Pro-rated payment amount.
+        approvers:
+          type: string
+          description: Comma-separated list of names of people who approved this payment. May be empty if no approvals were required or recorded.
+        frequency:
+          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsFrequency'
+          description: Work unit scale from the contractor's work statement. Indicates how work is measured and reported (hourly, daily, weekly, monthly, or custom units). Empty for contracts with fixed payments that don't require work quantity tracking, such as milestone-based contracts and consulting agreements.
+        adjustment:
+          type: string
+          description: Adjustment amount for the payment.
+        deductions:
+          type: string
+          description: Deductions from the payment.
+        invoice_id:
+          type: string
+          description: Unique identifier of this resource.
+        commissions:
+          type: string
+          description: Commissions included in the payment.
+        approve_date:
+          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate'
+          description: Date when the work report was approved by designated approvers. Empty for payments that don't require work report approval, such as service fees, management fees, and automated payments.
+        payment_date:
+          type: string
+          format: date-time
+          description: Date when the payment was made.
+        contract_type:
+          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractType'
+          description: Type of contract this payment relates to. Determines the nature of the work relationship and payment structure.
+        processing_fee:
+          type: string
+          description: Processing fee amount applied to the payment.
+        contract_country:
+          type: string
+          description: Country where the contract is established.
+        contractor_email:
+          type: string
+          description: Email address of the worker.
+        payment_currency:
+          type: string
+          description: Currency in which the payment was processed.
+        contract_start_date:
+          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate'
+          description: Start date of the contract. Empty for service agreements and fee-related contracts (such as equipment payments, insurance payments, and management fees) that don't have traditional contract start dates.
+        general_ledger_account:
+          type: string
+          description: General ledger account code or name for accounting purposes. May be configured at the group, company, or organization level. Empty if not configured.
+        total_payment_currency:
+          type: string
+          description: Total payment in the payment currency.
+        contractor_employee_name:
+          type: string
+          description: Name of the worker.
+        contractor_unique_identifier:
+          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractorUniqueIdentifier'
+          description: Unique identifier for the worker. May be empty for certain contract types such as service agreements and fees.
+      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItems
+    InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - pending
+      - paid
+      - processing
+      - canceled
+      - skipped
+      - failed
+      - refunded
+      description: Current status of the invoice.
+      title: InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the payment.
+        label:
+          type: string
+          description: A descriptive label for the payment.
+        total:
+          type: string
+          description: Original invoice total before any credits or balance were applied.
+        status:
+          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsStatus'
+          description: Status of the payment. Either 'paid' or 'processing'.
+        paid_at:
+          type: string
+          format: date-time
+          description: Date and time when the payment was completed, in ISO-8601 format.
+        workers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsWorkersItems'
+          description: Array of workers associated with this payment.
+        invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsInvoicesItems'
+          description: Array of invoices associated with this payment.
+        timezone:
+          type: string
+          description: Timezone offset in ISO 8601 format (e.g., +02:00, -05:00).
+        total_due:
+          type: string
+          description: Amount due for the payment after applying any credits or balance. Equals 'total' when no credits were used.
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the payment was created, in ISO-8601 format.
+        deel_reference:
+          type:
+          - string
+          - 'null'
+          description: Deel reference identifier for the payment.
+        payment_method:
+          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPaymentMethod'
+          description: Payment method details for the transaction.
+        payment_currency:
+          type: string
+          description: Three-letter currency code for the payment, following ISO 4217.
+        general_funds_used:
+          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsGeneralFundsUsed'
+          description: Amount paid using the client's general balance funds.
+        deel_granted_credits_used:
+          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsDeelGrantedCreditsUsed'
+          description: Amount paid using Deel-granted credits.
+        prepaid_billing_credits_used:
+          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPrepaidBillingCreditsUsed'
+          description: Amount paid using prepaid billing credits.
+        eor_early_invoicing_funds_used:
+          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsEorEarlyInvoicingFundsUsed'
+          description: Amount paid using EOR early invoicing funds.
+      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItems
+    Accounting_retrievePaymentReceipts-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaData'
+      title: Accounting_retrievePaymentReceipts-v2026-01-01_Response_200
+    InvoicesGetParametersStatus:
+      type: string
+      enum:
+      - all
+      title: InvoicesGetParametersStatus
+    Accounting_retrieveAPaymentBreakdown-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItems'
+      title: Accounting_retrieveAPaymentBreakdown-v2026-01-01_Response_200
+    Accounting_getBillingInvoiceDownloadLink_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InvoicesIdDownloadGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Accounting_getBillingInvoiceDownloadLink_Response_200
+    InvoicesIdDownloadGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the invoice.
+        url:
+          type:
+          - string
+          - 'null'
+          description: URL to the requested invoice for download. This URL may expire after a certain duration.
+        expires_at:
+          type: string
+          format: date-time
+          description: The expiration date and time of the download URL, after which the URL will no longer be accessible.
+      required:
+      - url
+      title: InvoicesIdDownloadGetResponsesContentApplicationJsonSchemaData
+    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractType:
+      type: string
+      enum:
+      - milestones
+      - time_based
+      - ongoing_time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - peo
+      - peo_csa
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - gp_client_agreement
+      - ep_client_agreement
+      - power_of_attorney
+      - debt_authorization
+      - hris_direct_employee
+      - hris_service_agreement
+      - hofy_standalone_payment
+      - wework_standalone_payment
+      - travel_insurance_standalone_payment
+      - health_insurance_standalone_payment
+      - prepaid_billing
+      - missing_saas_fees
+      - one_off_service_fee
+      - eor_management_fee
+      - eor_one_off_management_fee
+      - engage_monthly_subscription_fee
+      - ats_subscription_fee
+      - benefits_admin_monthly_platform_fee
+      - contractor_outside_deel
+      - late_payment_fee
+      - background_check_standalone_payment
+      - peo_service_fee
+      - payment_processing_fee
+      - deel_percentage_fee
+      - netx_fee
+      - prepaid_funding_statement
+      - one_off_mobility_service_fee
+      - prepaid_billing_expired_credits
+      - implementation_delay
+      - managed_hr_monthly_subscription_fee
+      - expense_card
+      - anon_report_fee
+      - ic_maintenance_platform_fee
+      description: Type of contract this payment relates to. Determines the nature of the work relationship and payment structure.
+      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractType
+    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsStatus:
+      type: string
+      enum:
+      - paid
+      - processing
+      description: Status of the payment. Either 'paid' or 'processing'.
+      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsStatus
+    PaymentsGetParametersEntities1:
+      type: string
+      enum:
+      - individual
+      - company
+      title: PaymentsGetParametersEntities1
+    InvoicesGetResponsesContentApplicationJsonSchemaItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine readable error
+        message:
+          type: string
+          description: Description of the returned error
+      title: InvoicesGetResponsesContentApplicationJsonSchemaItems
+    InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataLineItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the line item
+        type:
+          $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataLineItemsItemsType'
+          description: The type of this line item
+        total:
+          type: string
+          description: Total amount for this line item
+        fx_rate:
+          type: string
+          description: Exchange rate used for this line item
+        quantity:
+          type: integer
+          description: Quantity of units billed in this line item
+        tax_rate:
+          type: string
+          description: Tax rate applied to this line item
+        tax_type:
+          type:
+          - string
+          - 'null'
+          description: Type of tax applied (if any); can be null
+        description:
+          type: string
+          description: Main description of the line item
+        price_per_unit:
+          type: number
+          format: double
+          description: Price charged per unit
+        sub_description:
+          type: string
+          description: Optional additional description or detail
+      title: InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataLineItemsItems
+    InvoicesGetParametersInclude:
+      type: string
+      enum:
+      - cor
+      title: InvoicesGetParametersInclude
+    PaymentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: PaymentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    InvoicesDeelGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        offset:
+          type: number
+          format: double
+          description: Offset
+        total_rows:
+          type: number
+          format: double
+          description: Total number of rows
+        items_per_page:
+          type: number
+          format: double
+          description: Number of items per page
+      required:
+      - offset
+      - total_rows
+      - items_per_page
+      title: InvoicesDeelGetResponsesContentApplicationJsonSchemaPage
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    PaymentsGetParametersStatuses1:
+      type: string
+      enum:
+      - paid
+      - processing
+      title: PaymentsGetParametersStatuses1
+    InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the invoice
+        label:
+          type: string
+          description: Human-readable label or reference number for the invoice
+        total:
+          type: string
+          description: Total amount of the invoice
+        status:
+          $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current payment status of the invoice.
+        paid_at:
+          type: string
+          format: date-time
+          description: Date and time when the invoice was paid
+        currency:
+          type: string
+          description: Currency code for the invoice total
+        due_date:
+          type: string
+          format: date-time
+          description: The due date for the invoice payment
+        issued_at:
+          type: string
+          format: date-time
+          description: Date and time when the invoice was issued
+        worker_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the worker profile
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the invoice was created in the system
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataLineItemsItems'
+          description: The individual line items associated with the invoice
+        recipient_legal_entity_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the recipient legal entity
+      description: The invoice resource returned
+      title: InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData
+    PaymentsGetParametersEntitiesSchemaOneOf0Items:
+      type: string
+      enum:
+      - individual
+      - company
+      title: PaymentsGetParametersEntitiesSchemaOneOf0Items
+    PaymentsGetParametersStatuses0:
+      type: array
+      items:
+        $ref: '#/components/schemas/PaymentsGetParametersStatusesSchemaOneOf0Items'
+      title: PaymentsGetParametersStatuses0
+    PaymentsGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItems'
+          description: Array of payment receipts matching the query criteria.
+        total:
+          type: number
+          format: double
+          description: The total number of payments matching the query.
+        has_more:
+          type: boolean
+          description: Inform if there are more entries to be fetched using next cursor,.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: A cursor for pagination. Use the value returned in the 'next_cursor' field to get the next page of results. If there are no more results, this will be null.
+        total_count:
+          type: number
+          format: double
+          description: The total number of payments matching the query.
+      title: PaymentsGetResponsesContentApplicationJsonSchemaData
+    InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the invoice.
+        label:
+          type: string
+          description: Label of the invoice.
+        total:
+          type: string
+          description: Total invoice amount including Fee and VAT.
+        status:
+          $ref: '#/components/schemas/InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Current status of the invoice.
+        currency:
+          type: string
+          description: Currency code.
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+      required:
+      - id
+      - label
+      - total
+      - status
+      - currency
+      - created_at
+      title: InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItems
+    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsEorEarlyInvoicingFundsUsed:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount deducted from EOR early invoicing funds, in the payment currency. '0.00' if not used.
+        original_amount:
+          type:
+          - string
+          - 'null'
+          description: Amount deducted from EOR early invoicing funds, in the original currency they were held in. Null if not used.
+        original_currency:
+          type:
+          - string
+          - 'null'
+          description: Currency in which the EOR early invoicing funds were held, following ISO 4217. Null if not used.
+      description: Amount paid using EOR early invoicing funds.
+      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsEorEarlyInvoicingFundsUsed
+    InvoicesGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - pending
+      - paid
+      - processing
+      - credited
+      - refunded
+      description: Current status of the invoice.
+      title: InvoicesGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    PaymentsGetParametersCurrencies:
+      oneOf:
+      - type: array
+        items:
+          type: string
+      - type: string
+      title: PaymentsGetParametersCurrencies
+    InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error response
+      required:
+      - message
+      title: InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    PaymentsGetParametersEntities0:
+      type: array
+      items:
+        $ref: '#/components/schemas/PaymentsGetParametersEntitiesSchemaOneOf0Items'
+      title: PaymentsGetParametersEntities0
+    RetrievePaymentReceipts-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrievePaymentReceipts-v2026-01-01RequestInternalServerError
+    InvoicesGetResponsesContentApplicationJsonSchemaDataItemsPaidAt:
+      oneOf:
+      - type: string
+        format: date-time
+      - type: string
+      description: Date/time when the invoice was paid (ISO-8601). May be null or empty string.
+      title: InvoicesGetResponsesContentApplicationJsonSchemaDataItemsPaidAt
+    PaymentsGetParametersStatusesSchemaOneOf0Items:
+      type: string
+      enum:
+      - paid
+      - processing
+      title: PaymentsGetParametersStatusesSchemaOneOf0Items
+    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId1:
+      type: string
+      enum:
+      - ''
+      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId1
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsFrequency:
+      type: string
+      enum:
+      - hourly
+      - daily
+      - weekly
+      - biweekly
+      - semimonthly
+      - monthly
+      - custom
+      - ''
+      description: Work unit scale from the contractor's work statement. Indicates how work is measured and reported (hourly, daily, weekly, monthly, or custom units). Empty for contracts with fixed payments that don't require work quantity tracking, such as milestone-based contracts and consulting agreements.
+      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsFrequency
+    InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - open
+      - pending
+      - skipped
+      - preprocessing
+      - processing
+      - credited
+      - processed
+      - paid
+      - failed
+      - cancelled
+      - refunded
+      - unpayable
+      - awaiting_payment
+      description: Current payment status of the invoice.
+      title: InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataStatus
     PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPaymentMethod:
       type: object
       properties:
@@ -452,6 +1114,53 @@ components:
           description: Type of payment method used for the transaction.
       description: Payment method details for the transaction.
       title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPaymentMethod
+    Accounting_retrieveInvoices_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoicesGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/InvoicesGetResponsesContentApplicationJsonSchemaPage'
+      required:
+      - data
+      - page
+      title: Accounting_retrieveInvoices_Response_200
+    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsInvoicesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the invoice.
+      required:
+      - id
+      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsInvoicesItems
+    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPrepaidBillingCreditsUsed:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount deducted from prepaid billing credits, in the payment currency. '0.00' if not used.
+        original_amount:
+          type:
+          - string
+          - 'null'
+          description: Amount deducted from prepaid billing credits, in the original currency they were held in. Null if not used.
+        original_currency:
+          type:
+          - string
+          - 'null'
+          description: Currency in which the prepaid billing credits were held, following ISO 4217. Null if not used.
+      description: Amount paid using prepaid billing credits.
+      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPrepaidBillingCreditsUsed
+    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId:
+      oneOf:
+      - type: string
+        format: uuid
+      - $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId1'
+      description: Unique identifier for the group associated with this payment. Empty for organization-level payments, individual payments, and standalone service fees that are not associated with a specific group.
+      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId
     InvoicesGetResponsesContentApplicationJsonSchemaPage:
       type: object
       properties:
@@ -477,14 +1186,33 @@ components:
       - total_rows
       - items_per_page
       title: InvoicesGetResponsesContentApplicationJsonSchemaPage
-    Accounting_getBillingInvoiceDownloadLink_Response_200:
+    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractorUniqueIdentifier1:
+      type: string
+      enum:
+      - ''
+      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractorUniqueIdentifier1
+    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate1:
+      type: string
+      enum:
+      - ''
+      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate1
+    ApiErrorContainer:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/InvoicesIdDownloadGetResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: Accounting_getBillingInvoiceDownloadLink_Response_200
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate:
+      oneOf:
+      - type: string
+        format: date-time
+      - $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate1'
+      description: Start date of the contract. Empty for service agreements and fee-related contracts (such as equipment payments, insurance payments, and management fees) that don't have traditional contract start dates.
+      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate
     InvoicesGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -577,74 +1305,31 @@ components:
       - contract_id
       - vat_percentage
       title: InvoicesGetResponsesContentApplicationJsonSchemaDataItems
-    RetrievePaymentReceipts-v2026-01-01RequestInternalServerError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: RetrievePaymentReceipts-v2026-01-01RequestInternalServerError
-    PaymentsGetParametersEntities0:
-      type: array
-      items:
-        $ref: '#/components/schemas/PaymentsGetParametersEntitiesSchemaOneOf0Items'
-      title: PaymentsGetParametersEntities0
-    InvoicesGetResponsesContentApplicationJsonSchemaItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine readable error
-        message:
-          type: string
-          description: Description of the returned error
-      title: InvoicesGetResponsesContentApplicationJsonSchemaItems
-    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId:
-      oneOf:
-      - type: string
-        format: uuid
-      - $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId1'
-      description: Unique identifier for the group associated with this payment. Empty for organization-level payments, individual payments, and standalone service fees that are not associated with a specific group.
-      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId
-    InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error response
-      required:
-      - message
-      title: InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems
-    ApiErrorRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
+    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPaymentMethodType:
+      type: string
+      enum:
+      - stripe_bacs_debit
+      - pay_pal
+      - stripe_card
+      - bt_card
+      - stripe_ach
+      - coinbase
+      - go_cardless
+      - brex
+      - stripe_sepa_debit
+      - transferwise
+      - go_cardless_becs
+      - bank_transfer
+      - mercury_wire
+      - bt_pay_pal
+      - ach
+      - client_balance
+      - fee_credits
+      - eor_funding_balance
+      - alviere_ach
+      - adyen_card
+      description: Type of payment method used for the transaction.
+      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPaymentMethodType
     InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataLineItemsItemsType:
       type: string
       enum:
@@ -1056,473 +1741,57 @@ components:
       - EOR_HEALTH_AND_SAFETY_TRAINING_FEE
       description: The type of this line item
       title: InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataLineItemsItemsType
-    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsEorEarlyInvoicingFundsUsed:
-      type: object
-      properties:
-        amount:
-          type: string
-          description: Amount deducted from EOR early invoicing funds, in the payment currency. '0.00' if not used.
-        original_amount:
-          type:
-          - string
-          - 'null'
-          description: Amount deducted from EOR early invoicing funds, in the original currency they were held in. Null if not used.
-        original_currency:
-          type:
-          - string
-          - 'null'
-          description: Currency in which the EOR early invoicing funds were held, following ISO 4217. Null if not used.
-      description: Amount paid using EOR early invoicing funds.
-      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsEorEarlyInvoicingFundsUsed
-    PaymentsGetParametersCurrencies:
-      oneOf:
-      - type: array
-        items:
-          type: string
-      - type: string
-      title: PaymentsGetParametersCurrencies
-    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItems:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date-time
-          description: Date associated with the payment breakdown.
-        work:
-          type: string
-          description: Base payment amount for work performed, including regular salary/wages and off-cycle payments.
-        bonus:
-          type: string
-          description: Additional bonus payment amount awarded to the worker.
-        total:
-          type: string
-          description: Total payment due for this breakdown item.
-        others:
-          type: string
-          description: Other payment amounts.
-        currency:
-          type: string
-          description: Currency code for this payment.
-        expenses:
-          type: string
-          description: Expenses related to the payment.
-        group_id:
-          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId'
-          description: Unique identifier for the group associated with this payment. Empty for organization-level payments, individual payments, and standalone service fees that are not associated with a specific group.
-        overtime:
-          type: string
-          description: Overtime payment amount.
-        pro_rata:
-          type: string
-          description: Pro-rated payment amount.
-        approvers:
-          type: string
-          description: Comma-separated list of names of people who approved this payment. May be empty if no approvals were required or recorded.
-        frequency:
-          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsFrequency'
-          description: Work unit scale from the contractor's work statement. Indicates how work is measured and reported (hourly, daily, weekly, monthly, or custom units). Empty for contracts with fixed payments that don't require work quantity tracking, such as milestone-based contracts and consulting agreements.
-        adjustment:
-          type: string
-          description: Adjustment amount for the payment.
-        deductions:
-          type: string
-          description: Deductions from the payment.
-        invoice_id:
-          type: string
-          description: Unique identifier of this resource.
-        commissions:
-          type: string
-          description: Commissions included in the payment.
-        approve_date:
-          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate'
-          description: Date when the work report was approved by designated approvers. Empty for payments that don't require work report approval, such as service fees, management fees, and automated payments.
-        payment_date:
-          type: string
-          format: date-time
-          description: Date when the payment was made.
-        contract_type:
-          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractType'
-          description: Type of contract this payment relates to. Determines the nature of the work relationship and payment structure.
-        processing_fee:
-          type: string
-          description: Processing fee amount applied to the payment.
-        contract_country:
-          type: string
-          description: Country where the contract is established.
-        contractor_email:
-          type: string
-          description: Email address of the worker.
-        payment_currency:
-          type: string
-          description: Currency in which the payment was processed.
-        contract_start_date:
-          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate'
-          description: Start date of the contract. Empty for service agreements and fee-related contracts (such as equipment payments, insurance payments, and management fees) that don't have traditional contract start dates.
-        general_ledger_account:
-          type: string
-          description: General ledger account code or name for accounting purposes. May be configured at the group, company, or organization level. Empty if not configured.
-        total_payment_currency:
-          type: string
-          description: Total payment in the payment currency.
-        contractor_employee_name:
-          type: string
-          description: Name of the worker.
-        contractor_unique_identifier:
-          $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractorUniqueIdentifier'
-          description: Unique identifier for the worker. May be empty for certain contract types such as service agreements and fees.
-      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItems
-    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsStatus:
-      type: string
-      enum:
-      - paid
-      - processing
-      description: Status of the payment. Either 'paid' or 'processing'.
-      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsStatus
-    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate1:
-      type: string
-      enum:
-      - ''
-      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate1
     PaymentsGetParametersStatuses:
       oneOf:
       - $ref: '#/components/schemas/PaymentsGetParametersStatuses0'
       - $ref: '#/components/schemas/PaymentsGetParametersStatuses1'
       title: PaymentsGetParametersStatuses
-    Accounting_retrieveDeelInvoices_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItems'
-        page:
-          $ref: '#/components/schemas/InvoicesDeelGetResponsesContentApplicationJsonSchemaPage'
-      required:
-      - data
-      - page
-      title: Accounting_retrieveDeelInvoices_Response_200
-    InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataStatus:
-      type: string
-      enum:
-      - open
-      - pending
-      - skipped
-      - preprocessing
-      - processing
-      - credited
-      - processed
-      - paid
-      - failed
-      - cancelled
-      - refunded
-      - unpayable
-      - awaiting_payment
-      description: Current payment status of the invoice.
-      title: InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataStatus
-    PaymentsGetParametersEntities:
-      oneOf:
-      - $ref: '#/components/schemas/PaymentsGetParametersEntities0'
-      - $ref: '#/components/schemas/PaymentsGetParametersEntities1'
-      title: PaymentsGetParametersEntities
-    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractorUniqueIdentifier1:
-      type: string
-      enum:
-      - ''
-      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractorUniqueIdentifier1
-    InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the invoice
-        label:
-          type: string
-          description: Human-readable label or reference number for the invoice
-        total:
-          type: string
-          description: Total amount of the invoice
-        status:
-          $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataStatus'
-          description: Current payment status of the invoice.
-        paid_at:
-          type: string
-          format: date-time
-          description: Date and time when the invoice was paid
-        currency:
-          type: string
-          description: Currency code for the invoice total
-        due_date:
-          type: string
-          format: date-time
-          description: The due date for the invoice payment
-        issued_at:
-          type: string
-          format: date-time
-          description: Date and time when the invoice was issued
-        worker_id:
-          type: string
-          format: uuid
-          description: Unique identifier for the worker profile
-        created_at:
-          type: string
-          format: date-time
-          description: Timestamp of when the invoice was created in the system
-        line_items:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataLineItemsItems'
-          description: The individual line items associated with the invoice
-        recipient_legal_entity_id:
-          type: string
-          format: uuid
-          description: Unique identifier for the recipient legal entity
-      description: The invoice resource returned
-      title: InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData
-    InvoicesIdDownloadGetResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the invoice.
-        url:
-          type:
-          - string
-          - 'null'
-          description: URL to the requested invoice for download. This URL may expire after a certain duration.
-        expires_at:
-          type: string
-          format: date-time
-          description: The expiration date and time of the download URL, after which the URL will no longer be accessible.
-      required:
-      - url
-      title: InvoicesIdDownloadGetResponsesContentApplicationJsonSchemaData
-    PaymentsGetParametersStatuses1:
-      type: string
-      enum:
-      - paid
-      - processing
-      title: PaymentsGetParametersStatuses1
-    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsDeelGrantedCreditsUsed:
+    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsGeneralFundsUsed:
       type: object
       properties:
         amount:
           type: string
-          description: Amount deducted from Deel-granted credits, in the payment currency. '0.00' if not used.
+          description: Amount deducted from general funds, in the payment currency. '0.00' if not used.
         original_amount:
           type:
           - string
           - 'null'
-          description: Amount deducted from Deel-granted credits, in the original currency they were held in. Null if not used.
+          description: Amount deducted from general funds, in the original currency it was held in. Null if not used.
         original_currency:
           type:
           - string
           - 'null'
-          description: Currency in which the Deel-granted credits were held, following ISO 4217. Null if not used.
-      description: Amount paid using Deel-granted credits.
-      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsDeelGrantedCreditsUsed
-    InvoicesGetResponsesContentApplicationJsonSchemaDataItemsStatus:
-      type: string
-      enum:
-      - pending
-      - paid
-      - processing
-      - credited
-      - refunded
-      description: Current status of the invoice.
-      title: InvoicesGetResponsesContentApplicationJsonSchemaDataItemsStatus
-    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate:
-      oneOf:
-      - type: string
-        format: date-time
-      - $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate1'
-      description: Start date of the contract. Empty for service agreements and fee-related contracts (such as equipment payments, insurance payments, and management fees) that don't have traditional contract start dates.
-      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate
-    PaymentsGetResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        rows:
-          type: array
-          items:
-            $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItems'
-          description: Array of payment receipts matching the query criteria.
-        total:
-          type: number
-          format: double
-          description: The total number of payments matching the query.
-        has_more:
-          type: boolean
-          description: Inform if there are more entries to be fetched using next cursor,.
-        next_cursor:
-          type:
-          - string
-          - 'null'
-          description: A cursor for pagination. Use the value returned in the 'next_cursor' field to get the next page of results. If there are no more results, this will be null.
-        total_count:
-          type: number
-          format: double
-          description: The total number of payments matching the query.
-      title: PaymentsGetResponsesContentApplicationJsonSchemaData
-    InvoicesGetResponsesContentApplicationJsonSchemaDataItemsPaidAt:
-      oneOf:
-      - type: string
-        format: date-time
-      - type: string
-      description: Date/time when the invoice was paid (ISO-8601). May be null or empty string.
-      title: InvoicesGetResponsesContentApplicationJsonSchemaDataItemsPaidAt
-    Accounting_retrievePaymentReceipts-v2026-01-01_Response_200:
+          description: Currency in which the general funds were held, following ISO 4217. Null if not used.
+      description: Amount paid using the client's general balance funds.
+      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsGeneralFundsUsed
+    Accounting_getInvoiceById-v2026-01-01_Response_200:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaData'
-      title: Accounting_retrievePaymentReceipts-v2026-01-01_Response_200
-    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPaymentMethodType:
-      type: string
-      enum:
-      - stripe_bacs_debit
-      - pay_pal
-      - stripe_card
-      - bt_card
-      - stripe_ach
-      - coinbase
-      - go_cardless
-      - brex
-      - stripe_sepa_debit
-      - transferwise
-      - go_cardless_becs
-      - bank_transfer
-      - mercury_wire
-      - bt_pay_pal
-      - ach
-      - client_balance
-      - fee_credits
-      - eor_funding_balance
-      - alviere_ach
-      - adyen_card
-      description: Type of payment method used for the transaction.
-      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPaymentMethodType
-    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPrepaidBillingCreditsUsed:
+          $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData'
+          description: The invoice resource returned
+      title: Accounting_getInvoiceById-v2026-01-01_Response_200
+    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate:
+      oneOf:
+      - type: string
+        format: date-time
+      - $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate1'
+      description: Date when the work report was approved by designated approvers. Empty for payments that don't require work report approval, such as service fees, management fees, and automated payments.
+      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate
+    GetInvoiceById-v2026-01-01RequestNotFoundError:
       type: object
       properties:
-        amount:
-          type: string
-          description: Amount deducted from prepaid billing credits, in the payment currency. '0.00' if not used.
-        original_amount:
-          type:
-          - string
-          - 'null'
-          description: Amount deducted from prepaid billing credits, in the original currency they were held in. Null if not used.
-        original_currency:
-          type:
-          - string
-          - 'null'
-          description: Currency in which the prepaid billing credits were held, following ISO 4217. Null if not used.
-      description: Amount paid using prepaid billing credits.
-      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPrepaidBillingCreditsUsed
-    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate1:
-      type: string
-      enum:
-      - ''
-      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate1
-    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItems:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the payment.
-        label:
-          type: string
-          description: A descriptive label for the payment.
-        total:
-          type: string
-          description: Original invoice total before any credits or balance were applied.
-        status:
-          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsStatus'
-          description: Status of the payment. Either 'paid' or 'processing'.
-        paid_at:
-          type: string
-          format: date-time
-          description: Date and time when the payment was completed, in ISO-8601 format.
-        workers:
+        errors:
           type: array
           items:
-            $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsWorkersItems'
-          description: Array of workers associated with this payment.
-        invoices:
-          type: array
-          items:
-            $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsInvoicesItems'
-          description: Array of invoices associated with this payment.
-        timezone:
-          type: string
-          description: Timezone offset in ISO 8601 format (e.g., +02:00, -05:00).
-        total_due:
-          type: string
-          description: Amount due for the payment after applying any credits or balance. Equals 'total' when no credits were used.
-        created_at:
-          type: string
-          format: date-time
-          description: Date and time when the payment was created, in ISO-8601 format.
-        deel_reference:
-          type:
-          - string
-          - 'null'
-          description: Deel reference identifier for the payment.
-        payment_method:
-          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPaymentMethod'
-          description: Payment method details for the transaction.
-        payment_currency:
-          type: string
-          description: Three-letter currency code for the payment, following ISO 4217.
-        general_funds_used:
-          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsGeneralFundsUsed'
-          description: Amount paid using the client's general balance funds.
-        deel_granted_credits_used:
-          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsDeelGrantedCreditsUsed'
-          description: Amount paid using Deel-granted credits.
-        prepaid_billing_credits_used:
-          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsPrepaidBillingCreditsUsed'
-          description: Amount paid using prepaid billing credits.
-        eor_early_invoicing_funds_used:
-          $ref: '#/components/schemas/PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsEorEarlyInvoicingFundsUsed'
-          description: Amount paid using EOR early invoicing funds.
-      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItems
-    InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataLineItemsItems:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the line item
-        type:
-          $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataLineItemsItemsType'
-          description: The type of this line item
-        total:
-          type: string
-          description: Total amount for this line item
-        fx_rate:
-          type: string
-          description: Exchange rate used for this line item
-        quantity:
-          type: integer
-          description: Quantity of units billed in this line item
-        tax_rate:
-          type: string
-          description: Tax rate applied to this line item
-        tax_type:
-          type:
-          - string
-          - 'null'
-          description: Type of tax applied (if any); can be null
-        description:
-          type: string
-          description: Main description of the line item
-        price_per_unit:
-          type: number
-          format: double
-          description: Price charged per unit
-        sub_description:
-          type: string
-          description: Optional additional description or detail
-      title: InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataLineItemsItems
+            $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Error messages
+        request:
+          $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details
+      required:
+      - errors
+      title: GetInvoiceById-v2026-01-01RequestNotFoundError
     PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractorUniqueIdentifier:
       oneOf:
       - type: string
@@ -1542,220 +1811,11 @@ components:
           description: Status of API response
       description: Error request details
       title: InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaRequest
-    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId1:
+    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate1:
       type: string
       enum:
       - ''
-      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsGroupId1
-    PaymentsGetParametersStatuses0:
-      type: array
-      items:
-        $ref: '#/components/schemas/PaymentsGetParametersStatusesSchemaOneOf0Items'
-      title: PaymentsGetParametersStatuses0
-    Accounting_retrieveInvoices_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvoicesGetResponsesContentApplicationJsonSchemaDataItems'
-        page:
-          $ref: '#/components/schemas/InvoicesGetResponsesContentApplicationJsonSchemaPage'
-      required:
-      - data
-      - page
-      title: Accounting_retrieveInvoices_Response_200
-    InvoicesDeelGetResponsesContentApplicationJsonSchemaPage:
-      type: object
-      properties:
-        offset:
-          type: number
-          format: double
-          description: Offset
-        total_rows:
-          type: number
-          format: double
-          description: Total number of rows
-        items_per_page:
-          type: number
-          format: double
-          description: Number of items per page
-      required:
-      - offset
-      - total_rows
-      - items_per_page
-      title: InvoicesDeelGetResponsesContentApplicationJsonSchemaPage
-    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractType:
-      type: string
-      enum:
-      - milestones
-      - time_based
-      - ongoing_time_based
-      - pay_as_you_go_time_based
-      - commission
-      - payg_milestones
-      - payg_tasks
-      - eor
-      - peo
-      - peo_csa
-      - unknown
-      - employee
-      - global_payroll
-      - shield_msa
-      - gp_client_agreement
-      - ep_client_agreement
-      - power_of_attorney
-      - debt_authorization
-      - hris_direct_employee
-      - hris_service_agreement
-      - hofy_standalone_payment
-      - wework_standalone_payment
-      - travel_insurance_standalone_payment
-      - health_insurance_standalone_payment
-      - prepaid_billing
-      - missing_saas_fees
-      - one_off_service_fee
-      - eor_management_fee
-      - eor_one_off_management_fee
-      - engage_monthly_subscription_fee
-      - ats_subscription_fee
-      - benefits_admin_monthly_platform_fee
-      - contractor_outside_deel
-      - late_payment_fee
-      - background_check_standalone_payment
-      - peo_service_fee
-      - payment_processing_fee
-      - deel_percentage_fee
-      - netx_fee
-      - prepaid_funding_statement
-      - one_off_mobility_service_fee
-      - prepaid_billing_expired_credits
-      - implementation_delay
-      - managed_hr_monthly_subscription_fee
-      - expense_card
-      - anon_report_fee
-      - ic_maintenance_platform_fee
-      description: Type of contract this payment relates to. Determines the nature of the work relationship and payment structure.
-      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractType
-    Accounting_retrieveAPaymentBreakdown-v2026-01-01_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItems'
-      title: Accounting_retrieveAPaymentBreakdown-v2026-01-01_Response_200
-    PaymentsGetParametersEntities1:
-      type: string
-      enum:
-      - individual
-      - company
-      title: PaymentsGetParametersEntities1
-    PaymentsGetParametersStatusesSchemaOneOf0Items:
-      type: string
-      enum:
-      - paid
-      - processing
-      title: PaymentsGetParametersStatusesSchemaOneOf0Items
-    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate:
-      oneOf:
-      - type: string
-        format: date-time
-      - $ref: '#/components/schemas/PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate1'
-      description: Date when the work report was approved by designated approvers. Empty for payments that don't require work report approval, such as service fees, management fees, and automated payments.
-      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsApproveDate
-    PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsFrequency:
-      type: string
-      enum:
-      - hourly
-      - daily
-      - weekly
-      - biweekly
-      - semimonthly
-      - monthly
-      - custom
-      - ''
-      description: Work unit scale from the contractor's work statement. Indicates how work is measured and reported (hourly, daily, weekly, monthly, or custom units). Empty for contracts with fixed payments that don't require work quantity tracking, such as milestone-based contracts and consulting agreements.
-      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsFrequency
-    GetInvoiceById-v2026-01-01RequestNotFoundError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
-          description: Error messages
-        request:
-          $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaRequest'
-          description: Error request details
-      required:
-      - errors
-      title: GetInvoiceById-v2026-01-01RequestNotFoundError
-    InvoicesGetParametersInclude:
-      type: string
-      enum:
-      - cor
-      title: InvoicesGetParametersInclude
-    InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItems:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the invoice.
-        label:
-          type: string
-          description: Label of the invoice.
-        total:
-          type: string
-          description: Total invoice amount including Fee and VAT.
-        status:
-          $ref: '#/components/schemas/InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItemsStatus'
-          description: Current status of the invoice.
-        currency:
-          type: string
-          description: Currency code.
-        created_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: Long date-time format following ISO-8601
-      required:
-      - id
-      - label
-      - total
-      - status
-      - currency
-      - created_at
-      title: InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItems
-    Accounting_getInvoiceById-v2026-01-01_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/InvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData'
-          description: The invoice resource returned
-      title: Accounting_getInvoiceById-v2026-01-01_Response_200
-    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsInvoicesItems:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the invoice.
-      required:
-      - id
-      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsInvoicesItems
-    InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItemsStatus:
-      type: string
-      enum:
-      - pending
-      - paid
-      - processing
-      - canceled
-      - skipped
-      - failed
-      - refunded
-      description: Current status of the invoice.
-      title: InvoicesDeelGetResponsesContentApplicationJsonSchemaDataItemsStatus
+      title: PaymentsPaymentIdBreakdownGetResponsesContentApplicationJsonSchemaDataItemsContractStartDate1
     PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsWorkersItems:
       type: object
       properties:
@@ -1782,66 +1842,6 @@ components:
       required:
       - picUrl
       title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsWorkersItems
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    PaymentsGetResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-      required:
-      - code
-      - message
-      title: PaymentsGetResponsesContentApplicationJsonSchemaErrorsItems
-    PaymentsGetParametersEntitiesSchemaOneOf0Items:
-      type: string
-      enum:
-      - individual
-      - company
-      title: PaymentsGetParametersEntitiesSchemaOneOf0Items
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    InvoicesGetParametersStatus:
-      type: string
-      enum:
-      - all
-      title: InvoicesGetParametersStatus
-    PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsGeneralFundsUsed:
-      type: object
-      properties:
-        amount:
-          type: string
-          description: Amount deducted from general funds, in the payment currency. '0.00' if not used.
-        original_amount:
-          type:
-          - string
-          - 'null'
-          description: Amount deducted from general funds, in the original currency it was held in. Null if not used.
-        original_currency:
-          type:
-          - string
-          - 'null'
-          description: Currency in which the general funds were held, following ISO 4217. Null if not used.
-      description: Amount paid using the client's general balance funds.
-      title: PaymentsGetResponsesContentApplicationJsonSchemaDataRowsItemsGeneralFundsUsed
   securitySchemes:
     deelToken:
       type: http

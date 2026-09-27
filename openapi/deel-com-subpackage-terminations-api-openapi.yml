@@ -138,30 +138,6 @@ paths:
               - data
 components:
   schemas:
-    DeleteContractTerminationRequestRequestInternalServerError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
-      title: DeleteContractTerminationRequestRequestInternalServerError
-    DeleteContractTerminationRequestRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
-      title: DeleteContractTerminationRequestRequestBadRequestError
-    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire:
-      type: string
-      enum:
-      - 'YES'
-      - 'NO'
-      - DONT_KNOW
-      description: Indicates whether the contractor is eligible for rehire in the future.
-      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire
     ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType:
       type: string
       enum:
@@ -170,12 +146,51 @@ components:
       - END_OF_CONTRACT
       description: The type of termination. Specifies whether it is a resignation (contractor-initiated), termination (client-initiated), or end of contract (mutual/planned).
       title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType
-    terminations_createContractTermination_Response_201:
+    ApiError:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData'
-      title: terminations_createContractTermination_Response_201
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    DeleteContractTerminationRequestRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteContractTerminationRequestRequestBadRequestError
     ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -219,58 +234,33 @@ components:
           format: date-time
           description: Contract completion date
       title: ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
     terminations_deleteContractTermination_Response_204:
       type: object
       properties: {}
       description: Empty response body
       title: terminations_deleteContractTermination_Response_204
-    ApiErrorRequest:
+    DeleteContractTerminationRequestRequestInternalServerError:
       type: object
       properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
-    ApiError:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteContractTerminationRequestRequestInternalServerError
+    terminations_createContractTermination_Response_201:
       type: object
       properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
+        data:
+          $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData'
+      title: terminations_createContractTermination_Response_201
+    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire:
+      type: string
+      enum:
+      - 'YES'
+      - 'NO'
+      - DONT_KNOW
+      description: Indicates whether the contractor is eligible for rehire in the future.
+      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire
     ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems:
       type: object
       properties:
@@ -281,6 +271,16 @@ components:
           type: string
           description: Human-readable explanation of the error
       title: ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
   securitySchemes:
     deelToken:
       type: http

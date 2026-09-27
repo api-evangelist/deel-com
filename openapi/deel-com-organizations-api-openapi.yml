@@ -65,23 +65,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrganizationStructure'
 components:
+  responses:
+    Unauthorized:
+      description: Missing or invalid bearer token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Rate limit exceeded (5 requests/second per organization)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
-    Group:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        type:
-          type: string
-    OrganizationListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Organization'
     Department:
       type: object
       properties:
@@ -91,6 +88,27 @@ components:
           type: string
         parent_id:
           type: string
+    OrganizationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organization'
+    OrganizationStructure:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            departments:
+              type: array
+              items:
+                $ref: '#/components/schemas/Department'
+            groups:
+              type: array
+              items:
+                $ref: '#/components/schemas/Group'
     Organization:
       type: object
       properties:
@@ -107,20 +125,15 @@ components:
           format: date-time
         external_id:
           type: string
-    OrganizationStructure:
+    Group:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            departments:
-              type: array
-              items:
-                $ref: '#/components/schemas/Department'
-            groups:
-              type: array
-              items:
-                $ref: '#/components/schemas/Group'
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
     Error:
       type: object
       properties:
@@ -135,19 +148,6 @@ components:
                 type: string
               field:
                 type: string
-  responses:
-    Unauthorized:
-      description: Missing or invalid bearer token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    RateLimited:
-      description: Rate limit exceeded (5 requests/second per organization)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   securitySchemes:
     BearerAuth:
       type: http
