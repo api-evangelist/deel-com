@@ -145,20 +145,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/Contract'
 components:
-  responses:
-    Unauthorized:
-      description: Missing or invalid bearer token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    RateLimited:
-      description: Rate limit exceeded (5 requests/second per organization)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
+    ContractListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contract'
+        page:
+          type: object
+          properties:
+            limit:
+              type: integer
+            after_cursor:
+              type: string
+    Error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              message:
+                type: string
+              field:
+                type: string
     Contract:
       type: object
       properties:
@@ -216,34 +231,19 @@ components:
         created_at:
           type: string
           format: date-time
-    ContractListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Contract'
-        page:
-          type: object
-          properties:
-            limit:
-              type: integer
-            after_cursor:
-              type: string
-    Error:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: object
-            properties:
-              code:
-                type: string
-              message:
-                type: string
-              field:
-                type: string
+  responses:
+    RateLimited:
+      description: Rate limit exceeded (5 requests/second per organization)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid bearer token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   securitySchemes:
     BearerAuth:
       type: http

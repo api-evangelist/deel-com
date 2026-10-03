@@ -108,6 +108,49 @@ paths:
                 $ref: '#/components/schemas/ListOrganizationTasks-v2026-03-03RequestInternalServerError'
 components:
   schemas:
+    OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - PENDING
+      - COMPLETED
+      - DISMISSED
+      - FAILED
+      description: Current status of the task.
+      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsAssigneesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Public identifier of the assignee (HRIS profile OID or profile public_id).
+        email:
+          type:
+          - string
+          - 'null'
+          description: Assignee's email address.
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: Assignee's last name.
+        first_name:
+          type:
+          - string
+          - 'null'
+          description: Assignee's first name.
+      required:
+      - id
+      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsAssigneesItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
     ListOrganizationTasks-v2026-03-03RequestBadRequestError:
       type: object
       properties:
@@ -119,6 +162,58 @@ components:
       required:
       - errors
       title: ListOrganizationTasks-v2026-03-03RequestBadRequestError
+    ListOrganizationTasks-v2026-03-03RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error entries.
+      required:
+      - errors
+      title: ListOrganizationTasks-v2026-03-03RequestUnauthorizedError
+    ListOrganizationTasks-v2026-03-03RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error entries.
+      required:
+      - errors
+      title: ListOrganizationTasks-v2026-03-03RequestForbiddenError
+    ListOrganizationTasks-v2026-03-03RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error entries.
+      required:
+      - errors
+      title: ListOrganizationTasks-v2026-03-03RequestInternalServerError
+    OrganizationsTasksGetParametersStatusesSchemaItems:
+      type: string
+      enum:
+      - PENDING
+      - COMPLETED
+      - DISMISSED
+      - FAILED
+      title: OrganizationsTasksGetParametersStatusesSchemaItems
+    ListOrganizationTasks-v2026-03-03RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of validation errors.
+      required:
+      - errors
+      title: ListOrganizationTasks-v2026-03-03RequestUnprocessableEntityError
     ApiError:
       type: object
       properties:
@@ -156,17 +251,34 @@ components:
           format: double
           description: The code of the source handler which produced the returned error
       title: ApiErrorRequest
-    ListOrganizationTasks-v2026-03-03RequestUnprocessableEntityError:
+    OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties: {}
+      description: Additional error details.
+      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems:
       type: object
       properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
-          description: List of validation errors.
+        code:
+          type: string
+          description: Machine-readable error code.
+        field:
+          type:
+          - string
+          - 'null'
+          description: Request field that caused the error, if applicable.
+        details:
+          oneOf:
+          - $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          - type: 'null'
+          description: Additional error details.
+        message:
+          type: string
+          description: Human-readable error message.
       required:
-      - errors
-      title: ListOrganizationTasks-v2026-03-03RequestUnprocessableEntityError
+      - code
+      - message
+      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems
     Organization_Tasks_listOrganizationTasks-v2026-03-03_Response_200:
       type: object
       properties:
@@ -192,108 +304,25 @@ components:
       - next_cursor
       - total_count
       title: Organization Tasks_listOrganizationTasks-v2026-03-03_Response_200
-    OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code.
-        field:
-          type:
-          - string
-          - 'null'
-          description: Request field that caused the error, if applicable.
-        details:
-          oneOf:
-          - $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItemsDetails'
-          - type: 'null'
-          description: Additional error details.
-        message:
-          type: string
-          description: Human-readable error message.
-      required:
-      - code
-      - message
-      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems
-    ListOrganizationTasks-v2026-03-03RequestInternalServerError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
-          description: List of error entries.
-      required:
-      - errors
-      title: ListOrganizationTasks-v2026-03-03RequestInternalServerError
-    OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsAssigneesItems:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Public identifier of the assignee (HRIS profile OID or profile public_id).
-        email:
-          type:
-          - string
-          - 'null'
-          description: Assignee's email address.
-        last_name:
-          type:
-          - string
-          - 'null'
-          description: Assignee's last name.
-        first_name:
-          type:
-          - string
-          - 'null'
-          description: Assignee's first name.
-      required:
-      - id
-      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsAssigneesItems
-    ListOrganizationTasks-v2026-03-03RequestUnauthorizedError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
-          description: List of error entries.
-      required:
-      - errors
-      title: ListOrganizationTasks-v2026-03-03RequestUnauthorizedError
-    ListOrganizationTasks-v2026-03-03RequestForbiddenError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItems'
-          description: List of error entries.
-      required:
-      - errors
-      title: ListOrganizationTasks-v2026-03-03RequestForbiddenError
-    OrganizationsTasksGetParametersStatusesSchemaItems:
+    OrganizationsTasksGetParametersCategory:
       type: string
       enum:
-      - PENDING
-      - COMPLETED
-      - DISMISSED
-      - FAILED
-      title: OrganizationsTasksGetParametersStatusesSchemaItems
-    OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus:
-      type: string
-      enum:
-      - PENDING
-      - COMPLETED
-      - DISMISSED
-      - FAILED
-      description: Current status of the task.
-      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus
-    OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItemsDetails:
-      type: object
-      properties: {}
-      description: Additional error details.
-      title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaErrorsItemsDetails
+      - PAYROLL
+      - PAYMENTS
+      - SETUP
+      - EXPENSE_REQUESTS
+      - TIME_OFF_REQUESTS
+      - TIME_SHEET_SUBMISSIONS
+      - PEOPLE_MANAGEMENT
+      - DOCUMENT_ACTIONS
+      - LEGAL_ENTITY_DOCUMENTS
+      - HIRING
+      - OTHER_TASKS
+      - DEEL_IT
+      - COMPLIANCE
+      - PAYMENT_METHODS
+      - ACCOUNTING
+      title: OrganizationsTasksGetParametersCategory
     OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -348,35 +377,6 @@ components:
           type: string
           description: Human-readable title of the task.
       title: OrganizationsTasksGetResponsesContentApplicationJsonSchemaDataItems
-    OrganizationsTasksGetParametersCategory:
-      type: string
-      enum:
-      - PAYROLL
-      - PAYMENTS
-      - SETUP
-      - EXPENSE_REQUESTS
-      - TIME_OFF_REQUESTS
-      - TIME_SHEET_SUBMISSIONS
-      - PEOPLE_MANAGEMENT
-      - DOCUMENT_ACTIONS
-      - LEGAL_ENTITY_DOCUMENTS
-      - HIRING
-      - OTHER_TASKS
-      - DEEL_IT
-      - COMPLIANCE
-      - PAYMENT_METHODS
-      - ACCOUNTING
-      title: OrganizationsTasksGetParametersCategory
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
   securitySchemes:
     deelToken:
       type: http

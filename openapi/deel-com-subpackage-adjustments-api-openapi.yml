@@ -439,14 +439,156 @@ paths:
                 $ref: '#/components/schemas/ApiErrorContainer'
 components:
   schemas:
-    adjustments_updateContractAdjustment_Response_200:
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1:
+      type: string
+      enum:
+      - DRAFT
+      - PENDING
+      - ERRORS_FOUND
+      - APPROVED
+      - DENIED
+      - DISBURSE_SCHEDULED
+      - REIMBURSED
+      - UNDER_REVIEW
+      - PENDING_DEEL_REVIEW
+      description: Adjustment status (when contract type is EOR)
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: You must have access to the contract sent
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the adjustment
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile'
+          - type: 'null'
+          description: Info for the attachment of adjustment
+        title:
+          type: string
+          description: The title of the adjustment
+        amount:
+          type: string
+          description: The amount of the adjustment
+        status:
+          $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Adjustment status
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was last updated
+        contract_id:
+          type: string
+          description: The identifier of the contract associated with the adjustment
+        description:
+          type: string
+          description: The description of the adjustment
+        cycle_reference:
+          type:
+          - string
+          - 'null'
+          description: The reference to the cycle associated with the adjustment
+        move_next_cycle:
+          type: boolean
+          description: If an adjustments can belong to another payroll cycle
+        date_of_adjustment:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date of the adjustment
+        actual_end_cycle_date:
+          type: string
+          description: The date of the actual end cycle date
+        adjustment_category_id:
+          type: string
+          description: The identifier of the adjustment category associated with the adjustment
+        actual_start_cycle_date:
+          type: string
+          description: The date of the actual start cycle date
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems
+    adjustments_createContractAdjustment_Response_201:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/AdjustmentsIdPatchResponsesContentApplicationJsonSchemaData'
+          $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaData'
       required:
       - data
-      title: adjustments_updateContractAdjustment_Response_200
+      title: adjustments_createContractAdjustment_Response_201
+    AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms the deletion.
+      required:
+      - deleted
+      title: AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - open
+      - pending_approval
+      - overwritten
+      - failed
+      - success
+      - DRAFT
+      - PENDING
+      - APPROVED
+      - DENIED
+      - DISBURSE_SCHEDULED
+      - REIMBURSED
+      - UNDER_REVIEW
+      - ERRORS_FOUND
+      - PENDING_DEEL_REVIEW
+      - AI_CHECK_IN_PROGRESS
+      description: Adjustment status
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        fileType:
+          type: string
+          description: The type of the file
+      description: Info for the attachment of adjustment
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile
     AdjustmentsPostResponsesContentApplicationJsonSchemaDataFile:
       type: object
       properties:
@@ -517,96 +659,24 @@ components:
           type: string
           description: The date of the actual start cycle date
       title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaData
-    CreateANewAdjustment-v2026-01-01RequestBadRequestError:
+    adjustments_updateContractAdjustment_Response_200:
       type: object
       properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+        data:
+          $ref: '#/components/schemas/AdjustmentsIdPatchResponsesContentApplicationJsonSchemaData'
       required:
-      - errors
-      title: CreateANewAdjustment-v2026-01-01RequestBadRequestError
-    AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        message:
-          type: string
-      required:
-      - message
-      title: AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems
-    AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus:
-      type: string
-      enum:
-      - open
-      - pending_approval
-      - overwritten
-      - failed
-      - success
-      - DRAFT
-      - PENDING
-      - APPROVED
-      - DENIED
-      - DISBURSE_SCHEDULED
-      - REIMBURSED
-      - UNDER_REVIEW
-      - ERRORS_FOUND
-      - PENDING_DEEL_REVIEW
-      - AI_CHECK_IN_PROGRESS
-      description: Adjustment status
-      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus
-    adjustments_getContractAdjustments_Response_200:
+      - data
+      title: adjustments_updateContractAdjustment_Response_200
+    adjustments_getAdjustmentCategories_Response_200:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems'
+            $ref: '#/components/schemas/AdjustmentsCategoriesGetResponsesContentApplicationJsonSchemaDataItems'
       required:
       - data
-      title: adjustments_getContractAdjustments_Response_200
-    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique identifier of the file
-        name:
-          type: string
-          description: The name of the file
-        fileType:
-          type: string
-          description: The type of the file
-      description: Info for the attachment of adjustment
-      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile
-    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0:
-      type: string
-      enum:
-      - OPEN
-      - PENDING_APPROVAL
-      - OVERWRITTEN
-      - FAILED
-      - SUCCESS
-      - AI_CHECK_IN_PROGRESS
-      description: Adjustment status (when contract type is GP)
-      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0
-    AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        message:
-          type: string
-          description: You must have access to the contract sent
-      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
+      title: adjustments_getAdjustmentCategories_Response_200
     AdjustmentsCategoriesGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -623,68 +693,14 @@ components:
           type: string
           description: The unit type of the adjustment category.
       title: AdjustmentsCategoriesGetResponsesContentApplicationJsonSchemaDataItems
-    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
-      type: string
-      enum:
-      - open
-      - pending_approval
-      - overwritten
-      - failed
-      - success
-      - DRAFT
-      - PENDING
-      - APPROVED
-      - DENIED
-      - DISBURSE_SCHEDULED
-      - REIMBURSED
-      - UNDER_REVIEW
-      - ERRORS_FOUND
-      - PENDING_DEEL_REVIEW
-      - AI_CHECK_IN_PROGRESS
-      description: Adjustment status
-      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus
-    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1:
-      type: string
-      enum:
-      - DRAFT
-      - PENDING
-      - ERRORS_FOUND
-      - APPROVED
-      - DENIED
-      - DISBURSE_SCHEDULED
-      - REIMBURSED
-      - UNDER_REVIEW
-      - PENDING_DEEL_REVIEW
-      description: Adjustment status (when contract type is EOR)
-      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1
-    AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataFile:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique identifier of the file
-        name:
-          type: string
-          description: The name of the file
-        fileType:
-          type: string
-          description: The type of the file
-      description: Info about the attachment of adjustment
-      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataFile
-    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus:
-      oneOf:
-      - $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0'
-      - $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1'
-      description: The status of the adjustments
-      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus
-    RetrieveAdjustmentsRequestBadRequestError:
+    RetrieveAnAdjustmentRequestBadRequestError:
       type: object
       properties:
         errors:
           type: array
           items:
-            $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
-      title: RetrieveAdjustmentsRequestBadRequestError
+            $ref: '#/components/schemas/AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveAnAdjustmentRequestBadRequestError
     ApiErrorRequest:
       type: object
       properties:
@@ -712,13 +728,62 @@ components:
           format: double
           description: The code of the source handler which produced the returned error
       title: ApiErrorRequest
-    AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount:
-      oneOf:
-      - type: string
-      - type: number
-        format: double
-      description: Amount of adjustment.
-      title: AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount
+    AdjustmentsCategoriesGetParametersContractTypesSchemaItems:
+      type: string
+      enum:
+      - peo
+      - global_payroll
+      - hris_direct_employee
+      - eor
+      - employee
+      - independent_contractor
+      title: AdjustmentsCategoriesGetParametersContractTypesSchemaItems
+    RetrieveAdjustmentsRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveAdjustmentsRequestBadRequestError
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - open
+      - pending_approval
+      - overwritten
+      - failed
+      - success
+      - DRAFT
+      - PENDING
+      - APPROVED
+      - DENIED
+      - DISBURSE_SCHEDULED
+      - REIMBURSED
+      - UNDER_REVIEW
+      - ERRORS_FOUND
+      - PENDING_DEEL_REVIEW
+      - AI_CHECK_IN_PROGRESS
+      description: Adjustment status
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0:
+      type: string
+      enum:
+      - OPEN
+      - PENDING_APPROVAL
+      - OVERWRITTEN
+      - FAILED
+      - SUCCESS
+      - AI_CHECK_IN_PROGRESS
+      description: Adjustment status (when contract type is GP)
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: You must have access to the contract sent
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems
     AdjustmentsIdPatchResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -727,55 +792,26 @@ components:
       required:
       - updated
       title: AdjustmentsIdPatchResponsesContentApplicationJsonSchemaData
-    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        message:
-          type: string
-          description: You must have access to the contract sent
-      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems
-    adjustments_deleteContractAdjustment_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: adjustments_deleteContractAdjustment_Response_200
-    AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        deleted:
-          type: boolean
-          description: Confirms the deletion.
-      required:
-      - deleted
-      title: AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    AdjustmentsPostRequestBodyContentMultipartFormDataSchemaAmount:
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus:
       oneOf:
-      - type: string
-      - type: number
-        format: double
-      description: Amount of adjustment.
-      title: AdjustmentsPostRequestBodyContentMultipartFormDataSchemaAmount
-    RetrieveAnAdjustmentRequestBadRequestError:
+      - $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0'
+      - $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1'
+      description: The status of the adjustments
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataFile:
       type: object
       properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems'
-      title: RetrieveAnAdjustmentRequestBadRequestError
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        fileType:
+          type: string
+          description: The type of the file
+      description: Info about the attachment of adjustment
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataFile
     adjustments_getContractAdjustment_Response_200:
       type: object
       properties:
@@ -784,6 +820,59 @@ components:
       required:
       - data
       title: adjustments_getContractAdjustment_Response_200
+    CreateANewAdjustment-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateANewAdjustment-v2026-01-01RequestBadRequestError
+    adjustments_deleteContractAdjustment_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: adjustments_deleteContractAdjustment_Response_200
+    AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Amount of adjustment.
+      title: AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount
+    adjustments_getContractAdjustments_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: adjustments_getContractAdjustments_Response_200
+    AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaData:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: File of adjustment.
+        title:
+          type: string
+          description: Title of adjustment.
+        amount:
+          $ref: '#/components/schemas/AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount'
+          description: Amount of adjustment.
+        description:
+          type: string
+          description: Description of adjustment.
+      description: Details of adjustment to update
+      title: AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaData
     AdjustmentsPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -840,110 +929,21 @@ components:
           type: string
           description: The date of the actual start cycle date
       title: AdjustmentsPostResponsesContentApplicationJsonSchemaData
-    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems:
+    AdjustmentsPostRequestBodyContentMultipartFormDataSchemaAmount:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Amount of adjustment.
+      title: AdjustmentsPostRequestBodyContentMultipartFormDataSchemaAmount
+    AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems:
       type: object
       properties:
-        id:
+        message:
           type: string
-          description: The unique identifier of the adjustment
-        file:
-          oneOf:
-          - $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile'
-          - type: 'null'
-          description: Info for the attachment of adjustment
-        title:
-          type: string
-          description: The title of the adjustment
-        amount:
-          type: string
-          description: The amount of the adjustment
-        status:
-          $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
-          description: Adjustment status
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time when the adjustment was created
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time when the adjustment was last updated
-        contract_id:
-          type: string
-          description: The identifier of the contract associated with the adjustment
-        description:
-          type: string
-          description: The description of the adjustment
-        cycle_reference:
-          type:
-          - string
-          - 'null'
-          description: The reference to the cycle associated with the adjustment
-        move_next_cycle:
-          type: boolean
-          description: If an adjustments can belong to another payroll cycle
-        date_of_adjustment:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: The date of the adjustment
-        actual_end_cycle_date:
-          type: string
-          description: The date of the actual end cycle date
-        adjustment_category_id:
-          type: string
-          description: The identifier of the adjustment category associated with the adjustment
-        actual_start_cycle_date:
-          type: string
-          description: The date of the actual start cycle date
-      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems
-    AdjustmentsCategoriesGetParametersContractTypesSchemaItems:
-      type: string
-      enum:
-      - peo
-      - global_payroll
-      - hris_direct_employee
-      - eor
-      - employee
-      - independent_contractor
-      title: AdjustmentsCategoriesGetParametersContractTypesSchemaItems
-    adjustments_createContractAdjustment_Response_201:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaData'
       required:
-      - data
-      title: adjustments_createContractAdjustment_Response_201
-    AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaData:
-      type: object
-      properties:
-        file:
-          type: string
-          format: binary
-          description: File of adjustment.
-        title:
-          type: string
-          description: Title of adjustment.
-        amount:
-          $ref: '#/components/schemas/AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount'
-          description: Amount of adjustment.
-        description:
-          type: string
-          description: Description of adjustment.
-      description: Details of adjustment to update
-      title: AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaData
-    adjustments_getAdjustmentCategories_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdjustmentsCategoriesGetResponsesContentApplicationJsonSchemaDataItems'
-      required:
-      - data
-      title: adjustments_getAdjustmentCategories_Response_200
+      - message
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems
   securitySchemes:
     deelToken:
       type: http

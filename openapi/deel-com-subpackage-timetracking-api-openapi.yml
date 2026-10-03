@@ -488,88 +488,68 @@ paths:
               - data
 components:
   schemas:
-    ? TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetSubmissionStatus
-    : type: string
-      enum:
-      - UPLOADING
-      - UPLOAD_FAILED
-      - PROCESSING
-      - SUBMITTED
-      - INVALID
-      - FAILED
-      description: Current status of the timesheet submission
-      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetSubmissionStatus
-    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+    time-tracking_deleteTimeTrackingShiftRateByExternalId_Response_204:
       type: object
-      properties:
-        timesheet:
-          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheet'
-          description: Current state of the timesheet that cannot be reviewed
-      required:
-      - timesheet
-      description: Additional details about the error, including the current timesheet state
-      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetails
-    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataSubmissionStatus:
-      type: string
-      enum:
-      - UPLOADING
-      - UPLOAD_FAILED
-      - PROCESSING
-      - SUBMITTED
-      - INVALID
-      - FAILED
-      description: Current status of the timesheet submission
-      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataSubmissionStatus
-    time-tracking_getTimeTrackingShiftRateByExternalId_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdGetResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: time-tracking_getTimeTrackingShiftRateByExternalId_Response_200
-    TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code
-        field:
-          type: string
-          description: Name of the field causing the error (for validation issues)
-        message:
-          type: string
-          description: Human-readable explanation of the error
-      required:
-      - code
-      - field
-      - message
-      title: TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems
-    TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaData:
+      properties: {}
+      description: Empty response body
+      title: time-tracking_deleteTimeTrackingShiftRateByExternalId_Response_204
+    TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
         name:
           type: string
-          description: The updated name of the shift rate.
+          description: Name of the shift rate.
         type:
           type: string
-          description: The type of shift rate, e.g., MULTIPLIER_PERCENTAGE.
+          description: Type of the shift rate (e.g., MULTIPLIER_PERCENTAGE or FLAT_RATE).
         value:
           type: number
           format: double
-          description: The updated value of the shift rate.
+          description: The value associated with the shift rate.
         created_at:
           type: string
-          format: date-time
-          description: The timestamp when the shift rate was created.
+          description: Timestamp indicating when the shift rate was created.
         updated_at:
           type: string
-          format: date-time
-          description: The timestamp when the shift rate was last updated.
+          description: Timestamp indicating when the shift rate was last updated.
         external_id:
           type: string
-          description: The unique identifier of the updated shift rate.
-      title: TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaData
+          description: External identifier of the shift rate.
+      required:
+      - name
+      - type
+      - value
+      - created_at
+      - updated_at
+      - external_id
+      title: TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaDataItems
+    TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Description of the error.
+      title: TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaError
+    TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the shift rate.
+        type:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaDataType'
+          description: The type of the shift rate.
+        value:
+          type: number
+          format: double
+          description: The value of the shift rate.
+        external_id:
+          type: string
+          description: A unique identifier for the shift rate.
+      required:
+      - name
+      - external_id
+      title: TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaData
     TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -595,29 +575,6 @@ components:
       - review_status
       description: Updated timesheet details after review
       title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaData
-    time-tracking_getTimeTrackingShiftRates_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaDataItems'
-        page:
-          $ref: '#/components/schemas/TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaPage'
-      required:
-      - data
-      - page
-      title: time-tracking_getTimeTrackingShiftRates_Response_200
-    GenerateTimesheetUploadUrl-v2026-01-01RequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: GenerateTimesheetUploadUrl-v2026-01-01RequestBadRequestError
     ApiError:
       type: object
       properties:
@@ -628,6 +585,117 @@ components:
           type: string
           description: The JSON path where input validation failed
       title: ApiError
+    ReviewASubmittedTimesheetRequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ReviewASubmittedTimesheetRequestNotFoundError
+    time-tracking_getTimeTrackingTimesheetsUploadUrl_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: time-tracking_getTimeTrackingTimesheetsUploadUrl_Response_201
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataFileData:
+      type: object
+      properties:
+        file_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the timesheet file
+        file_name:
+          type: string
+          description: Name of the timesheet file
+        download_url:
+          type: string
+          format: uri
+          description: Pre-signed S3 URL for downloading the timesheet file
+      required:
+      - file_id
+      - file_name
+      - download_url
+      description: Present only when `extend=file_data` is provided. Contains file details and download URL.
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataFileData
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type:
+          - string
+          - 'null'
+          description: Name of the field causing the error (for validation issues)
+        details:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          description: Additional details about the error, including the current timesheet state
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      required:
+      - code
+      - details
+      - message
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems
+    TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        offset:
+          type: integer
+          description: The offset/index for the current page of records.
+        total_rows:
+          type: integer
+          description: Total number of shift rates available in the dataset.
+        items_per_page:
+          type: integer
+          description: The number of items returned per page.
+      required:
+      - offset
+      - total_rows
+      - items_per_page
+      title: TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaPage
+    GenerateTimesheetUploadUrl-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GenerateTimesheetUploadUrl-v2026-01-01RequestNotFoundError
+    TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        review_reason:
+          type:
+          - string
+          - 'null'
+          description: Reason for rejecting the timesheet. Required when review_status is REJECTED, optional when APPROVED.
+        review_status:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaDataReviewStatus'
+          description: The review status for the timesheet. Must be APPROVED or REJECTED.
+      required:
+      - review_status
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaData
+    GenerateTimesheetUploadUrl-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GenerateTimesheetUploadUrl-v2026-01-01RequestBadRequestError
     TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaDataType:
       type: string
       enum:
@@ -636,13 +704,327 @@ components:
       - PER_UNIT_FLAT_RATE
       description: The type of the shift rate.
       title: TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaDataType
-    TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaError:
+    ApiErrorContainer:
       type: object
       properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Name of the field causing the error (for validation issues)
         message:
           type: string
-          description: Description of the error.
-      title: TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaError
+          description: Human-readable explanation of the error
+      required:
+      - code
+      - field
+      - message
+      title: TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems
+    time-tracking_reviewTimeTrackingTimesheet_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaData'
+          description: Updated timesheet details after review
+      required:
+      - data
+      title: time-tracking_reviewTimeTrackingTimesheet_Response_201
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewStatus:
+      type: string
+      enum:
+      - PENDING_CREATION
+      - PENDING_REVIEW
+      - APPROVED
+      - REJECTED
+      description: Current status of the timesheet review
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewStatus
+    UpdateAShiftRateRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaError'
+      title: UpdateAShiftRateRequestBadRequestError
+    RetrieveATimesheet-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveATimesheet-v2026-01-01RequestNotFoundError
+    time-tracking_getTimeTrackingTimesheetById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaData'
+          description: Timesheet data including validation errors if applicable. When extend=file_data, also includes file_data object with file details and download URL.
+      required:
+      - data
+      title: time-tracking_getTimeTrackingTimesheetById_Response_200
+    TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - MULTIPLIER_PERCENTAGE
+      - PER_HOUR_FLAT_RATE
+      - PER_UNIT_FLAT_RATE
+      description: The updated type of shift rate.
+      title: TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaDataType
+    ? TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetSubmissionStatus
+    : type: string
+      enum:
+      - UPLOADING
+      - UPLOAD_FAILED
+      - PROCESSING
+      - SUBMITTED
+      - INVALID
+      - FAILED
+      description: Current status of the timesheet submission
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetSubmissionStatus
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    TimeTrackingShiftRatesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the created shift rate.
+        type:
+          type: string
+          description: The type of the created shift rate.
+        value:
+          type: number
+          format: double
+          description: The value of the created shift rate.
+        external_id:
+          type: string
+          description: The unique identifier of the created shift rate.
+      title: TimeTrackingShiftRatesPostResponsesContentApplicationJsonSchemaData
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItemsType:
+      type: string
+      enum:
+      - EMPTY_TIMESHEET
+      - INVALID_TIMESHEET_FORMAT
+      - FILE_TOO_LARGE
+      - INVALID_FILE_TYPE
+      - INVALID_SHIFT_TIME_ORDER
+      - INVALID_BREAK_TIME_ORDER
+      - BREAK_OUTSIDE_SHIFT
+      - OVERLAPPING_BREAKS
+      - CANNOT_SUBMIT_SHIFTS
+      - WORK_DURATION_MISMATCH
+      - NON_WORKING_DAY_VIOLATION
+      - PUBLIC_HOLIDAY_VIOLATION
+      - TIME_OFF_VIOLATION
+      - SHIFT_OUT_OF_CYCLE
+      - DAY_UNAVAILABLE
+      - INVALID_SHIFT_SUBMIT_TYPE
+      - INVALID_SHIFT_ORIGIN
+      - INVALID_SHIFT_TYPE
+      - INVALID_SHIFT_KEEP_IN_TOUCH_DATE_INTERVAL
+      - OVERLAPPING_SHIFT
+      - SHIFT_CONTRACT_IN_RESTRICTED_STATUS
+      - SHIFT_CONTRACT_IN_TERMINATION_STATUS
+      - SHIFT_CONTRACT_COMPLETION_DATE
+      - SHIFT_CONTRACT_START_DATE
+      - SHIFT_MAX_SATURDAYS_PER_YEAR_VIOLATION
+      - INVALID_DAY_TRACKING_DATA
+      - SHIFT_MAX_WORKING_DAYS_PER_YEAR_VIOLATION
+      - SHIFT_MAX_CONSECUTIVE_DAYS_STREAK_VIOLATION
+      - BREAK_TYPE_NOT_AVAILABLE
+      - BREAK_MISSED_OR_WAIVED
+      - BREAK_DURATION_MISMATCH
+      - BREAK_MAX_DURATION_EXCEEDED
+      - WORK_LOCATION_VIOLATION
+      - WORK_LOCATION_MISMATCH_BETWEEN_TIME_CLOCK_EVENTS_FOR_SHIFT
+      - MISSING_WORK_DESCRIPTION
+      description: Type of validation error
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItemsType
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetReviewStatus:
+      type: string
+      enum:
+      - PENDING_CREATION
+      - PENDING_REVIEW
+      - APPROVED
+      - REJECTED
+      description: Current status of the timesheet review
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetReviewStatus
+    ReviewASubmittedTimesheetRequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ReviewASubmittedTimesheetRequestUnprocessableEntityError
+    TimeTrackingShiftRatesExternalIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the shift rate.
+        type:
+          type: string
+          description: The type of the shift rate (e.g., MULTIPLIER_PERCENTAGE or FLAT_RATE).
+        value:
+          type: number
+          format: double
+          description: The value of the shift rate.
+        external_id:
+          type: string
+          description: The unique external identifier of the shift rate.
+      title: TimeTrackingShiftRatesExternalIdGetResponsesContentApplicationJsonSchemaData
+    TimeTrackingTimesheetsUploadUrlPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        end_date:
+          type: string
+          format: date
+          description: End date of the timesheet period. Must be equal to or later than start_date.
+        file_name:
+          type: string
+          description: Name of the timesheet file. Must end with .csv extension.
+        start_date:
+          type: string
+          format: date
+          description: Start date of the timesheet period. Must be equal to or earlier than end_date.
+        contract_id:
+          type: string
+          description: Id of the worker's contract associated with the timesheet
+      required:
+      - end_date
+      - file_name
+      - start_date
+      - contract_id
+      title: TimeTrackingTimesheetsUploadUrlPostRequestBodyContentApplicationJsonSchemaData
+    TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The updated name of the shift rate.
+        type:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaDataType'
+          description: The updated type of shift rate.
+        value:
+          type: number
+          format: double
+          description: The updated value of the shift rate.
+      title: TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaData
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItems:
+      type: object
+      properties:
+        row:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Row number in the timesheet file where the error occurred
+        type:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItemsType'
+          description: Type of validation error
+        column:
+          type:
+          - string
+          - 'null'
+          description: Column name in the timesheet file where the error occurred
+        context:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            description: Any type
+          description: Additional context information about the error
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - type
+      - message
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItems
+    TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaDataReviewStatus:
+      type: string
+      enum:
+      - APPROVED
+      - REJECTED
+      description: The review status for the timesheet. Must be APPROVED or REJECTED.
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaDataReviewStatus
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the timesheet
+        contract_id:
+          type: string
+          description: External id of the worker's contract associated with the timesheet
+        reviewed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the timesheet was reviewed (if already reviewed)
+        review_status:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetReviewStatus'
+          description: Current status of the timesheet review
+        submission_status:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetSubmissionStatus'
+          description: Current status of the timesheet submission
+      required:
+      - id
+      - contract_id
+      - review_status
+      - submission_status
+      description: Current state of the timesheet that cannot be reviewed
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheet
+    time-tracking_createTimeTrackingShiftRate_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: time-tracking_createTimeTrackingShiftRate_Response_201
     TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -674,14 +1056,22 @@ components:
       - upload_url
       - upload_fields
       title: TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaData
-    time-tracking_createTimeTrackingShiftRate_Response_201:
+    time-tracking_updateTimeTrackingShiftRateByExternalId_Response_200:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/TimeTrackingShiftRatesPostResponsesContentApplicationJsonSchemaData'
+          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaData'
+      title: time-tracking_updateTimeTrackingShiftRateByExternalId_Response_200
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties:
+        timesheet:
+          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheet'
+          description: Current state of the timesheet that cannot be reviewed
       required:
-      - data
-      title: time-tracking_createTimeTrackingShiftRate_Response_201
+      - timesheet
+      description: Additional details about the error, including the current timesheet state
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetails
     TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -738,180 +1128,31 @@ components:
       - validation_errors
       description: Timesheet data including validation errors if applicable. When extend=file_data, also includes file_data object with file details and download URL.
       title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaData
-    ReviewASubmittedTimesheetRequestNotFoundError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: ReviewASubmittedTimesheetRequestNotFoundError
-    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataFileData:
-      type: object
-      properties:
-        file_id:
-          type: string
-          format: uuid
-          description: Unique identifier for the timesheet file
-        file_name:
-          type: string
-          description: Name of the timesheet file
-        download_url:
-          type: string
-          format: uri
-          description: Pre-signed S3 URL for downloading the timesheet file
-      required:
-      - file_id
-      - file_name
-      - download_url
-      description: Present only when `extend=file_data` is provided. Contains file details and download URL.
-      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataFileData
-    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewStatus:
-      type: string
-      enum:
-      - PENDING_CREATION
-      - PENDING_REVIEW
-      - APPROVED
-      - REJECTED
-      description: Current status of the timesheet review
-      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewStatus
-    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheet:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier for the timesheet
-        contract_id:
-          type: string
-          description: External id of the worker's contract associated with the timesheet
-        reviewed_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: Timestamp when the timesheet was reviewed (if already reviewed)
-        review_status:
-          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetReviewStatus'
-          description: Current status of the timesheet review
-        submission_status:
-          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetSubmissionStatus'
-          description: Current status of the timesheet submission
-      required:
-      - id
-      - contract_id
-      - review_status
-      - submission_status
-      description: Current state of the timesheet that cannot be reviewed
-      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheet
-    TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaDataType:
-      type: string
-      enum:
-      - MULTIPLIER_PERCENTAGE
-      - PER_HOUR_FLAT_RATE
-      - PER_UNIT_FLAT_RATE
-      description: The updated type of shift rate.
-      title: TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaDataType
-    ApiErrorRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
-    TimeTrackingShiftRatesPostResponsesContentApplicationJsonSchemaData:
+    TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
         name:
           type: string
-          description: The name of the created shift rate.
+          description: The updated name of the shift rate.
         type:
           type: string
-          description: The type of the created shift rate.
+          description: The type of shift rate, e.g., MULTIPLIER_PERCENTAGE.
         value:
           type: number
           format: double
-          description: The value of the created shift rate.
+          description: The updated value of the shift rate.
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the shift rate was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the shift rate was last updated.
         external_id:
           type: string
-          description: The unique identifier of the created shift rate.
-      title: TimeTrackingShiftRatesPostResponsesContentApplicationJsonSchemaData
-    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaDataReviewStatus:
-      type: string
-      enum:
-      - PENDING_CREATION
-      - PENDING_REVIEW
-      - APPROVED
-      - REJECTED
-      description: Current status of the timesheet review
-      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaDataReviewStatus
-    TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        review_reason:
-          type:
-          - string
-          - 'null'
-          description: Reason for rejecting the timesheet. Required when review_status is REJECTED, optional when APPROVED.
-        review_status:
-          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaDataReviewStatus'
-          description: The review status for the timesheet. Must be APPROVED or REJECTED.
-      required:
-      - review_status
-      title: TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaData
-    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItems:
-      type: object
-      properties:
-        row:
-          type:
-          - number
-          - 'null'
-          format: double
-          description: Row number in the timesheet file where the error occurred
-        type:
-          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItemsType'
-          description: Type of validation error
-        column:
-          type:
-          - string
-          - 'null'
-          description: Column name in the timesheet file where the error occurred
-        context:
-          type:
-          - object
-          - 'null'
-          additionalProperties:
-            description: Any type
-          description: Additional context information about the error
-        message:
-          type: string
-          description: Human-readable error message
-      required:
-      - type
-      - message
-      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItems
+          description: The unique identifier of the updated shift rate.
+      title: TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaData
     GenerateTimesheetUploadUrl-v2026-01-01RequestUnprocessableEntityError:
       type: object
       properties:
@@ -922,192 +1163,27 @@ components:
       required:
       - errors
       title: GenerateTimesheetUploadUrl-v2026-01-01RequestUnprocessableEntityError
-    time-tracking_getTimeTrackingTimesheetsUploadUrl_Response_201:
+    time-tracking_getTimeTrackingShiftRateByExternalId_Response_200:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaData'
+          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdGetResponsesContentApplicationJsonSchemaData'
       required:
       - data
-      title: time-tracking_getTimeTrackingTimesheetsUploadUrl_Response_201
-    TimeTrackingTimesheetsUploadUrlPostRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        end_date:
-          type: string
-          format: date
-          description: End date of the timesheet period. Must be equal to or later than start_date.
-        file_name:
-          type: string
-          description: Name of the timesheet file. Must end with .csv extension.
-        start_date:
-          type: string
-          format: date
-          description: Start date of the timesheet period. Must be equal to or earlier than end_date.
-        contract_id:
-          type: string
-          description: Id of the worker's contract associated with the timesheet
-      required:
-      - end_date
-      - file_name
-      - start_date
-      - contract_id
-      title: TimeTrackingTimesheetsUploadUrlPostRequestBodyContentApplicationJsonSchemaData
-    time-tracking_deleteTimeTrackingShiftRateByExternalId_Response_204:
-      type: object
-      properties: {}
-      description: Empty response body
-      title: time-tracking_deleteTimeTrackingShiftRateByExternalId_Response_204
-    UpdateAShiftRateRequestBadRequestError:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaError'
-      title: UpdateAShiftRateRequestBadRequestError
-    ReviewASubmittedTimesheetRequestUnprocessableEntityError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: ReviewASubmittedTimesheetRequestUnprocessableEntityError
-    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code
-        field:
-          type:
-          - string
-          - 'null'
-          description: Name of the field causing the error (for validation issues)
-        details:
-          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetails'
-          description: Additional details about the error, including the current timesheet state
-        message:
-          type: string
-          description: Human-readable explanation of the error
-      required:
-      - code
-      - details
-      - message
-      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItems
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The updated name of the shift rate.
-        type:
-          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaDataType'
-          description: The updated type of shift rate.
-        value:
-          type: number
-          format: double
-          description: The updated value of the shift rate.
-      title: TimeTrackingShiftRatesExternalIdPatchRequestBodyContentApplicationJsonSchemaData
-    time-tracking_reviewTimeTrackingTimesheet_Response_201:
+      title: time-tracking_getTimeTrackingShiftRateByExternalId_Response_200
+    time-tracking_getTimeTrackingShiftRates_Response_200:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaData'
-          description: Updated timesheet details after review
-      required:
-      - data
-      title: time-tracking_reviewTimeTrackingTimesheet_Response_201
-    GenerateTimesheetUploadUrl-v2026-01-01RequestNotFoundError:
-      type: object
-      properties:
-        errors:
           type: array
           items:
-            $ref: '#/components/schemas/TimeTrackingTimesheetsUploadUrlPostResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: GenerateTimesheetUploadUrl-v2026-01-01RequestNotFoundError
-    time-tracking_getTimeTrackingTimesheetById_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaData'
-          description: Timesheet data including validation errors if applicable. When extend=file_data, also includes file_data object with file details and download URL.
+            $ref: '#/components/schemas/TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaPage'
       required:
       - data
-      title: time-tracking_getTimeTrackingTimesheetById_Response_200
-    TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The name of the shift rate.
-        type:
-          $ref: '#/components/schemas/TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaDataType'
-          description: The type of the shift rate.
-        value:
-          type: number
-          format: double
-          description: The value of the shift rate.
-        external_id:
-          type: string
-          description: A unique identifier for the shift rate.
-      required:
-      - name
-      - external_id
-      title: TimeTrackingShiftRatesPostRequestBodyContentApplicationJsonSchemaData
-    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItemsType:
-      type: string
-      enum:
-      - EMPTY_TIMESHEET
-      - INVALID_TIMESHEET_FORMAT
-      - FILE_TOO_LARGE
-      - INVALID_FILE_TYPE
-      - INVALID_SHIFT_TIME_ORDER
-      - INVALID_BREAK_TIME_ORDER
-      - BREAK_OUTSIDE_SHIFT
-      - OVERLAPPING_BREAKS
-      - CANNOT_SUBMIT_SHIFTS
-      - WORK_DURATION_MISMATCH
-      - NON_WORKING_DAY_VIOLATION
-      - PUBLIC_HOLIDAY_VIOLATION
-      - TIME_OFF_VIOLATION
-      - SHIFT_OUT_OF_CYCLE
-      - DAY_UNAVAILABLE
-      - INVALID_SHIFT_SUBMIT_TYPE
-      - INVALID_SHIFT_ORIGIN
-      - INVALID_SHIFT_TYPE
-      - INVALID_SHIFT_KEEP_IN_TOUCH_DATE_INTERVAL
-      - OVERLAPPING_SHIFT
-      - SHIFT_CONTRACT_IN_RESTRICTED_STATUS
-      - SHIFT_CONTRACT_IN_TERMINATION_STATUS
-      - SHIFT_CONTRACT_COMPLETION_DATE
-      - SHIFT_CONTRACT_START_DATE
-      - SHIFT_MAX_SATURDAYS_PER_YEAR_VIOLATION
-      - INVALID_DAY_TRACKING_DATA
-      - SHIFT_MAX_WORKING_DAYS_PER_YEAR_VIOLATION
-      - SHIFT_MAX_CONSECUTIVE_DAYS_STREAK_VIOLATION
-      - BREAK_TYPE_NOT_AVAILABLE
-      - BREAK_MISSED_OR_WAIVED
-      - BREAK_DURATION_MISMATCH
-      - BREAK_MAX_DURATION_EXCEEDED
-      - WORK_LOCATION_VIOLATION
-      - WORK_LOCATION_MISMATCH_BETWEEN_TIME_CLOCK_EVENTS_FOR_SHIFT
-      - MISSING_WORK_DESCRIPTION
-      description: Type of validation error
-      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataValidationErrorsItemsType
+      - page
+      title: time-tracking_getTimeTrackingShiftRates_Response_200
     TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems:
       type: object
       properties:
@@ -1125,94 +1201,7 @@ components:
       - field
       - message
       title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems
-    TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaPage:
-      type: object
-      properties:
-        offset:
-          type: integer
-          description: The offset/index for the current page of records.
-        total_rows:
-          type: integer
-          description: Total number of shift rates available in the dataset.
-        items_per_page:
-          type: integer
-          description: The number of items returned per page.
-      required:
-      - offset
-      - total_rows
-      - items_per_page
-      title: TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaPage
-    time-tracking_updateTimeTrackingShiftRateByExternalId_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/TimeTrackingShiftRatesExternalIdPatchResponsesContentApplicationJsonSchemaData'
-      title: time-tracking_updateTimeTrackingShiftRateByExternalId_Response_200
-    TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaDataReviewStatus:
-      type: string
-      enum:
-      - APPROVED
-      - REJECTED
-      description: The review status for the timesheet. Must be APPROVED or REJECTED.
-      title: TimeTrackingTimesheetsTimesheetIdReviewPostRequestBodyContentApplicationJsonSchemaDataReviewStatus
-    TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaDataItems:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Name of the shift rate.
-        type:
-          type: string
-          description: Type of the shift rate (e.g., MULTIPLIER_PERCENTAGE or FLAT_RATE).
-        value:
-          type: number
-          format: double
-          description: The value associated with the shift rate.
-        created_at:
-          type: string
-          description: Timestamp indicating when the shift rate was created.
-        updated_at:
-          type: string
-          description: Timestamp indicating when the shift rate was last updated.
-        external_id:
-          type: string
-          description: External identifier of the shift rate.
-      required:
-      - name
-      - type
-      - value
-      - created_at
-      - updated_at
-      - external_id
-      title: TimeTrackingShiftRatesGetResponsesContentApplicationJsonSchemaDataItems
-    RetrieveATimesheet-v2026-01-01RequestNotFoundError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: RetrieveATimesheet-v2026-01-01RequestNotFoundError
-    TimeTrackingShiftRatesExternalIdGetResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The name of the shift rate.
-        type:
-          type: string
-          description: The type of the shift rate (e.g., MULTIPLIER_PERCENTAGE or FLAT_RATE).
-        value:
-          type: number
-          format: double
-          description: The value of the shift rate.
-        external_id:
-          type: string
-          description: The unique external identifier of the shift rate.
-      title: TimeTrackingShiftRatesExternalIdGetResponsesContentApplicationJsonSchemaData
-    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetReviewStatus:
+    TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaDataReviewStatus:
       type: string
       enum:
       - PENDING_CREATION
@@ -1220,7 +1209,18 @@ components:
       - APPROVED
       - REJECTED
       description: Current status of the timesheet review
-      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaErrorsItemsDetailsTimesheetReviewStatus
+      title: TimeTrackingTimesheetsTimesheetIdReviewPostResponsesContentApplicationJsonSchemaDataReviewStatus
+    TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataSubmissionStatus:
+      type: string
+      enum:
+      - UPLOADING
+      - UPLOAD_FAILED
+      - PROCESSING
+      - SUBMITTED
+      - INVALID
+      - FAILED
+      description: Current status of the timesheet submission
+      title: TimeTrackingTimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataSubmissionStatus
   securitySchemes:
     deelToken:
       type: http

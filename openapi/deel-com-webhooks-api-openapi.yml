@@ -118,8 +118,12 @@ paths:
           description: Webhook deleted
 components:
   schemas:
-    WebhookUpdate:
+    WebhookCreate:
       type: object
+      required:
+      - name
+      - url
+      - events
       properties:
         name:
           type: string
@@ -130,10 +134,12 @@ components:
           type: array
           items:
             type: string
-        active:
-          type: boolean
         secret:
           type: string
+          description: HMAC signing secret (write-only). If omitted, Deel generates one.
+        active:
+          type: boolean
+          default: true
     Webhook:
       type: object
       properties:
@@ -161,12 +167,8 @@ components:
           format: date-time
         last_delivery_status:
           type: integer
-    WebhookCreate:
+    WebhookUpdate:
       type: object
-      required:
-      - name
-      - url
-      - events
       properties:
         name:
           type: string
@@ -177,12 +179,10 @@ components:
           type: array
           items:
             type: string
-        secret:
-          type: string
-          description: HMAC signing secret (write-only). If omitted, Deel generates one.
         active:
           type: boolean
-          default: true
+        secret:
+          type: string
   securitySchemes:
     BearerAuth:
       type: http

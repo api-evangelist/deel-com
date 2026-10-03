@@ -337,15 +337,57 @@ paths:
                 $ref: '#/components/schemas/ApiErrorContainer'
 components:
   schemas:
-    LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaDataItems:
-      type: string
-      enum:
-      - VACATION
-      - SICK_LEAVE
-      - OTHER
-      - UNPAID_LEAVE
-      description: Predefined time-off types. Possible values include 'VACATION', 'SICK_LEAVE', 'UNPAID_LEAVE'  and 'OTHER'.
-      title: LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaDataItems
+    LookupsSenioritiesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: A unique identifier for the seniority level.
+        name:
+          type: string
+          description: The name of the seniority level, e.g., 'Mid (Individual Contributor Level 2)'.
+        level:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The hierarchical level of seniority, where higher numbers indicate greater seniority.
+      required:
+      - id
+      - name
+      title: LookupsSenioritiesGetResponsesContentApplicationJsonSchemaDataItems
+    LookupsJobTitlesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: identifier of the job title
+        name:
+          type: string
+          description: Job title.
+      required:
+      - id
+      - name
+      title: LookupsJobTitlesGetResponsesContentApplicationJsonSchemaDataItems
+    GetLookupsRequestBadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message explaining what went wrong.
+      title: GetLookupsRequestBadRequestError
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
     lookups_getCountries_Response_200:
       type: object
       properties:
@@ -365,27 +407,83 @@ components:
       required:
       - errors
       title: RetrieveTimeOffTypesRequestNotFoundError
-    Lookups_getLookups_Response_200:
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    LookupsGetParametersDocuments:
+      type: string
+      enum:
+      - sicNumbers
+      - entityTypes
+      - countries
+      title: LookupsGetParametersDocuments
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    lookups_getJobTitles_Response_200:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/LookupsGetResponsesContentApplicationJsonSchemaDataItems'
-      title: Lookups_getLookups_Response_200
-    LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItemsStatesItems:
+            $ref: '#/components/schemas/LookupsJobTitlesGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/LookupsJobTitlesGetResponsesContentApplicationJsonSchemaPage'
+      title: lookups_getJobTitles_Response_200
+    LookupsCurrenciesGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
         code:
           type: string
-          description: The code representing the sub-territory (e.g., state or region).
+          description: The ISO 4217 three-letter currency code.
         name:
-          type: string
-          description: The name of the sub-territory (e.g., state or region).
+          type:
+          - string
+          - 'null'
+          description: The name of the currency. This may be null if a name is not available.
       required:
       - code
-      - name
-      title: LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItemsStatesItems
+      title: LookupsCurrenciesGetResponsesContentApplicationJsonSchemaDataItems
+    lookups_getTimeOffTypes_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of predefined time-off types supported by the Deel platform.
+      title: lookups_getTimeOffTypes_Response_200
     LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -423,25 +521,14 @@ components:
       - visa_support
       - default_currency
       title: LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItems
-    lookups_getSeniorityLevels_Response_200:
+    Lookups_getLookups_Response_200:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/LookupsSenioritiesGetResponsesContentApplicationJsonSchemaDataItems'
-          description: List of predefined seniority levels supported by the Deel platform.
-      title: lookups_getSeniorityLevels_Response_200
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
+            $ref: '#/components/schemas/LookupsGetResponsesContentApplicationJsonSchemaDataItems'
+      title: Lookups_getLookups_Response_200
     LookupsJobTitlesGetResponsesContentApplicationJsonSchemaPage:
       type: object
       properties:
@@ -451,103 +538,28 @@ components:
       required:
       - cursor
       title: LookupsJobTitlesGetResponsesContentApplicationJsonSchemaPage
-    lookups_getJobTitles_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/LookupsJobTitlesGetResponsesContentApplicationJsonSchemaDataItems'
-        page:
-          $ref: '#/components/schemas/LookupsJobTitlesGetResponsesContentApplicationJsonSchemaPage'
-      title: lookups_getJobTitles_Response_200
-    LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message describing what went wrong.
-      required:
-      - message
-      title: LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaErrorsItems
-    ApiErrorRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
-    LookupsCurrenciesGetResponsesContentApplicationJsonSchemaDataItems:
+    LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: string
+      enum:
+      - VACATION
+      - SICK_LEAVE
+      - OTHER
+      - UNPAID_LEAVE
+      description: Predefined time-off types. Possible values include 'VACATION', 'SICK_LEAVE', 'UNPAID_LEAVE'  and 'OTHER'.
+      title: LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaDataItems
+    LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItemsStatesItems:
       type: object
       properties:
         code:
           type: string
-          description: The ISO 4217 three-letter currency code.
+          description: The code representing the sub-territory (e.g., state or region).
         name:
-          type:
-          - string
-          - 'null'
-          description: The name of the currency. This may be null if a name is not available.
+          type: string
+          description: The name of the sub-territory (e.g., state or region).
       required:
       - code
-      title: LookupsCurrenciesGetResponsesContentApplicationJsonSchemaDataItems
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    LookupsSenioritiesGetResponsesContentApplicationJsonSchemaDataItems:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: A unique identifier for the seniority level.
-        name:
-          type: string
-          description: The name of the seniority level, e.g., 'Mid (Individual Contributor Level 2)'.
-        level:
-          type:
-          - number
-          - 'null'
-          format: double
-          description: The hierarchical level of seniority, where higher numbers indicate greater seniority.
-      required:
-      - id
       - name
-      title: LookupsSenioritiesGetResponsesContentApplicationJsonSchemaDataItems
-    GetLookupsRequestBadRequestError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message explaining what went wrong.
-      title: GetLookupsRequestBadRequestError
+      title: LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItemsStatesItems
     LookupsGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -558,29 +570,6 @@ components:
           type: string
           description: The value associated with the lookup item (e.g., ISO code, type identifier).
       title: LookupsGetResponsesContentApplicationJsonSchemaDataItems
-    LookupsJobTitlesGetResponsesContentApplicationJsonSchemaDataItems:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: identifier of the job title
-        name:
-          type: string
-          description: Job title.
-      required:
-      - id
-      - name
-      title: LookupsJobTitlesGetResponsesContentApplicationJsonSchemaDataItems
-    lookups_getTimeOffTypes_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaDataItems'
-          description: List of predefined time-off types supported by the Deel platform.
-      title: lookups_getTimeOffTypes_Response_200
     lookups_getCurrencies_Response_200:
       type: object
       properties:
@@ -590,13 +579,24 @@ components:
             $ref: '#/components/schemas/LookupsCurrenciesGetResponsesContentApplicationJsonSchemaDataItems'
           description: List of currencies supported by Deel.
       title: lookups_getCurrencies_Response_200
-    LookupsGetParametersDocuments:
-      type: string
-      enum:
-      - sicNumbers
-      - entityTypes
-      - countries
-      title: LookupsGetParametersDocuments
+    lookups_getSeniorityLevels_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupsSenioritiesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of predefined seniority levels supported by the Deel platform.
+      title: lookups_getSeniorityLevels_Response_200
+    LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message describing what went wrong.
+      required:
+      - message
+      title: LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaErrorsItems
   securitySchemes:
     deelToken:
       type: http

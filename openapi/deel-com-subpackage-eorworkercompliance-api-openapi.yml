@@ -311,40 +311,6 @@ paths:
                   description: 'The employee compliance document to upload. Accepted formats: PNG, JPG, JPEG, HEIC, PDF.'
 components:
   schemas:
-    eor-worker-compliance_getEORWorkerComplianceDocuments_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: eor-worker-compliance_getEORWorkerComplianceDocuments_Response_200
-    UploadEmployeeComplianceDocument-v2026-01-01RequestInternalServerError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
-      title: UploadEmployeeComplianceDocument-v2026-01-01RequestInternalServerError
-    EorWorkersComplianceDocumentsDocumentIdAcknowledgementPostResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code
-        message:
-          type: string
-          description: Human-readable explanation of the error
-      title: EorWorkersComplianceDocumentsDocumentIdAcknowledgementPostResponsesContentApplicationJsonSchemaErrorsItems
-    UploadEmployeeComplianceDocument-v2026-01-01RequestForbiddenError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
-      title: UploadEmployeeComplianceDocument-v2026-01-01RequestForbiddenError
     ListOfEmployeeComplianceDocuments-v2026-01-01RequestForbiddenError:
       type: object
       properties:
@@ -355,14 +321,157 @@ components:
       required:
       - errors
       title: ListOfEmployeeComplianceDocuments-v2026-01-01RequestForbiddenError
-    eor-worker-compliance_downloadComplianceDocument_Response_200:
+    EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus:
+      type: string
+      enum:
+      - AWAITING_EX_REVIEW
+      - AWAITING_EXTERNAL_REVIEW
+      - REJECTED
+      - APPROVED
+      - ON_HOLD
+      description: Review status of the uploaded document, null if no document has been uploaded yet.
+      title: EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus
+    EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human-readable error message.
+      required:
+      - message
+      title: EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems
+    ListOfEmployeeComplianceDocuments-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListOfEmployeeComplianceDocuments-v2026-01-01RequestInternalServerError
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    DownloadSubmittedComplianceDocumentRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaRequest'
+      title: DownloadSubmittedComplianceDocumentRequestBadRequestError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ListOfEmployeeComplianceDocuments-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListOfEmployeeComplianceDocuments-v2026-01-01RequestUnauthorizedError
+    UploadEmployeeComplianceDocument-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UploadEmployeeComplianceDocument-v2026-01-01RequestUnauthorizedError
+    EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates whether the file upload was successful.
+      required:
+      - success
+      title: EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaData
+    eor-worker-compliance_createComplianceDocumentAcknowledgement_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: eor-worker-compliance_createComplianceDocumentAcknowledgement_Response_204
+    EorWorkersComplianceDocumentsDocumentIdTemplatesDownloadGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL for the requested compliance document template.
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Expiration date time of download URL.
+        updated_at:
+          type: string
+          format: date-time
+          description: Last modified date of the template file
+      title: EorWorkersComplianceDocumentsDocumentIdTemplatesDownloadGetResponsesContentApplicationJsonSchemaData
+    eor-worker-compliance_uploadEORWorkerComplianceDocument_Response_200:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaData'
+          $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaData'
       required:
       - data
-      title: eor-worker-compliance_downloadComplianceDocument_Response_200
+      title: eor-worker-compliance_uploadEORWorkerComplianceDocument_Response_200
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    AcknowledgeAComplianceDocumentRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdAcknowledgementPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: AcknowledgeAComplianceDocumentRequestInternalServerError
     EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItems:
       type: object
       properties:
@@ -431,93 +540,38 @@ components:
       - required_in_30_days
       - is_acknowledgement_only_document
       title: EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItems
-    ApiError:
+    eor-worker-compliance_getEORWorkerComplianceDocuments_Response_200:
       type: object
       properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    ListOfEmployeeComplianceDocuments-v2026-01-01RequestInternalServerError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+        data:
+          $ref: '#/components/schemas/EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData'
       required:
-      - errors
-      title: ListOfEmployeeComplianceDocuments-v2026-01-01RequestInternalServerError
-    ListOfEmployeeComplianceDocuments-v2026-01-01RequestUnauthorizedError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: ListOfEmployeeComplianceDocuments-v2026-01-01RequestUnauthorizedError
-    UploadEmployeeComplianceDocument-v2026-01-01RequestUnauthorizedError:
+      - data
+      title: eor-worker-compliance_getEORWorkerComplianceDocuments_Response_200
+    UploadEmployeeComplianceDocument-v2026-01-01RequestNotFoundError:
       type: object
       properties:
         errors:
           type: array
           items:
             $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
-      title: UploadEmployeeComplianceDocument-v2026-01-01RequestUnauthorizedError
-    eor-worker-compliance_createComplianceDocumentAcknowledgement_Response_204:
-      type: object
-      properties: {}
-      description: Empty response body
-      title: eor-worker-compliance_createComplianceDocumentAcknowledgement_Response_204
-    EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        path:
-          type: string
-          description: The JSON path where input validation failed
-        message:
-          type: string
-          description: A description of the returned error
-      title: EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems
-    EorWorkersComplianceDocumentsDocumentIdTemplatesDownloadGetResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        url:
-          type: string
-          description: The URL for the requested compliance document template.
-        expires_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: Expiration date time of download URL.
-        updated_at:
-          type: string
-          format: date-time
-          description: Last modified date of the template file
-      title: EorWorkersComplianceDocumentsDocumentIdTemplatesDownloadGetResponsesContentApplicationJsonSchemaData
-    EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Human-readable error message.
-      required:
-      - message
-      title: EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems
-    eor-worker-compliance_uploadEORWorkerComplianceDocument_Response_200:
+      title: UploadEmployeeComplianceDocument-v2026-01-01RequestNotFoundError
+    eor-worker-compliance_downloadComplianceDocumentTemplate_Response_200:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaData'
+          $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdTemplatesDownloadGetResponsesContentApplicationJsonSchemaData'
       required:
       - data
-      title: eor-worker-compliance_uploadEORWorkerComplianceDocument_Response_200
+      title: eor-worker-compliance_downloadComplianceDocumentTemplate_Response_200
+    eor-worker-compliance_downloadComplianceDocument_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-worker-compliance_downloadComplianceDocument_Response_200
     EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaRequest:
       type: object
       properties:
@@ -545,33 +599,50 @@ components:
           type: string
           description: The request ID of the failed request
       title: EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaRequest
-    ApiErrorRequest:
+    AcknowledgeAComplianceDocumentRequestBadRequestError:
       type: object
       properties:
-        method:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdAcknowledgementPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: AcknowledgeAComplianceDocumentRequestBadRequestError
+    EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
           type: string
-          description: The HTTP method of the failed request
-        url:
+          description: The JSON path where input validation failed
+        message:
           type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
+          description: A description of the returned error
+      title: EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems
+    EorWorkersComplianceDocumentsDocumentIdAcknowledgementPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
         code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: EorWorkersComplianceDocumentsDocumentIdAcknowledgementPostResponsesContentApplicationJsonSchemaErrorsItems
+    UploadEmployeeComplianceDocument-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UploadEmployeeComplianceDocument-v2026-01-01RequestForbiddenError
+    UploadEmployeeComplianceDocument-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UploadEmployeeComplianceDocument-v2026-01-01RequestInternalServerError
     EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems:
       type: object
       properties:
@@ -587,70 +658,6 @@ components:
       - code
       - message
       title: EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems
-    EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus:
-      type: string
-      enum:
-      - AWAITING_EX_REVIEW
-      - AWAITING_EXTERNAL_REVIEW
-      - REJECTED
-      - APPROVED
-      - ON_HOLD
-      description: Review status of the uploaded document, null if no document has been uploaded yet.
-      title: EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus
-    EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        documents:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItems'
-          description: List of compliance documents required for the worker.
-      required:
-      - documents
-      title: EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData
-    eor-worker-compliance_downloadComplianceDocumentTemplate_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdTemplatesDownloadGetResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: eor-worker-compliance_downloadComplianceDocumentTemplate_Response_200
-    EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        success:
-          type: boolean
-          description: Indicates whether the file upload was successful.
-      required:
-      - success
-      title: EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaData
-    UploadEmployeeComplianceDocument-v2026-01-01RequestNotFoundError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
-      title: UploadEmployeeComplianceDocument-v2026-01-01RequestNotFoundError
-    UploadEmployeeComplianceDocument-v2026-01-01RequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
-      title: UploadEmployeeComplianceDocument-v2026-01-01RequestBadRequestError
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
     EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -662,32 +669,25 @@ components:
           format: date-time
           description: Expiration date time of download URL.
       title: EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaData
-    AcknowledgeAComplianceDocumentRequestInternalServerError:
+    EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItems'
+          description: List of compliance documents required for the worker.
+      required:
+      - documents
+      title: EorWorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData
+    UploadEmployeeComplianceDocument-v2026-01-01RequestBadRequestError:
       type: object
       properties:
         errors:
           type: array
           items:
-            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdAcknowledgementPostResponsesContentApplicationJsonSchemaErrorsItems'
-      title: AcknowledgeAComplianceDocumentRequestInternalServerError
-    DownloadSubmittedComplianceDocumentRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems'
-        request:
-          $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaRequest'
-      title: DownloadSubmittedComplianceDocumentRequestBadRequestError
-    AcknowledgeAComplianceDocumentRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdAcknowledgementPostResponsesContentApplicationJsonSchemaErrorsItems'
-      title: AcknowledgeAComplianceDocumentRequestBadRequestError
+            $ref: '#/components/schemas/EorWorkersComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UploadEmployeeComplianceDocument-v2026-01-01RequestBadRequestError
   securitySchemes:
     deelToken:
       type: http

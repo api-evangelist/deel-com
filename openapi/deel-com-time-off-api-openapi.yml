@@ -216,30 +216,37 @@ paths:
                             name:
                               type: string
 components:
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
   schemas:
-    Entitlement:
+    TimeOffRequestCreate:
       type: object
+      required:
+      - person_id
+      - policy_id
+      - start_date
+      - end_date
       properties:
+        person_id:
+          type: string
         policy_id:
           type: string
-        policy_name:
-          type: string
-        accrued:
-          type: number
-        used:
-          type: number
-        pending:
-          type: number
-        available:
-          type: number
-        unit:
-          type: string
-          enum:
-          - days
-          - hours
-        as_of:
+        start_date:
           type: string
           format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        half_day:
+          type: boolean
     TimeOffPolicy:
       type: object
       properties:
@@ -300,36 +307,29 @@ components:
         created_at:
           type: string
           format: date-time
-    TimeOffRequestCreate:
+    Entitlement:
       type: object
-      required:
-      - person_id
-      - policy_id
-      - start_date
-      - end_date
       properties:
-        person_id:
-          type: string
         policy_id:
           type: string
-        start_date:
+        policy_name:
+          type: string
+        accrued:
+          type: number
+        used:
+          type: number
+        pending:
+          type: number
+        available:
+          type: number
+        unit:
+          type: string
+          enum:
+          - days
+          - hours
+        as_of:
           type: string
           format: date
-        end_date:
-          type: string
-          format: date
-        reason:
-          type: string
-        half_day:
-          type: boolean
-  parameters:
-    IdempotencyKey:
-      name: Idempotency-Key
-      in: header
-      required: false
-      schema:
-        type: string
-        format: uuid
   securitySchemes:
     BearerAuth:
       type: http

@@ -300,19 +300,57 @@ paths:
                   description: Form submission payload containing respondent type, question answers, and optional version.
 components:
   schemas:
-    EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems:
+    SubmitProjectAssignmentCheckinQuestionnaireDataRequestConflictError:
       type: object
       properties:
-        code:
-          type: string
-          description: Machine-readable error code
-        message:
-          type: string
-          description: Human-readable explanation of the error
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems'
       required:
-      - code
-      - message
-      title: EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems
+      - errors
+      title: SubmitProjectAssignmentCheckinQuestionnaireDataRequestConflictError
+    EorContractsContractIdProjectAssignmentAcceptPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        version:
+          type: string
+          description: This field is to ensure that the latest version of the project assignment PDF matches the version received from the webhook. If it is not sent, the version validation is not performed and the endpoint returns the PDF. If it is sent, it is checked whether the current version is equal to the version sent; if not, a 409 error occurs, otherwise, the PDF is returned.
+      title: EorContractsContractIdProjectAssignmentAcceptPostRequestBodyContentApplicationJsonSchemaData
+    EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaDataType'
+          description: Indicates who is submitting the form. Can be either 'EMPLOYEE' or 'CLIENT'.
+        version:
+          type: string
+          description: Optional version identifier of the form or schema.
+        questions_with_answers:
+          type: object
+          additionalProperties:
+            type: string
+          description: Map of question IDs to their corresponding answers.
+      required:
+      - type
+      - questions_with_answers
+      description: Form submission payload containing respondent type, question answers, and optional version.
+      title: EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaData
+    FetchProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: FetchProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError
+    EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - EMPLOYEE
+      - CLIENT
+      description: Indicates who is submitting the form. Can be either 'EMPLOYEE' or 'CLIENT'.
+      title: EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaDataType
     AcceptEorProjectAssignmentAsClientRequestInternalServerError:
       type: object
       properties:
@@ -323,6 +361,83 @@ components:
       required:
       - errors
       title: AcceptEorProjectAssignmentAsClientRequestInternalServerError
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the resource
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItems'
+          description: Sections of questions
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the resource was created (ISO 8601).
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the resource was last updated (ISO 8601).
+      required:
+      - id
+      - sections
+      - created_at
+      - updated_at
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaData
+    eor-project-assignment_getProjectAssignmentCheckin_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: eor-project-assignment_getProjectAssignmentCheckin_Response_200
+    EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems
+    FetchProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: FetchProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    eor-project-assignment_checkinProjectAssignment_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: eor-project-assignment_checkinProjectAssignment_Response_204
     EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItems:
       type: object
       properties:
@@ -356,120 +471,16 @@ components:
       - type
       - title
       title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItems
-    EorContractsContractIdProjectAssignmentAcceptPostRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        version:
-          type: string
-          description: This field is to ensure that the latest version of the project assignment PDF matches the version received from the webhook. If it is not sent, the version validation is not performed and the endpoint returns the PDF. If it is sent, it is checked whether the current version is equal to the version sent; if not, a 409 error occurs, otherwise, the PDF is returned.
-      title: EorContractsContractIdProjectAssignmentAcceptPostRequestBodyContentApplicationJsonSchemaData
-    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsType:
-      type: string
-      enum:
-      - FreeText
-      - Paragraph
-      - SingleSelection
-      - MultiSelection
-      - Address
-      - PhoneNumber
-      - DocumentUpload
-      - Number
-      - Dropdown
-      - DatePicker
-      - Email
-      description: Type of the question.
-      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsType
-    FetchProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError:
+    FetchProjectAssignmentCheckinQuestionnaireDataRequestConflictError:
       type: object
       properties:
         errors:
           type: array
           items:
             $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems'
-      title: FetchProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError
-    FetchEorProjectAssignmentPdfRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems'
       required:
       - errors
-      title: FetchEorProjectAssignmentPdfRequestBadRequestError
-    ? EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsDefaultValue
-    : oneOf:
-      - type: string
-      - type: number
-        format: double
-      - type: boolean
-      description: Default value to pre-fill in the form.
-      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsDefaultValue
-    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItems:
-      type: object
-      properties:
-        title:
-          type: string
-          description: Title of the section.
-        subtitle:
-          type: string
-          description: Additional information shown at the top of the section.
-        questions:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItems'
-          description: List of questions within the section.
-      required:
-      - title
-      - questions
-      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItems
-    EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaDataType:
-      type: string
-      enum:
-      - EMPLOYEE
-      - CLIENT
-      description: Indicates who is submitting the form. Can be either 'EMPLOYEE' or 'CLIENT'.
-      title: EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaDataType
-    AcceptEorProjectAssignmentAsClientRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentAcceptPostResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: AcceptEorProjectAssignmentAsClientRequestBadRequestError
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code
-        message:
-          type: string
-          description: Human-readable explanation of the error
-      title: EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems
-    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code
-        message:
-          type: string
-          description: Human-readable explanation of the error
-      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems
+      title: FetchProjectAssignmentCheckinQuestionnaireDataRequestConflictError
     ApiErrorRequest:
       type: object
       properties:
@@ -497,53 +508,6 @@ components:
           format: double
           description: The code of the source handler which produced the returned error
       title: ApiErrorRequest
-    EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaDataType'
-          description: Indicates who is submitting the form. Can be either 'EMPLOYEE' or 'CLIENT'.
-        version:
-          type: string
-          description: Optional version identifier of the form or schema.
-        questions_with_answers:
-          type: object
-          additionalProperties:
-            type: string
-          description: Map of question IDs to their corresponding answers.
-      required:
-      - type
-      - questions_with_answers
-      description: Form submission payload containing respondent type, question answers, and optional version.
-      title: EorContractsContractIdProjectAssignmentCheckinPostRequestBodyContentApplicationJsonSchemaData
-    FetchEorProjectAssignmentPdfRequestInternalServerError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: FetchEorProjectAssignmentPdfRequestInternalServerError
-    SubmitProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems'
-      title: SubmitProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError
-    FetchProjectAssignmentCheckinQuestionnaireDataRequestConflictError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: FetchProjectAssignmentCheckinQuestionnaireDataRequestConflictError
     AcceptEorProjectAssignmentAsClientRequestConflictError:
       type: object
       properties:
@@ -554,6 +518,144 @@ components:
       required:
       - errors
       title: AcceptEorProjectAssignmentAsClientRequestConflictError
+    eor-project-assignment_acceptProjectAssignment_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: eor-project-assignment_acceptProjectAssignment_Response_204
+    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsType:
+      type: string
+      enum:
+      - FreeText
+      - Paragraph
+      - SingleSelection
+      - MultiSelection
+      - Address
+      - PhoneNumber
+      - DocumentUpload
+      - Number
+      - Dropdown
+      - DatePicker
+      - Email
+      description: Type of the question.
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsType
+    ? EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsDefaultValue
+    : oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      description: Default value to pre-fill in the form.
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsDefaultValue
+    SubmitProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SubmitProjectAssignmentCheckinQuestionnaireDataRequestInternalServerError
+    EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      required:
+      - code
+      - message
+      title: EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems
+    SubmitProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SubmitProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError
+    FetchEorProjectAssignmentPdfRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchEorProjectAssignmentPdfRequestInternalServerError
+    FetchEorProjectAssignmentPdfRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchEorProjectAssignmentPdfRequestBadRequestError
+    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItems:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the section.
+        subtitle:
+          type: string
+          description: Additional information shown at the top of the section.
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItems'
+          description: List of questions within the section.
+      required:
+      - title
+      - questions
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItems
+    FetchEorProjectAssignmentPdfRequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchEorProjectAssignmentPdfRequestConflictError
+    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems
+    AcceptEorProjectAssignmentAsClientRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentAcceptPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AcceptEorProjectAssignmentAsClientRequestBadRequestError
+    ? EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsOptionsItems
+    : type: object
+      properties:
+        title:
+          type: string
+          description: Display text for the option.
+        value:
+          type:
+          - string
+          - 'null'
+          description: Value associated with the option.
+      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsOptionsItems
     EorContractsContractIdProjectAssignmentAcceptPostResponsesContentApplicationJsonSchemaErrorsItems:
       type: object
       properties:
@@ -567,108 +669,6 @@ components:
       - code
       - message
       title: EorContractsContractIdProjectAssignmentAcceptPostResponsesContentApplicationJsonSchemaErrorsItems
-    eor-project-assignment_getProjectAssignmentCheckin_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: eor-project-assignment_getProjectAssignmentCheckin_Response_200
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier of the resource
-        sections:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItems'
-          description: Sections of questions
-        created_at:
-          type: string
-          format: date-time
-          description: Timestamp indicating when the resource was created (ISO 8601).
-        updated_at:
-          type: string
-          format: date-time
-          description: Timestamp indicating when the resource was last updated (ISO 8601).
-      required:
-      - id
-      - sections
-      - created_at
-      - updated_at
-      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaData
-    SubmitProjectAssignmentCheckinQuestionnaireDataRequestConflictError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: SubmitProjectAssignmentCheckinQuestionnaireDataRequestConflictError
-    SubmitProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinPostResponsesContentApplicationJsonSchemaErrorsItems'
-      title: SubmitProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError
-    FetchEorProjectAssignmentPdfRequestConflictError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentGetResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: FetchEorProjectAssignmentPdfRequestConflictError
-    FetchProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaErrorsItems'
-      title: FetchProjectAssignmentCheckinQuestionnaireDataRequestBadRequestError
-    eor-project-assignment_acceptProjectAssignment_Response_204:
-      type: object
-      properties: {}
-      description: Empty response body
-      title: eor-project-assignment_acceptProjectAssignment_Response_204
-    ? EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsOptionsItems
-    : type: object
-      properties:
-        title:
-          type: string
-          description: Display text for the option.
-        value:
-          type:
-          - string
-          - 'null'
-          description: Value associated with the option.
-      title: EorContractsContractIdProjectAssignmentCheckinGetResponsesContentApplicationJsonSchemaDataSectionsItemsQuestionsItemsOptionsItems
-    eor-project-assignment_checkinProjectAssignment_Response_204:
-      type: object
-      properties: {}
-      description: Empty response body
-      title: eor-project-assignment_checkinProjectAssignment_Response_204
   securitySchemes:
     deelToken:
       type: http

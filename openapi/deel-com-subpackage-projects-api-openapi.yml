@@ -584,49 +584,69 @@ paths:
                 $ref: '#/components/schemas/ApiErrorContainer'
 components:
   schemas:
-    DeleteHourlyReportPresetRequestNotFoundError:
+    CreateHourlyReportPresetRequestForbiddenError:
       type: object
       properties:
         error:
           type: string
-      title: DeleteHourlyReportPresetRequestNotFoundError
-    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile:
+      title: CreateHourlyReportPresetRequestForbiddenError
+    TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
         id:
           type: string
-          description: The unique identifier of the file
-        name:
-          type: string
-          description: The name of the file
+          format: uuid
+          description: The unique identifier of the hourly report root preset
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataFile'
+          - type: 'null'
         type:
+          $ref: '#/components/schemas/TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataType'
+          description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
+        title:
           type: string
-          description: The type of the file
-      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile
-    TimesheetsPresetsIdDeleteResponsesContentApplicationJsonSchemaData:
+          description: The title of the hourly report root preset
+        status:
+          type: string
+          description: The current status of the hourly report root preset
+        description:
+          type: string
+          description: Detailed description of the hourly report root preset's purpose and contents
+      required:
+      - id
+      - title
+      - status
+      - description
+      title: TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaData
+    GetHourlyReportPresetsRequestBadRequestError:
       type: object
       properties:
-        deleted:
-          type: boolean
-          description: Indicates whether the hourly report preset was successfully deleted
+        error:
+          type: string
       required:
-      - deleted
-      title: TimesheetsPresetsIdDeleteResponsesContentApplicationJsonSchemaData
-    Projects_getTimesheetsPresetById_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: Projects_getTimesheetsPresetById_Response_200
-    TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsType:
+      - error
+      title: GetHourlyReportPresetsRequestBadRequestError
+    TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataType:
       type: string
       enum:
       - RATE
       - TRACKING
       description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
-      title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsType
+      title: TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataType
+    TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItemsActionType:
+      type: string
+      enum:
+      - ADD
+      default: ADD
+      description: The action to perform with this preset (currently only ADD is supported)
+      title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItemsActionType
+    GetHourlyReportRootPresetByIdRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: GetHourlyReportRootPresetByIdRequestBadRequestError
     TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -660,12 +680,135 @@ components:
       - contracts_count
       - hourly_report_presets_count
       title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItems
-    GetHourlyReportRootPresetByIdRequestNotFoundError:
+    GetHourlyReportPresetByIdRequestForbiddenError:
       type: object
       properties:
         error:
           type: string
-      title: GetHourlyReportRootPresetByIdRequestNotFoundError
+      title: GetHourlyReportPresetByIdRequestForbiddenError
+    TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type of the file
+      title: TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataFile
+    Projects_getTimesheetsPresetById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_getTimesheetsPresetById_Response_200
+    CreateHourlyReportRootPresetRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateHourlyReportRootPresetRequestBadRequestError
+    UpdateHourlyReportPresetRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: UpdateHourlyReportPresetRequestNotFoundError
+    TimesheetsRootPresetsGetParametersOrderBy:
+      type: string
+      enum:
+      - created_at
+      default: created_at
+      title: TimesheetsRootPresetsGetParametersOrderBy
+    TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItems:
+      type: object
+      properties:
+        file:
+          type:
+          - string
+          - 'null'
+          format: binary
+          description: Optional file attachment for this specific preset instance
+        rate:
+          type: number
+          format: double
+          description: The hourly rate for this preset (must be greater than 0)
+        title:
+          type: string
+          description: The title for this specific preset instance (maximum 255 characters)
+        action_type:
+          $ref: '#/components/schemas/TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItemsActionType'
+          description: The action to perform with this preset (currently only ADD is supported)
+        contract_id:
+          type: string
+          description: The unique identifier of the contract this preset is associated with
+        description:
+          type:
+          - string
+          - 'null'
+          description: Detailed description for this specific preset instance (maximum 30000 characters)
+      required:
+      - contract_id
+      title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    Projects_getContractTimesheetsPresets_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaPage'
+      required:
+      - data
+      - page
+      title: Projects_getContractTimesheetsPresets_Response_200
+    TimesheetsRootPresetsGetParametersOrderDirection:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      default: DESC
+      title: TimesheetsRootPresetsGetParametersOrderDirection
+    Projects_getHourlyReportRootPresetById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_getHourlyReportRootPresetById_Response_200
+    TimesheetsPresetsIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the updated hourly report preset
+      required:
+      - id
+      title: TimesheetsPresetsIdPatchResponsesContentApplicationJsonSchemaData
+    DeleteHourlyReportPresetRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: DeleteHourlyReportPresetRequestNotFoundError
     ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -702,26 +845,84 @@ components:
         error:
           type: string
       title: UpdateHourlyReportPresetRequestForbiddenError
-    TimesheetsRootPresetsGetParametersOrderDirection:
-      type: string
-      enum:
-      - ASC
-      - DESC
-      default: DESC
-      title: TimesheetsRootPresetsGetParametersOrderDirection
-    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetFile:
+    TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaDataAsyncTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The identifier of the asynchronous task processing this request
+      title: TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaDataAsyncTask
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
         id:
           type: string
-          description: The unique identifier of the file
-        name:
-          type: string
-          description: The name of the file
+          format: uuid
+          description: The unique identifier of the hourly report preset
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataFile'
+          - type: 'null'
         type:
+          $ref: '#/components/schemas/TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataType'
+          description: The type of preset based on type of root preset
+        title:
           type: string
-          description: The type of the file
-      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetFile
+          description: The title of the hourly report preset
+        status:
+          type: string
+          description: The current status of the hourly report preset
+        description:
+          type: string
+          description: A detailed description of the hourly report preset
+      required:
+      - id
+      - title
+      - status
+      - description
+      title: TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaData
+    TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - RATE
+      - TRACKING
+      description: The type of preset based on type of root preset
+      title: TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataType
+    TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the created root preset
+        async_task:
+          $ref: '#/components/schemas/TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaDataAsyncTask'
+      required:
+      - id
+      title: TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type: string
+          description: Pagination cursor for fetching the next set of results
+        total_rows:
+          type: integer
+          description: Total number of rows available in the result set
+      required:
+      - cursor
+      - total_rows
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaPage
     TimesheetsPresetsIdPatchRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -744,25 +945,59 @@ components:
           - 'null'
           description: A detailed description of the hourly report preset's purpose and contents (maximum 30000 characters)
       title: TimesheetsPresetsIdPatchRequestBodyContentApplicationJsonSchemaData
-    TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaPage:
+    Projects_getHourlyReportRootPresets_Response_200:
       type: object
       properties:
-        cursor:
-          type: string
-          description: Pagination cursor for fetching the next set of results
-        total_rows:
-          type: integer
-          description: Total number of root presets available
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaPage'
       required:
-      - cursor
-      - total_rows
-      title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaPage
-    GetHourlyReportRootPresetByIdRequestBadRequestError:
+      - data
+      - page
+      title: Projects_getHourlyReportRootPresets_Response_200
+    TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsType:
+      type: string
+      enum:
+      - RATE
+      - TRACKING
+      description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
+      title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsType
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    GetHourlyReportRootPresetByIdRequestNotFoundError:
       type: object
       properties:
         error:
           type: string
-      title: GetHourlyReportRootPresetByIdRequestBadRequestError
+      title: GetHourlyReportRootPresetByIdRequestNotFoundError
     TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaType:
       type: string
       enum:
@@ -770,22 +1005,6 @@ components:
       - TRACKING
       description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
       title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaType
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    UpdateHourlyReportPresetRequestNotFoundError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: UpdateHourlyReportPresetRequestNotFoundError
     TimesheetsPresetsPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -796,31 +1015,97 @@ components:
       required:
       - id
       title: TimesheetsPresetsPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type of the file
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile
+    Projects_createTimesheetsPreset_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsPresetsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_createTimesheetsPreset_Response_201
+    TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsProcessingType:
+      type: string
+      enum:
+      - ASYNC
+      - SYNC
+      default: SYNC
+      description: Determines whether presets should be processed synchronously or asynchronously
+      title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsProcessingType
+    TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type of the file
+      title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile
+    TimesheetsPresetsIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Indicates whether the hourly report preset was successfully deleted
+      required:
+      - deleted
+      title: TimesheetsPresetsIdDeleteResponsesContentApplicationJsonSchemaData
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        type:
+          type: string
+          description: The type of the file
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetFile
+    Projects_createRootTimesheetsPreset_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_createRootTimesheetsPreset_Response_200
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetType:
+      type: string
+      enum:
+      - RATE
+      - TRACKING
+      description: The type of preset based on type of root preset
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetType
     DeleteHourlyReportPresetRequestForbiddenError:
       type: object
       properties:
         error:
           type: string
       title: DeleteHourlyReportPresetRequestForbiddenError
-    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaPage:
+    CreateHourlyReportPresetRequestBadRequestError:
       type: object
       properties:
-        cursor:
+        error:
           type: string
-          description: Pagination cursor for fetching the next set of results
-        total_rows:
-          type: integer
-          description: Total number of rows available in the result set
-      required:
-      - cursor
-      - total_rows
-      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaPage
-    TimesheetsRootPresetsGetParametersOrderBy:
-      type: string
-      enum:
-      - created_at
-      default: created_at
-      title: TimesheetsRootPresetsGetParametersOrderBy
+      title: CreateHourlyReportPresetRequestBadRequestError
     TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataFile:
       type: object
       properties:
@@ -834,6 +1119,70 @@ components:
           type: string
           description: The type of the file
       title: TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataFile
+    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPreset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the root preset
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetFile'
+          - type: 'null'
+        type:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetType'
+          description: The type of preset based on type of root preset
+        title:
+          type: string
+          description: The title of the root preset template
+        description:
+          type: string
+          description: Detailed description of the root preset template
+      required:
+      - id
+      - title
+      - description
+      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPreset
+    UpdateHourlyReportPresetRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: UpdateHourlyReportPresetRequestBadRequestError
+    DeleteHourlyReportPresetRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: DeleteHourlyReportPresetRequestBadRequestError
+    GetHourlyReportPresetByIdRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: GetHourlyReportPresetByIdRequestNotFoundError
+    Projects_deleteTimesheetsPreset_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsPresetsIdDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Projects_deleteTimesheetsPreset_Response_200
+    TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type: string
+          description: Pagination cursor for fetching the next set of results
+        total_rows:
+          type: integer
+          description: Total number of root presets available
+      required:
+      - cursor
+      - total_rows
+      title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaPage
     TimesheetsPresetsPostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -867,294 +1216,6 @@ components:
       - work_statement_id
       - hourly_report_root_preset_id
       title: TimesheetsPresetsPostRequestBodyContentApplicationJsonSchemaData
-    CreateHourlyReportPresetRequestForbiddenError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: CreateHourlyReportPresetRequestForbiddenError
-    Projects_createRootTimesheetsPreset_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: Projects_createRootTimesheetsPreset_Response_200
-    TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItems:
-      type: object
-      properties:
-        file:
-          type:
-          - string
-          - 'null'
-          format: binary
-          description: Optional file attachment for this specific preset instance
-        rate:
-          type: number
-          format: double
-          description: The hourly rate for this preset (must be greater than 0)
-        title:
-          type: string
-          description: The title for this specific preset instance (maximum 255 characters)
-        action_type:
-          $ref: '#/components/schemas/TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItemsActionType'
-          description: The action to perform with this preset (currently only ADD is supported)
-        contract_id:
-          type: string
-          description: The unique identifier of the contract this preset is associated with
-        description:
-          type:
-          - string
-          - 'null'
-          description: Detailed description for this specific preset instance (maximum 30000 characters)
-      required:
-      - contract_id
-      title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItems
-    TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier of the hourly report preset
-        file:
-          oneOf:
-          - $ref: '#/components/schemas/TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataFile'
-          - type: 'null'
-        type:
-          $ref: '#/components/schemas/TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataType'
-          description: The type of preset based on type of root preset
-        title:
-          type: string
-          description: The title of the hourly report preset
-        status:
-          type: string
-          description: The current status of the hourly report preset
-        description:
-          type: string
-          description: A detailed description of the hourly report preset
-      required:
-      - id
-      - title
-      - status
-      - description
-      title: TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaData
-    ApiErrorRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
-    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPreset:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier of the root preset
-        file:
-          oneOf:
-          - $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetFile'
-          - type: 'null'
-        type:
-          $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetType'
-          description: The type of preset based on type of root preset
-        title:
-          type: string
-          description: The title of the root preset template
-        description:
-          type: string
-          description: Detailed description of the root preset template
-      required:
-      - id
-      - title
-      - description
-      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPreset
-    GetHourlyReportPresetByIdRequestNotFoundError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: GetHourlyReportPresetByIdRequestNotFoundError
-    DeleteHourlyReportPresetRequestBadRequestError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: DeleteHourlyReportPresetRequestBadRequestError
-    Projects_getContractTimesheetsPresets_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItems'
-        page:
-          $ref: '#/components/schemas/ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaPage'
-      required:
-      - data
-      - page
-      title: Projects_getContractTimesheetsPresets_Response_200
-    GetHourlyReportPresetByIdRequestForbiddenError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: GetHourlyReportPresetByIdRequestForbiddenError
-    TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier of the hourly report root preset
-        file:
-          oneOf:
-          - $ref: '#/components/schemas/TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataFile'
-          - type: 'null'
-        type:
-          $ref: '#/components/schemas/TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataType'
-          description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
-        title:
-          type: string
-          description: The title of the hourly report root preset
-        status:
-          type: string
-          description: The current status of the hourly report root preset
-        description:
-          type: string
-          description: Detailed description of the hourly report root preset's purpose and contents
-      required:
-      - id
-      - title
-      - status
-      - description
-      title: TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaData
-    TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier of the created root preset
-        async_task:
-          $ref: '#/components/schemas/TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaDataAsyncTask'
-      required:
-      - id
-      title: TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaData
-    TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataType:
-      type: string
-      enum:
-      - RATE
-      - TRACKING
-      description: The type of preset, RATE – indicates a preset that overrides the default contract rate, TRACKING - used exclusively for tracking, applying the default contract rate
-      title: TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaDataType
-    TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique identifier of the file
-        name:
-          type: string
-          description: The name of the file
-        type:
-          type: string
-          description: The type of the file
-      title: TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItemsFile
-    GetHourlyReportRootPresetsRequestBadRequestError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: GetHourlyReportRootPresetsRequestBadRequestError
-    TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItemsActionType:
-      type: string
-      enum:
-      - ADD
-      default: ADD
-      description: The action to perform with this preset (currently only ADD is supported)
-      title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsItemsActionType
-    GetHourlyReportPresetsRequestBadRequestError:
-      type: object
-      properties:
-        error:
-          type: string
-      required:
-      - error
-      title: GetHourlyReportPresetsRequestBadRequestError
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetType:
-      type: string
-      enum:
-      - RATE
-      - TRACKING
-      description: The type of preset based on type of root preset
-      title: ContractsContractIdTimesheetsPresetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportRootPresetType
-    UpdateHourlyReportPresetRequestBadRequestError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: UpdateHourlyReportPresetRequestBadRequestError
-    Projects_createTimesheetsPreset_Response_201:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/TimesheetsPresetsPostResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: Projects_createTimesheetsPreset_Response_201
-    CreateHourlyReportRootPresetRequestBadRequestError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: CreateHourlyReportRootPresetRequestBadRequestError
-    Projects_getHourlyReportRootPresets_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaDataItems'
-        page:
-          $ref: '#/components/schemas/TimesheetsRootPresetsGetResponsesContentApplicationJsonSchemaPage'
-      required:
-      - data
-      - page
-      title: Projects_getHourlyReportRootPresets_Response_200
     Projects_updateTimesheetsPreset_Response_200:
       type: object
       properties:
@@ -1163,73 +1224,12 @@ components:
       required:
       - data
       title: Projects_updateTimesheetsPreset_Response_200
-    TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataType:
-      type: string
-      enum:
-      - RATE
-      - TRACKING
-      description: The type of preset based on type of root preset
-      title: TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataType
-    CreateHourlyReportPresetRequestBadRequestError:
+    GetHourlyReportRootPresetsRequestBadRequestError:
       type: object
       properties:
         error:
           type: string
-      title: CreateHourlyReportPresetRequestBadRequestError
-    TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsProcessingType:
-      type: string
-      enum:
-      - ASYNC
-      - SYNC
-      default: SYNC
-      description: Determines whether presets should be processed synchronously or asynchronously
-      title: TimesheetsRootPresetsPostRequestBodyContentApplicationJsonSchemaHourlyReportPresetsProcessingType
-    TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaDataAsyncTask:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: The identifier of the asynchronous task processing this request
-      title: TimesheetsRootPresetsPostResponsesContentApplicationJsonSchemaDataAsyncTask
-    Projects_getHourlyReportRootPresetById_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/TimesheetsRootPresetsIdGetResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: Projects_getHourlyReportRootPresetById_Response_200
-    TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataFile:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique identifier of the file
-        name:
-          type: string
-          description: The name of the file
-        type:
-          type: string
-          description: The type of the file
-      title: TimesheetsPresetsIdGetResponsesContentApplicationJsonSchemaDataFile
-    TimesheetsPresetsIdPatchResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier of the updated hourly report preset
-      required:
-      - id
-      title: TimesheetsPresetsIdPatchResponsesContentApplicationJsonSchemaData
-    Projects_deleteTimesheetsPreset_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/TimesheetsPresetsIdDeleteResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: Projects_deleteTimesheetsPreset_Response_200
+      title: GetHourlyReportRootPresetsRequestBadRequestError
   securitySchemes:
     deelToken:
       type: http

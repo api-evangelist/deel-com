@@ -138,24 +138,51 @@ paths:
               - data
 components:
   schemas:
-    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType:
-      type: string
-      enum:
-      - RESIGNATION
-      - TERMINATION
-      - END_OF_CONTRACT
-      description: The type of termination. Specifies whether it is a resignation (contractor-initiated), termination (client-initiated), or end of contract (mutual/planned).
-      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType
-    ApiError:
+    DeleteContractTerminationRequestRequestBadRequestError:
       type: object
       properties:
-        message:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteContractTerminationRequestRequestBadRequestError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
           type: string
-          description: A description of the returned error
-        path:
+          description: Contract id
+        completion_date:
           type: string
-          description: The JSON path where input validation failed
-      title: ApiError
+          format: date-time
+          description: Contract completion date
+      title: ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire:
+      type: string
+      enum:
+      - 'YES'
+      - 'NO'
+      - DONT_KNOW
+      description: Indicates whether the contractor is eligible for rehire in the future.
+      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire
+    DeleteContractTerminationRequestRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteContractTerminationRequestRequestInternalServerError
     ApiErrorRequest:
       type: object
       properties:
@@ -183,14 +210,31 @@ components:
           format: double
           description: The code of the source handler which produced the returned error
       title: ApiErrorRequest
-    DeleteContractTerminationRequestRequestBadRequestError:
+    ApiError:
       type: object
       properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
-      title: DeleteContractTerminationRequestRequestBadRequestError
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems
+    terminations_deleteContractTermination_Response_204:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: terminations_deleteContractTermination_Response_204
     ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -223,64 +267,20 @@ components:
           description: Free-form text providing additional context about the termination reason. Can be provided independently without termination_reason_id, or used to add context to a selected reason.
       description: 'Termination data. At minimum, you must provide either terminate_now: true (for immediate termination) OR completion_date (for scheduled termination).'
       title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaData
-    ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Contract id
-        completion_date:
-          type: string
-          format: date-time
-          description: Contract completion date
-      title: ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData
-    terminations_deleteContractTermination_Response_204:
-      type: object
-      properties: {}
-      description: Empty response body
-      title: terminations_deleteContractTermination_Response_204
-    DeleteContractTerminationRequestRequestInternalServerError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
-      title: DeleteContractTerminationRequestRequestInternalServerError
+    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType:
+      type: string
+      enum:
+      - RESIGNATION
+      - TERMINATION
+      - END_OF_CONTRACT
+      description: The type of termination. Specifies whether it is a resignation (contractor-initiated), termination (client-initiated), or end of contract (mutual/planned).
+      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType
     terminations_createContractTermination_Response_201:
       type: object
       properties:
         data:
           $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData'
       title: terminations_createContractTermination_Response_201
-    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire:
-      type: string
-      enum:
-      - 'YES'
-      - 'NO'
-      - DONT_KNOW
-      description: Indicates whether the contractor is eligible for rehire in the future.
-      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire
-    ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code
-        message:
-          type: string
-          description: Human-readable explanation of the error
-      title: ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
   securitySchemes:
     deelToken:
       type: http
