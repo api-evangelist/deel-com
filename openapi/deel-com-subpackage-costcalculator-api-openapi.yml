@@ -57,16 +57,37 @@ paths:
                   $ref: '#/components/schemas/EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaData'
 components:
   schemas:
-    ApiErrorContainer:
+    EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
+        state:
+          type: string
+          description: The state or region within the country, if applicable.
+        salary:
+          type: number
+          format: double
+          description: The base salary for the employee.
+        country:
+          type: string
+          description: The full name of the country where the employee is based.
+        benefits:
+          type:
+          - array
+          - 'null'
           items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
+            $ref: '#/components/schemas/EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaDataBenefitsItems'
+          description: A list of selected benefit plans for the employee.
+        currency:
+          type: string
+          description: The currency in which the costs are calculated.
+        country_code:
+          type: string
+          description: The two-letter country code where the employee is based.
+      required:
+      - salary
+      - country
+      - currency
+      title: EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaData
     EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaDataBenefitsItems:
       type: object
       properties:
@@ -81,25 +102,6 @@ components:
       required:
       - provider_id
       title: EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaDataBenefitsItems
-    EorEmploymentCostPostResponsesContentApplicationJsonSchemaCostsItems:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Name of the cost item.
-        amount:
-          type: string
-          description: Cost amount.
-        country:
-          type: string
-          description: The country of the cost item.
-        frequency:
-          type: string
-          description: The frequency of the cost (e.g., monthly, annually).
-        country_code:
-          type: string
-          description: ISO Alpha-2 code of the country.
-      title: EorEmploymentCostPostResponsesContentApplicationJsonSchemaCostsItems
     ApiErrorRequest:
       type: object
       properties:
@@ -178,45 +180,35 @@ components:
           type: string
           description: Severance accrual costs.
       title: cost-calculator_getEmploymentCost_Response_200
-    EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaData:
+    ApiErrorContainer:
       type: object
       properties:
-        state:
-          type: string
-          description: The state or region within the country, if applicable.
-        salary:
-          type: number
-          format: double
-          description: The base salary for the employee.
-        country:
-          type: string
-          description: The full name of the country where the employee is based.
-        benefits:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaDataBenefitsItems'
-          description: A list of selected benefit plans for the employee.
-        currency:
-          type: string
-          description: The currency in which the costs are calculated.
-        country_code:
-          type: string
-          description: The two-letter country code where the employee is based.
-      required:
-      - salary
-      - country
-      - currency
-      title: EorEmploymentCostPostRequestBodyContentApplicationJsonSchemaData
-    EorEmploymentCostPostResponsesContentApplicationJsonSchemaAdditionalData:
-      type: object
-      properties:
-        additional_notes:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
           type: array
           items:
-            type: string
-      title: EorEmploymentCostPostResponsesContentApplicationJsonSchemaAdditionalData
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    EorEmploymentCostPostResponsesContentApplicationJsonSchemaCostsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the cost item.
+        amount:
+          type: string
+          description: Cost amount.
+        country:
+          type: string
+          description: The country of the cost item.
+        frequency:
+          type: string
+          description: The frequency of the cost (e.g., monthly, annually).
+        country_code:
+          type: string
+          description: ISO Alpha-2 code of the country.
+      title: EorEmploymentCostPostResponsesContentApplicationJsonSchemaCostsItems
     EorEmploymentCostPostResponsesContentApplicationJsonSchemaBenefitsDataItems:
       type: object
       properties:
@@ -233,6 +225,14 @@ components:
           type: string
           description: Fees associated with the benefit.
       title: EorEmploymentCostPostResponsesContentApplicationJsonSchemaBenefitsDataItems
+    EorEmploymentCostPostResponsesContentApplicationJsonSchemaAdditionalData:
+      type: object
+      properties:
+        additional_notes:
+          type: array
+          items:
+            type: string
+      title: EorEmploymentCostPostResponsesContentApplicationJsonSchemaAdditionalData
   securitySchemes:
     deelToken:
       type: http

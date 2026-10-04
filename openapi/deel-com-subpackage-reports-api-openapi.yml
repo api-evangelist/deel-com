@@ -288,45 +288,16 @@ paths:
                 $ref: '#/components/schemas/GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestInternalServerError'
 components:
   schemas:
-    reports_getGPReportGrossToNet_Response_200:
+    ListGrossToNetReportRequestBadRequestError:
       type: object
       properties:
-        data:
+        errors:
           type: array
           items:
-            type: object
-            additionalProperties:
-              $ref: '#/components/schemas/GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItems'
-          description: List of report rows (summary rows are filtered out). Each row contains dynamic column keys mapped to cell objects.
-        page:
-          $ref: '#/components/schemas/GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaPage'
-          description: Pagination metadata for the report rows.
-      required:
-      - data
-      - page
-      title: reports_getGPReportGrossToNet_Response_200
-    ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsPaymentData:
-      type: object
-      properties:
-        conversion_rate:
-          type: string
-          description: Conversion rate applied between the payroll currency and the payment currency.
-        payment_currency:
-          type: string
-          description: Currency in which the payment is made.
-      description: Payment details associated with the payroll event. Null if no payment data is available.
-      title: ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsPaymentData
-    ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsItemsItemsCategoryGroup:
-      type: string
-      enum:
-      - ADDITIONS
-      - DEDUCTIONS
-      - BENEFITS
-      - INFOS
-      - CONTRIBUTIONS
-      - TOTALS
-      description: Category group for the reporting label.
-      title: ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsItemsItemsCategoryGroup
+            $ref: '#/components/schemas/GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaRequest'
+      title: ListGrossToNetReportRequestBadRequestError
     ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsItemsItems:
       type: object
       properties:
@@ -347,6 +318,74 @@ components:
           $ref: '#/components/schemas/ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsItemsItemsCategoryGroup'
           description: Category group for the reporting label.
       title: ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsItemsItems
+    reports_getGPReportGrossToNet_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of report rows (summary rows are filtered out). Each row contains dynamic column keys mapped to cell objects.
+        page:
+          $ref: '#/components/schemas/GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaPage'
+          description: Pagination metadata for the report rows.
+      required:
+      - data
+      - page
+      title: reports_getGPReportGrossToNet_Response_200
+    GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Cell type used for rendering/formatting.
+        label:
+          type: string
+          description: Human-readable label of the column for this cell.
+        compareValue:
+          description: Raw value for the comparison period, if applicable.
+        currentValue:
+          description: Raw value for the current period. Type varies by column (string/number/null/etc).
+        percentageDiff:
+          description: Percentage difference between current and comparison values, if applicable.
+        formattedCurrentValue:
+          description: Formatted value for display purposes.
+      required:
+      - type
+      - label
+      description: A cell value object for a given column.
+      title: GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItems
+    GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the payroll event.
+        status:
+          type: string
+          description: Status of the payroll event (e.g., OPEN, CLOSED).
+        end_date:
+          type: string
+          format: date-time
+          description: End date of the payroll event in ISO-8601 format.
+        lock_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Date when the payroll event is locked, in ISO-8601 format.
+        start_date:
+          type: string
+          format: date-time
+          description: Start date of the payroll event in ISO-8601 format.
+      required:
+      - id
+      - status
+      - end_date
+      - start_date
+      title: GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaDataItems
     ApiError:
       type: object
       properties:
@@ -357,17 +396,17 @@ components:
           type: string
           description: The JSON path where input validation failed
       title: ApiError
-    ApiErrorContainer:
+    GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems:
       type: object
       properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaRequest:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems
+    GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaRequest:
       type: object
       properties:
         url:
@@ -393,7 +432,57 @@ components:
         api_req_id:
           type: string
           description: The request ID of the failed request
-      title: GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaRequest
+      title: GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaRequest
+    ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsPaymentData:
+      type: object
+      properties:
+        conversion_rate:
+          type: string
+          description: Conversion rate applied between the payroll currency and the payment currency.
+        payment_currency:
+          type: string
+          description: Currency in which the payment is made.
+      description: Payment details associated with the payroll event. Null if no payment data is available.
+      title: ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsPaymentData
+    GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Error message explaining the resource was not found.
+      title: GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestNotFoundError
+    ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsItemsItemsCategoryGroup:
+      type: string
+      enum:
+      - ADDITIONS
+      - DEDUCTIONS
+      - BENEFITS
+      - INFOS
+      - CONTRIBUTIONS
+      - TOTALS
+      description: Category group for the reporting label.
+      title: ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItemsItemsItemsCategoryGroup
+    GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestBadRequestError
+    ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation of the server error.
+      title: ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems
     GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaPage:
       type: object
       properties:
@@ -415,89 +504,6 @@ components:
       - total_rows
       description: Pagination metadata for the report rows.
       title: GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaPage
-    GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestInternalServerError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems'
-      title: GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestInternalServerError
-    ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code.
-        message:
-          type: string
-          description: Human-readable explanation of the server error.
-      title: ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems
-    ApiErrorRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
-    reports_getGPLegalEntityReports_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaDataItems'
-      required:
-      - data
-      title: reports_getGPLegalEntityReports_Response_200
-    GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems'
-      title: GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestBadRequestError
-    ListGrossToNetReportRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems'
-        request:
-          $ref: '#/components/schemas/GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaRequest'
-      title: ListGrossToNetReportRequestBadRequestError
-    ListPayrollEventsByLegalEntityRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaErrorsItems'
-        request:
-          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaRequest'
-      title: ListPayrollEventsByLegalEntityRequestBadRequestError
     Reports_getsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01_Response_200:
       type: object
       properties:
@@ -533,26 +539,24 @@ components:
       - next_cursor
       - items_per_page
       title: Reports_getsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01_Response_200
-    GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaErrorsItems:
+    ApiErrorContainer:
       type: object
       properties:
-        path:
-          type: string
-          description: The JSON path where input validation failed
-        message:
-          type: string
-          description: A description of the returned error
-      title: GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaErrorsItems
-    GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestInternalServerError:
       type: object
       properties:
-        path:
-          type: string
-          description: The JSON path where input validation failed
-        message:
-          type: string
-          description: A description of the returned error
-      title: GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestInternalServerError
     ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -573,39 +577,34 @@ components:
           - type: 'null'
           description: Payment details associated with the payroll event. Null if no payment data is available.
       title: ReportsPayrollCyclesCycleIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItems
-    GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestNotFoundError:
+    ApiErrorRequest:
       type: object
       properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
         code:
-          type: string
-          description: Machine-readable error code.
-        message:
-          type: string
-          description: Error message explaining the resource was not found.
-      title: GetsG2NReportDataForAGivenPayrollCycleByItsId-v2026-01-01RequestNotFoundError
-    GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItems:
-      type: object
-      properties:
-        type:
-          type: string
-          description: Cell type used for rendering/formatting.
-        label:
-          type: string
-          description: Human-readable label of the column for this cell.
-        compareValue:
-          description: Raw value for the comparison period, if applicable.
-        currentValue:
-          description: Raw value for the current period. Type varies by column (string/number/null/etc).
-        percentageDiff:
-          description: Percentage difference between current and comparison values, if applicable.
-        formattedCurrentValue:
-          description: Formatted value for display purposes.
-      required:
-      - type
-      - label
-      description: A cell value object for a given column.
-      title: GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaDataItems
-    GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaRequest:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaRequest:
       type: object
       properties:
         url:
@@ -631,36 +630,37 @@ components:
         api_req_id:
           type: string
           description: The request ID of the failed request
-      title: GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaRequest
-    GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaDataItems:
+      title: GpReportsIdGrossToNetGetResponsesContentApplicationJsonSchemaRequest
+    reports_getGPLegalEntityReports_Response_200:
       type: object
       properties:
-        id:
-          type: string
-          description: Unique identifier for the payroll event.
-        status:
-          type: string
-          description: Status of the payroll event (e.g., OPEN, CLOSED).
-        end_date:
-          type: string
-          format: date-time
-          description: End date of the payroll event in ISO-8601 format.
-        lock_date:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: Date when the payroll event is locked, in ISO-8601 format.
-        start_date:
-          type: string
-          format: date-time
-          description: Start date of the payroll event in ISO-8601 format.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaDataItems'
       required:
-      - id
-      - status
-      - end_date
-      - start_date
-      title: GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaDataItems
+      - data
+      title: reports_getGPLegalEntityReports_Response_200
+    GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ListPayrollEventsByLegalEntityRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdReportsGetResponsesContentApplicationJsonSchemaRequest'
+      title: ListPayrollEventsByLegalEntityRequestBadRequestError
   securitySchemes:
     deelToken:
       type: http

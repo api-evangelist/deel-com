@@ -146,16 +146,6 @@ paths:
                 $ref: '#/components/schemas/ApiErrorContainer'
 components:
   schemas:
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
     HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -171,25 +161,12 @@ components:
           type: boolean
           description: Is Supportive Position
       title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItems
-    Positions_fetchHrisPositionsFromAHrisProfile-v2026-01-01_Response_200:
+    positions_applyPositionChanges_Response_204:
       type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItems'
-      title: Positions_fetchHrisPositionsFromAHrisProfile-v2026-01-01_Response_200
-    HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataDeleteItems:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Id of the position to be deleted.
-      required:
-      - id
-      title: HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataDeleteItems
-    FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestNotFoundError:
+      properties: {}
+      description: Empty response body
+      title: positions_applyPositionChanges_Response_204
+    FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestBadRequestError:
       type: object
       properties:
         errors:
@@ -198,36 +175,26 @@ components:
             $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems'
       required:
       - errors
-      title: FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestNotFoundError
-    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeam:
+      title: FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestBadRequestError
+    HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataAddItems:
       type: object
       properties:
-        id:
+        role_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Id of the role to be assigned to the position.
+        team_id:
           type: string
           format: uuid
-          description: Team ID
-        name:
-          type: string
-          description: Team Name
-        organization_structure:
-          $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeamOrganizationStructure'
-      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeam
-    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeamOrganizationStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Organization Structure ID
-        name:
-          type: string
-          description: Organization Structure Name
-      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeamOrganizationStructure
-    positions_applyPositionChanges_Response_204:
-      type: object
-      properties: {}
-      description: Empty response body
-      title: positions_applyPositionChanges_Response_204
+          description: Id of the team to be assigned to the position.
+        is_supportive:
+          type: boolean
+          description: Flag to indicate if the position is supportive.
+      required:
+      - team_id
+      title: HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataAddItems
     ApiErrorRequest:
       type: object
       properties:
@@ -255,6 +222,47 @@ components:
           format: double
           description: The code of the source handler which produced the returned error
       title: ApiErrorRequest
+    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestNotFoundError
+    Positions_fetchHrisPositionsFromAHrisProfile-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItems'
+      title: Positions_fetchHrisPositionsFromAHrisProfile-v2026-01-01_Response_200
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
     HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -278,16 +286,29 @@ components:
       - profile_id
       description: The request payload containing the position changes to apply.
       title: HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaData
-    ApiError:
+    HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataDeleteItems:
       type: object
       properties:
-        message:
+        id:
           type: string
-          description: A description of the returned error
-        path:
+          format: uuid
+          description: Id of the position to be deleted.
+      required:
+      - id
+      title: HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataDeleteItems
+    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeam:
+      type: object
+      properties:
+        id:
           type: string
-          description: The JSON path where input validation failed
-      title: ApiError
+          format: uuid
+          description: Team ID
+        name:
+          type: string
+          description: Team Name
+        organization_structure:
+          $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeamOrganizationStructure'
+      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeam
     HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataEditItems:
       type: object
       properties:
@@ -307,6 +328,17 @@ components:
       required:
       - id
       title: HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataEditItems
+    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeamOrganizationStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Organization Structure ID
+        name:
+          type: string
+          description: Organization Structure Name
+      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsTeamOrganizationStructure
     HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsRole:
       type: object
       properties:
@@ -318,48 +350,16 @@ components:
           type: string
           description: Role Name
       title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataItemsRole
-    HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+    ApiErrorContainer:
       type: object
       properties:
-        code:
-          type: string
-        field:
-          type: string
-        message:
-          type: string
-      required:
-      - code
-      - message
-      title: HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems
-    HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataAddItems:
-      type: object
-      properties:
-        role_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-          description: Id of the role to be assigned to the position.
-        team_id:
-          type: string
-          format: uuid
-          description: Id of the team to be assigned to the position.
-        is_supportive:
-          type: boolean
-          description: Flag to indicate if the position is supportive.
-      required:
-      - team_id
-      title: HrisPositionsApplyChangesPostRequestBodyContentApplicationJsonSchemaDataAddItems
-    FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestBadRequestError:
-      type: object
-      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
         errors:
           type: array
           items:
-            $ref: '#/components/schemas/HrisPositionsProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems'
-      required:
-      - errors
-      title: FetchHrisPositionsFromAHrisProfile-v2026-01-01RequestBadRequestError
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
   securitySchemes:
     deelToken:
       type: http

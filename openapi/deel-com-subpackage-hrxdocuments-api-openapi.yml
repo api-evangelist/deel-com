@@ -148,6 +148,22 @@ paths:
                 $ref: '#/components/schemas/RetrieveHrxDocumentsRequestInternalServerError'
 components:
   schemas:
+    DownloadHrxDocumentsRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DownloadHrxDocumentsRequestBadRequestError
+    DownloadHrxDocumentsRequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DownloadHrxDocumentsRequestUnauthorizedError
     EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems:
       type: object
       properties:
@@ -161,24 +177,33 @@ components:
           type: string
           description: Description of the returned error
       title: EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems
-    ApiErrorContainer:
+    ApiErrorRequest:
       type: object
       properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    RetrieveHrxDocumentsRequestUnauthorizedError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
-      title: RetrieveHrxDocumentsRequestUnauthorizedError
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
     RetrieveHrxDocumentsRequestBadRequestError:
       type: object
       properties:
@@ -187,6 +212,28 @@ components:
           items:
             $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
       title: RetrieveHrxDocumentsRequestBadRequestError
+    EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItemsCategoryType:
+      type: string
+      enum:
+      - EMPLOYMENT_AGREEMENT
+      - ONBOARDING_REGISTRATION
+      - OFFBOARDING_TERMINATION
+      - TAX_FISCAL
+      - STATUS_BENEFITS
+      - VISA_TRAVEL_SUPPORT
+      - OTHER
+      description: Type of the document category
+      title: EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItemsCategoryType
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
     HRX_Documents_retrieveHrxDocuments_Response_200:
       type: object
       properties:
@@ -212,6 +259,54 @@ components:
       - next_cursor
       - total_count
       title: HRX Documents_retrieveHrxDocuments_Response_200
+    RetrieveHrxDocumentsRequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveHrxDocumentsRequestUnauthorizedError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    RetrieveHrxDocumentsRequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveHrxDocumentsRequestInternalServerError
+    HRX_Documents_downloadHrxDocuments_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaData'
+          description: Download information for the HRX document
+      required:
+      - data
+      title: HRX Documents_downloadHrxDocuments_Response_200
+    EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where authentication failed
+        message:
+          type: string
+          description: Description of the returned error
+      title: EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems
     EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -274,101 +369,6 @@ components:
       - updated_at
       description: Download information for the HRX document
       title: EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaData
-    EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Error code of the handler which produced the returned error
-        field:
-          type: string
-          description: The field name where authentication failed
-        message:
-          type: string
-          description: Description of the returned error
-      title: EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems
-    RetrieveHrxDocumentsRequestInternalServerError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
-      title: RetrieveHrxDocumentsRequestInternalServerError
-    ApiErrorRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItemsCategoryType:
-      type: string
-      enum:
-      - EMPLOYMENT_AGREEMENT
-      - ONBOARDING_REGISTRATION
-      - OFFBOARDING_TERMINATION
-      - TAX_FISCAL
-      - STATUS_BENEFITS
-      - VISA_TRAVEL_SUPPORT
-      - OTHER
-      description: Type of the document category
-      title: EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItemsCategoryType
-    HRX_Documents_downloadHrxDocuments_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaData'
-          description: Download information for the HRX document
-      required:
-      - data
-      title: HRX Documents_downloadHrxDocuments_Response_200
-    DownloadHrxDocumentsRequestUnauthorizedError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
-      title: DownloadHrxDocumentsRequestUnauthorizedError
-    DownloadHrxDocumentsRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
-      title: DownloadHrxDocumentsRequestBadRequestError
   securitySchemes:
     deelToken:
       type: http

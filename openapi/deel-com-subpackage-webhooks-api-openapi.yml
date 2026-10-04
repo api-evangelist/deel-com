@@ -410,16 +410,6 @@ paths:
                 $ref: '#/components/schemas/ApiErrorContainer'
 components:
   schemas:
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
     PatchWebhookRequestStatus:
       type: string
       enum:
@@ -491,6 +481,122 @@ components:
       - created_at
       - updated_at
       title: WebhookItem
+    WebhookEventTypeResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          format: double
+          description: Event type unique identifier.
+        module_name:
+          type: string
+          description: Name of the rabbit queue.
+        module_label:
+          type: string
+          description: Display name of the rabbit queue in Deel UI.
+        name:
+          type: string
+          description: Name of the webhook event.
+        description:
+          type: string
+          description: Describes the webhook event and other pertinent info.
+        payload_example:
+          type:
+          - string
+          - 'null'
+          description: JSON payload example of the specific event.
+        created_at:
+          type: string
+          description: Time at which the event type was created.
+        updated_at:
+          type: string
+          description: Time at which the event type was updated.
+      required:
+      - id
+      - module_name
+      - module_label
+      - name
+      - description
+      title: WebhookEventTypeResponse
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    WebhookItemStatus:
+      type: string
+      enum:
+      - enabled
+      - disabled
+      description: Status of webhook.
+      title: WebhookItemStatus
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    WebhookEventTypeListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookEventTypeResponse'
+      title: WebhookEventTypeListResponse
+    GenericResultDeleted:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GenericResultDeletedData'
+      required:
+      - data
+      title: GenericResultDeleted
+    GenericResultDeletedData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms the deletion.
+      required:
+      - deleted
+      title: GenericResultDeletedData
+    WebhookListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookItem'
+      required:
+      - data
+      title: WebhookListResponse
     WebhookItemResponse:
       type: object
       properties:
@@ -589,122 +695,16 @@ components:
       - disabled
       description: Status of webhook.
       title: CreateWebhookRequestStatus
-    WebhookListResponse:
+    ApiErrorContainer:
       type: object
       properties:
-        data:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
           type: array
           items:
-            $ref: '#/components/schemas/WebhookItem'
-      required:
-      - data
-      title: WebhookListResponse
-    WebhookItemStatus:
-      type: string
-      enum:
-      - enabled
-      - disabled
-      description: Status of webhook.
-      title: WebhookItemStatus
-    GenericResultDeleted:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GenericResultDeletedData'
-      required:
-      - data
-      title: GenericResultDeleted
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    ApiErrorRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
-    WebhookEventTypeResponse:
-      type: object
-      properties:
-        id:
-          type: number
-          format: double
-          description: Event type unique identifier.
-        module_name:
-          type: string
-          description: Name of the rabbit queue.
-        module_label:
-          type: string
-          description: Display name of the rabbit queue in Deel UI.
-        name:
-          type: string
-          description: Name of the webhook event.
-        description:
-          type: string
-          description: Describes the webhook event and other pertinent info.
-        payload_example:
-          type:
-          - string
-          - 'null'
-          description: JSON payload example of the specific event.
-        created_at:
-          type: string
-          description: Time at which the event type was created.
-        updated_at:
-          type: string
-          description: Time at which the event type was updated.
-      required:
-      - id
-      - module_name
-      - module_label
-      - name
-      - description
-      title: WebhookEventTypeResponse
-    WebhookEventTypeListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebhookEventTypeResponse'
-      title: WebhookEventTypeListResponse
-    GenericResultDeletedData:
-      type: object
-      properties:
-        deleted:
-          type: boolean
-          description: Confirms the deletion.
-      required:
-      - deleted
-      title: GenericResultDeletedData
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
   securitySchemes:
     deelToken:
       type: http

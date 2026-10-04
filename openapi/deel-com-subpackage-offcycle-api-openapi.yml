@@ -166,38 +166,105 @@ paths:
                 $ref: '#/components/schemas/ApiErrorContainer'
 components:
   schemas:
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    off-cycle_createContractOffCyclePayment_Response_201:
+    off-cycle_getContractOffCyclePayments_Response_200:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsPostResponsesContentApplicationJsonSchemaData'
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItems'
       required:
       - data
-      title: off-cycle_createContractOffCyclePayment_Response_201
-    ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      title: off-cycle_getContractOffCyclePayments_Response_200
+    ContractsContractIdOffCyclePaymentsPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
         id:
           type: string
           format: uuid
-          description: Unique identifier of the reporter.
-        full_name:
+          description: The unique identifier of the created off-cycle payment.
+        created:
+          type: boolean
+          description: Indicates whether the off-cycle payment was successfully created.
+      required:
+      - created
+      title: ContractsContractIdOffCyclePaymentsPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
           type: string
-          description: Full name of the individual who reported the payment.
+          format: uuid
+          description: Unique identifier for the off-cycle payment.
+        amount:
+          type: string
+          description: Amount of the off-cycle payment.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: Current status of the off-cycle payment.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the off-cycle payment was created.
+        description:
+          type: string
+          description: Description of the off-cycle payment.
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy'
+        currency_code:
+          type: string
+          description: ISO 4217 currency code of the payment.
+        date_submitted:
+          type: string
+          format: date-time
+          description: Timestamp of when the payment was submitted.
       required:
       - id
-      description: Details of the person who reported the off-cycle payment.
-      title: ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+      - amount
+      - status
+      - created_at
+      - description
+      - reported_by
+      - currency_code
+      - date_submitted
+      title: ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaData
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    off-cycle_getContractOffCyclePaymentById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: off-cycle_getContractOffCyclePaymentById_Response_200
     ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -240,55 +307,48 @@ components:
       - currency_code
       - date_submitted
       title: ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItems
-    ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaData:
+    off-cycle_createContractOffCyclePayment_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: off-cycle_createContractOffCyclePayment_Response_201
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Current status of the off-cycle payment.
+      title: ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataStatus
+    ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy:
       type: object
       properties:
         id:
           type: string
           format: uuid
-          description: Unique identifier for the off-cycle payment.
-        amount:
+          description: Unique identifier of the reporter.
+        full_name:
           type: string
-          description: Amount of the off-cycle payment.
-        status:
-          oneOf:
-          - $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataStatus'
-          - type: 'null'
-          description: Current status of the off-cycle payment.
-        created_at:
-          type: string
-          format: date-time
-          description: Timestamp of when the off-cycle payment was created.
-        description:
-          type: string
-          description: Description of the off-cycle payment.
-        reported_by:
-          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy'
-        currency_code:
-          type: string
-          description: ISO 4217 currency code of the payment.
-        date_submitted:
-          type: string
-          format: date-time
-          description: Timestamp of when the payment was submitted.
+          description: Full name of the person who reported the payment.
       required:
       - id
-      - amount
-      - status
-      - created_at
-      - description
-      - reported_by
-      - currency_code
-      - date_submitted
-      title: ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaData
-    off-cycle_getContractOffCyclePaymentById_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: off-cycle_getContractOffCyclePaymentById_Response_200
+      title: ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy
     ContractsContractIdOffCyclePaymentsPostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -317,79 +377,6 @@ components:
       - description
       - date_submitted
       title: ContractsContractIdOffCyclePaymentsPostRequestBodyContentApplicationJsonSchemaData
-    ContractsContractIdOffCyclePaymentsPostResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier of the created off-cycle payment.
-        created:
-          type: boolean
-          description: Indicates whether the off-cycle payment was successfully created.
-      required:
-      - created
-      title: ContractsContractIdOffCyclePaymentsPostResponsesContentApplicationJsonSchemaData
-    ApiErrorRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        url:
-          type: string
-          description: The relative URL of the failed request
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-      title: ApiErrorRequest
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier of the reporter.
-        full_name:
-          type: string
-          description: Full name of the person who reported the payment.
-      required:
-      - id
-      title: ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataReportedBy
-    off-cycle_getContractOffCyclePayments_Response_200:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItems'
-      required:
-      - data
-      title: off-cycle_getContractOffCyclePayments_Response_200
     ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
       type: string
       enum:
@@ -401,17 +388,30 @@ components:
       - processing
       description: The current status of the off-cycle payment.
       title: ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsStatus
-    ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataStatus:
-      type: string
-      enum:
-      - approved
-      - declined
-      - not_payable
-      - paid
-      - pending
-      - processing
-      description: Current status of the off-cycle payment.
-      title: ContractsContractIdOffCyclePaymentsIdGetResponsesContentApplicationJsonSchemaDataStatus
+    ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the reporter.
+        full_name:
+          type: string
+          description: Full name of the individual who reported the payment.
+      required:
+      - id
+      description: Details of the person who reported the off-cycle payment.
+      title: ContractsContractIdOffCyclePaymentsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
   securitySchemes:
     deelToken:
       type: http
