@@ -416,6 +416,105 @@ paths:
               - data
 components:
   schemas:
+    ReviewASingleTaskRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewASingleTaskRequestBadRequestError
+    ReviewASingleTaskRequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewASingleTaskRequestUnauthorizedError
+    ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: The amount to be associated with the task, in the appropriate currency.
+        description:
+          type:
+          - string
+          - 'null'
+          description: A description of the task.
+        date_submitted:
+          $ref: '#/components/schemas/ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaDataDateSubmitted'
+          description: The date the task was submitted, in ISO 8601 format. Also accepts date-time (YYYY-MM-DDTHH:MM:SSZ).
+        is_auto_approved:
+          type: boolean
+          description: If true, the task will be automatically approved as part of the request.
+      required:
+      - amount
+      - description
+      - date_submitted
+      title: ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the created task.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: The current status of the task.
+        created:
+          type: boolean
+          description: Indicates whether the task creation operation was successful.
+      title: ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaData
+    ReviewMultipleTasksRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewMultipleTasksRequestNotFoundError
+    tasks_getContractTasks_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: tasks_getContractTasks_Response_200
+    ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: An array of task IDs to review. A maximum of 1000 task IDs is allowed per request.
+        reason:
+          type:
+          - string
+          - 'null'
+          description: Optional reason for declining the tasks.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus'
+          description: The review status of the tasks. Possible values are 'approved' or 'declined'.
+      required:
+      - ids
+      - status
+      title: ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaData
+    CreateANewTaskRequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateANewTaskRequestInternalServerError
+    ReviewMultipleTasksRequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewMultipleTasksRequestUnauthorizedError
     ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
@@ -445,141 +544,14 @@ components:
       - description
       - date_submitted
       title: ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItems
-    Tasks_updateTaskById_Response_200:
+    UpdateTaskByIdRequestInternalServerError:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/TasksTaskIdPatchResponsesContentApplicationJsonSchemaData'
-      title: Tasks_updateTaskById_Response_200
-    ContractsContractIdTasksTaskIdReviewsPostResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        created:
-          type: boolean
-          description: Indicating whether the task review was created
-      required:
-      - created
-      title: ContractsContractIdTasksTaskIdReviewsPostResponsesContentApplicationJsonSchemaData
-    ReviewASingleTaskRequestUnauthorizedError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: ReviewASingleTaskRequestUnauthorizedError
-    TasksTaskIdPatchRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        amount:
-          type:
-          - string
-          - 'null'
-          description: The amount to be associated with the task, in the appropriate currency.
-        description:
-          type:
-          - string
-          - 'null'
-          description: A description of the task.
-        hourly_report_preset_id:
-          type:
-          - string
-          - 'null'
-          description: Public ID of the hourly report preset, if applicable.
-      title: TasksTaskIdPatchRequestBodyContentApplicationJsonSchemaData
-    ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        amount:
-          type: string
-          description: The amount to be associated with the task, in the appropriate currency.
-        description:
-          type:
-          - string
-          - 'null'
-          description: A description of the task.
-        date_submitted:
-          $ref: '#/components/schemas/ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaDataDateSubmitted'
-          description: The date the task was submitted, in ISO 8601 format. Also accepts date-time (YYYY-MM-DDTHH:MM:SSZ).
-        is_auto_approved:
-          type: boolean
-          description: If true, the task will be automatically approved as part of the request.
-      required:
-      - amount
-      - description
-      - date_submitted
-      title: ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaData
-    ReviewASingleTaskRequestBadRequestError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: ReviewASingleTaskRequestBadRequestError
-    TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code
-        message:
-          type: string
-          description: Human-readable explanation of the error
-      title: TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems
-    ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier for the created task.
-        status:
-          oneOf:
-          - $ref: '#/components/schemas/ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaDataStatus'
-          - type: 'null'
-          description: The current status of the task.
-        created:
-          type: boolean
-          description: Indicates whether the task creation operation was successful.
-      title: ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaData
-    ReviewASingleTaskRequestNotFoundError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: ReviewASingleTaskRequestNotFoundError
-    ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus:
-      type: string
-      enum:
-      - approved
-      - declined
-      description: The review status of the task. Possible values are 'approved' or 'declined'.
-      title: ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus
-    ReviewMultipleTasksRequestBadRequestError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: ReviewMultipleTasksRequestBadRequestError
-    tasks_createContractTaskReview_Response_201:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ContractsContractIdTasksTaskIdReviewsPostResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: tasks_createContractTaskReview_Response_201
-    ReviewMultipleTasksRequestNotFoundError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: ReviewMultipleTasksRequestNotFoundError
-    tasks_deleteContractTask_Response_200:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ContractsContractIdTasksTaskIdDeleteResponsesContentApplicationJsonSchemaData'
-      required:
-      - data
-      title: tasks_deleteContractTask_Response_200
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateTaskByIdRequestInternalServerError
     ContractsContractIdTasksTaskIdDeleteResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -589,119 +561,59 @@ components:
       required:
       - deleted
       title: ContractsContractIdTasksTaskIdDeleteResponsesContentApplicationJsonSchemaData
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
-    UpdateTaskByIdRequestBadRequestError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
-      title: UpdateTaskByIdRequestBadRequestError
-    CreateANewTaskRequestInternalServerError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: CreateANewTaskRequestInternalServerError
-    ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus:
-      type: string
-      enum:
-      - approved
-      - declined
-      description: The review status of the tasks. Possible values are 'approved' or 'declined'.
-      title: ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus
-    ReviewMultipleTasksRequestUnauthorizedError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: ReviewMultipleTasksRequestUnauthorizedError
-    tasks_getContractTasks_Response_200:
+    Tasks_updateTaskById_Response_200:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItems'
+          $ref: '#/components/schemas/TasksTaskIdPatchResponsesContentApplicationJsonSchemaData'
+      title: Tasks_updateTaskById_Response_200
+    tasks_createContractTask_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaData'
       required:
       - data
-      title: tasks_getContractTasks_Response_200
-    UpdateTaskByIdRequestInternalServerError:
+      title: tasks_createContractTask_Response_201
+    ContractsContractIdTasksManyReviewsPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
-      title: UpdateTaskByIdRequestInternalServerError
-    ReviewMultipleTasksRequestInternalServerError:
+        created:
+          type: boolean
+          description: Indicating whether the task review was created
+      required:
+      - created
+      title: ContractsContractIdTasksManyReviewsPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaDataDateSubmitted:
+      oneOf:
+      - type: string
+        format: date
+      - type: string
+        format: date-time
+      description: The date the task was submitted, in ISO 8601 format. Also accepts date-time (YYYY-MM-DDTHH:MM:SSZ).
+      title: ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaDataDateSubmitted
+    ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
-        error:
-          type: string
-      title: ReviewMultipleTasksRequestInternalServerError
-    ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaDataStatus:
-      type: string
-      enum:
-      - approved
-      - declined
-      - not_payable
-      - paid
-      - pending
-      - processing
-      description: The current status of the task.
-      title: ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaDataStatus
-    ApiErrorContainer:
-      type: object
-      properties:
-        request:
-          $ref: '#/components/schemas/ApiErrorRequest'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiError'
-      title: ApiErrorContainer
-    ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus:
-      type: string
-      enum:
-      - approved
-      - declined
-      - not_payable
-      - paid
-      - pending
-      - processing
-      description: The current status of the task.
-      title: ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus
-    ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsAttachment:
-      type: object
-      properties:
-        key:
+        reason:
           type:
           - string
           - 'null'
-          description: (Optional) The key for accessing the attachment.
-        filename:
-          type:
-          - string
-          - 'null'
-          description: (Optional) The name of the file attached to the task.
-      title: ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsAttachment
-    CreateANewTaskRequestUnauthorizedError:
+          description: Optional reason for declining the task.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus'
+          description: The review status of the task. Possible values are 'approved' or 'declined'.
+      required:
+      - status
+      title: ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaData
+    tasks_createContractTaskReview_Response_201:
       type: object
       properties:
-        error:
-          type: string
-      title: CreateANewTaskRequestUnauthorizedError
+        data:
+          $ref: '#/components/schemas/ContractsContractIdTasksTaskIdReviewsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: tasks_createContractTaskReview_Response_201
     ApiErrorRequest:
       type: object
       properties:
@@ -729,23 +641,117 @@ components:
           format: double
           description: The code of the source handler which produced the returned error
       title: ApiErrorRequest
-    ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaDataDateSubmitted:
-      oneOf:
-      - type: string
-        format: date
-      - type: string
-        format: date-time
-      description: The date the task was submitted, in ISO 8601 format. Also accepts date-time (YYYY-MM-DDTHH:MM:SSZ).
-      title: ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaDataDateSubmitted
-    ContractsContractIdTasksManyReviewsPostResponsesContentApplicationJsonSchemaData:
+    ReviewMultipleTasksRequestInternalServerError:
       type: object
       properties:
-        created:
-          type: boolean
-          description: Indicating whether the task review was created
-      required:
-      - created
-      title: ContractsContractIdTasksManyReviewsPostResponsesContentApplicationJsonSchemaData
+        error:
+          type: string
+      title: ReviewMultipleTasksRequestInternalServerError
+    ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsAttachment:
+      type: object
+      properties:
+        key:
+          type:
+          - string
+          - 'null'
+          description: (Optional) The key for accessing the attachment.
+        filename:
+          type:
+          - string
+          - 'null'
+          description: (Optional) The name of the file attached to the task.
+      title: ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsAttachment
+    TasksTaskIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        amount:
+          type:
+          - string
+          - 'null'
+          description: The amount to be associated with the task, in the appropriate currency.
+        description:
+          type:
+          - string
+          - 'null'
+          description: A description of the task.
+        hourly_report_preset_id:
+          type:
+          - string
+          - 'null'
+          description: Public ID of the hourly report preset, if applicable.
+      title: TasksTaskIdPatchRequestBodyContentApplicationJsonSchemaData
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems
+    ReviewASingleTaskRequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewASingleTaskRequestInternalServerError
+    ReviewMultipleTasksRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewMultipleTasksRequestBadRequestError
+    CreateANewTaskRequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateANewTaskRequestUnauthorizedError
+    ReviewASingleTaskRequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewASingleTaskRequestNotFoundError
+    ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: The current status of the task.
+      title: ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaDataStatus
+    ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: The current status of the task.
+      title: ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    CreateANewTaskRequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateANewTaskRequestBadRequestError
     TasksTaskIdPatchResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
@@ -761,28 +767,36 @@ components:
       - created_at
       - updated_at
       title: TasksTaskIdPatchResponsesContentApplicationJsonSchemaData
-    tasks_createContractTask_Response_201:
+    UpdateTaskByIdRequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateTaskByIdRequestBadRequestError
+    ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      description: The review status of the tasks. Possible values are 'approved' or 'declined'.
+      title: ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus
+    ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      description: The review status of the task. Possible values are 'approved' or 'declined'.
+      title: ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus
+    tasks_deleteContractTask_Response_200:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaData'
+          $ref: '#/components/schemas/ContractsContractIdTasksTaskIdDeleteResponsesContentApplicationJsonSchemaData'
       required:
       - data
-      title: tasks_createContractTask_Response_201
-    ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaData:
-      type: object
-      properties:
-        reason:
-          type:
-          - string
-          - 'null'
-          description: Optional reason for declining the task.
-        status:
-          $ref: '#/components/schemas/ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus'
-          description: The review status of the task. Possible values are 'approved' or 'declined'.
-      required:
-      - status
-      title: ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaData
+      title: tasks_deleteContractTask_Response_200
     Tasks_reviewMultipleTasks_Response_201:
       type: object
       properties:
@@ -791,39 +805,25 @@ components:
       required:
       - data
       title: Tasks_reviewMultipleTasks_Response_201
-    CreateANewTaskRequestBadRequestError:
+    ApiError:
       type: object
       properties:
-        error:
+        message:
           type: string
-      title: CreateANewTaskRequestBadRequestError
-    ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaData:
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdTasksTaskIdReviewsPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
-        ids:
-          type: array
-          items:
-            type: string
-            format: uuid
-          description: An array of task IDs to review. A maximum of 1000 task IDs is allowed per request.
-        reason:
-          type:
-          - string
-          - 'null'
-          description: Optional reason for declining the tasks.
-        status:
-          $ref: '#/components/schemas/ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus'
-          description: The review status of the tasks. Possible values are 'approved' or 'declined'.
+        created:
+          type: boolean
+          description: Indicating whether the task review was created
       required:
-      - ids
-      - status
-      title: ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaData
-    ReviewASingleTaskRequestInternalServerError:
-      type: object
-      properties:
-        error:
-          type: string
-      title: ReviewASingleTaskRequestInternalServerError
+      - created
+      title: ContractsContractIdTasksTaskIdReviewsPostResponsesContentApplicationJsonSchemaData
   securitySchemes:
     deelToken:
       type: http

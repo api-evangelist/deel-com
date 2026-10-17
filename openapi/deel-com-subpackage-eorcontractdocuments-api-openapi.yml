@@ -69,12 +69,33 @@ paths:
                 $ref: '#/components/schemas/ApiErrorContainer'
 components:
   schemas:
-    EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaDataItemsDocumentType:
-      type: string
-      enum:
-      - FRAMEWORK_AGREEMENT
-      description: The type of document. Currently only FRAMEWORK_AGREEMENT is supported.
-      title: EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaDataItemsDocumentType
+    EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaRequest
     FetchEorContractDocumentsRequestBadRequestError:
       type: object
       properties:
@@ -85,16 +106,52 @@ components:
         request:
           $ref: '#/components/schemas/EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaRequest'
       title: FetchEorContractDocumentsRequestBadRequestError
-    EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+    EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
-        path:
-          type: string
-          description: The JSON path where input validation failed
+        signature:
+          type:
+          - string
+          - 'null'
+          description: The signature of the client if the document is signed.
+        signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time the client signed the document if it is signed.
+        document_type:
+          $ref: '#/components/schemas/EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaDataItemsDocumentType'
+          description: The type of document. Currently only FRAMEWORK_AGREEMENT is supported.
+        eor_signature:
+          type:
+          - string
+          - 'null'
+          description: The signature of the EOR if the document is signed.
+        eor_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time the EOR signed the document if it is signed.
+        client_job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title of the client if the document is signed.
+      required:
+      - document_type
+      title: EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaDataItems
+    ApiError:
+      type: object
+      properties:
         message:
           type: string
           description: A description of the returned error
-      title: EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
     eor-contract-documents_getEORContractDocuments_Response_200:
       type: object
       properties:
@@ -132,79 +189,6 @@ components:
           format: double
           description: The code of the source handler which produced the returned error
       title: ApiErrorRequest
-    EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaDataItems:
-      type: object
-      properties:
-        signature:
-          type:
-          - string
-          - 'null'
-          description: The signature of the client if the document is signed.
-        signed_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: The date and time the client signed the document if it is signed.
-        document_type:
-          $ref: '#/components/schemas/EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaDataItemsDocumentType'
-          description: The type of document. Currently only FRAMEWORK_AGREEMENT is supported.
-        eor_signature:
-          type:
-          - string
-          - 'null'
-          description: The signature of the EOR if the document is signed.
-        eor_signed_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: The date and time the EOR signed the document if it is signed.
-        client_job_title:
-          type:
-          - string
-          - 'null'
-          description: The job title of the client if the document is signed.
-      required:
-      - document_type
-      title: EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaDataItems
-    EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaRequest:
-      type: object
-      properties:
-        url:
-          type: string
-          description: The relative URL of the failed request
-        code:
-          type: number
-          format: double
-          description: The code of the source handler which produced the returned error
-        docs:
-          type: string
-          description: A link to the official documentation for the requested endpoint resource
-        method:
-          type: string
-          description: The HTTP method of the failed request
-        source:
-          type: string
-          description: The source handler which produced the returned error
-        status:
-          type: number
-          format: double
-          description: The status code of the response
-        api_req_id:
-          type: string
-          description: The request ID of the failed request
-      title: EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaRequest
-    ApiError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: A description of the returned error
-        path:
-          type: string
-          description: The JSON path where input validation failed
-      title: ApiError
     ApiErrorContainer:
       type: object
       properties:
@@ -215,6 +199,22 @@ components:
           items:
             $ref: '#/components/schemas/ApiError'
       title: ApiErrorContainer
+    EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaDataItemsDocumentType:
+      type: string
+      enum:
+      - FRAMEWORK_AGREEMENT
+      description: The type of document. Currently only FRAMEWORK_AGREEMENT is supported.
+      title: EorContractsContractIdDocumentsGetResponsesContentApplicationJsonSchemaDataItemsDocumentType
   securitySchemes:
     deelToken:
       type: http

@@ -44,7 +44,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/OffCyclePayment'
 components:
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
   schemas:
+    OffCyclePayment:
+      type: object
+      properties:
+        id:
+          type: string
+        contract_id:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        reason:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - processing
+          - paid
+          - failed
+        created_at:
+          type: string
+          format: date-time
     OffCycleCreate:
       type: object
       required:
@@ -70,37 +101,6 @@ components:
           - other
         notes:
           type: string
-    OffCyclePayment:
-      type: object
-      properties:
-        id:
-          type: string
-        contract_id:
-          type: string
-        amount:
-          type: number
-        currency:
-          type: string
-        reason:
-          type: string
-        status:
-          type: string
-          enum:
-          - pending
-          - processing
-          - paid
-          - failed
-        created_at:
-          type: string
-          format: date-time
-  parameters:
-    IdempotencyKey:
-      name: Idempotency-Key
-      in: header
-      required: false
-      schema:
-        type: string
-        format: uuid
   securitySchemes:
     BearerAuth:
       type: http

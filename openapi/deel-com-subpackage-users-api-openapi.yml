@@ -194,6 +194,87 @@ paths:
               $ref: '#/components/schemas/SearchRequest'
 components:
   schemas:
+    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsAddressesItems:
+      type: object
+      properties:
+        type:
+          type: string
+        region:
+          type: string
+        country:
+          type:
+          - string
+          - 'null'
+        lineTwo:
+          type: string
+        locality:
+          type: string
+        postalCode:
+          type: string
+        streetAddress:
+          type: string
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsAddressesItems
+    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtensionEnterprise20UserManager:
+      type: object
+      properties:
+        email:
+          type: string
+        value:
+          type: string
+        displayName:
+          type: string
+      required:
+      - value
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtensionEnterprise20UserManager
+    SearchRequest:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: page size
+        filter:
+          type: string
+          description: only support 'userName' or 'email' filter expressions for now
+        schemas:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchRequestSchemasItems'
+        startIndex:
+          type: integer
+          description: start index (1-based)
+      title: SearchRequest
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: detail error message
+        schemas:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorResponseSchemasItems'
+        scimType:
+          $ref: '#/components/schemas/ErrorResponseScimType'
+          description: bad request type when status code is 400
+        status:
+          type: string
+          description: same as HTTP status code, e.g. 400, 401, etc.
+      title: ErrorResponse
+    ErrorResponseScimType:
+      type: string
+      enum:
+      - uniqueness
+      - tooMany
+      - mutability
+      - sensitive
+      - invalidSyntax
+      - invalidFilter
+      - invalidPath
+      - invalidValue
+      - invalidVers
+      - noTarget
+      description: bad request type when status code is 400
+      title: ErrorResponseScimType
     ? UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserOrganizationalStructuresItems
     : type: object
       properties:
@@ -214,20 +295,65 @@ components:
           - string
           - 'null'
       title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserOrganizationalStructuresItems
-    Email:
+    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsName:
       type: object
       properties:
-        type:
-          $ref: '#/components/schemas/EmailType'
+        givenName:
+          type:
+          - string
+          - 'null'
+        familyName:
+          type:
+          - string
+          - 'null'
+      required:
+      - givenName
+      - familyName
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsName
+    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsMeta:
+      type: object
+      properties:
+        created:
+          type: string
+        location:
+          type: string
+        lastModified:
+          type: string
+        resourceType:
+          $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsMetaResourceType'
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsMeta
+    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsMetaResourceType:
+      type: string
+      enum:
+      - User
+      - Group
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsMetaResourceType
+    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsTeam:
+      type: object
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsTeam
+    SearchRequestSchemasItems:
+      type: string
+      enum:
+      - urn:ietf:params:scim:api:messages:2.0:SearchRequest
+      title: SearchRequestSchemasItems
+    CustomField:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Custom fields's unique identifier.
+        name:
+          type: string
+          description: Custom fields's name.
         value:
           type: string
-        primary:
-          type: boolean
-          default: false
-      required:
-      - type
-      - value
-      title: Email
+          description: Custom fields's value.
+      title: CustomField
     UsersGetParametersFilter:
       oneOf:
       - type: string
@@ -235,112 +361,6 @@ components:
         items:
           type: string
       title: UsersGetParametersFilter
-    EnterpriseUser:
-      type: object
-      properties:
-        department:
-          type: string
-          description: Employee's department in Deel HRIS.
-        costCenter:
-          type: string
-          description: Legal entity.
-        organization:
-          type: string
-          description: Organization name in Deel.
-        manager:
-          $ref: '#/components/schemas/Manager'
-      title: EnterpriseUser
-    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtensionEnterprise20UserManager:
-      type: object
-      properties:
-        email:
-          type: string
-        value:
-          type: string
-        displayName:
-          type: string
-      required:
-      - value
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtensionEnterprise20UserManager
-    Manager:
-      type: object
-      properties:
-        value:
-          type: string
-          description: Manager's unique identifier.
-        displayName:
-          type: string
-          description: Manager's full name.
-        email:
-          type: string
-          description: Manager's email.
-      required:
-      - value
-      title: Manager
-    UserResponse:
-      type: object
-      properties:
-        active:
-          type: boolean
-          default: false
-          description: Hiring status. True if user employment is active. False if employment is not active.
-        emails:
-          type: array
-          items:
-            $ref: '#/components/schemas/Email'
-        title:
-          type: string
-          description: Job title.
-        userType:
-          type: string
-          description: User type.
-        addresses:
-          type: array
-          items:
-            $ref: '#/components/schemas/Address'
-        id:
-          type: string
-          description: Unique resource id (UUID) defined by Deel.
-        name:
-          $ref: '#/components/schemas/Name'
-        schemas:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserSchemasItems'
-        urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:
-          $ref: '#/components/schemas/EnterpriseUser'
-        urn:ietf:params:scim:schemas:extension:2.0:User:
-          $ref: '#/components/schemas/UserExtension'
-        userName:
-          type: string
-          description: User's work email.
-        meta:
-          $ref: '#/components/schemas/Meta'
-      required:
-      - emails
-      - name
-      - schemas
-      - userName
-      - meta
-      title: UserResponse
-    UsersGetResponsesContentApplicationJsonSchemaError:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Error code identifying the type of error.
-        details:
-          type:
-          - string
-          - 'null'
-          description: Additional details about the error.
-        message:
-          type: string
-          description: Error message describing what went wrong.
-      required:
-      - code
-      - message
-      title: UsersGetResponsesContentApplicationJsonSchemaError
     UsersGetResponsesContentApplicationJsonSchemaResourcesItemsEmailsItems:
       type: object
       properties:
@@ -355,6 +375,240 @@ components:
       - type
       - value
       title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsEmailsItems
+    UserExtensionEmploymentsItemsTeam:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Team name.
+      description: Team name.
+      title: UserExtensionEmploymentsItemsTeam
+    Users_getUsers_Response_200:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaSchemasItems'
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItems'
+        startIndex:
+          type: integer
+          format: int64
+        itemsPerPage:
+          type: integer
+          format: int64
+        totalResults:
+          type: integer
+          format: int64
+      title: Users_getUsers_Response_200
+    UserSearchResponse:
+      type: object
+      properties:
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+          description: User list.
+        itemsPerPage:
+          type: integer
+          format: int64
+        schemas:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSearchResponseSchemasItems'
+        startIndex:
+          type: integer
+          format: int64
+          description: Start index of the current page.
+        totalResults:
+          type: integer
+          format: int64
+      title: UserSearchResponse
+    UserExtensionEmploymentsItems:
+      type: object
+      properties:
+        contractId:
+          type: string
+          description: Contract identifier.
+        title:
+          type:
+          - string
+          - 'null'
+          description: Contract title
+        startDate:
+          type:
+          - string
+          - 'null'
+          description: Contract start date.
+        contractType:
+          type:
+          - string
+          - 'null'
+          description: Type of Deel contract
+        active:
+          type: boolean
+          default: false
+          description: Indicates if the contract is currently active.
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code.
+        country:
+          type:
+          - string
+          - 'null'
+          description: Country code.
+        team:
+          $ref: '#/components/schemas/UserExtensionEmploymentsItemsTeam'
+          description: Team name.
+      title: UserExtensionEmploymentsItems
+    OrganizationalStructure:
+      type: object
+      properties:
+        structureId:
+          type: string
+          description: Id of the Organizational structure.
+        structureName:
+          type: string
+          description: Name of the Organizational structure.
+        nameHierarchy:
+          type: string
+          description: Org structure hierarchy by name.
+        name:
+          type: string
+          description: Team name.
+        externalId:
+          type: string
+          description: Team external ID.
+        externalIdHierarchy:
+          type: string
+          description: Org structure hierarchy by external IDs.
+      title: OrganizationalStructure
+    ListUsers-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: ListUsers-v2026-01-01RequestInternalServerError
+    Address:
+      type: object
+      properties:
+        streetAddress:
+          type: string
+          description: Street and number.
+        locality:
+          type: string
+          description: Locality name.
+        region:
+          type: string
+          description: Region code.
+        postalCode:
+          type: string
+          description: Postal code.
+        country:
+          $ref: '#/components/schemas/CountryCode'
+        type:
+          type: string
+          description: Address type.
+      title: Address
+    ? UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItems
+    : type: object
+      properties:
+        id:
+          type: string
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItemsData'
+          - type: 'null'
+          description: 'The custom field value payload. Structure varies by field type: Text/Number/Date have {value}, Percentage has {value, text}, Currency has {amount, currency}, List has {option}, Multiselect has {options}.'
+        name:
+          type: string
+        type:
+          type: string
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItems
+    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20User:
+      type: object
+      properties:
+        state:
+          type:
+          - string
+          - 'null'
+        country:
+          type:
+          - string
+          - 'null'
+        endDate:
+          type: string
+        birthday:
+          type: string
+        workerId:
+          type:
+          - string
+          - 'null'
+        isManager:
+          type: boolean
+          default: false
+        startDate:
+          type:
+          - string
+          - 'null'
+        employments:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItems'
+        customFields:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserCustomFieldsItems'
+        hiringStatus:
+          type: string
+        workLocation:
+          type:
+          - string
+          - 'null'
+          description: The work location label assigned to the worker's HRIS profile
+        preferredName:
+          type: string
+        preferredLastName:
+          type: string
+        preferredFirstName:
+          type: string
+        departmentHierarchy:
+          type:
+          - string
+          - 'null'
+        departmentExternalId:
+          type:
+          - string
+          - 'null'
+        organizationalStructures:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserOrganizationalStructuresItems'
+        departmentExternalIdHierarchy:
+          type:
+          - string
+          - 'null'
+        workerTerminationLastDateOfWork:
+          type:
+          - string
+          - 'null'
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20User
+    EmailType:
+      type: string
+      enum:
+      - work
+      title: EmailType
     UserExtension:
       type: object
       properties:
@@ -443,6 +697,116 @@ components:
           - 'null'
           description: Hierarchy path of the team up to the root using external ids
       title: UserExtension
+    CountryCode:
+      type: string
+      title: CountryCode
+    ErrorResponseSchemasItems:
+      type: string
+      enum:
+      - urn:ietf:params:scim:api:messages:2.0:Error
+      title: ErrorResponseSchemasItems
+    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserCustomFieldsItems:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type:
+          - string
+          - 'null'
+        value:
+          type:
+          - string
+          - 'null'
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserCustomFieldsItems
+    UsersGetResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error.
+        details:
+          type:
+          - string
+          - 'null'
+          description: Additional details about the error.
+        message:
+          type: string
+          description: Error message describing what went wrong.
+      required:
+      - code
+      - message
+      title: UsersGetResponsesContentApplicationJsonSchemaError
+    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItems:
+      type: object
+      properties:
+        team:
+          $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsTeam'
+        state:
+          type:
+          - string
+          - 'null'
+        title:
+          type:
+          - string
+          - 'null'
+        active:
+          type: boolean
+          default: false
+        country:
+          type:
+          - string
+          - 'null'
+        startDate:
+          type:
+          - string
+          - 'null'
+        contractId:
+          type: string
+        contractType:
+          type:
+          - string
+          - 'null'
+        customFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItems'
+          description: Contract-level custom fields associated with the employment
+        employeeNumber:
+          type:
+          - string
+          - 'null'
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItems
+    Manager:
+      type: object
+      properties:
+        value:
+          type: string
+          description: Manager's unique identifier.
+        displayName:
+          type: string
+          description: Manager's full name.
+        email:
+          type: string
+          description: Manager's email.
+      required:
+      - value
+      title: Manager
+    EnterpriseUser:
+      type: object
+      properties:
+        department:
+          type: string
+          description: Employee's department in Deel HRIS.
+        costCenter:
+          type: string
+          description: Legal entity.
+        organization:
+          type: string
+          description: Organization name in Deel.
+        manager:
+          $ref: '#/components/schemas/Manager'
+      title: EnterpriseUser
     Name:
       type: object
       properties:
@@ -456,156 +820,37 @@ components:
       - familyName
       - givenName
       title: Name
-    Address:
-      type: object
-      properties:
-        streetAddress:
-          type: string
-          description: Street and number.
-        locality:
-          type: string
-          description: Locality name.
-        region:
-          type: string
-          description: Region code.
-        postalCode:
-          type: string
-          description: Postal code.
-        country:
-          $ref: '#/components/schemas/CountryCode'
-        type:
-          type: string
-          description: Address type.
-      title: Address
-    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsMeta:
-      type: object
-      properties:
-        created:
-          type: string
-        location:
-          type: string
-        lastModified:
-          type: string
-        resourceType:
-          $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsMetaResourceType'
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsMeta
-    UserExtensionEmploymentsItems:
-      type: object
-      properties:
-        contractId:
-          type: string
-          description: Contract identifier.
-        title:
-          type:
-          - string
-          - 'null'
-          description: Contract title
-        startDate:
-          type:
-          - string
-          - 'null'
-          description: Contract start date.
-        contractType:
-          type:
-          - string
-          - 'null'
-          description: Type of Deel contract
-        active:
-          type: boolean
-          default: false
-          description: Indicates if the contract is currently active.
-        state:
-          type:
-          - string
-          - 'null'
-          description: State code.
-        country:
-          type:
-          - string
-          - 'null'
-          description: Country code.
-        team:
-          $ref: '#/components/schemas/UserExtensionEmploymentsItemsTeam'
-          description: Team name.
-      title: UserExtensionEmploymentsItems
-    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsAddressesItems:
-      type: object
-      properties:
-        type:
-          type: string
-        region:
-          type: string
-        country:
-          type:
-          - string
-          - 'null'
-        lineTwo:
-          type: string
-        locality:
-          type: string
-        postalCode:
-          type: string
-        streetAddress:
-          type: string
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsAddressesItems
     UsersGetResponsesContentApplicationJsonSchemaResourcesItemsSchemasItems:
       type: string
       enum:
       - urn:ietf:params:scim:schemas:core:2.0:User
       title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsSchemasItems
-    UserSchemasItems:
+    ? UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItemsData
+    : type: object
+      properties: {}
+      description: 'The custom field value payload. Structure varies by field type: Text/Number/Date have {value}, Percentage has {value, text}, Currency has {amount, currency}, List has {option}, Multiselect has {options}.'
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItemsData
+    UserSearchResponseSchemasItems:
       type: string
       enum:
-      - urn:ietf:params:scim:schemas:core:2.0:User
-      title: UserSchemasItems
-    CountryCode:
-      type: string
-      title: CountryCode
-    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsName:
+      - urn:ietf:params:scim:api:messages:2.0:ListResponse
+      title: UserSearchResponseSchemasItems
+    Meta:
       type: object
       properties:
-        givenName:
-          type:
-          - string
-          - 'null'
-        familyName:
-          type:
-          - string
-          - 'null'
-      required:
-      - givenName
-      - familyName
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsName
-    SearchRequest:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: page size
-        filter:
+        created:
           type: string
-          description: only support 'userName' or 'email' filter expressions for now
-        schemas:
-          type: array
-          items:
-            $ref: '#/components/schemas/SearchRequestSchemasItems'
-        startIndex:
-          type: integer
-          description: start index (1-based)
-      title: SearchRequest
-    UserExtensionEmploymentsItemsTeam:
-      type: object
-      properties:
-        name:
+          format: date-time
+        lastModified:
           type: string
-          description: Team name.
-      description: Team name.
-      title: UserExtensionEmploymentsItemsTeam
-    ErrorResponseSchemasItems:
-      type: string
-      enum:
-      - urn:ietf:params:scim:api:messages:2.0:Error
-      title: ErrorResponseSchemasItems
+          format: date-time
+        location:
+          type: string
+          description: resource location URI
+        resourceType:
+          $ref: '#/components/schemas/MetaResourceType'
+      description: Resource metadata.
+      title: Meta
     UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtensionEnterprise20User:
       type: object
       properties:
@@ -626,82 +871,89 @@ components:
         preferredFirstName:
           type: string
       title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtensionEnterprise20User
-    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsMetaResourceType:
-      type: string
-      enum:
-      - User
-      - Group
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsMetaResourceType
-    UserSearchResponseSchemasItems:
-      type: string
-      enum:
-      - urn:ietf:params:scim:api:messages:2.0:ListResponse
-      title: UserSearchResponseSchemasItems
-    OrganizationalStructure:
-      type: object
-      properties:
-        structureId:
-          type: string
-          description: Id of the Organizational structure.
-        structureName:
-          type: string
-          description: Name of the Organizational structure.
-        nameHierarchy:
-          type: string
-          description: Org structure hierarchy by name.
-        name:
-          type: string
-          description: Team name.
-        externalId:
-          type: string
-          description: Team external ID.
-        externalIdHierarchy:
-          type: string
-          description: Org structure hierarchy by external IDs.
-      title: OrganizationalStructure
-    Users_getUsers_Response_200:
-      type: object
-      properties:
-        schemas:
-          type: array
-          items:
-            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaSchemasItems'
-        Resources:
-          type: array
-          items:
-            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItems'
-        startIndex:
-          type: integer
-          format: int64
-        itemsPerPage:
-          type: integer
-          format: int64
-        totalResults:
-          type: integer
-          format: int64
-      title: Users_getUsers_Response_200
-    ErrorResponse:
-      type: object
-      properties:
-        detail:
-          type: string
-          description: detail error message
-        schemas:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorResponseSchemasItems'
-        scimType:
-          $ref: '#/components/schemas/ErrorResponseScimType'
-          description: bad request type when status code is 400
-        status:
-          type: string
-          description: same as HTTP status code, e.g. 400, 401, etc.
-      title: ErrorResponse
     UsersGetResponsesContentApplicationJsonSchemaSchemasItems:
       type: string
       enum:
       - urn:ietf:params:scim:api:messages:2.0:ListResponse
       title: UsersGetResponsesContentApplicationJsonSchemaSchemasItems
+    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsEmailsItemsType:
+      type: string
+      enum:
+      - home
+      - work
+      - other
+      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsEmailsItemsType
+    UserSchemasItems:
+      type: string
+      enum:
+      - urn:ietf:params:scim:schemas:core:2.0:User
+      title: UserSchemasItems
+    UserResponse:
+      type: object
+      properties:
+        active:
+          type: boolean
+          default: false
+          description: Hiring status. True if user employment is active. False if employment is not active.
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/Email'
+        title:
+          type: string
+          description: Job title.
+        userType:
+          type: string
+          description: User type.
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        id:
+          type: string
+          description: Unique resource id (UUID) defined by Deel.
+        name:
+          $ref: '#/components/schemas/Name'
+        schemas:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSchemasItems'
+        urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:
+          $ref: '#/components/schemas/EnterpriseUser'
+        urn:ietf:params:scim:schemas:extension:2.0:User:
+          $ref: '#/components/schemas/UserExtension'
+        userName:
+          type: string
+          description: User's work email.
+        meta:
+          $ref: '#/components/schemas/Meta'
+      required:
+      - emails
+      - name
+      - schemas
+      - userName
+      - meta
+      title: UserResponse
+    Email:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/EmailType'
+        value:
+          type: string
+        primary:
+          type: boolean
+          default: false
+      required:
+      - type
+      - value
+      title: Email
+    MetaResourceType:
+      type: string
+      enum:
+      - User
+      - Group
+      title: MetaResourceType
     UsersGetResponsesContentApplicationJsonSchemaResourcesItems:
       type: object
       properties:
@@ -743,258 +995,6 @@ components:
       - schemas
       - userName
       title: UsersGetResponsesContentApplicationJsonSchemaResourcesItems
-    ? UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItemsData
-    : type: object
-      properties: {}
-      description: 'The custom field value payload. Structure varies by field type: Text/Number/Date have {value}, Percentage has {value, text}, Currency has {amount, currency}, List has {option}, Multiselect has {options}.'
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItemsData
-    CustomField:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Custom fields's unique identifier.
-        name:
-          type: string
-          description: Custom fields's name.
-        value:
-          type: string
-          description: Custom fields's value.
-      title: CustomField
-    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItems:
-      type: object
-      properties:
-        team:
-          $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsTeam'
-        state:
-          type:
-          - string
-          - 'null'
-        title:
-          type:
-          - string
-          - 'null'
-        active:
-          type: boolean
-          default: false
-        country:
-          type:
-          - string
-          - 'null'
-        startDate:
-          type:
-          - string
-          - 'null'
-        contractId:
-          type: string
-        contractType:
-          type:
-          - string
-          - 'null'
-        customFields:
-          type: array
-          items:
-            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItems'
-          description: Contract-level custom fields associated with the employment
-        employeeNumber:
-          type:
-          - string
-          - 'null'
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItems
-    MetaResourceType:
-      type: string
-      enum:
-      - User
-      - Group
-      title: MetaResourceType
-    Meta:
-      type: object
-      properties:
-        created:
-          type: string
-          format: date-time
-        lastModified:
-          type: string
-          format: date-time
-        location:
-          type: string
-          description: resource location URI
-        resourceType:
-          $ref: '#/components/schemas/MetaResourceType'
-      description: Resource metadata.
-      title: Meta
-    ? UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItems
-    : type: object
-      properties:
-        id:
-          type: string
-        data:
-          oneOf:
-          - $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItemsData'
-          - type: 'null'
-          description: 'The custom field value payload. Structure varies by field type: Text/Number/Date have {value}, Percentage has {value, text}, Currency has {amount, currency}, List has {option}, Multiselect has {options}.'
-        name:
-          type: string
-        type:
-          type: string
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsCustomFieldsItems
-    EmailType:
-      type: string
-      enum:
-      - work
-      title: EmailType
-    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20User:
-      type: object
-      properties:
-        state:
-          type:
-          - string
-          - 'null'
-        country:
-          type:
-          - string
-          - 'null'
-        endDate:
-          type: string
-        birthday:
-          type: string
-        workerId:
-          type:
-          - string
-          - 'null'
-        isManager:
-          type: boolean
-          default: false
-        startDate:
-          type:
-          - string
-          - 'null'
-        employments:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItems'
-        customFields:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserCustomFieldsItems'
-        hiringStatus:
-          type: string
-        workLocation:
-          type:
-          - string
-          - 'null'
-          description: The work location label assigned to the worker's HRIS profile
-        preferredName:
-          type: string
-        preferredLastName:
-          type: string
-        preferredFirstName:
-          type: string
-        departmentHierarchy:
-          type:
-          - string
-          - 'null'
-        departmentExternalId:
-          type:
-          - string
-          - 'null'
-        organizationalStructures:
-          type: array
-          items:
-            $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserOrganizationalStructuresItems'
-        departmentExternalIdHierarchy:
-          type:
-          - string
-          - 'null'
-        workerTerminationLastDateOfWork:
-          type:
-          - string
-          - 'null'
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20User
-    ListUsers-v2026-01-01RequestInternalServerError:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/UsersGetResponsesContentApplicationJsonSchemaError'
-      required:
-      - error
-      title: ListUsers-v2026-01-01RequestInternalServerError
-    SearchRequestSchemasItems:
-      type: string
-      enum:
-      - urn:ietf:params:scim:api:messages:2.0:SearchRequest
-      title: SearchRequestSchemasItems
-    ErrorResponseScimType:
-      type: string
-      enum:
-      - uniqueness
-      - tooMany
-      - mutability
-      - sensitive
-      - invalidSyntax
-      - invalidFilter
-      - invalidPath
-      - invalidValue
-      - invalidVers
-      - noTarget
-      description: bad request type when status code is 400
-      title: ErrorResponseScimType
-    UserSearchResponse:
-      type: object
-      properties:
-        Resources:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserResponse'
-          description: User list.
-        itemsPerPage:
-          type: integer
-          format: int64
-        schemas:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserSearchResponseSchemasItems'
-        startIndex:
-          type: integer
-          format: int64
-          description: Start index of the current page.
-        totalResults:
-          type: integer
-          format: int64
-      title: UserSearchResponse
-    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsEmailsItemsType:
-      type: string
-      enum:
-      - home
-      - work
-      - other
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsEmailsItemsType
-    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsTeam:
-      type: object
-      properties:
-        name:
-          type:
-          - string
-          - 'null'
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserEmploymentsItemsTeam
-    UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserCustomFieldsItems:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type:
-          - string
-          - 'null'
-        value:
-          type:
-          - string
-          - 'null'
-      title: UsersGetResponsesContentApplicationJsonSchemaResourcesItemsUrnIetfParamsScimSchemasExtension20UserCustomFieldsItems
   securitySchemes:
     deelToken:
       type: http
