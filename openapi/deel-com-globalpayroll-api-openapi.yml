@@ -1,0 +1,4401 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Global Payroll API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: globalPayroll
+paths:
+  /gp/contracts/{contract_id}/banks:
+    post:
+      operationId: globalPayroll_addGpContractBankAccount-v2026-09-17
+      summary: Add bank account
+      description: 'Adds a bank account for the GP contract; country-specific field requirements must be retrieved from `GET /gp/contracts/{contract_id}/banks/guide` before submitting.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: contract_id
+        in: path
+        description: Unique identifier for a contract.
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_addGpContractBankAccount-v2026-09-17_Response_201'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddGpContractBankAccount-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Request body containing the details of the bank account to be added.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpContractsContractIdBanksPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: globalPayroll_getGpContractBankAccounts-v2026-09-17
+      summary: Retrieve bank accounts
+      description: 'Retrieves the bank accounts configured for a specific contract, including how each account''s share of the salary is split via funds_distribution — use this when a worker has multiple accounts under one contract to see how pay is being distributed across them.
+
+
+        **Token scopes**: `people:read`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: contract_id
+        in: path
+        description: Unique identifier for a contract.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_getGpContractBankAccounts-v2026-09-17_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetGpContractBankAccounts-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /gp/legal-entities/{legal_entity_id}/payroll-migration-imports:
+    post:
+      operationId: globalPayroll_importPayrollMigrationFiles-v2026-09-14
+      summary: Add payroll migration files to a legal entity
+      description: 'Attach year-to-date payroll files to a legal entity''s payroll migration import, created on the first call. Upload each file to the Deel file service first and pass the id and secret it returns. The import stays IN_PROGRESS until submitted; attaching files to a submitted one reopens it. Atomic: one rejected file stores nothing.
+
+
+        **Token scopes**: `global-payroll:write`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: The unique identifier of the legal entity the payroll migration files belong to.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_importPayrollMigrationFiles-v2026-09-14_Response_201'
+        '400':
+          description: '400'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportPayrollMigrationFiles-v2026-09-14RequestBadRequestError'
+        '401':
+          description: '401'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportPayrollMigrationFiles-v2026-09-14RequestUnauthorizedError'
+        '403':
+          description: '403'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportPayrollMigrationFiles-v2026-09-14RequestForbiddenError'
+        '404':
+          description: '404'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportPayrollMigrationFiles-v2026-09-14RequestNotFoundError'
+        '409':
+          description: '409'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportPayrollMigrationFiles-v2026-09-14RequestConflictError'
+        '500':
+          description: '500'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportPayrollMigrationFiles-v2026-09-14RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: The payroll migration files to attach to the import.
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: globalPayroll_listPayrollMigrationImports-v2026-09-15
+      summary: List payroll migration imports for a legal entity
+      description: 'Use this to check on the status of payroll migration imports for a legal entity before starting a new one — for example, to confirm previously submitted files have been reviewed, or to see files a partner already added before uploading more.
+
+
+        **Token scopes**: `global-payroll:read`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: The unique identifier of the legal entity whose payroll migration imports to list.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: limit
+        in: query
+        description: The maximum number of imports to return, between 1 and 50. Defaults to 20.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 20
+      - name: cursor
+        in: query
+        description: An opaque cursor from the previous page's pagination.next_cursor. Omit it for the first page.
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 255
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_listPayrollMigrationImports-v2026-09-15_Response_200'
+        '400':
+          description: '400'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayrollMigrationImports-v2026-09-15RequestBadRequestError'
+        '401':
+          description: '401'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayrollMigrationImports-v2026-09-15RequestUnauthorizedError'
+        '403':
+          description: '403'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayrollMigrationImports-v2026-09-15RequestForbiddenError'
+        '404':
+          description: '404'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayrollMigrationImports-v2026-09-15RequestNotFoundError'
+        '500':
+          description: '500'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayrollMigrationImports-v2026-09-15RequestInternalServerError'
+      security:
+      - deelToken: []
+  /gp/workers:
+    post:
+      operationId: globalPayroll_createGpWorker-v2026-10-01
+      summary: Create a Global Payroll worker
+      description: 'Creates a Global Payroll worker and their contract in a single call, so API clients and partner integrations can onboard Global Payroll workers directly instead of using the legacy `POST /rest/contracts/gp` flow. No invitation email is sent to the worker unless the request asks for one.
+
+
+        **Token scopes**: `contracts:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-12.'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/GpWorkersPostParametersXBeta'
+      responses:
+        '201':
+          description: The worker and their contract were created. `data.id` is the contract id; `data.employee.id` is the worker id to use with the other Global Payroll worker endpoints.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_createGpWorker-v2026-10-01_Response_201'
+        '400':
+          description: 'Bad request. Codes: validation_error (the body is invalid; field names the offending property), invalid_payroll_group (the payroll group is missing, inactive, not a Global Payroll group or in another legal entity), currency_not_allowed (not allowed for the legal entity country), work_location_required (US legal entities), contract_state_required (the country needs contract_state), entity_integration_active (the legal entity has an active HR integration).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateGpWorker-v2026-10-01RequestBadRequestError'
+        '401':
+          description: The authentication is missing or is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateGpWorker-v2026-10-01RequestUnauthorizedError'
+        '403':
+          description: 'Forbidden. Codes: team_permission_denied (the caller cannot create contracts in the team), forbidden (the caller''s organization cannot use this endpoint).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateGpWorker-v2026-10-01RequestForbiddenError'
+        '404':
+          description: 'Not found. Codes: legal_entity_not_found, team_not_found, entity_address_not_found. The referenced resource does not exist or does not belong to your organization.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateGpWorker-v2026-10-01RequestNotFoundError'
+        '409':
+          description: 'Conflict. Codes: worker_already_exists (the external_id or the email already has a worker or active contract in this legal entity; details carry worker_id and contract_id), external_id_mismatch (the email belongs to a worker with a different external_id), employee_number_taken (the employee number is used in this legal entity), creation_in_progress (an identical create is still running, retry shortly).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateGpWorker-v2026-10-01RequestConflictError'
+        '500':
+          description: An unexpected error occurred while creating the worker.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateGpWorker-v2026-10-01RequestInternalServerError'
+      requestBody:
+        description: Worker, contract and compensation details.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpWorkersPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /gp/workers/{id}/payslips/{payslip_id}/download:
+    get:
+      operationId: globalPayroll_downloadAGpWorkerPayslip-v2026-01-01
+      summary: Download a GP worker payslip
+      description: 'Returns a pre-signed download URL for a specific Global Payroll (GP) employee payslip PDF. Use this after calling Retrieve employee payslips to obtain the payslipId. Requires the worker id (UUID) and the payslipId from the list response. The returned URL is temporary and should be used promptly to download the file. Supports only GP contract types.
+
+
+        **Token scopes**: `payslips:read`, `worker:read`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: id
+        in: path
+        description: Unique identifier for the worker.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: payslipId
+        in: path
+        description: Unique identifier for the payslip.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: payslip_id
+        in: path
+        description: Unique identifier for the payslip.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_downloadAGpWorkerPayslip-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request - Validation error or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadAGpWorkerPayslip-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /gp/legal-entities/{legal_entity_id}/payroll-migration-imports/{import_id}:
+    get:
+      operationId: globalPayroll_getPayrollMigrationImport-v2026-09-15
+      summary: Get a payroll migration import
+      description: 'Read back one payroll migration import: its state, when it was submitted, and the files attached to it. There is no webhook today, so this is how a caller follows a submission after submitting it.
+
+
+        **Token scopes**: `global-payroll:read`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: The unique identifier of the legal entity the payroll migration import belongs to.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: import_id
+        in: path
+        description: The unique identifier of the payroll migration import, as returned when it was submitted.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_getPayrollMigrationImport-v2026-09-15_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: '401'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollMigrationImport-v2026-09-15RequestUnauthorizedError'
+        '403':
+          description: '403'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollMigrationImport-v2026-09-15RequestForbiddenError'
+        '404':
+          description: '404'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollMigrationImport-v2026-09-15RequestNotFoundError'
+        '500':
+          description: '500'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollMigrationImport-v2026-09-15RequestInternalServerError'
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/additional-info:
+    get:
+      operationId: globalPayroll_getContractAdditionalInfo-v2026-09-14
+      summary: Get additional info for a contract
+      description: 'Returns the values a worker submitted for the country-specific additional-information fields on a contract - details local law requires before payroll can run, such as local identifiers, demographic data and emergency contacts. The field set varies per country, so it is kept out of the core contract payload: call this to mirror those values into an external HRIS or payroll system, or to check what a worker supplied during onboarding. Use GET /contracts/{contract_id} for the contract terms. EOR and GP.
+
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the GP contract.
+        required: true
+        schema:
+          type: string
+          pattern: ^(([a-z0-9]{6,})|([a-z0-9-_]{20,})|(-2[0-9]{2}))$
+          maxLength: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_getContractAdditionalInfo-v2026-09-14_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: '403'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetContractAdditionalInfo-v2026-09-14RequestForbiddenError'
+        '404':
+          description: '404'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetContractAdditionalInfo-v2026-09-14RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /payroll-activations:
+    get:
+      operationId: globalPayroll_getPayrollActivations-v2026-10-12
+      summary: Get payroll activation readiness for a legal entity
+      description: 'Returns whether a legal entity has reached payroll activation readiness, giving clients and partners a self-serve signal they can check over the public API instead of asking Deel support. Call it before starting a step that requires payroll to already be active for the legal entity, and gate that step on the result. A legal entity whose activation is still in progress, or that has none yet, is reported as not ready.
+
+
+        **Token scopes**: `global-payroll:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-12.'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: legal_entity_id
+        in: query
+        description: The unique identifier of the legal entity whose payroll readiness should be returned.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/PayrollActivationsGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_getPayrollActivations-v2026-10-12_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: '401'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollActivations-v2026-10-12RequestUnauthorizedError'
+        '403':
+          description: '403'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollActivations-v2026-10-12RequestForbiddenError'
+        '404':
+          description: '404'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollActivations-v2026-10-12RequestNotFoundError'
+        '500':
+          description: '500'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPayrollActivations-v2026-10-12RequestInternalServerError'
+      security:
+      - deelToken: []
+  /payroll-groups:
+    get:
+      operationId: globalPayroll_listPayrollGroups-v2026-09-08
+      summary: List payroll groups for a legal entity
+      description: 'Lists the active payroll groups of a legal entity, with the REGULAR payroll calendars of each group that start in the chosen year (the current year by default). Use it to find the payroll groups of a legal entity and their calendars for a given year; leave the calendars out when you only need the groups.
+
+
+        **Token scopes**: `global-payroll:read`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: legalEntityId
+        in: query
+        description: Public UUID of the legal entity whose payroll groups to retrieve.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: calendarYear
+        in: query
+        description: Calendar year to filter payroll cycles by. Defaults to the current year.
+        required: false
+        schema:
+          type: integer
+          minimum: 2020
+          maximum: 2035
+      - name: includePayrollCalendar
+        in: query
+        description: Whether to include REGULAR payroll calendars for each group. Defaults to true. Set to false to skip calendar fetching for a faster response.
+        required: false
+        schema:
+          type: boolean
+          default: true
+      - name: pagination
+        in: query
+        description: 'Cursor-based pagination parameters. limit: max items per page (1-15, default 10). cursor: opaque string from the previous response''s pagination.nextCursor field.'
+        required: false
+        schema:
+          $ref: '#/components/schemas/PayrollGroupsGetParametersPagination'
+          default:
+            limit: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_listPayrollGroups-v2026-09-08_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: '403'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayrollGroups-v2026-09-08RequestForbiddenError'
+        '404':
+          description: '404'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayrollGroups-v2026-09-08RequestNotFoundError'
+        '500':
+          description: '500'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPayrollGroups-v2026-09-08RequestInternalServerError'
+      security:
+      - deelToken: []
+  /forms/gp/worker-additional-fields/{country_code}:
+    get:
+      operationId: globalPayroll_retrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01
+      summary: Retrieve additional information fields for GP workers by country
+      description: 'Retrieves the country-specific additional fields a Global Payroll worker must provide to stay compliant with local regulations. Call this before creating a GP contract or submitting worker additional information via POST or PATCH `/gp/workers/contracts/{contract_id}/additional-information`, so you know which fields to include and whether each is required.
+
+
+        **Token scopes**: `forms:read`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: country_code
+        in: path
+        description: ISO 3166-1 alpha-2 country code for which to retrieve GP worker additional fields.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Use this response to render dynamic form fields for GP worker onboarding. Contains field configuration, validation rules, display metadata, and dependency logic needed to build country-specific additional information forms.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_retrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01_Response_200'
+        '400':
+          description: Returned when the country_code path parameter is not a recognized ISO 3166-1 alpha-2 code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Authentication failed. The access token is missing, expired, or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Access denied. The authenticated user does not have the required forms:read scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestForbiddenError'
+        '404':
+          description: The country_code is a valid ISO code but no additional information template exists for it in the Employee Data Management system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestNotFoundError'
+        '429':
+          description: Rate limit exceeded. The client has sent too many requests in a given time window.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal server error. Returned when the Employee Data Management service is unreachable, or an unexpected error occurs during field retrieval.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /gp/contracts/{contract_id}/banks/guide:
+    get:
+      operationId: globalPayroll_getGpContractBankGuide-v2026-09-17
+      summary: Retrieve bank guide
+      description: 'Call this endpoint before rendering a contract''s bank account form, to determine which fields must be shown as required for that country.
+
+
+        **Token scopes**: `people:read`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: contract_id
+        in: path
+        description: Unique identifier for a contract.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_getGpContractBankGuide-v2026-09-17_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetGpContractBankGuide-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /hris/workers/{worker_id}/banks:
+    get:
+      operationId: globalPayroll_getHrisBankAccounts-v2026-09-21
+      summary: Retrieve HRIS worker bank accounts
+      description: 'Use this endpoint when processing payroll for an HRIS worker to retrieve the active bank account details needed for payment disbursement.
+
+
+        **Token scopes**: `people:read`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: worker_id
+        in: path
+        description: Unique identifier for an HRIS worker.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_getHrisBankAccounts-v2026-09-21_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: HrisProfile not found.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /gp/workers/creation-schema:
+    get:
+      operationId: globalPayroll_retrieveGpWorkerCreationSchema-v2026-10-01
+      summary: Retrieve the Global Payroll worker creation schema
+      description: 'Returns the fields POST /rest/gp/workers accepts, with whether each is required, its permitted values and its validation rules. Pass country, or legal_entity_id and payroll_group_id, to get the rules that apply to that case: contract_state and its provinces, work_location for US entities, postal code format, allowed currencies and the employee_number requirement of a Payroll Connect group. Build the form from this response and the create will not reject it.
+
+
+        **Token scopes**: `contracts:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-12.'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: country
+        in: query
+        description: ISO 3166-1 alpha-2 country of the legal entity. Adds the country rules. Must match the legal entity when legal_entity_id is also given.
+        required: false
+        schema:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+      - name: legal_entity_id
+        in: query
+        description: Legal entity of your organization. Its country is used and the currencies it may pay in are returned.
+        required: false
+        schema:
+          type: string
+          format: uuid
+          minLength: 36
+          maxLength: 36
+      - name: payroll_group_id
+        in: query
+        description: Payroll group of the legal entity. When it is a Payroll Connect (Soft GP) group, employee_number is reported as required. Requires legal_entity_id.
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 100
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/GpWorkersCreationSchemaGetParametersXBeta'
+      responses:
+        '200':
+          description: The fields the create endpoint accepts for the given context.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_retrieveGpWorkerCreationSchema-v2026-10-01_Response_200'
+        '400':
+          description: 'Bad request. Codes: validation_error (a query parameter is invalid, or country does not match the legal entity country).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveGpWorkerCreationSchema-v2026-10-01RequestBadRequestError'
+        '401':
+          description: The authentication is missing or is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveGpWorkerCreationSchema-v2026-10-01RequestUnauthorizedError'
+        '403':
+          description: The token does not grant the contracts:read scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveGpWorkerCreationSchema-v2026-10-01RequestForbiddenError'
+        '404':
+          description: The legal entity does not exist or does not belong to your organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveGpWorkerCreationSchema-v2026-10-01RequestNotFoundError'
+        '500':
+          description: An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveGpWorkerCreationSchema-v2026-10-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /gp/contracts/{contract_id}/banks/settings:
+    patch:
+      operationId: globalPayroll_setGpContractBankSettings-v2026-09-17
+      summary: Set salary split
+      description: 'Use this when a worker has multiple bank accounts under a single Global Payroll contract and you need to control what portion of their salary goes to each. Sets how the employee''s salary is split across that contract''s bank accounts, independently of the worker''s other contracts. Each entry gives the percentage (0–100) paid to one account, and the percentages across the contract''s accounts must add up to 100.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: contract_id
+        in: path
+        description: Unique identifier for a contract.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_setGpContractBankSettings-v2026-09-17_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetGpContractBankSettings-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpContractsContractIdBanksSettingsPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /gp/legal-entities/{legal_entity_id}/payroll-migration-imports/{import_id}/submit:
+    post:
+      operationId: globalPayroll_submitPayrollMigrationImport-v2026-09-14
+      summary: Submit a payroll migration import for review
+      description: 'Submit a payroll migration import for review, handing its files to the Deel Payroll Implementation Manager working on the legal entity. An import already submitted is refused rather than submitted twice - treat that as success. Attaching more files reopens an import, so it can be submitted again once it has changed.
+
+
+        **Token scopes**: `global-payroll:write`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: The unique identifier of the legal entity the payroll migration import belongs to.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: import_id
+        in: path
+        description: The unique identifier of the payroll migration import to submit, as returned when its files were attached.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_submitPayrollMigrationImport-v2026-09-14_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: '401'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitPayrollMigrationImport-v2026-09-14RequestUnauthorizedError'
+        '403':
+          description: '403'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitPayrollMigrationImport-v2026-09-14RequestForbiddenError'
+        '404':
+          description: '404'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitPayrollMigrationImport-v2026-09-14RequestNotFoundError'
+        '409':
+          description: '409'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitPayrollMigrationImport-v2026-09-14RequestConflictError'
+        '500':
+          description: '500'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitPayrollMigrationImport-v2026-09-14RequestInternalServerError'
+      security:
+      - deelToken: []
+  /gp/contracts/{contract_id}/banks/{bank_id}:
+    patch:
+      operationId: globalPayroll_patchGpContractBankAccount-v2026-09-17
+      summary: Update bank account
+      description: 'Updates the bank account details for a specific contract''s bank record. Use this when a worker has multiple active Global Payroll contracts and needs to manage each contract''s bank account and salary split independently, without affecting other contracts. Only the fields provided in the request body are updated.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: contract_id
+        in: path
+        description: Unique identifier for a contract.
+        required: true
+        schema:
+          type: string
+      - name: bank_id
+        in: path
+        description: Unique identifier for the bank account in UUID format.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_patchGpContractBankAccount-v2026-09-17_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchGpContractBankAccount-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Request body to modify an existing bank account for an employee.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpContractsContractIdBanksBankIdPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /gp/contracts/{contract_id}/employment-type:
+    patch:
+      operationId: globalPayroll_updateEmploymentTypeForAContract-v2026-07-07
+      summary: Update employment type for a contract
+      description: 'Changes the employment type of a Global Payroll contract (full-time, part-time or on leave) together with the share of full-time hours the worker is on, taking effect from a date you choose. Use it when a worker changes working pattern. To change the contract end date instead, use `PATCH /rest/gp/contracts/{contract_id}/end-date`.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the GP contract.
+        required: true
+        schema:
+          type: string
+          pattern: ^(([a-z0-9]{6,})|([a-z0-9-_]{20,})|(-2[0-9]{2}))$
+          maxLength: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_updateEmploymentTypeForAContract-v2026-07-07_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: '403'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEmploymentTypeForAContract-v2026-07-07RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpContractsContractIdEmploymentTypePatchRequestBodyContentApplicationJsonSchemaData'
+                  description: Employment-type change details, including the effective date.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /gp/contracts/{contract_id}/end-date:
+    patch:
+      operationId: globalPayroll_updateEndDateForAContract-v2026-10-12
+      summary: Update end date for a contract
+      description: 'Update the end date of a Global Payroll contract from the date the change takes effect. Setting an end date makes the contract fixed-term; sending null makes it open-ended. The contract term is derived from the end date. Each call adds an entry to the end date history of the contract.
+
+
+        **Token scopes**: `contracts:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-12.'
+      tags:
+      - globalPayroll
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the GP contract.
+        required: true
+        schema:
+          type: string
+          pattern: ^(([a-z0-9]{6,})|([a-z0-9-_]{20,})|(-2[0-9]{2}))$
+          maxLength: 100
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/GpContractsContractIdEndDatePatchParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Global_Payroll_updateEndDateForAContract-v2026-10-12_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: '403'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEndDateForAContract-v2026-10-12RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpContractsContractIdEndDatePatchRequestBodyContentApplicationJsonSchemaData'
+                  description: End date change details, including the effective date.
+              required:
+              - data
+      security:
+      - deelToken: []
+components:
+  schemas:
+    GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      title: GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsValue
+    GpContractsContractIdBanksSettingsPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksSettingsPatchRequestBodyContentApplicationJsonSchemaDataSettingsItems'
+          description: The salary split across the contract's bank accounts. Percentages must add up to 100.
+      required:
+      - settings
+      title: GpContractsContractIdBanksSettingsPatchRequestBodyContentApplicationJsonSchemaData
+    UpdateEndDateForAContract-v2026-10-12RequestForbiddenError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The caller is not authorized to act on this contract.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: UpdateEndDateForAContract-v2026-10-12RequestForbiddenError
+    GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Machine-readable error code.
+        field:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Path of the request field the error refers to, when the error is caused by a single field.
+        details:
+          $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          description: Extra machine-readable context. Conflict errors carry the worker_id and contract_id of the existing record; currency_not_allowed carries allowed_currencies.
+        message:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItems
+    GpWorkersPostRequestBodyContentApplicationJsonSchemaDataHomeAddress:
+      type: object
+      properties:
+        zip:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Postal code.
+        city:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: City.
+        state:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: State, province or region.
+        street:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Street and number.
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country of the home address as an ISO 3166-1 alpha-2 code.
+      required:
+      - zip
+      - city
+      - street
+      - country
+      description: Home address of the worker.
+      title: GpWorkersPostRequestBodyContentApplicationJsonSchemaDataHomeAddress
+    ? GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsFilesItemsSource
+    : type: string
+      enum:
+      - INTERNAL
+      - EXTERNAL
+      description: 'Which surface the file arrived through: EXTERNAL for this API, INTERNAL for the Deel web app. An import can hold both when a client and a partner have each added files to it.'
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsFilesItemsSource
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Use this array to identify each validation failure. Each item describes one parameter that failed validation.
+      required:
+      - errors
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestBadRequestError
+    ? GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataFilesItemsSource
+    : type: string
+      enum:
+      - INTERNAL
+      - EXTERNAL
+      description: 'Which surface the file arrived through: EXTERNAL for this API, INTERNAL for the Deel web app. An import can hold both when a client and a partner have each added files to it.'
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataFilesItemsSource
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsStatus:
+      type: string
+      enum:
+      - DRAFT
+      - IN_PROGRESS
+      - SUBMITTED
+      description: The state of the import. IN_PROGRESS holds files that have not been submitted, and is what attaching files leaves behind - including on an import that had already been submitted, which reopens it. SUBMITTED once handed to Deel for review. DRAFT is an import started with no files yet, which only happens in the Deel web app.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsStatus
+    GetGpContractBankAccounts-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetGpContractBankAccounts-v2026-09-17RequestBadRequestError
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Use this value to identify the field that this dependency refers to. Contains the snake_case key of the dependency field, matching another field's 'key' property in the same response.
+        value:
+          $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue'
+          description: 'Use this value to evaluate the dependency condition. When the value is a primitive (string, number, or boolean), the condition is satisfied when the referenced field equals this value. When the value is an array, the condition is satisfied when the referenced field equals any one of its entries. When the value is an object, apply the operator in ''op'': ''eq'' (equals), ''ne'' (not equals), ''gt'' (greater than), ''gte'' (greater than or equal), ''lt'' (less than), ''lte'' (less than or equal), ''contains'' (field value contains the specified substring) each compare against ''value'', while ''notnull'' takes no operand and is satisfied when the referenced field holds any non-empty value.'
+      required:
+      - key
+      - value
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Use this message for logging and debugging purposes. Contains a general error description.
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestInternalServerError
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Use this value as the field identifier when submitting additional information. Represents the snake_case version of the internal field name, generated by the API naming convention service.
+        type:
+          $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsType'
+          description: 'Use this value to determine the data type expected when submitting field values. Mapped from the raw input type: ''date'', ''text'', ''select'', ''textarea'', ''tel'', ''phone'', and ''string'' map to "string"; ''number'' maps to "number"; ''checkbox'' maps to "boolean". An empty string indicates an unrecognized input type.'
+        ui_guide:
+          $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsUiGuide'
+          description: Use this object to control how the field is rendered in the UI. Contains labels, input type, display order, and supplementary text.
+        validation:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsValidationItems'
+          description: Use this array to apply client-side validation before form submission. Contains zero or one validation rule per field. An empty array means no validation is configured.
+        is_required:
+          type: boolean
+          description: Use this flag to determine whether the field must be provided when submitting additional information. For GP workers, the value considers the GP-specific optionality setting when available, falling back to the general optionality flag.
+        required_by:
+          type: string
+          description: 'Use this value to determine at which stage in the payroll lifecycle this field must be collected. Known values: ''before_payroll'' (required before payroll processing), ''after_payroll'' (can be collected after initial payroll), ''contract_signing'' (required at contract signing). Absent from the response when no lifecycle stage is configured.'
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems'
+          description: Use this array to implement conditional field visibility. When non-empty, this field should only be displayed and required when the referenced dependency conditions are met. An empty array means the field has no conditional dependencies.
+        values_allowed:
+          type: array
+          items:
+            type: string
+          description: Use this array to populate dropdown or select options when field_type is 'select'. Only present when the field has predefined options. Absent from the response for free-text, date, number, and other non-select field types.
+      required:
+      - key
+      - type
+      - ui_guide
+      - validation
+      - is_required
+      - dependencies
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItems
+    GpContractsContractIdBanksPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        city:
+          type: string
+          description: The city of the user's address.
+        iban:
+          type: string
+          description: The International Bank Account Number (IBAN).
+        email:
+          type: string
+          description: The user's email address.
+        phone:
+          type: string
+          description: The user's phone number.
+        postal:
+          type: string
+          description: The user's postal or ZIP code.
+        tax_id:
+          type: string
+          description: The user's tax identification number.
+        bank_code:
+          type: string
+          description: The bank code.
+        bank_name:
+          type: string
+          description: Name of the user's bank.
+        full_name:
+          type: string
+          description: Full name of the user.
+        swift_bic:
+          type: string
+          description: SWIFT/BIC code for the bank.
+        rib_number:
+          type: string
+          description: The RIB (Relevé d'Identité Bancaire).
+        branch_code:
+          type: string
+          description: The branch code of the user's bank.
+        account_type:
+          type: string
+          description: Bank account type.
+        country_code:
+          type: string
+          description: The country code of the user's address.
+        address_line1:
+          type: string
+          description: The primary address line.
+        address_line2:
+          type: string
+          description: The secondary address line.
+        currency_code:
+          type: string
+          description: The currency code for transactions.
+        original_name:
+          type: string
+          description: The original name of the user.
+        account_number:
+          type: string
+          description: The user's bank account number.
+        province_state:
+          type: string
+          description: The state or province of the user's address.
+        bank_branch_name:
+          type: string
+          description: The name of the user's bank branch.
+        bank_country_code:
+          type: string
+          description: The country code where the bank is located.
+        ach_routing_number:
+          type: string
+          description: The ACH (Automated Clearing House) Routing Number.
+      title: GpContractsContractIdBanksPostRequestBodyContentApplicationJsonSchemaData
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataFilesItems:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataFilesItemsSource'
+          description: 'Which surface the file arrived through: EXTERNAL for this API, INTERNAL for the Deel web app. An import can hold both when a client and a partner have each added files to it.'
+        file_id:
+          type: string
+          description: The identifier of the file in the Deel file service.
+        file_name:
+          type:
+          - string
+          - 'null'
+          description: The name displayed for the file in Deel, when one is known.
+        file_size:
+          type:
+          - integer
+          - 'null'
+          minimum: 1
+          maximum: 10485760
+          description: The size of the file in bytes, when one is known.
+        mime_type:
+          type:
+          - string
+          - 'null'
+          description: The media type of the file, when one is known.
+        uploaded_at:
+          type: string
+          format: date-time
+          description: When the file was uploaded to the Deel file service.
+      required:
+      - source
+      - file_id
+      - file_name
+      - file_size
+      - mime_type
+      - uploaded_at
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataFilesItems
+    ListPayrollMigrationImports-v2026-09-15RequestUnauthorizedError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The request carries no caller identity the gateway could resolve.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ListPayrollMigrationImports-v2026-09-15RequestUnauthorizedError
+    ListPayrollMigrationImports-v2026-09-15RequestInternalServerError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Internal server error.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ListPayrollMigrationImports-v2026-09-15RequestInternalServerError
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf4Op:
+      type: string
+      enum:
+      - notnull
+      description: 'Use this operator on its own: the condition is satisfied when the referenced field holds any non-empty value. It takes no operand.'
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf4Op
+    CreateGpWorker-v2026-10-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateGpWorker-v2026-10-01RequestBadRequestError
+    GpContractsContractIdEmploymentTypePatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        fte:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          description: Full-time equivalent for the new employment type, as a fraction between 0 and 1 (inclusive).
+        effective_date:
+          type: string
+          format: date
+          description: The date from which the new employment type takes effect (YYYY-MM-DD).
+        employment_type:
+          $ref: '#/components/schemas/GpContractsContractIdEmploymentTypePatchRequestBodyContentApplicationJsonSchemaDataEmploymentType'
+          description: 'The new employment type: EMPLOYEE_FT (full-time), EMPLOYEE_PT (part-time), or ON_LEAVE (on leave).'
+      required:
+      - fte
+      - effective_date
+      - employment_type
+      description: Employment-type change details, including the effective date.
+      title: GpContractsContractIdEmploymentTypePatchRequestBodyContentApplicationJsonSchemaData
+    SubmitPayrollMigrationImport-v2026-09-14RequestNotFoundError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Payroll migration import not found.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: SubmitPayrollMigrationImport-v2026-09-14RequestNotFoundError
+    RetrieveGpWorkerCreationSchema-v2026-10-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveGpWorkerCreationSchema-v2026-10-01RequestBadRequestError
+    GpWorkersPostRequestBodyContentApplicationJsonSchemaDataEmploymentType:
+      type: string
+      enum:
+      - FULL_TIME
+      - PART_TIME
+      description: Employment type of the worker.
+      title: GpWorkersPostRequestBodyContentApplicationJsonSchemaDataEmploymentType
+    Global_Payroll_patchGpContractBankAccount-v2026-09-17_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpContractsContractIdBanksBankIdPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Global Payroll_patchGpContractBankAccount-v2026-09-17_Response_200
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue4:
+      type: object
+      properties:
+        op:
+          $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf4Op'
+          description: 'Use this operator on its own: the condition is satisfied when the referenced field holds any non-empty value. It takes no operand.'
+      required:
+      - op
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue4
+    ListPayrollMigrationImports-v2026-09-15RequestBadRequestError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The pagination cursor is invalid or no longer resolves.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ListPayrollMigrationImports-v2026-09-15RequestBadRequestError
+    GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error response
+      required:
+      - message
+      title: GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems
+    GetGpContractBankGuide-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetGpContractBankGuide-v2026-09-17RequestBadRequestError
+    PayrollGroupsGetResponsesContentApplicationJsonSchemaPagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 9007199254740991
+          description: Maximum number of items returned in this page.
+        hasMore:
+          type: boolean
+          description: Whether additional pages exist after this one.
+        nextCursor:
+          type:
+          - string
+          - 'null'
+          description: Opaque cursor for the next page, or null when there are no more results.
+      required:
+      - limit
+      - hasMore
+      - nextCursor
+      title: PayrollGroupsGetResponsesContentApplicationJsonSchemaPagination
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Use this message to understand why the request failed. Indicates the country does not have an additional info template configured.
+      required:
+      - message
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestNotFoundError
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsType:
+      type: string
+      enum:
+      - YTD_HISTORICAL_INGESTION
+      description: What kind of ingestion this is. Year-to-date payroll history is the only kind today.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsType
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataFilesItemsSource:
+      type: string
+      enum:
+      - INTERNAL
+      - EXTERNAL
+      description: 'Which surface the file arrived through: EXTERNAL for this API, INTERNAL for the Deel web app. An import can hold both when a client and a partner have each added files to it.'
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataFilesItemsSource
+    PayrollGroupsGetParametersPagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 15
+          default: 10
+        cursor:
+          type: string
+          pattern: ^[A-Za-z0-9_-]+$
+          minLength: 1
+          maxLength: 256
+      title: PayrollGroupsGetParametersPagination
+    PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the payroll group.
+        name:
+          type: string
+          description: Human-readable name of the payroll group.
+        calendars:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItemsCalendarsItems'
+          description: REGULAR calendars for this group within the requested year.
+        is_active:
+          type: boolean
+          description: Whether the payroll group is currently active.
+        regular_cycle_cadence:
+          $ref: '#/components/schemas/PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItemsRegularCycleCadence'
+          description: Frequency at which regular payroll cycles are run for this group.
+      required:
+      - id
+      - name
+      - calendars
+      - is_active
+      - regular_cycle_cadence
+      title: PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItems
+    GpWorkersPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        pto:
+          $ref: '#/components/schemas/GpWorkersPostRequestBodyContentApplicationJsonSchemaDataPto'
+          description: Paid time off settings for the worker.
+        team_id:
+          type: string
+          format: uuid
+          minLength: 36
+          maxLength: 36
+          description: Identifier of the team the contract is created in. It must belong to your organization and the caller needs permission to create contracts in it.
+        job_title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Job title of the worker.
+        start_date:
+          type: string
+          format: date
+          minLength: 10
+          maxLength: 10
+          description: Employment start date, in YYYY-MM-DD format. The payroll start date defaults to it.
+        external_id:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Identifier of the worker in your own system. It must be unique within your organization.
+        compensation:
+          $ref: '#/components/schemas/GpWorkersPostRequestBodyContentApplicationJsonSchemaDataCompensation'
+          description: Base compensation of the worker.
+        home_address:
+          $ref: '#/components/schemas/GpWorkersPostRequestBodyContentApplicationJsonSchemaDataHomeAddress'
+          description: Home address of the worker.
+        personal_info:
+          $ref: '#/components/schemas/GpWorkersPostRequestBodyContentApplicationJsonSchemaDataPersonalInfo'
+          description: Personal details of the worker.
+        work_location:
+          $ref: '#/components/schemas/GpWorkersPostRequestBodyContentApplicationJsonSchemaDataWorkLocation'
+          description: Where the worker works. Required when the legal entity is in the United States.
+        contract_state:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: State or province code the contract is governed by. Required when the legal entity country has provinces enabled for Global Payroll (for example CA, US, AU, BR, IN) and must be one of its provinces.
+        fte_percentage:
+          type: integer
+          minimum: 1
+          maximum: 99
+          description: Full-time equivalent percentage, from 1 to 99. Required when employment_type is PART_TIME and not allowed when it is FULL_TIME.
+        employee_number:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Employee number in your payroll system. Required when the payroll group is a Payroll Connect (Soft GP) group. It must be unique within the legal entity.
+        employment_type:
+          $ref: '#/components/schemas/GpWorkersPostRequestBodyContentApplicationJsonSchemaDataEmploymentType'
+          description: Employment type of the worker.
+        legal_entity_id:
+          type: string
+          format: uuid
+          minLength: 36
+          maxLength: 36
+          description: Identifier of the Global Payroll legal entity the worker is employed by. It must belong to your organization.
+        payroll_group_id:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Identifier of the active Global Payroll payroll group of the legal entity the worker is paid in.
+        should_invite_employee_to_app:
+          type: boolean
+          default: false
+          description: Whether to email the worker an invitation to join Deel. Defaults to false.
+      required:
+      - team_id
+      - job_title
+      - start_date
+      - compensation
+      - home_address
+      - personal_info
+      - employment_type
+      - legal_entity_id
+      - payroll_group_id
+      title: GpWorkersPostRequestBodyContentApplicationJsonSchemaData
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItems:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsType'
+          description: What kind of ingestion this is. Year-to-date payroll history is the only kind today.
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsFilesItems'
+          description: The files attached to the import.
+        status:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsStatus'
+          description: The state of the import. IN_PROGRESS holds files that have not been submitted, and is what attaching files leaves behind - including on an import that had already been submitted, which reopens it. SUBMITTED once handed to Deel for review. DRAFT is an import started with no files yet, which only happens in the Deel web app.
+        import_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the payroll migration import.
+        created_at:
+          type: string
+          format: date-time
+          description: When the import was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: When the import last changed.
+        submitted_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the import was submitted for review, or null when it is not SUBMITTED.
+        legal_entity_id:
+          type: string
+          format: uuid
+          description: The legal entity the import belongs to.
+      required:
+      - type
+      - files
+      - status
+      - import_id
+      - created_at
+      - updated_at
+      - submitted_at
+      - legal_entity_id
+      description: The payroll migration import.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItems
+    ListPayrollGroups-v2026-09-08RequestInternalServerError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Unable to retrieve payroll groups from upstream.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ListPayrollGroups-v2026-09-08RequestInternalServerError
+    GpContractsContractIdEndDatePatchParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: GpContractsContractIdEndDatePatchParametersXBeta
+    Global_Payroll_downloadAGpWorkerPayslip-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Global Payroll_downloadAGpWorkerPayslip-v2026-01-01_Response_200
+    ListPayrollGroups-v2026-09-08RequestForbiddenError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The caller is not authorized to access this legal entity.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ListPayrollGroups-v2026-09-08RequestForbiddenError
+    ImportPayrollMigrationFiles-v2026-09-14RequestConflictError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostResponsesContentApplicationJsonSchemaData'
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: One or more files are already attached to this payroll migration import.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ImportPayrollMigrationFiles-v2026-09-14RequestConflictError
+    Global_Payroll_retrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Use this array to build the form UI. Each item defines one field with its type, validation, and display configuration. Items are pre-sorted by EDM display order. An empty array means no additional fields are configured for the requested country.
+      required:
+      - data
+      title: Global Payroll_retrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01_Response_200
+    GpWorkersPostResponsesContentApplicationJsonSchemaDataClientLegalEntity:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Legal entity name.
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaDataClientLegalEntity
+    GetPayrollMigrationImport-v2026-09-15RequestForbiddenError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The caller is not authorized to act on this legal entity.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: GetPayrollMigrationImport-v2026-09-15RequestForbiddenError
+    GetPayrollMigrationImport-v2026-09-15RequestInternalServerError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Internal server error.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: GetPayrollMigrationImport-v2026-09-15RequestInternalServerError
+    GetContractAdditionalInfo-v2026-09-14RequestNotFoundError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Contract not found or has no additional info.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: GetContractAdditionalInfo-v2026-09-14RequestNotFoundError
+    Global_Payroll_getGpContractBankGuide-v2026-09-17_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: Global Payroll_getGpContractBankGuide-v2026-09-17_Response_200
+    PayrollActivationsGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        is_ready:
+          type: boolean
+          description: Whether the payroll activation has reached the READY stage. False if there is none yet.
+      required:
+      - is_ready
+      title: PayrollActivationsGetResponsesContentApplicationJsonSchemaData
+    GpContractsContractIdBanksSettingsPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation.
+      title: GpContractsContractIdBanksSettingsPatchResponsesContentApplicationJsonSchemaErrorsItems
+    PatchGpContractBankAccount-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksBankIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: PatchGpContractBankAccount-v2026-09-17RequestBadRequestError
+    CreateGpWorker-v2026-10-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateGpWorker-v2026-10-01RequestInternalServerError
+    CreateGpWorker-v2026-10-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateGpWorker-v2026-10-01RequestForbiddenError
+    PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItemsCalendarsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the calendar.
+        values:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItemsCalendarsItemsValues'
+          description: 'Map of calendar milestone keys to their scheduled date-time values. A calendar holds only the milestones its payroll uses. Possible keys:
+
+            - `START`: Start date of the payroll cycle.
+
+            - `END`: End date of the payroll cycle.
+
+            - `CYCLE_SUBMISSION`: Deadline to submit payroll inputs for the cycle.
+
+            - `CYCLE_PUBLISHING`: Date the processed payroll is published for review.
+
+            - `CYCLE_APPROVAL`: Deadline to approve the payroll (for EOR, the payments package).
+
+            - `PAYROLL_FUNDING`: Date the payroll funding invoice is issued.
+
+            - `FUNDING_PAYMENT_RECEIPT`: Date the funding payment must be received.
+
+            - `INVOICE_PUBLISHING`: Date the payroll invoices are published.
+
+            - `PAYMENT_RELEASE`: Date the salary payments are released.
+
+            - `PAYSLIPS_PUBLISHING`: Date the payslips are published.
+
+            - `SALARY_PAY`: Date the employees are paid.
+
+            - `TIME_SHEETS_CUT_OFF`: Cut-off date for timesheets to be included in the cycle.
+
+            - `LATE_STARTERS_CUTOFF`: Cut-off date for new hires to be included in the cycle.
+
+            - `SOFT_G2N_UPLOAD`: Date the gross-to-net (G2N) report is uploaded.
+
+            - `FINAL_BATCH_REPORTS`: Date the final batch reports are delivered.'
+        calendar_type:
+          type: string
+          description: Type of the calendar, e.g. REGULAR.
+      required:
+      - id
+      - values
+      - calendar_type
+      title: PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItemsCalendarsItems
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsFilesItems:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsFilesItemsSource'
+          description: 'Which surface the file arrived through: EXTERNAL for this API, INTERNAL for the Deel web app. An import can hold both when a client and a partner have each added files to it.'
+        file_id:
+          type: string
+          description: The identifier of the file in the Deel file service.
+        file_name:
+          type:
+          - string
+          - 'null'
+          description: The name displayed for the file in Deel, when one is known.
+        file_size:
+          type:
+          - integer
+          - 'null'
+          minimum: 1
+          maximum: 10485760
+          description: The size of the file in bytes, when one is known.
+        mime_type:
+          type:
+          - string
+          - 'null'
+          description: The media type of the file, when one is known.
+        uploaded_at:
+          type: string
+          format: date-time
+          description: When the file was uploaded to the Deel file service.
+      required:
+      - source
+      - file_id
+      - file_name
+      - file_size
+      - mime_type
+      - uploaded_at
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItemsFilesItems
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        file_ids:
+          type: array
+          items:
+            type: string
+          description: The ids of the files the request was rejected over.
+      required:
+      - file_ids
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostResponsesContentApplicationJsonSchemaData
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataPeriod:
+      type: object
+      properties:
+        end:
+          type:
+          - string
+          - 'null'
+          description: The last day the payroll data Deel holds covers, as YYYY-MM-DD.
+        start:
+          type:
+          - string
+          - 'null'
+          description: The first day the payroll data Deel holds covers, as YYYY-MM-DD.
+      required:
+      - end
+      - start
+      description: The period the legal entity's payroll data on the Deel side already covers.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataPeriod
+    GpWorkersPostResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract.
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaDataType
+    GpContractsContractIdEmploymentTypePatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        fte:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          description: The full-time equivalent for the updated employment type, as a fraction between 0 and 1 (inclusive).
+        contract_id:
+          type: string
+          pattern: ^(([a-z0-9]{6,})|([a-z0-9-_]{20,})|(-2[0-9]{2}))$
+          maxLength: 100
+          description: The unique identifier of the GP contract.
+        effective_date:
+          type: string
+          format: date
+          description: The date from which the change takes effect.
+        employment_type:
+          $ref: '#/components/schemas/GpContractsContractIdEmploymentTypePatchResponsesContentApplicationJsonSchemaDataEmploymentType'
+          description: The updated employment type.
+      required:
+      - fte
+      - contract_id
+      - effective_date
+      - employment_type
+      title: GpContractsContractIdEmploymentTypePatchResponsesContentApplicationJsonSchemaData
+    GpContractsContractIdBanksBankIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        city:
+          type: string
+          description: The city of the user's address.
+        iban:
+          type: string
+          description: The International Bank Account Number (IBAN).
+        email:
+          type: string
+          description: The user's email address.
+        phone:
+          type: string
+          description: The user's phone number.
+        postal:
+          type: string
+          description: The user's postal or ZIP code.
+        tax_id:
+          type: string
+          description: The user's tax identification number.
+        bank_code:
+          type: string
+          description: The bank code.
+        bank_name:
+          type: string
+          description: Name of the user's bank.
+        full_name:
+          type: string
+          description: Full name of the user.
+        swift_bic:
+          type: string
+          description: SWIFT/BIC code for the bank.
+        rib_number:
+          type: string
+          description: The RIB (Relevé d'Identité Bancaire).
+        branch_code:
+          type: string
+          description: The branch code of the user's bank.
+        account_type:
+          type: string
+          description: Bank account type.
+        country_code:
+          type: string
+          description: The country code of the user's address.
+        address_line1:
+          type: string
+          description: The primary address line.
+        address_line2:
+          type: string
+          description: The secondary address line.
+        currency_code:
+          type: string
+          description: The currency code for transactions.
+        original_name:
+          type: string
+          description: The original name of the user.
+        account_number:
+          type: string
+          description: The user's bank account number.
+        province_state:
+          type: string
+          description: The state or province of the user's address.
+        bank_branch_name:
+          type: string
+          description: The name of the user's bank branch.
+        bank_country_code:
+          type: string
+          description: The country code where the bank is located.
+        ach_routing_number:
+          type: string
+          description: The ACH (Automated Clearing House) Routing Number.
+      title: GpContractsContractIdBanksBankIdPatchRequestBodyContentApplicationJsonSchemaData
+    GetPayrollActivations-v2026-10-12RequestNotFoundError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Legal entity not found.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: GetPayrollActivations-v2026-10-12RequestNotFoundError
+    PayrollActivationsGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: PayrollActivationsGetParametersXBeta
+    GpContractsContractIdEndDatePatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The recorded contract end date, or null when the contract is open-ended.
+        contract_id:
+          type: string
+          pattern: ^(([a-z0-9]{6,})|([a-z0-9-_]{20,})|(-2[0-9]{2}))$
+          maxLength: 100
+          description: The unique identifier of the GP contract.
+        contract_term:
+          $ref: '#/components/schemas/GpContractsContractIdEndDatePatchResponsesContentApplicationJsonSchemaDataContractTerm'
+          description: 'The contract term derived from the end date: DEFINITE when an end date is set, INDEFINITE when it is null.'
+        effective_date:
+          type: string
+          format: date
+          description: The date from which the change takes effect.
+      required:
+      - end_date
+      - contract_id
+      - contract_term
+      - effective_date
+      title: GpContractsContractIdEndDatePatchResponsesContentApplicationJsonSchemaData
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestUnauthorizedError
+    GpWorkersPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id of the contract created.
+        type:
+          $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaDataType'
+          description: Type of a contract.
+        client:
+          $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaDataClient'
+        status:
+          $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Status of a contract in Deel workflow.
+        employee:
+          $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaDataEmployee'
+        job_title:
+          type: string
+          description: Employee's job title.
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601.
+        employment:
+          $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaDataEmployment'
+        compensation_details:
+          $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaDataCompensationDetails'
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaData
+    CreateGpWorker-v2026-10-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateGpWorker-v2026-10-01RequestNotFoundError
+    PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItemsRegularCycleCadence:
+      type: string
+      enum:
+      - WEEKLY
+      - BIWEEKLY
+      - MONTHLY
+      - BIMONTHLY
+      - FOUR_WEEKLY
+      - QUARTERLY
+      description: Frequency at which regular payroll cycles are run for this group.
+      title: PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItemsRegularCycleCadence
+    Global_Payroll_getHrisBankAccounts-v2026-09-21_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkersWorkerIdBanksGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: Global Payroll_getHrisBankAccounts-v2026-09-21_Response_200
+    GpWorkersPostRequestBodyContentApplicationJsonSchemaDataWorkLocation:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Name of an active address of the legal entity, as shown in the app. Alternative to entity_address_id when is_remote is false. 'Remote' is accepted and means a remote worker.
+        is_remote:
+          type: boolean
+          description: Whether the worker works remotely rather than from an entity office.
+        effective_date:
+          type: string
+          format: date
+          description: Date from which the work location applies. Defaults to start_date.
+        entity_address_id:
+          type: string
+          format: uuid
+          minLength: 36
+          maxLength: 36
+          description: Identifier of an active address of the legal entity. When is_remote is false, provide either this or name.
+      required:
+      - is_remote
+      description: Where the worker works. Required when the legal entity is in the United States.
+      title: GpWorkersPostRequestBodyContentApplicationJsonSchemaDataWorkLocation
+    GpContractsContractIdBanksGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        city:
+          type: string
+          description: The city of the user's address.
+        iban:
+          type: string
+          description: The International Bank Account Number (IBAN).
+        email:
+          type: string
+          description: The user's email address.
+        phone:
+          type: string
+          description: The user's phone number.
+        postal:
+          type: string
+          description: The user's postal or ZIP code.
+        tax_id:
+          type: string
+          description: The user's tax identification number.
+        bank_code:
+          type: string
+          description: The bank code.
+        bank_name:
+          type: string
+          description: Name of the user's bank.
+        full_name:
+          type: string
+          description: Full name of the user.
+        sort_code:
+          type: string
+          description: UK sort code.
+        swift_bic:
+          type: string
+          description: SWIFT/BIC code for the bank.
+        rib_number:
+          type: string
+          description: The RIB(Relevé d'Identité Bancaire).
+        branch_code:
+          type: string
+          description: The branch code of the user's bank.
+        account_type:
+          type: string
+          description: Bank account type.
+        country_code:
+          type: string
+          description: The country code of the user.
+        address_line1:
+          type: string
+          description: The primary address line.
+        address_line2:
+          type: string
+          description: The secondary address line.
+        currency_code:
+          type: string
+          description: The currency code for transactions.
+        original_name:
+          type: string
+          description: The original name of the user.
+        account_number:
+          type: string
+          description: The user's bank account number.
+        province_state:
+          type: string
+          description: The state or province of the user's address.
+        bank_branch_name:
+          type: string
+          description: The name of the user's bank branch.
+        bank_country_code:
+          type: string
+          description: The country code where the bank is located.
+        ach_routing_number:
+          type: string
+          description: The ACH (Automated Clearing House) Routing Number.
+        id:
+          type: string
+          description: Unique identifier of this resource.
+        status:
+          type: string
+          description: Current status of bank account.
+        created_at:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601.
+        updated_at:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601.
+        funds_distribution:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Percentage (0–100) of the salary paid to this account. All of a contract’s accounts sum to 100.
+      required:
+      - id
+      - created_at
+      - updated_at
+      title: GpContractsContractIdBanksGetResponsesContentApplicationJsonSchemaDataItems
+    UpdateEmploymentTypeForAContract-v2026-07-07RequestForbiddenError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The caller is not authorized to act on this contract.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: UpdateEmploymentTypeForAContract-v2026-07-07RequestForbiddenError
+    GetPayrollActivations-v2026-10-12RequestUnauthorizedError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Access denied due to missing or invalid credentials.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: GetPayrollActivations-v2026-10-12RequestUnauthorizedError
+    GpContractsContractIdEmploymentTypePatchResponsesContentApplicationJsonSchemaDataEmploymentType:
+      type: string
+      enum:
+      - EMPLOYEE_FT
+      - EMPLOYEE_PT
+      - ON_LEAVE
+      description: The updated employment type.
+      title: GpContractsContractIdEmploymentTypePatchResponsesContentApplicationJsonSchemaDataEmploymentType
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ListPayrollGroups-v2026-09-08RequestNotFoundError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Legal entity not found.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ListPayrollGroups-v2026-09-08RequestNotFoundError
+    Global_Payroll_retrieveGpWorkerCreationSchema-v2026-10-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Fields accepted by POST /rest/gp/workers. A field absent from the list is not accepted for the given country.
+      required:
+      - data
+      title: Global Payroll_retrieveGpWorkerCreationSchema-v2026-10-01_Response_200
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsType:
+      type: string
+      enum:
+      - string
+      - number
+      - boolean
+      - ''
+      description: 'Use this value to determine the data type expected when submitting field values. Mapped from the raw input type: ''date'', ''text'', ''select'', ''textarea'', ''tel'', ''phone'', and ''string'' map to "string"; ''number'' maps to "number"; ''checkbox'' maps to "boolean". An empty string indicates an unrecognized input type.'
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsType
+    GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation.
+      title: GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaErrorsItems
+    GpWorkersPostResponsesContentApplicationJsonSchemaDataEmployee:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Worker id. Use it with the other Global Payroll worker endpoints (`/rest/gp/workers/{worker_id}/...`).
+        email:
+          type: string
+          description: Employee's email address.
+        last_name:
+          type: string
+          description: Employee's last name.
+        first_name:
+          type: string
+          description: Employee's first name.
+        employee_number:
+          type:
+          - string
+          - 'null'
+          description: Employee's number.
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaDataEmployee
+    GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        url:
+          type: string
+          description: A pre-signed URL to download the payslip PDF.
+      required:
+      - url
+      title: GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaData
+    GpContractsContractIdBanksPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation.
+      title: GpContractsContractIdBanksPostResponsesContentApplicationJsonSchemaErrorsItems
+    GetPayrollActivations-v2026-10-12RequestForbiddenError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Access forbidden. You do not have permission to view this resource.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: GetPayrollActivations-v2026-10-12RequestForbiddenError
+    GpContractsContractIdBanksSettingsPatchRequestBodyContentApplicationJsonSchemaDataSettingsItems:
+      type: object
+      properties:
+        bank_id:
+          type: string
+          description: Identifier of the bank account (as returned by GET /banks).
+        funds_distribution:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Percentage (0–100) of the salary paid to this account.
+      required:
+      - bank_id
+      - funds_distribution
+      title: GpContractsContractIdBanksSettingsPatchRequestBodyContentApplicationJsonSchemaDataSettingsItems
+    ListPayrollMigrationImports-v2026-09-15RequestNotFoundError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Legal entity not found.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ListPayrollMigrationImports-v2026-09-15RequestNotFoundError
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf3Op:
+      type: string
+      enum:
+      - eq
+      - ne
+      - gt
+      - gte
+      - lt
+      - lte
+      - contains
+      description: Use this operator to evaluate the dependency condition against the referenced field's submitted value.
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf3Op
+    AddGpContractBankAccount-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: AddGpContractBankAccount-v2026-09-17RequestBadRequestError
+    RetrieveGpWorkerCreationSchema-v2026-10-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveGpWorkerCreationSchema-v2026-10-01RequestForbiddenError
+    SubmitPayrollMigrationImport-v2026-09-14RequestForbiddenError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The caller is not authorized to act on this legal entity.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: SubmitPayrollMigrationImport-v2026-09-14RequestForbiddenError
+    GpWorkersPostResponsesContentApplicationJsonSchemaDataCompensationDetails:
+      type: object
+      properties:
+        scale:
+          type: string
+          description: Scale at which the salary is paid.
+        salary:
+          type: number
+          format: double
+          description: Gross annual/month salary.
+        currency:
+          type: string
+          description: Currency of gross annual/month salary.
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaDataCompensationDetails
+    GpContractsContractIdBanksSettingsPatchResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the bank account.
+        funds_distribution:
+          type: number
+          format: double
+          description: Percentage (0–100) of the salary paid to this account.
+      required:
+      - id
+      - funds_distribution
+      title: GpContractsContractIdBanksSettingsPatchResponsesContentApplicationJsonSchemaDataItems
+    Global_Payroll_getContractAdditionalInfo-v2026-09-14_Response_200:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            description: Any type
+      required:
+      - data
+      title: Global Payroll_getContractAdditionalInfo-v2026-09-14_Response_200
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataType'
+          description: What kind of ingestion this is. Year-to-date payroll history is the only kind today.
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataFilesItems'
+          description: The files attached to the import.
+        status:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: The state of the import. IN_PROGRESS holds files that have not been submitted, and is what attaching files leaves behind - including on an import that had already been submitted, which reopens it. SUBMITTED once handed to Deel for review. DRAFT is an import started with no files yet, which only happens in the Deel web app.
+        import_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the payroll migration import.
+        created_at:
+          type: string
+          format: date-time
+          description: When the import was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: When the import last changed.
+        submitted_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the import was submitted for review, or null when it is not SUBMITTED.
+        legal_entity_id:
+          type: string
+          format: uuid
+          description: The legal entity the import belongs to.
+      required:
+      - type
+      - files
+      - status
+      - import_id
+      - created_at
+      - updated_at
+      - submitted_at
+      - legal_entity_id
+      description: The payroll migration import.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaData
+    GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems:
+      type: object
+      properties:
+        field:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Field this one depends on.
+        equals:
+          type: array
+          items:
+            description: Any type
+          description: Values of the referenced field that trigger the condition.
+      required:
+      - field
+      title: GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems
+    GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties:
+        worker_id:
+          type:
+          - string
+          - 'null'
+          description: Id of the existing worker the request conflicts with.
+        contract_id:
+          type:
+          - string
+          - 'null'
+          description: Id of the existing contract the request conflicts with.
+        allowed_currencies:
+          type: array
+          items:
+            type: string
+          description: Currencies the legal entity may pay in, when the requested currency is not allowed.
+      description: Extra machine-readable context. Conflict errors carry the worker_id and contract_id of the existing record; currency_not_allowed carries allowed_currencies.
+      title: GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    GpContractsContractIdEndDatePatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The new contract end date (YYYY-MM-DD), or null to make the contract open-ended.
+        effective_date:
+          type: string
+          format: date
+          description: The date from which the new end date applies (YYYY-MM-DD).
+      required:
+      - end_date
+      - effective_date
+      description: End date change details, including the effective date.
+      title: GpContractsContractIdEndDatePatchRequestBodyContentApplicationJsonSchemaData
+    GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Machine-readable error code.
+        field:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Path of the request field the error refers to, when the error is caused by a single field.
+        details:
+          $ref: '#/components/schemas/GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          description: Extra machine-readable context. Conflict errors carry the worker_id and contract_id of the existing record; currency_not_allowed carries allowed_currencies.
+        message:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaErrorsItems
+    GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItemsType:
+      type: string
+      enum:
+      - string
+      - number
+      - boolean
+      - object
+      - array
+      description: Transport type of the field.
+      title: GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItemsType
+    GpContractsContractIdEmploymentTypePatchRequestBodyContentApplicationJsonSchemaDataEmploymentType:
+      type: string
+      enum:
+      - EMPLOYEE_FT
+      - EMPLOYEE_PT
+      - ON_LEAVE
+      description: 'The new employment type: EMPLOYEE_FT (full-time), EMPLOYEE_PT (part-time), or ON_LEAVE (on leave).'
+      title: GpContractsContractIdEmploymentTypePatchRequestBodyContentApplicationJsonSchemaDataEmploymentType
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - DRAFT
+      - IN_PROGRESS
+      - SUBMITTED
+      description: The state of the import. IN_PROGRESS holds files that have not been submitted, and is what attaching files leaves behind - including on an import that had already been submitted, which reopens it. SUBMITTED once handed to Deel for review. DRAFT is an import started with no files yet, which only happens in the Deel web app.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataStatus
+    ListPayrollMigrationImports-v2026-09-15RequestForbiddenError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The caller is not authorized to act on this legal entity.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ListPayrollMigrationImports-v2026-09-15RequestForbiddenError
+    GpWorkersPostResponsesContentApplicationJsonSchemaDataEmploymentHolidays:
+      type: object
+      properties:
+        allowance:
+          type: number
+          format: double
+          description: Number of holidays.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601.
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaDataEmploymentHolidays
+    GetPayrollMigrationImport-v2026-09-15RequestNotFoundError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Payroll migration import not found.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: GetPayrollMigrationImport-v2026-09-15RequestNotFoundError
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - YTD_HISTORICAL_INGESTION
+      description: What kind of ingestion this is. Year-to-date payroll history is the only kind today.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataType
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      - $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue3'
+      - $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue4'
+      - type: array
+        items:
+          type: string
+      description: 'Use this value to evaluate the dependency condition. When the value is a primitive (string, number, or boolean), the condition is satisfied when the referenced field equals this value. When the value is an array, the condition is satisfied when the referenced field equals any one of its entries. When the value is an object, apply the operator in ''op'': ''eq'' (equals), ''ne'' (not equals), ''gt'' (greater than), ''gte'' (greater than or equal), ''lt'' (less than), ''lte'' (less than or equal), ''contains'' (field value contains the specified substring) each compare against ''value'', while ''notnull'' takes no operand and is satisfied when the referenced field holds any non-empty value.'
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue
+    GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties:
+        worker_id:
+          type:
+          - string
+          - 'null'
+          description: Id of the existing worker the request conflicts with.
+        contract_id:
+          type:
+          - string
+          - 'null'
+          description: Id of the existing contract the request conflicts with.
+        allowed_currencies:
+          type: array
+          items:
+            type: string
+          description: Currencies the legal entity may pay in, when the requested currency is not allowed.
+      description: Extra machine-readable context. Conflict errors carry the worker_id and contract_id of the existing record; currency_not_allowed carries allowed_currencies.
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataType'
+          description: What kind of ingestion this is. Year-to-date payroll history is the only kind today.
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataFilesItems'
+          description: The files attached to the import.
+        status:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: The state of the import. IN_PROGRESS holds files that have not been submitted, and is what attaching files leaves behind - including on an import that had already been submitted, which reopens it. SUBMITTED once handed to Deel for review. DRAFT is an import started with no files yet, which only happens in the Deel web app.
+        import_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the payroll migration import.
+        created_at:
+          type: string
+          format: date-time
+          description: When the import was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: When the import last changed.
+        submitted_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the import was submitted for review, or null when it is not SUBMITTED.
+        legal_entity_id:
+          type: string
+          format: uuid
+          description: The legal entity the import belongs to.
+      required:
+      - type
+      - files
+      - status
+      - import_id
+      - created_at
+      - updated_at
+      - submitted_at
+      - legal_entity_id
+      description: The payroll migration import.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaData
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    GpContractsContractIdBanksGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation.
+      title: GpContractsContractIdBanksGetResponsesContentApplicationJsonSchemaErrorsItems
+    GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The unique key representing the field.
+        type:
+          type: string
+          description: The type of the field, such as 'Text' or 'Dropdown'.
+        label:
+          type: string
+          description: The label or display name for this field.
+        is_required:
+          type: boolean
+          description: Indicates whether the field is required.
+        validations:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItems'
+          description: An array of validation rules applied to the field.
+        values_allowed:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValuesAllowedItems'
+          description: An array of allowed values for the field (e.g., for dropdown fields).
+      required:
+      - key
+      - is_required
+      title: GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItems
+    ImportPayrollMigrationFiles-v2026-09-14RequestBadRequestError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostResponsesContentApplicationJsonSchemaData'
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: One or more files could not be claimed - check that each upload finished its security scan.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ImportPayrollMigrationFiles-v2026-09-14RequestBadRequestError
+    GpWorkersPostRequestBodyContentApplicationJsonSchemaDataPto:
+      type: object
+      properties:
+        start_date:
+          type: string
+          format: date
+          minLength: 10
+          maxLength: 10
+          description: Date paid time off starts accruing, in YYYY-MM-DD format.
+        yearly_allowance:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of paid time off days granted per year.
+      description: Paid time off settings for the worker.
+      title: GpWorkersPostRequestBodyContentApplicationJsonSchemaDataPto
+    Global_Payroll_getPayrollMigrationImport-v2026-09-15_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaData'
+          description: The payroll migration import.
+      required:
+      - data
+      title: Global Payroll_getPayrollMigrationImport-v2026-09-15_Response_200
+    GpContractsContractIdEndDatePatchResponsesContentApplicationJsonSchemaDataContractTerm:
+      type: string
+      enum:
+      - DEFINITE
+      - INDEFINITE
+      description: 'The contract term derived from the end date: DEFINITE when an end date is set, INDEFINITE when it is null.'
+      title: GpContractsContractIdEndDatePatchResponsesContentApplicationJsonSchemaDataContractTerm
+    GpContractsContractIdBanksBankIdPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation.
+      title: GpContractsContractIdBanksBankIdPatchResponsesContentApplicationJsonSchemaErrorsItems
+    GetPayrollMigrationImport-v2026-09-15RequestUnauthorizedError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The request carries no caller identity the gateway could resolve.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: GetPayrollMigrationImport-v2026-09-15RequestUnauthorizedError
+    CreateGpWorker-v2026-10-01RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateGpWorker-v2026-10-01RequestConflictError
+    GpWorkersPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: GpWorkersPostParametersXBeta
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaPagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 50
+          description: The page size that was applied - the requested limit, or its default when none was sent.
+        has_more:
+          type: boolean
+          description: Whether a further page of imports exists.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: The cursor to pass to fetch the next page, or null when this is the last one.
+      required:
+      - limit
+      - has_more
+      - next_cursor
+      description: Pagination metadata for the page of imports returned.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaPagination
+    Global_Payroll_submitPayrollMigrationImport-v2026-09-14_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaData'
+          description: The payroll migration import.
+      required:
+      - data
+      title: Global Payroll_submitPayrollMigrationImport-v2026-09-14_Response_200
+    Global_Payroll_updateEmploymentTypeForAContract-v2026-07-07_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpContractsContractIdEmploymentTypePatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Global Payroll_updateEmploymentTypeForAContract-v2026-07-07_Response_200
+    CreateGpWorker-v2026-10-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateGpWorker-v2026-10-01RequestUnauthorizedError
+    GpWorkersPostRequestBodyContentApplicationJsonSchemaDataPersonalInfo:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 255
+          description: Personal email address of the worker. It identifies the worker within your organization.
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Last name of the worker.
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: First name of the worker.
+        work_email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 255
+          description: Work email address of the worker.
+        nationality:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Nationality of the worker as an ISO 3166-1 alpha-2 country code.
+        date_of_birth:
+          type: string
+          format: date
+          minLength: 10
+          maxLength: 10
+          description: Date of birth of the worker, in YYYY-MM-DD format.
+      required:
+      - email
+      - last_name
+      - first_name
+      description: Personal details of the worker.
+      title: GpWorkersPostRequestBodyContentApplicationJsonSchemaDataPersonalInfo
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataFilesItems:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataFilesItemsSource'
+          description: 'Which surface the file arrived through: EXTERNAL for this API, INTERNAL for the Deel web app. An import can hold both when a client and a partner have each added files to it.'
+        file_id:
+          type: string
+          description: The identifier of the file in the Deel file service.
+        file_name:
+          type:
+          - string
+          - 'null'
+          description: The name displayed for the file in Deel, when one is known.
+        file_size:
+          type:
+          - integer
+          - 'null'
+          minimum: 1
+          maximum: 10485760
+          description: The size of the file in bytes, when one is known.
+        mime_type:
+          type:
+          - string
+          - 'null'
+          description: The media type of the file, when one is known.
+        uploaded_at:
+          type: string
+          format: date-time
+          description: When the file was uploaded to the Deel file service.
+      required:
+      - source
+      - file_id
+      - file_name
+      - file_size
+      - mime_type
+      - uploaded_at
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataFilesItems
+    ImportPayrollMigrationFiles-v2026-09-14RequestUnauthorizedError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The request carries no caller identity the gateway could resolve.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ImportPayrollMigrationFiles-v2026-09-14RequestUnauthorizedError
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostRequestBodyContentApplicationJsonSchemaDataFilesItems:
+      type: object
+      properties:
+        file_id:
+          type: string
+          pattern: ^[A-Za-z0-9_-]+$
+          minLength: 1
+          maxLength: 64
+          description: The identifier the Deel file service returned for the uploaded file.
+        one_time_secret:
+          type: string
+          pattern: ^[\u0021-\u007e]+$
+          minLength: 1
+          maxLength: 255
+          description: The single-use secret the Deel file service returned alongside the file id.
+      required:
+      - file_id
+      - one_time_secret
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostRequestBodyContentApplicationJsonSchemaDataFilesItems
+    GpContractsContractIdBanksBankIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the modified bank account.
+        status:
+          type: string
+          description: The status of the modified bank account.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the bank account was created, in ISO-8601 format.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp of the last update to the bank account, in ISO-8601 format.
+      required:
+      - id
+      - status
+      - created_at
+      - updated_at
+      title: GpContractsContractIdBanksBankIdPatchResponsesContentApplicationJsonSchemaData
+    GpWorkersPostRequestBodyContentApplicationJsonSchemaDataCompensation:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GpWorkersPostRequestBodyContentApplicationJsonSchemaDataCompensationType'
+          default: SALARIED
+          description: Whether the worker is salaried or paid hourly. Defaults to SALARIED.
+        scale:
+          $ref: '#/components/schemas/GpWorkersPostRequestBodyContentApplicationJsonSchemaDataCompensationScale'
+          description: Period the amount is paid for.
+        amount:
+          type: number
+          format: double
+          minimum: 0
+          description: Base compensation amount per scale period.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: ISO 4217 currency code. It must be one of the currencies allowed for the legal entity country.
+      required:
+      - scale
+      - amount
+      - currency
+      description: Base compensation of the worker.
+      title: GpWorkersPostRequestBodyContentApplicationJsonSchemaDataCompensation
+    SetGpContractBankSettings-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksSettingsPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: SetGpContractBankSettings-v2026-09-17RequestBadRequestError
+    ImportPayrollMigrationFiles-v2026-09-14RequestInternalServerError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Internal server error.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ImportPayrollMigrationFiles-v2026-09-14RequestInternalServerError
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue3:
+      type: object
+      properties:
+        op:
+          $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValueOneOf3Op'
+          description: Use this operator to evaluate the dependency condition against the referenced field's submitted value.
+        value:
+          description: Use this value as the operand for the dependency condition evaluation.
+      required:
+      - op
+      - value
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItemsValue3
+    ImportPayrollMigrationFiles-v2026-09-14RequestNotFoundError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Legal entity not found.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ImportPayrollMigrationFiles-v2026-09-14RequestNotFoundError
+    ImportPayrollMigrationFiles-v2026-09-14RequestForbiddenError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The caller is not authorized to act on this legal entity.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: ImportPayrollMigrationFiles-v2026-09-14RequestForbiddenError
+    Global_Payroll_createGpWorker-v2026-10-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Global Payroll_createGpWorker-v2026-10-01_Response_201
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - YTD_HISTORICAL_INGESTION
+      description: What kind of ingestion this is. Year-to-date payroll history is the only kind today.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdSubmitPostResponsesContentApplicationJsonSchemaDataType
+    GpWorkersPostRequestBodyContentApplicationJsonSchemaDataCompensationType:
+      type: string
+      enum:
+      - SALARIED
+      - HOURLY
+      default: SALARIED
+      description: Whether the worker is salaried or paid hourly. Defaults to SALARIED.
+      title: GpWorkersPostRequestBodyContentApplicationJsonSchemaDataCompensationType
+    Global_Payroll_updateEndDateForAContract-v2026-10-12_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpContractsContractIdEndDatePatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Global Payroll_updateEndDateForAContract-v2026-10-12_Response_200
+    RetrieveGpWorkerCreationSchema-v2026-10-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveGpWorkerCreationSchema-v2026-10-01RequestInternalServerError
+    RetrieveGpWorkerCreationSchema-v2026-10-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveGpWorkerCreationSchema-v2026-10-01RequestUnauthorizedError
+    GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsType:
+      type: string
+      enum:
+      - MIN_LENGTH
+      - MAX_LENGTH
+      - REGEX
+      description: The type of validation applied to the field.
+      title: GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsType
+    GetPayrollActivations-v2026-10-12RequestInternalServerError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Internal server error.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: GetPayrollActivations-v2026-10-12RequestInternalServerError
+    Global_Payroll_importPayrollMigrationFiles-v2026-09-14_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostResponsesContentApplicationJsonSchemaData'
+          description: The payroll migration import.
+      required:
+      - data
+      title: Global Payroll_importPayrollMigrationFiles-v2026-09-14_Response_201
+    GetContractAdditionalInfo-v2026-09-14RequestForbiddenError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The caller is not authorized to access this contract.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: GetContractAdditionalInfo-v2026-09-14RequestForbiddenError
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        period:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataPeriod'
+          description: The period the legal entity's payroll data on the Deel side already covers.
+        imports:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaDataImportsItems'
+          description: The legal entity's payroll migration imports, newest first. Empty when it has none.
+      required:
+      - period
+      - imports
+      description: The legal entity's payroll migration imports and the payroll data Deel already holds.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaData
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestForbiddenError
+    GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItemsValidationItems:
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: Constraint name, e.g. pattern, max, length, format, not_allowed.
+        field:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Field this constraint is relative to, when the bound references another field.
+        value:
+          description: Constraint argument, when the constraint is a literal.
+        message:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Error message the create endpoint returns when the constraint fails.
+      required:
+      - type
+      title: GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItemsValidationItems
+    GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValuesAllowedItems:
+      type: object
+      properties:
+        label:
+          type: string
+          description: The display name of the allowed value.
+        value:
+          type: string
+          description: The value associated with the allowed option.
+      title: GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValuesAllowedItems
+    GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItems:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsType'
+          description: The type of validation applied to the field.
+        value:
+          $ref: '#/components/schemas/GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsValue'
+      title: GpContractsContractIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItems
+    Global_Payroll_setGpContractBankSettings-v2026-09-17_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksSettingsPatchResponsesContentApplicationJsonSchemaDataItems'
+          description: The resulting split per account after the update.
+      required:
+      - data
+      title: Global Payroll_setGpContractBankSettings-v2026-09-17_Response_200
+    Global_Payroll_listPayrollGroups-v2026-09-08_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItems'
+        pagination:
+          $ref: '#/components/schemas/PayrollGroupsGetResponsesContentApplicationJsonSchemaPagination'
+      required:
+      - data
+      - pagination
+      title: Global Payroll_listPayrollGroups-v2026-09-08_Response_200
+    GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: Method of the API
+        status:
+          type: number
+          format: double
+          description: Status of API response
+      description: Error request details
+      title: GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaRequest
+    RetrieveGpWorkerCreationSchema-v2026-10-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveGpWorkerCreationSchema-v2026-10-01RequestNotFoundError
+    Global_Payroll_getGpContractBankAccounts-v2026-09-17_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpContractsContractIdBanksGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: Global Payroll_getGpContractBankAccounts-v2026-09-17_Response_200
+    GpWorkersPostResponsesContentApplicationJsonSchemaDataEmployment:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Is it a full-time contract or a part-time contract?
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code of the state/province where this person will be employed.
+        country:
+          type: string
+          description: Country of employment.
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601.
+        holidays:
+          $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaDataEmploymentHolidays'
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601.
+        is_work_visa_required:
+          type: boolean
+          description: Do you require Deel to apply for a work visa for this person?
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaDataEmployment
+    DownloadAGpWorkerPayslip-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Error messages
+        request:
+          $ref: '#/components/schemas/GpWorkersIdPayslipsPayslipIdDownloadGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details
+      required:
+      - errors
+      title: DownloadAGpWorkerPayslip-v2026-01-01RequestBadRequestError
+    GpWorkersPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - new
+      - under_review
+      - waiting_for_employee_contract
+      - waiting_for_client_sign
+      - processing_payment
+      - waiting_for_contractor_sign
+      - waiting_for_eor_sign
+      - waiting_for_employee_sign
+      - awaiting_deposit_payment
+      - in_progress
+      - completed
+      - cancelled
+      - user_cancelled
+      - rejected
+      - waiting_for_client_payment
+      - onboarding
+      description: Status of a contract in Deel workflow.
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaDataStatus
+    SubmitPayrollMigrationImport-v2026-09-14RequestInternalServerError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: Internal server error.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: SubmitPayrollMigrationImport-v2026-09-14RequestInternalServerError
+    GpContractsContractIdBanksPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the newly added bank account.
+        status:
+          type: string
+          description: The status of the newly added bank account.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the bank account was created, in ISO-8601 format.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp of the last update to the bank account, in ISO-8601 format.
+        funds_distribution:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Percentage (0–100) of the salary paid to this account. A newly added account starts at 0 unless it is the only account; use PATCH /banks/settings to change the split.
+      required:
+      - id
+      - status
+      - created_at
+      - updated_at
+      title: GpContractsContractIdBanksPostResponsesContentApplicationJsonSchemaData
+    SubmitPayrollMigrationImport-v2026-09-14RequestConflictError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: This payroll migration import has already been submitted.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: SubmitPayrollMigrationImport-v2026-09-14RequestConflictError
+    GpWorkersPostResponsesContentApplicationJsonSchemaDataClient:
+      type: object
+      properties:
+        legal_entity:
+          $ref: '#/components/schemas/GpWorkersPostResponsesContentApplicationJsonSchemaDataClientLegalEntity'
+      title: GpWorkersPostResponsesContentApplicationJsonSchemaDataClient
+    HrisWorkersWorkerIdBanksGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Bank account ID
+        iban:
+          type: string
+          description: International Bank Account Number
+        status:
+          type: string
+          description: Account status
+        bank_name:
+          type: string
+          description: Bank name
+        full_name:
+          type: string
+          description: Account holder name
+        account_number:
+          type: string
+          description: Bank account number
+      title: HrisWorkersWorkerIdBanksGetResponsesContentApplicationJsonSchemaDataItems
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - DRAFT
+      - IN_PROGRESS
+      - SUBMITTED
+      description: The state of the import. IN_PROGRESS holds files that have not been submitted, and is what attaching files leaves behind - including on an import that had already been submitted, which reopens it. SUBMITTED once handed to Deel for review. DRAFT is an import started with no files yet, which only happens in the Deel web app.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsImportIdGetResponsesContentApplicationJsonSchemaDataStatus
+    SubmitPayrollMigrationImport-v2026-09-14RequestUnauthorizedError:
+      type: object
+      properties:
+        code:
+          type: string
+        data:
+          description: Any type
+        status:
+          type: number
+          format: double
+        defined:
+          type: boolean
+        message:
+          type: string
+          default: The request carries no caller identity the gateway could resolve.
+      required:
+      - code
+      - status
+      - defined
+      - message
+      title: SubmitPayrollMigrationImport-v2026-09-14RequestUnauthorizedError
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Use this message to detect rate limiting. Implement exponential backoff before retrying.
+      required:
+      - message
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems
+    GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostRequestBodyContentApplicationJsonSchemaDataFilesItems'
+          description: The files to attach to the import, between 1 and 50 per request.
+      required:
+      - files
+      description: The payroll migration files to attach to the import.
+      title: GpLegalEntitiesLegalEntityIdPayrollMigrationImportsPostRequestBodyContentApplicationJsonSchemaData
+    GpWorkersCreationSchemaGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: GpWorkersCreationSchemaGetParametersXBeta
+    GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        key:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Field to send, exactly as the create endpoint accepts it. Dotted for nested objects.
+        type:
+          $ref: '#/components/schemas/GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItemsType'
+          description: Transport type of the field.
+        default:
+          description: Value applied when the field is omitted.
+        validation:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItemsValidationItems'
+          description: Constraints applied to the value.
+        is_nullable:
+          type: boolean
+          description: Whether null is an accepted value.
+        is_required:
+          type: boolean
+          description: Whether the field must be provided for the given country, legal entity and payroll group.
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItemsDependenciesItems'
+          description: Other fields this field is conditional on.
+        values_allowed:
+          type: array
+          items:
+            description: Any type
+          description: Permitted values, when the field is restricted to a fixed set. For contract_state these are the provinces of the country.
+      required:
+      - key
+      - type
+      - is_required
+      title: GpWorkersCreationSchemaGetResponsesContentApplicationJsonSchemaDataItems
+    Global_Payroll_listPayrollMigrationImports-v2026-09-15_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaData'
+          description: The legal entity's payroll migration imports and the payroll data Deel already holds.
+        pagination:
+          $ref: '#/components/schemas/GpLegalEntitiesLegalEntityIdPayrollMigrationImportsGetResponsesContentApplicationJsonSchemaPagination'
+          description: Pagination metadata for the page of imports returned.
+      required:
+      - data
+      - pagination
+      title: Global Payroll_listPayrollMigrationImports-v2026-09-15_Response_200
+    PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItemsCalendarsItemsValues:
+      type: object
+      properties:
+        value:
+          type: string
+          description: ISO-8601 date-time value for this calendar key.
+      required:
+      - value
+      title: PayrollGroupsGetResponsesContentApplicationJsonSchemaDataItemsCalendarsItemsValues
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsValidationItems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Use this value to determine which validation strategy to apply. "REGEX" indicates the 'value' field contains a regular expression pattern. Any other value indicates a custom validation type identified by its uppercase name.
+        value:
+          type: string
+          description: Use this value as the validation parameter. For REGEX type, contains the regular expression pattern to validate the field input against. Absent when the validation type is a custom type that does not require a parameter.
+        error_message:
+          type: string
+          description: Use this message to display to the user when the field value fails validation. Defaults to 'Review the value entered' when no custom message is configured.
+      required:
+      - type
+      - error_message
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsValidationItems
+    FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsUiGuide:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Use this value as the primary English-language label when rendering the field in the UI.
+        order:
+          type: integer
+          minimum: 1
+          description: Use this value to determine the display position of the field in the form. Starts at 1 and reflects the position in the response array, which is pre-sorted by the configured display order.
+        field_type:
+          type: string
+          description: Use this value to select the appropriate UI input component. Represents the raw input type from the field configuration. Known values include 'text', 'date', 'select', 'textarea', 'tel', 'phone', 'number', 'checkbox', and 'string'. Additional values may exist.
+        description:
+          type: string
+          description: Use this value to display supplementary context about the field below or beside the input. HTML tags are stripped. Returns an empty string when no description is configured.
+        helper_text:
+          type: string
+          description: Use this value to display footnote or instructional text near the field. HTML tags are stripped. Returns an empty string when no helper text is configured.
+        local_label:
+          type: string
+          description: Use this value as the localized field label when rendering the form in the worker's local language.
+      required:
+      - label
+      - order
+      - field_type
+      - description
+      - helper_text
+      - local_label
+      description: Use this object to control how the field is rendered in the UI. Contains labels, input type, display order, and supplementary text.
+      title: FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataItemsUiGuide
+    Global_Payroll_addGpContractBankAccount-v2026-09-17_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpContractsContractIdBanksPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Global Payroll_addGpContractBankAccount-v2026-09-17_Response_201
+    Global_Payroll_getPayrollActivations-v2026-10-12_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PayrollActivationsGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Global Payroll_getPayrollActivations-v2026-10-12_Response_200
+    RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormsGpWorkerAdditionalFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAdditionalInformationFieldsForGpWorkersByCountry-v2026-01-01RequestTooManyRequestsError
+    GpWorkersPostRequestBodyContentApplicationJsonSchemaDataCompensationScale:
+      type: string
+      enum:
+      - ANNUALLY
+      - MONTHLY
+      - BI_MONTHLY
+      - TWO_WEEKLY
+      - WEEKLY
+      - DAILY
+      - HOURLY
+      description: Period the amount is paid for.
+      title: GpWorkersPostRequestBodyContentApplicationJsonSchemaDataCompensationScale
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

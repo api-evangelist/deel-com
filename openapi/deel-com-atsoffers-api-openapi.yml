@@ -1,0 +1,518 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Offers API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsOffers
+paths:
+  /ats/offers:
+    get:
+      operationId: atsOffers_retrieveAListOfAtsOffers-v2026-01-01
+      summary: Retrieve a list of ATS offers
+      description: 'Returns all offers associated with the organization, including worker type and offer status, to support pre-onboarding and contract creation workflows.
+
+
+        **Token scopes**: `ats:read`, `worker:read`'
+      tags:
+      - atsOffers
+      parameters:
+      - name: application_id
+        in: query
+        description: Filter offers by a specific application ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: job_ids
+        in: query
+        description: Filter offers by the job IDs of their applications.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: offer_status
+        in: query
+        description: Filter offers by status. Offers still awaiting an outcome are SENT (with the candidate), WAITING_FOR_APPROVAL and APPROVED (internal), CREATED (not yet sent); terminal statuses are ACCEPTED, REJECTED and EXPIRED.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsOffersGetParametersOfferStatusSchemaItems'
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-offers_retrieveAListOfAtsOffers-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOffers-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOffers-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOffers-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsEmail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the email
+        body:
+          type: string
+          description: Email body
+        subject:
+          type: string
+          description: Email subject
+        sender_name:
+          type: string
+          description: Sender name
+        recipient_cc:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Carbon-copy recipient email address
+        recipient_to:
+          type: string
+          format: email
+          description: Primary recipient email address
+        recipient_bcc:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Blind-carbon-copy recipient email address
+      required:
+      - id
+      - body
+      - subject
+      - sender_name
+      - recipient_to
+      description: Email details
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsEmail
+    AtsOffersGetParametersOfferStatusSchemaItems:
+      type: string
+      enum:
+      - CREATED
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - NOT_APPROVED
+      - SENT
+      - EXPIRED
+      - ACCEPTED
+      - REJECTED
+      title: AtsOffersGetParametersOfferStatusSchemaItems
+    AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsWorkerType:
+      type: string
+      enum:
+      - CONTRACTOR_FIXED
+      - CONTRACTOR_PAY_AS_YOU_GO
+      - CONTRACTOR_MILESTONE
+      - DIRECT_EMPLOYEE
+      - EOR_EMPLOYEE
+      - GLOBAL_PAYROLL_EMPLOYEE
+      - PEO_EMPLOYEE
+      - PWAC
+      - UNKNOWN
+      description: Worker type
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsWorkerType
+    AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsCustomFieldsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the custom field
+        name:
+          type: string
+          description: Custom field name
+        type:
+          $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsCustomFieldsItemsType'
+          description: Type of custom field
+        required:
+          type: boolean
+          description: Whether the custom field is required
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description of the custom field
+      required:
+      - id
+      - name
+      - type
+      - required
+      description: Custom field attached to the offer
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsCustomFieldsItems
+    AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsApplication:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Application unique identifier
+        job:
+          $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsApplicationJob'
+          description: The job the application belongs to. The title repeats the offer's own job_title field.
+        candidate:
+          oneOf:
+          - $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsApplicationCandidate'
+          - type: 'null'
+          description: The candidate who received the offer. Null once the candidate has been deleted or anonymized.
+      required:
+      - id
+      - job
+      - candidate
+      description: 'The application this offer was made on, so an offer identifies its own candidate and job without a second lookup. Always present: an offer whose application the caller cannot see is not returned at all.'
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsApplication
+    AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsApplicationJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job unique identifier
+        title:
+          type: string
+          description: Job title
+      required:
+      - id
+      - title
+      description: The job the application belongs to. The title repeats the offer's own job_title field.
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsApplicationJob
+    AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsOfferStatus:
+      type: string
+      enum:
+      - CREATED
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - NOT_APPROVED
+      - SENT
+      - EXPIRED
+      - ACCEPTED
+      - REJECTED
+      description: Offer status
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsOfferStatus
+    AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsApplicationCandidate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Candidate unique identifier
+        last_name:
+          type: string
+          description: Candidate last name
+        first_name:
+          type: string
+          description: Candidate first name
+      required:
+      - id
+      - last_name
+      - first_name
+      description: The candidate who received the offer. Null once the candidate has been deleted or anonymized.
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsApplicationCandidate
+    AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsCustomFieldsItemsType:
+      type: string
+      enum:
+      - TEXT
+      - PERCENTAGE
+      - LIST
+      - MULTISELECT
+      - DATE
+      - NUMBER
+      - CURRENCY
+      - HYPERLINK
+      description: Type of custom field
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsCustomFieldsItemsType
+    ListOffers-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: ListOffers-v2026-01-01RequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ats-offers_retrieveAListOfAtsOffers-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of offers.
+        has_more:
+          type: boolean
+          description: Indicates if there are more items to fetch.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page of results
+        total_count:
+          type: number
+          format: double
+          description: Total number of offers
+      title: ats-offers_retrieveAListOfAtsOffers-v2026-01-01_Response_200
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ListOffers-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: ListOffers-v2026-01-01RequestInternalServerError
+    AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsCompensationPeriodSlug:
+      type: string
+      enum:
+      - annually
+      - monthly
+      - semimonthly
+      - biweekly
+      - weekly
+      - daily
+      - hourly
+      description: Compensation period
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsCompensationPeriodSlug
+    AtsOffersGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier
+        email:
+          oneOf:
+          - $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsEmail'
+          - type: 'null'
+          description: Email details
+        sent_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the offer reached the candidate, through Deel or another channel; null until it has been sent
+        job_title:
+          type: string
+          description: Job title
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the offer was created
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date when the sent offer expires if the candidate has not responded
+        replied_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the candidate replied (accepted or rejected) to the offer
+        start_date:
+          type: string
+          format: date-time
+          description: Start date
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the offer was last updated
+        application:
+          $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsApplication'
+          description: 'The application this offer was made on, so an offer identifies its own candidate and job without a second lookup. Always present: an offer whose application the caller cannot see is not returned at all.'
+        worker_type:
+          $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsWorkerType'
+          description: Worker type
+        country_code:
+          type: string
+          format: country-code
+          description: Country code
+        offer_status:
+          $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsOfferStatus'
+          description: Offer status
+        attachment_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Attachment identifier
+        custom_fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsCustomFieldsItems'
+          description: Custom fields attached to the offer
+        approval_rule_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Approval rule identifier
+        additional_details:
+          type:
+          - string
+          - 'null'
+          description: Additional details about the offer
+        approval_request_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Approval request identifier
+        compensation_amount:
+          type: number
+          format: double
+          description: Compensation amount
+        rejection_reason_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Rejection reason identifier
+        compensation_currency:
+          type: string
+          description: Compensation currency
+        compensation_period_slug:
+          $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaDataItemsCompensationPeriodSlug'
+          description: Compensation period
+        offer_letter_template_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Offer letter template identifier
+        application_interview_plan_stage_id:
+          type: string
+          format: uuid
+          description: Application interview plan stage identifier
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaDataItems
+    AtsOffersGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsOffersGetResponsesContentApplicationJsonSchemaErrorsItems
+    ListOffers-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsOffersGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: ListOffers-v2026-01-01RequestForbiddenError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

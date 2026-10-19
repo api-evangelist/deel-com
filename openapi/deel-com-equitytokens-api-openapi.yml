@@ -1,0 +1,3591 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Equity Tokens API
+  version: 1.0.0
+  description: API endpoints related to Equity Tokens.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: equityTokens
+  description: API endpoints related to Equity Tokens.
+paths:
+  /equities-tokens/tax-events:
+    post:
+      operationId: equityTokens_createEquityOrTokenTaxEvent-v2026-01-01
+      summary: Create equity or token tax event
+      description: 'Submits an equity or token tax event for an EOR worker enrolled in Equity & Token Services.
+
+
+        **Token scopes**: `equities:write`'
+      tags:
+      - equityTokens
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_Tokens_createEquityOrTokenTaxEvent-v2026-01-01_Response_201'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateEquityOrTokenTaxEvent-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /equity-awards:
+    get:
+      operationId: equityTokens_listEquityAwards-v2026-09-09
+      summary: List equity awards granted
+      description: 'Retrieves the equity awards an organization has granted, as ingested from Shareworks, in ascending employee_number order. Use it to reconcile what was granted to whom, with the grant quantity, price and fair market value at the grant date. This dataset identifies a grant by name and date rather than by grant number, so several records can share one employee and grant name; occurrence_index separates them. Requires the `equities.view` permission at the organization level.
+
+
+        **Token scopes**: `equities:read`'
+      tags:
+      - equityTokens
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of records to return in this page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      - name: cursor
+        in: query
+        description: Opaque pagination cursor returned as next_cursor by a previous response. Omit to fetch the first page.
+        required: false
+        schema:
+          type: string
+          maxLength: 2048
+      - name: employee_number
+        in: query
+        description: Only return records for this exact Shareworks employee number.
+        required: false
+        schema:
+          type: string
+          maxLength: 64
+      - name: grant_date_from
+        in: query
+        description: Only return records with a grant_date on or after this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: grant_date_to
+        in: query
+        description: Only return records with a grant_date on or before this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: List equity awards granted returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_Tokens_listEquityAwards-v2026-09-09_Response_200'
+        '400':
+          description: Bad request — invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityAwards-v2026-09-09RequestBadRequestError'
+        '401':
+          description: Unauthorized — missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityAwards-v2026-09-09RequestUnauthorizedError'
+        '403':
+          description: Forbidden — caller lacks the equities.view permission, or the caller's organization is not permitted to access this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityAwards-v2026-09-09RequestForbiddenError'
+        '404':
+          description: Not found — the requested resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityAwards-v2026-09-09RequestNotFoundError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityAwards-v2026-09-09RequestInternalServerError'
+      security:
+      - deelToken: []
+  /equity-amortizations:
+    get:
+      operationId: equityTokens_listEquityAmortizations-v2026-09-09
+      summary: List equity grant expense amortization records
+      description: 'Retrieves the period-by-period amortization of share-based compensation expense per equity grant in an organization, as ingested from Shareworks. Use it to build an expense recognition schedule, or to forecast the expense still to be accrued on outstanding grants. Each record reflects the most recently ingested reporting period; earlier periods are overwritten, so this is not a period history. Requires the `equities.view` permission at the organization level.
+
+
+        **Token scopes**: `equities:read`'
+      tags:
+      - equityTokens
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of records to return in this page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      - name: cursor
+        in: query
+        description: Opaque pagination cursor returned as next_cursor by a previous response. Omit to fetch the first page.
+        required: false
+        schema:
+          type: string
+          maxLength: 2048
+      - name: employee_number
+        in: query
+        description: Only return records for this exact Shareworks employee number.
+        required: false
+        schema:
+          type: string
+          maxLength: 64
+      - name: employee_grant_number
+        in: query
+        description: Only return records for this exact Shareworks grant number.
+        required: false
+        schema:
+          type: string
+          maxLength: 100
+      - name: grant_date_from
+        in: query
+        description: Only return records with a grant_date on or after this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: grant_date_to
+        in: query
+        description: Only return records with a grant_date on or before this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: List equity grant expense amortization records returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_Tokens_listEquityAmortizations-v2026-09-09_Response_200'
+        '400':
+          description: Bad request — invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityAmortizations-v2026-09-09RequestBadRequestError'
+        '401':
+          description: Unauthorized — missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityAmortizations-v2026-09-09RequestUnauthorizedError'
+        '403':
+          description: Forbidden — caller lacks the equities.view permission, or the caller's organization is not permitted to access this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityAmortizations-v2026-09-09RequestForbiddenError'
+        '404':
+          description: Not found — the requested resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityAmortizations-v2026-09-09RequestNotFoundError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityAmortizations-v2026-09-09RequestInternalServerError'
+      security:
+      - deelToken: []
+  /equity-expenses:
+    get:
+      operationId: equityTokens_listEquityExpenses-v2026-09-09
+      summary: List equity grant total expense records
+      description: 'Retrieves the total share-based compensation expense recognised per equity grant in an organization, as ingested from Shareworks. Use it at period close to tie the equity expense in the ledger back to the individual grants that produced it. Each record reflects the most recently ingested reporting period; earlier periods are overwritten, so this is not a period history. Requires the `equities.view` permission at the organization level.
+
+
+        **Token scopes**: `equities:read`'
+      tags:
+      - equityTokens
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of records to return in this page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      - name: cursor
+        in: query
+        description: Opaque pagination cursor returned as next_cursor by a previous response. Omit to fetch the first page.
+        required: false
+        schema:
+          type: string
+          maxLength: 2048
+      - name: employee_number
+        in: query
+        description: Only return records for this exact Shareworks employee number.
+        required: false
+        schema:
+          type: string
+          maxLength: 64
+      - name: employee_grant_number
+        in: query
+        description: Only return records for this exact Shareworks grant number.
+        required: false
+        schema:
+          type: string
+          maxLength: 100
+      - name: grant_date_from
+        in: query
+        description: Only return records with a grant_date on or after this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: grant_date_to
+        in: query
+        description: Only return records with a grant_date on or before this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: List equity grant total expense records returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_Tokens_listEquityExpenses-v2026-09-09_Response_200'
+        '400':
+          description: Bad request — invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityExpenses-v2026-09-09RequestBadRequestError'
+        '401':
+          description: Unauthorized — missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityExpenses-v2026-09-09RequestUnauthorizedError'
+        '403':
+          description: Forbidden — caller lacks the equities.view permission, or the caller's organization is not permitted to access this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityExpenses-v2026-09-09RequestForbiddenError'
+        '404':
+          description: Not found — the requested resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityExpenses-v2026-09-09RequestNotFoundError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityExpenses-v2026-09-09RequestInternalServerError'
+      security:
+      - deelToken: []
+  /equity-valuations:
+    get:
+      operationId: equityTokens_listEquityValuations-v2026-09-09
+      summary: List equity grant valuations
+      description: 'Retrieves the expense valuation inputs for each equity grant in an organization, as ingested from Shareworks, in ascending employee_grant_number order. Use it to reproduce or audit a grant expense figure: it carries the valuation model, amortization method, fair value per share, forfeiture rate, and the volatility, expected life, risk-free rate and dividend yield assumptions behind them. Requires the `equities.view` permission at the organization level.
+
+
+        **Token scopes**: `equities:read`'
+      tags:
+      - equityTokens
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of records to return in this page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      - name: cursor
+        in: query
+        description: Opaque pagination cursor returned as next_cursor by a previous response. Omit to fetch the first page.
+        required: false
+        schema:
+          type: string
+          maxLength: 2048
+      - name: employee_grant_number
+        in: query
+        description: Only return records for this exact Shareworks grant number.
+        required: false
+        schema:
+          type: string
+          maxLength: 100
+      - name: grant_date_from
+        in: query
+        description: Only return records with a grant_date on or after this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: grant_date_to
+        in: query
+        description: Only return records with a grant_date on or before this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: List equity grant valuations returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_Tokens_listEquityValuations-v2026-09-09_Response_200'
+        '400':
+          description: Bad request — invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityValuations-v2026-09-09RequestBadRequestError'
+        '401':
+          description: Unauthorized — missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityValuations-v2026-09-09RequestUnauthorizedError'
+        '403':
+          description: Forbidden — caller lacks the equities.view permission, or the caller's organization is not permitted to access this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityValuations-v2026-09-09RequestForbiddenError'
+        '404':
+          description: Not found — the requested resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityValuations-v2026-09-09RequestNotFoundError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityValuations-v2026-09-09RequestInternalServerError'
+      security:
+      - deelToken: []
+  /equity-grants:
+    get:
+      operationId: equityTokens_listEquityGrantsWithTaxEvents-v2026-08-10
+      summary: List equity grants with tax events
+      description: 'Retrieves the equity grants for an organization, each including its vesting events and associated tax events. Requires the `equities.view` permission at the organization level.
+
+
+        **Token scopes**: `equities:read`'
+      tags:
+      - equityTokens
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of grants to return
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 100
+      - name: offset
+        in: query
+        description: Number of grants to skip before starting to return results
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      - name: search
+        in: query
+        description: Free-text search across grant/worker name and email
+        required: false
+        schema:
+          type: string
+          maxLength: 255
+      responses:
+        '200':
+          description: A paginated list of equity grants, each including its vesting events and associated tax events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_Tokens_listEquityGrantsWithTaxEvents-v2026-08-10_Response_200'
+        '400':
+          description: One or more query parameters are invalid. See the errors array for detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityGrantsWithTaxEvents-v2026-08-10RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: The token does not grant `equities.view` at the organization level.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityGrantsWithTaxEvents-v2026-08-10RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /equity-option-ledger:
+    get:
+      operationId: equityTokens_listEquityOptionLedgerEntries-v2026-09-09
+      summary: List equity option ledger entries
+      description: 'Retrieves the full option holder ledger for an organization, as ingested from Shareworks, in ascending employee_grant_number order. Use it as the per-grant system of record: it carries the vested, unvested, exercised, cancelled, expired and outstanding share counts for every grant, plus grant agreement and disqualification dates. Records carry direct identifiers, including a tax identifier and a home address. Requires the `equities.view` permission at the organization level.
+
+
+        **Token scopes**: `equities:read`'
+      tags:
+      - equityTokens
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of records to return in this page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      - name: cursor
+        in: query
+        description: Opaque pagination cursor returned as next_cursor by a previous response. Omit to fetch the first page.
+        required: false
+        schema:
+          type: string
+          maxLength: 2048
+      - name: employee_number
+        in: query
+        description: Only return records for this exact Shareworks employee number.
+        required: false
+        schema:
+          type: string
+          maxLength: 64
+      - name: employee_grant_number
+        in: query
+        description: Only return records for this exact Shareworks grant number.
+        required: false
+        schema:
+          type: string
+          maxLength: 100
+      - name: grant_date_from
+        in: query
+        description: Only return records with a grant_date on or after this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: grant_date_to
+        in: query
+        description: Only return records with a grant_date on or before this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: List equity option ledger entries returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_Tokens_listEquityOptionLedgerEntries-v2026-09-09_Response_200'
+        '400':
+          description: Bad request — invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityOptionLedgerEntries-v2026-09-09RequestBadRequestError'
+        '401':
+          description: Unauthorized — missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityOptionLedgerEntries-v2026-09-09RequestUnauthorizedError'
+        '403':
+          description: Forbidden — caller lacks the equities.view permission, or the caller's organization is not permitted to access this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityOptionLedgerEntries-v2026-09-09RequestForbiddenError'
+        '404':
+          description: Not found — the requested resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityOptionLedgerEntries-v2026-09-09RequestNotFoundError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityOptionLedgerEntries-v2026-09-09RequestInternalServerError'
+      security:
+      - deelToken: []
+  /equity-participants:
+    get:
+      operationId: equityTokens_listEquityParticipants-v2026-09-08
+      summary: List equity participants
+      description: 'Retrieves the people who hold equity in an organization, as ingested from Shareworks, in ascending employee_number order. Use it to reconcile equity participants against HRIS records, or to feed worker identity and residence data into equity tax calculations. Records carry direct identifiers, including a full Social Security Number where the source reports one. Requires the `equities.view` permission at the organization level.
+
+
+        **Token scopes**: `equities:read`'
+      tags:
+      - equityTokens
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of records to return in this page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      - name: cursor
+        in: query
+        description: Opaque pagination cursor returned as next_cursor by a previous response. Omit to fetch the first page.
+        required: false
+        schema:
+          type: string
+          maxLength: 2048
+      - name: employee_number
+        in: query
+        description: Only return records for this exact Shareworks employee number.
+        required: false
+        schema:
+          type: string
+          maxLength: 64
+      responses:
+        '200':
+          description: List equity participants returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_Tokens_listEquityParticipants-v2026-09-08_Response_200'
+        '400':
+          description: Bad request — invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityParticipants-v2026-09-08RequestBadRequestError'
+        '401':
+          description: Unauthorized — missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityParticipants-v2026-09-08RequestUnauthorizedError'
+        '403':
+          description: Forbidden — caller lacks the equities.view permission, or the caller's organization is not permitted to access this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityParticipants-v2026-09-08RequestForbiddenError'
+        '404':
+          description: Not found — the requested resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityParticipants-v2026-09-08RequestNotFoundError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityParticipants-v2026-09-08RequestInternalServerError'
+      security:
+      - deelToken: []
+  /equity-exercises:
+    get:
+      operationId: equityTokens_listEquityShareworksExercises-v2026-09-09
+      summary: List Shareworks equity exercises
+      description: 'Retrieves the equity exercises recorded for an organization, as ingested from Shareworks, in ascending exercise_date order. Use it to report realised option gains into payroll and tax withholding, or to reconcile exercise activity against a cap table. Each record carries the shares exercised, the strike price paid and the fair market value at exercise, so the gain can be recomputed rather than taken on trust. Requires the `equities.view` permission at the organization level.
+
+
+        **Token scopes**: `equities:read`'
+      tags:
+      - equityTokens
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of exercise records to return in this page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      - name: cursor
+        in: query
+        description: Opaque pagination cursor returned as next_cursor by a previous response. Omit to fetch the first page.
+        required: false
+        schema:
+          type: string
+          maxLength: 2048
+      - name: exercise_date_from
+        in: query
+        description: Only return exercises with an exercise_date on or after this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: exercise_date_to
+        in: query
+        description: Only return exercises with an exercise_date on or before this date (inclusive), in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: employee_number
+        in: query
+        description: Only return exercises for this exact Shareworks employee number.
+        required: false
+        schema:
+          type: string
+          maxLength: 64
+      responses:
+        '200':
+          description: Shareworks equity exercises returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity_Tokens_listEquityShareworksExercises-v2026-09-09_Response_200'
+        '400':
+          description: Bad request — invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityShareworksExercises-v2026-09-09RequestBadRequestError'
+        '401':
+          description: Unauthorized — missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityShareworksExercises-v2026-09-09RequestUnauthorizedError'
+        '403':
+          description: Forbidden — caller lacks the equities.view permission, or the caller's organization is not permitted to access this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEquityShareworksExercises-v2026-09-09RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    ListEquityAwards-v2026-09-09RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAwardsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityAwards-v2026-09-09RequestInternalServerError
+    EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        fx_rate:
+          type: string
+          title: float
+          description: The exchange rate used to convert the local currency to the payroll currency
+        tax_rate:
+          type: string
+          title: float
+          description: The tax rate applied to the benefit in kind
+        unit_fmv:
+          type: string
+          title: float
+          description: The fair market value of the equity/token grant at the time of the event
+        event_date:
+          type: string
+          format: date
+          description: The date of the event
+        sale_price:
+          type: string
+          title: float
+          description: The price at which the equity/token was sold
+        contract_id:
+          type: string
+          description: The unique identifier of the contract of the employee who received the equity/token grant
+        gross_value:
+          type: string
+          title: float
+          description: The gross value of the equity/token grant
+        plan_currency:
+          type: string
+          description: The currency in which the equity/token grant was issued
+        exercise_price:
+          type: string
+          title: float
+          description: The price at which the equity/token was exercised
+        equity_grant_id:
+          type: string
+          description: The unique identifier of the equity/token grant - optional in case you don't have remove the property
+        settlement_date:
+          type: string
+          format: date
+          description: The date of the settlement
+        payroll_currency:
+          type: string
+          description: The currency in which the payroll is processed
+        tax_jurisdiction:
+          type: string
+          description: The tax jurisdiction in which the equity/token grant was issued
+        transaction_fees:
+          type: string
+          title: float
+          description: The fees associated with the transaction
+        quantity_remaining:
+          type: string
+          title: float
+          description: The quantity of equity/token that remains
+        taxable_gain_or_loss:
+          type: string
+          title: float
+          description: The taxable gain or loss
+        total_exercise_price:
+          type: string
+          title: float
+          description: The total exercise price
+        total_taxes_withheld:
+          type: string
+          title: float
+          description: The total amount of taxes withheld
+        method_of_tax_coverage:
+          $ref: '#/components/schemas/EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaDataMethodOfTaxCoverage'
+          description: The method used to cover the taxes
+        quantity_withheld_or_sold:
+          type: string
+          title: float
+          description: The quantity of equity/token that was withheld or sold
+        withheld_tax_local_currency:
+          type: string
+          title: float
+          description: The tax withheld in the local currency
+        benefit_in_kind_local_currency:
+          type: string
+          title: float
+          description: The benefit in kind in the local currency
+        quantity_exercised_or_released:
+          type: string
+          title: float
+          description: The quantity of equity/token that was exercised or released
+      required:
+      - fx_rate
+      - contract_id
+      - plan_currency
+      - settlement_date
+      - payroll_currency
+      - tax_jurisdiction
+      - taxable_gain_or_loss
+      - total_taxes_withheld
+      - method_of_tax_coverage
+      - withheld_tax_local_currency
+      - benefit_in_kind_local_currency
+      title: EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaData
+    ListEquityGrantsWithTaxEvents-v2026-08-10RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityGrantsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListEquityGrantsWithTaxEvents-v2026-08-10RequestForbiddenError
+    EquityParticipantsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, if applicable.
+        message:
+          type: string
+          description: Human-readable explanation
+      required:
+      - message
+      title: EquityParticipantsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ListEquityExpenses-v2026-09-09RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityExpensesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityExpenses-v2026-09-09RequestNotFoundError
+    EquityExpensesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, if applicable.
+        message:
+          type: string
+          description: Human-readable explanation
+      required:
+      - message
+      title: EquityExpensesGetResponsesContentApplicationJsonSchemaErrorsItems
+    EquityParticipantsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the participant record.
+        ssn:
+          type:
+          - string
+          - 'null'
+          description: US Social Security Number, as reported by the ingested file. Returned in full, unmasked, because it is a required input to US equity tax withholding. Present only for participants whose source record carries one. Treat this value as a direct identifier and store it accordingly.
+        email:
+          type:
+          - string
+          - 'null'
+          description: Personal email address, as reported by the ingested file.
+        row_hash:
+          type: string
+          description: Hash of the reported values on this record. Compare it between syncs to detect a change without diffing every field.
+        full_name:
+          type:
+          - string
+          - 'null'
+          description: Participant full name, as reported by the ingested file.
+        hire_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Hire date, as reported by the ingested file.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was first ingested.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was last upserted, for incremental sync.
+        cost_center:
+          type:
+          - string
+          - 'null'
+          description: Cost center, as reported by the ingested file.
+        company_email:
+          type:
+          - string
+          - 'null'
+          description: Company email address, as reported by the ingested file.
+        pre_clearance:
+          type:
+          - string
+          - 'null'
+          description: Pre-clearance status, as reported by the ingested file.
+        source_file_id:
+          type: string
+          format: uuid
+          description: Identifier of the ingested Shareworks report file this record was last upserted from.
+        employee_number:
+          type: string
+          description: Shareworks employee number, as reported by the ingested file. The intended join key for this record. Some values are non-numeric for legacy or masked records.
+        hris_profile_id:
+          type:
+          - integer
+          - 'null'
+          description: Matched HRIS profile id, if employee_number could be resolved to one. Null when unmatched, or when employee_number is non-numeric or blank.
+        home_address_city:
+          type:
+          - string
+          - 'null'
+          description: Home address city, as reported by the ingested file.
+        organization_name:
+          type:
+          - string
+          - 'null'
+          description: Organization name, as reported by the ingested file.
+        current_employment:
+          type:
+          - string
+          - 'null'
+          description: Current employment classification, as reported by the ingested file.
+        account_holder_type:
+          type:
+          - string
+          - 'null'
+          description: Account holder type, as reported by the ingested file.
+        home_address_line_1:
+          type:
+          - string
+          - 'null'
+          description: First line of the home address, as reported by the ingested file.
+        home_address_line_2:
+          type:
+          - string
+          - 'null'
+          description: Second line of the home address, as reported by the ingested file.
+        home_address_country:
+          type:
+          - string
+          - 'null'
+          description: Home address country, as reported by the ingested file.
+        last_seen_dataset_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Identifier of the most recent ingested dataset in which this record still appeared. Null for records ingested before dataset tracking began.
+        account_activation_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Moment the Shareworks account was activated. The source file reports this in US Pacific local time; it is returned here in UTC.
+        alternate_employee_number:
+          type:
+          - string
+          - 'null'
+          description: Alternate employee number, as reported by the ingested file.
+        cost_center_effective_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date the cost center took effect.
+        home_address_state_province:
+          type:
+          - string
+          - 'null'
+          description: Home address state or province, as reported by the ingested file.
+        home_address_zip_postal_code:
+          type:
+          - string
+          - 'null'
+          description: Home address ZIP or postal code, as reported by the ingested file.
+        current_employment_description:
+          type:
+          - string
+          - 'null'
+          description: Free-text description of the current employment, as reported by the ingested file. Unpopulated in every record delivered so far.
+        company_provided_personal_email:
+          type:
+          - string
+          - 'null'
+          description: Personal email address supplied by the company, as reported by the ingested file.
+        current_employment_effective_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date the current employment classification took effect.
+        stock_options_and_awards_employee_status:
+          type:
+          - string
+          - 'null'
+          description: Stock options and awards employee status, as reported by the ingested file.
+        stock_options_and_awards_employee_status_effective_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date the stock options and awards employee status took effect.
+      required:
+      - id
+      - ssn
+      - email
+      - row_hash
+      - full_name
+      - hire_date
+      - created_at
+      - updated_at
+      - cost_center
+      - company_email
+      - pre_clearance
+      - source_file_id
+      - employee_number
+      - hris_profile_id
+      - home_address_city
+      - organization_name
+      - current_employment
+      - account_holder_type
+      - home_address_line_1
+      - home_address_line_2
+      - home_address_country
+      - last_seen_dataset_id
+      - account_activation_date
+      - alternate_employee_number
+      - cost_center_effective_date
+      - home_address_state_province
+      - home_address_zip_postal_code
+      - current_employment_description
+      - company_provided_personal_email
+      - current_employment_effective_date
+      - stock_options_and_awards_employee_status
+      - stock_options_and_awards_employee_status_effective_date
+      title: EquityParticipantsGetResponsesContentApplicationJsonSchemaDataItems
+    ListEquityShareworksExercises-v2026-09-09RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityExercisesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityShareworksExercises-v2026-09-09RequestForbiddenError
+    Equity_Tokens_listEquityOptionLedgerEntries-v2026-09-09_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityOptionLedgerGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of option holder ledger records, one per grant occurrence.
+        has_more:
+          type: boolean
+          description: Whether another page of results is available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page. Null when has_more is false.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      title: Equity Tokens_listEquityOptionLedgerEntries-v2026-09-09_Response_200
+    EquityAmortizationsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, if applicable.
+        message:
+          type: string
+          description: Human-readable explanation
+      required:
+      - message
+      title: EquityAmortizationsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ListEquityParticipants-v2026-09-08RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityParticipantsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityParticipants-v2026-09-08RequestForbiddenError
+    Equity_Tokens_listEquityAwards-v2026-09-09_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAwardsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of granted equity award records, one per reported award row.
+        has_more:
+          type: boolean
+          description: Whether another page of results is available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page. Null when has_more is false.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      title: Equity Tokens_listEquityAwards-v2026-09-09_Response_200
+    EquityValuationsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the record.
+        row_hash:
+          type: string
+          description: Hash of the reported values on this record. Compare it between syncs to detect a change without diffing every field.
+        plan_name:
+          type: string
+          description: Equity plan name, as reported by the ingested file.
+        award_type:
+          type: string
+          description: Award type (e.g. Restricted Stock - Standard), as reported by the ingested file.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was first ingested.
+        grant_date:
+          type: string
+          format: date
+          description: Date the grant was issued, as reported by the ingested file.
+        grant_name:
+          type: string
+          description: Grant name, as reported by the ingested file.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was last upserted, for incremental sync.
+        grant_price:
+          type: number
+          format: double
+          description: Strike/grant price per unit, as reported by the ingested file.
+        market_price:
+          type: number
+          format: double
+          description: Market price per unit, as reported by the ingested file.
+        expected_life:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: 'Expected life of the award (years), as reported by the ingested file. Sparsely populated (measured: 14,353 of 15,090 real rows).'
+        source_file_id:
+          type: string
+          format: uuid
+          description: Identifier of the ingested Shareworks report file this record was last upserted from.
+        valuation_type:
+          type: string
+          description: Valuation type, as reported by the ingested file.
+        volatility_type:
+          type:
+          - string
+          - 'null'
+          description: 'Volatility type, as reported by the ingested file. Sparsely populated (measured: 14,353 of 15,090 real rows).'
+        occurrence_index:
+          type: integer
+          description: Discriminates several records the source file reports for the same natural key. Starts at 1, in the order the rows appear in the file.
+        original_granted:
+          type: number
+          format: double
+          description: Original granted share count, as reported by the ingested file.
+        expected_life_type:
+          type:
+          - string
+          - 'null'
+          description: 'Expected life type, as reported by the ingested file. Sparsely populated (measured: 14,353 of 15,090 real rows).'
+        original_vest_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: 'Original vest date, as reported by the ingested file. Sparsely populated (measured: 4,477 of 15,090 real rows) - deliberately NOT part of the uniqueness key, since a Null value would not conflict with another Null under Postgres unique-constraint semantics.'
+        volatility_percent:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: 'Volatility, stored as the percent NUMBER itself, NOT a fraction. See parseShareworksPercent. Sparsely populated (measured: 14,353 of 15,090 real rows).'
+        amortization_method:
+          type: string
+          description: Amortization method (e.g. Straight-Line), as reported by the ingested file.
+        dividend_yield_type:
+          type:
+          - string
+          - 'null'
+          description: 'Dividend yield type, as reported by the ingested file. Sparsely populated (measured: 14,353 of 15,090 real rows).'
+        risk_free_rate_type:
+          type:
+          - string
+          - 'null'
+          description: 'Risk-free rate type, as reported by the ingested file. Sparsely populated (measured: 14,353 of 15,090 real rows).'
+        fair_value_per_share:
+          type: number
+          format: double
+          description: Fair market value per share, as reported by the ingested file.
+        last_seen_dataset_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Identifier of the most recent ingested dataset in which this record still appeared. Null for records ingested before dataset tracking began.
+        employee_grant_number:
+          type: string
+          description: Shareworks grant number for this employee, as reported by the ingested file.
+        risk_free_rate_source:
+          type:
+          - string
+          - 'null'
+          description: 'Risk-free rate source, as reported by the ingested file. Sparsely populated (measured: 8,308 of 15,090 real rows).'
+        dividend_yield_percent:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: 'Dividend yield, stored as the percent NUMBER itself, NOT a fraction. See parseShareworksPercent. Sparsely populated (measured: 14,353 of 15,090 real rows).'
+        risk_free_rate_percent:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: 'Risk-free rate, stored as the percent NUMBER itself, NOT a fraction. See parseShareworksPercent. Sparsely populated (measured: 14,353 of 15,090 real rows).'
+        expense_valuation_model:
+          type: string
+          description: Expense valuation model (e.g. Black-Scholes), as reported by the ingested file.
+        forfeiture_rate_percent:
+          type: number
+          format: double
+          description: Forfeiture rate, stored as the percent NUMBER itself (e.g. 5.25 means 5.25%), NOT a fraction. See parseShareworksPercent.
+        original_performance_rule:
+          type:
+          - string
+          - 'null'
+          description: 'Original performance rule, as reported by the ingested file. Sparsely populated (measured: 25 of 15,090 real rows).'
+        expense_amortization_start_date:
+          type: string
+          format: date
+          description: Expense amortization start date, as reported by the ingested file.
+        forfeiture_rate_calculation_method:
+          type: string
+          description: Forfeiture rate calculation method, as reported by the ingested file.
+      required:
+      - id
+      - row_hash
+      - plan_name
+      - award_type
+      - created_at
+      - grant_date
+      - grant_name
+      - updated_at
+      - grant_price
+      - market_price
+      - expected_life
+      - source_file_id
+      - valuation_type
+      - volatility_type
+      - occurrence_index
+      - original_granted
+      - expected_life_type
+      - original_vest_date
+      - volatility_percent
+      - amortization_method
+      - dividend_yield_type
+      - risk_free_rate_type
+      - fair_value_per_share
+      - last_seen_dataset_id
+      - employee_grant_number
+      - risk_free_rate_source
+      - dividend_yield_percent
+      - risk_free_rate_percent
+      - expense_valuation_model
+      - forfeiture_rate_percent
+      - original_performance_rule
+      - expense_amortization_start_date
+      - forfeiture_rate_calculation_method
+      title: EquityValuationsGetResponsesContentApplicationJsonSchemaDataItems
+    ListEquityAmortizations-v2026-09-09RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAmortizationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityAmortizations-v2026-09-09RequestNotFoundError
+    ListEquityExpenses-v2026-09-09RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityExpensesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityExpenses-v2026-09-09RequestBadRequestError
+    Equity_Tokens_listEquityShareworksExercises-v2026-09-09_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityExercisesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of exercise records. Worker name fields are deliberately not included — employee_number is the intended join key, and first/last name are SENSITIVE PII not needed by downstream consumers of this endpoint.
+        has_more:
+          type: boolean
+          description: Whether another page of results is available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page. Null when has_more is false.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      title: Equity Tokens_listEquityShareworksExercises-v2026-09-09_Response_200
+    ListEquityExpenses-v2026-09-09RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityExpensesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityExpenses-v2026-09-09RequestUnauthorizedError
+    ListEquityShareworksExercises-v2026-09-09RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityExercisesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityShareworksExercises-v2026-09-09RequestBadRequestError
+    ListEquityParticipants-v2026-09-08RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityParticipantsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityParticipants-v2026-09-08RequestUnauthorizedError
+    ListEquityOptionLedgerEntries-v2026-09-09RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityOptionLedgerGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityOptionLedgerEntries-v2026-09-09RequestUnauthorizedError
+    ListEquityValuations-v2026-09-09RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityValuationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityValuations-v2026-09-09RequestUnauthorizedError
+    ListEquityOptionLedgerEntries-v2026-09-09RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityOptionLedgerGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityOptionLedgerEntries-v2026-09-09RequestInternalServerError
+    ListEquityExpenses-v2026-09-09RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityExpensesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityExpenses-v2026-09-09RequestInternalServerError
+    ListEquityOptionLedgerEntries-v2026-09-09RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityOptionLedgerGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityOptionLedgerEntries-v2026-09-09RequestBadRequestError
+    EquityValuationsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, if applicable.
+        message:
+          type: string
+          description: Human-readable explanation
+      required:
+      - message
+      title: EquityValuationsGetResponsesContentApplicationJsonSchemaErrorsItems
+    EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: the id of the equity/token tax event generated
+        created_at:
+          type: string
+          format: date-time
+          description: the date and time when the equity/token tax event was created
+      title: EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaData
+    Equity_Tokens_listEquityGrantsWithTaxEvents-v2026-08-10_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityGrantsGetResponsesContentApplicationJsonSchemaDataItems'
+        limit:
+          type: integer
+          description: The limit applied to this page of results
+        total:
+          type: integer
+          description: The total number of grants matching the query, independent of limit/offset
+        offset:
+          type: integer
+          description: The offset applied to this page of results
+      title: Equity Tokens_listEquityGrantsWithTaxEvents-v2026-08-10_Response_200
+    CreateEquityOrTokenTaxEvent-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateEquityOrTokenTaxEvent-v2026-01-01RequestBadRequestError
+    EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: return code error
+        field:
+          type: string
+          description: field that caused the error
+        message:
+          type: string
+          description: description of the error
+      title: EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaErrorsItems
+    ListEquityParticipants-v2026-09-08RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityParticipantsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityParticipants-v2026-09-08RequestBadRequestError
+    ListEquityOptionLedgerEntries-v2026-09-09RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityOptionLedgerGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityOptionLedgerEntries-v2026-09-09RequestForbiddenError
+    ListEquityParticipants-v2026-09-08RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityParticipantsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityParticipants-v2026-09-08RequestNotFoundError
+    ListEquityShareworksExercises-v2026-09-09RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityExercisesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityShareworksExercises-v2026-09-09RequestUnauthorizedError
+    ListEquityValuations-v2026-09-09RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityValuationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityValuations-v2026-09-09RequestForbiddenError
+    EquityGrantsGetResponsesContentApplicationJsonSchemaDataItemsHrisProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the worker
+        email:
+          type: string
+          format: email
+          description: The worker's email address
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the worker's profile picture
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: The worker's job title
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: The worker's last name
+        first_name:
+          type:
+          - string
+          - 'null'
+          description: The worker's first name
+        hiring_type:
+          type:
+          - string
+          - 'null'
+          description: The worker's engagement type within Deel (e.g. employee, contractor)
+        middle_name:
+          type:
+          - string
+          - 'null'
+          description: The worker's middle name
+      description: Profile information for the EOR worker who holds the grant
+      title: EquityGrantsGetResponsesContentApplicationJsonSchemaDataItemsHrisProfile
+    EquityExercisesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the exercise record.
+        currency:
+          type: string
+          description: ISO 4217 currency code for the monetary fields on this record.
+        plan_name:
+          type:
+          - string
+          - 'null'
+          description: Equity plan name, as reported by the ingested file.
+        grant_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date the grant was issued.
+        grant_name:
+          type:
+          - string
+          - 'null'
+          description: Grant name, as reported by the ingested file.
+        grant_type:
+          type:
+          - string
+          - 'null'
+          description: Grant type (e.g. ISO, NSO, RSU), as reported by the ingested file.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was last upserted, for incremental sync.
+        exercise_fmv:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total fair market value of the exercised shares.
+        fmv_per_unit:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Fair market value per unit at exercise.
+        exercise_date:
+          type: string
+          format: date
+          description: Date the exercise took place.
+        exercise_gain:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Gain realized on exercise (FMV minus cost).
+        exercise_price:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Strike/exercise price per unit.
+        cost_of_options:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total cost paid to exercise the options.
+        employee_number:
+          type: string
+          description: Shareworks employee number, as reported by the ingested file. The intended join key for this record.
+        hris_profile_id:
+          type:
+          - integer
+          - 'null'
+          description: Matched HRIS profile id, if employee_number could be resolved to one. Null when unmatched.
+        employee_grant_number:
+          type: string
+          description: Shareworks grant number for this employee.
+        shares_exercised_total:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total number of shares exercised.
+        shares_exercised_vested:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of vested shares exercised.
+        shares_exercised_unvested:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of unvested shares exercised.
+      title: EquityExercisesGetResponsesContentApplicationJsonSchemaDataItems
+    ListEquityOptionLedgerEntries-v2026-09-09RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityOptionLedgerGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityOptionLedgerEntries-v2026-09-09RequestNotFoundError
+    ListEquityExpenses-v2026-09-09RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityExpensesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityExpenses-v2026-09-09RequestForbiddenError
+    Equity_Tokens_listEquityAmortizations-v2026-09-09_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAmortizationsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of expense amortization records, one per grant occurrence.
+        has_more:
+          type: boolean
+          description: Whether another page of results is available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page. Null when has_more is false.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      title: Equity Tokens_listEquityAmortizations-v2026-09-09_Response_200
+    ListEquityValuations-v2026-09-09RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityValuationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityValuations-v2026-09-09RequestInternalServerError
+    EquityGrantsGetResponsesContentApplicationJsonSchemaDataItemsVestedEventsItems:
+      type: object
+      properties:
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The quantity that vested on this date
+        vesting_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date this tranche vested
+      title: EquityGrantsGetResponsesContentApplicationJsonSchemaDataItemsVestedEventsItems
+    EquityGrantsGetResponsesContentApplicationJsonSchemaDataItemsTaxEventsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the tax event
+        note:
+          type:
+          - string
+          - 'null'
+          description: A free-text note attached to the tax event
+        email:
+          type: string
+          format: email
+          description: The worker's email address
+        country:
+          type:
+          - string
+          - 'null'
+          description: The ISO 3166-1 alpha-2 country code of the worker's employment country
+        fx_rate:
+          type:
+          - string
+          - 'null'
+          description: The exchange rate used to convert local currency to payroll currency
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the worker's profile picture
+        grant_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The unique identifier of the associated grant
+        tax_rate:
+          type:
+          - string
+          - 'null'
+          description: The tax rate applied to the benefit in kind
+        unit_fmv:
+          type:
+          - string
+          - 'null'
+          description: The fair market value per unit at the time of the event
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: The worker's last name
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time the tax event was created
+        event_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date of the tax event
+        first_name:
+          type:
+          - string
+          - 'null'
+          description: The worker's first name
+        grant_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date the associated grant was issued
+        grant_type:
+          type:
+          - string
+          - 'null'
+          description: The equity instrument type of the associated grant (e.g. RSU, NSO, ISO)
+        sale_price:
+          type:
+          - string
+          - 'null'
+          description: The price at which the equity was sold
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time the tax event was last updated
+        archived_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time the tax event was archived
+        contract_id:
+          type: string
+          description: The unique identifier of the contract associated with the tax event
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: An external system identifier for the worker, such as an ID from a cap-table provider
+        gross_value:
+          type:
+          - string
+          - 'null'
+          description: The gross value of the equity event, calculated as unit FMV multiplied by quantity exercised or released
+        is_archived:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the tax event has been archived
+        middle_name:
+          type:
+          - string
+          - 'null'
+          description: The worker's middle name
+        plan_currency:
+          type:
+          - string
+          - 'null'
+          description: The currency in which the equity plan was issued
+        exercise_price:
+          type:
+          - string
+          - 'null'
+          description: The price at which the equity was exercised
+        contract_status:
+          type: string
+          description: The lifecycle status of the associated worker contract (e.g. in_progress, completed, cancelled)
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the worker who holds the grant
+        instrument_type:
+          type:
+          - string
+          - 'null'
+          description: The type of equity instrument (e.g. RSU, NSO, ISO, PHANTOM, SARS)
+        organization_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the organization
+        settlement_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date the equity event was settled (i.e. when shares were transferred or cash was received)
+        created_by_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: The email of the user who created the tax event
+        payroll_currency:
+          type:
+          - string
+          - 'null'
+          description: The currency in which payroll is processed
+        tax_jurisdiction:
+          type:
+          - string
+          - 'null'
+          description: The ISO 3166-1 alpha-2 country code of the worker's contract jurisdiction at the time of the event
+        transaction_fees:
+          type:
+          - string
+          - 'null'
+          description: Brokerage or transaction fees associated with the equity event, in plan currency
+        organization_name:
+          type:
+          - string
+          - 'null'
+          description: The name of the organization
+        grant_reference_id:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The human-readable reference number of the associated grant
+        quantity_remaining:
+          type:
+          - string
+          - 'null'
+          description: The quantity of equity remaining
+        verification_status:
+          type:
+          - string
+          - 'null'
+          description: The current verification status of the tax event (PENDING_VERIFICATION, VERIFIED, SENT_FOR_PROCESSING, PROCESSED, MISMATCH)
+        taxable_gain_or_loss:
+          type:
+          - string
+          - 'null'
+          description: The taxable gain or loss on the event, typically gross value minus the total exercise price
+        total_exercise_price:
+          type:
+          - string
+          - 'null'
+          description: The total exercise price paid for the equity, calculated as exercise price per unit multiplied by quantity exercised
+        total_taxes_withheld:
+          type:
+          - string
+          - 'null'
+          description: The total amount of income tax and social contributions withheld on behalf of the worker
+        equity_service_status:
+          type: string
+          description: The equity service enrollment status for the worker (ONBOARDED, OFFBOARDED, NOT_ONBOARDED, NOT_ELIGIBLE, MORE_INFO_REQUIRED)
+        method_of_tax_coverage:
+          type:
+          - string
+          - 'null'
+          description: How the benefit-in-kind (BIK) tax on this equity event is collected. BIK_WITHHOLDING_* values indicate the employer withholds tax from payroll; the suffix identifies the mechanism (e.g. at-source deduction, salary deduction, net settlement, grossed-up bonus). BIK_REPORTING_ONLY reports the BIK without withholding. NO_BIK_NO_WITHHOLDING applies when no taxable benefit arises. AD_HOC covers special cases outside the standard methods.
+        sent_for_processing_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time the event was sent for payroll processing
+        actual_payroll_cycle_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The unique identifier of the actual payroll cycle
+        supporting_documents_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The unique identifier of the supporting documents attached to the event
+        actual_payroll_cycle_end:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The end date of the actual payroll cycle
+        contract_completion_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The completion date of the associated contract
+        expected_payroll_cycle_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The unique identifier of the expected payroll cycle
+        quantity_withheld_or_sold:
+          type:
+          - string
+          - 'null'
+          description: The quantity of equity withheld or sold
+        actual_payroll_cycle_start:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The start date of the actual payroll cycle
+        expected_payroll_cycle_end:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The end date of the expected payroll cycle
+        actual_payroll_cycle_cutoff:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The cutoff date of the actual payroll cycle
+        withheld_tax_local_currency:
+          type:
+          - string
+          - 'null'
+          description: The income tax and social contributions withheld, expressed in the worker's local payroll currency
+        expected_payroll_cycle_start:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The start date of the expected payroll cycle
+        expected_payroll_cycle_cutoff:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The cutoff date of the expected payroll cycle
+        benefit_in_kind_local_currency:
+          type:
+          - string
+          - 'null'
+          description: The benefit-in-kind (BIK) value reported to payroll, expressed in the worker's local payroll currency
+        quantity_exercised_or_released:
+          type:
+          - string
+          - 'null'
+          description: The quantity of equity exercised or released
+      title: EquityGrantsGetResponsesContentApplicationJsonSchemaDataItemsTaxEventsItems
+    ListEquityAmortizations-v2026-09-09RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAmortizationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityAmortizations-v2026-09-09RequestInternalServerError
+    ListEquityAwards-v2026-09-09RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAwardsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityAwards-v2026-09-09RequestForbiddenError
+    EquityAwardsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, if applicable.
+        message:
+          type: string
+          description: Human-readable explanation
+      required:
+      - message
+      title: EquityAwardsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ListEquityParticipants-v2026-09-08RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityParticipantsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityParticipants-v2026-09-08RequestInternalServerError
+    ListEquityGrantsWithTaxEvents-v2026-08-10RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityGrantsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListEquityGrantsWithTaxEvents-v2026-08-10RequestBadRequestError
+    EquityGrantsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the equity grant
+        value:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The total grant value at the time of issuance, in grant currency
+        source:
+          type:
+          - string
+          - 'null'
+          description: The system of record the grant originated from
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The total quantity granted
+        tranches:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The number of vesting tranches
+        grant_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date the grant was issued
+        grant_name:
+          type:
+          - string
+          - 'null'
+          description: The name of the grant
+        tax_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityGrantsGetResponsesContentApplicationJsonSchemaDataItemsTaxEventsItems'
+          description: The tax events reported against this grant
+        cliff_period:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The cliff period in months before any shares vest
+        grant_status:
+          type:
+          - string
+          - 'null'
+          description: The lifecycle status of the grant (e.g. GRANTED, PENDING_APPROVAL)
+        hris_profile:
+          $ref: '#/components/schemas/EquityGrantsGetResponsesContentApplicationJsonSchemaDataItemsHrisProfile'
+          description: Profile information for the EOR worker who holds the grant
+        reference_id:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The human-readable reference number of the grant
+        vested_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityGrantsGetResponsesContentApplicationJsonSchemaDataItemsVestedEventsItems'
+          description: The individual vesting events recorded for this grant
+        exercise_price:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The per-unit price at which the option or warrant can be exercised, in exercise price currency
+        grant_currency:
+          type:
+          - string
+          - 'null'
+          description: The currency of the grant value
+        vesting_length:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The total vesting length in months
+        vested_quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The quantity vested so far
+        fmv_when_granted:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The fair market value of the underlying instrument at grant time
+        equity_grant_type:
+          type:
+          - string
+          - 'null'
+          description: The type of equity instrument granted
+        option_expiration:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date the option expires
+        vesting_start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date vesting begins
+        equity_grant_type_name:
+          type:
+          - string
+          - 'null'
+          description: The organization's custom label for the grant type
+        exercise_price_currency:
+          type:
+          - string
+          - 'null'
+          description: The currency of the exercise price
+        additional_grant_requirements_and_restrictions:
+          type:
+          - string
+          - 'null'
+          description: Free-text additional requirements or restrictions on the grant
+      title: EquityGrantsGetResponsesContentApplicationJsonSchemaDataItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    Equity_Tokens_createEquityOrTokenTaxEvent-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EquitiesTokensTaxEventsPostResponsesContentApplicationJsonSchemaData'
+      title: Equity Tokens_createEquityOrTokenTaxEvent-v2026-01-01_Response_201
+    ListEquityAwards-v2026-09-09RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAwardsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityAwards-v2026-09-09RequestNotFoundError
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    Equity_Tokens_listEquityValuations-v2026-09-09_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityValuationsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of grant valuation records, one per grant occurrence.
+        has_more:
+          type: boolean
+          description: Whether another page of results is available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page. Null when has_more is false.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      title: Equity Tokens_listEquityValuations-v2026-09-09_Response_200
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    EquityGrantsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: A machine-readable code identifying the type of error
+        message:
+          type: string
+          description: A human-readable description of the error
+      title: EquityGrantsGetResponsesContentApplicationJsonSchemaErrorsItems
+    EquityExpensesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the record.
+        row_hash:
+          type: string
+          description: Hash of the reported values on this record. Compare it between syncs to detect a change without diffing every field.
+        plan_name:
+          type: string
+          description: Equity plan name, as reported by the ingested file.
+        award_type:
+          type: string
+          description: Award type (e.g. Restricted Stock - Standard), as reported by the ingested file.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was first ingested.
+        grant_date:
+          type: string
+          format: date
+          description: Date the grant was issued, as reported by the ingested file.
+        grant_name:
+          type: string
+          description: Grant name, as reported by the ingested file.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was last upserted, for incremental sync.
+        base_shares:
+          type: number
+          format: double
+          description: Base share count for this grant, as reported by the ingested file.
+        grant_price:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Strike/grant price per unit, as reported by the ingested file.
+        base_expense:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Base expense amount, as reported by the ingested file.
+        factor_shares:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Shares resulting from the performance factor, as reported by the ingested file.
+        source_file_id:
+          type: string
+          format: uuid
+          description: Identifier of the ingested Shareworks report file this record was last upserted from.
+        employee_number:
+          type: string
+          description: Shareworks employee number, as reported by the ingested file. The intended join key for this record. Some values are non-numeric for legacy or masked records.
+        hris_profile_id:
+          type:
+          - integer
+          - 'null'
+          description: Matched HRIS profile id, if employee_number could be resolved to one. Null when unmatched, or when employee_number is non-numeric or blank.
+        occurrence_index:
+          type: integer
+          description: Discriminates several records the source file reports for the same natural key. Starts at 1, in the order the rows appear in the file.
+        valuation_status:
+          type:
+          - string
+          - 'null'
+          description: Valuation status (e.g. Approved, Do Not Expense), as reported by the ingested file.
+        actual_forfeitures:
+          type: number
+          format: double
+          description: Actual forfeited share count, as reported by the ingested file.
+        fair_value_per_share:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Fair market value per share, as reported by the ingested file.
+        last_seen_dataset_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Identifier of the most recent ingested dataset in which this record still appeared. Null for records ingested before dataset tracking began.
+        unvested_repurchased:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Unvested shares repurchased, as reported by the ingested file.
+        employee_grant_number:
+          type: string
+          description: Shareworks grant number for this employee, as reported by the ingested file.
+        estimated_forfeitures:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Estimated forfeited share count, as reported by the ingested file.
+        forfeiture_rate_percent:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Forfeiture rate, stored as the percent NUMBER itself (e.g. 44.336788 means 44.336788%), NOT a fraction. See parseShareworksPercent.
+        total_estimated_expense:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total estimated expense, as reported by the ingested file.
+        actual_performance_factor:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Actual performance factor applied, as reported by the ingested file.
+        estimated_performance_factor:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Estimated performance factor, as reported by the ingested file.
+        total_actual_expense_to_accrue:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total actual expense to accrue, as reported by the ingested file.
+        total_actual_shares_to_expense:
+          type: number
+          format: double
+          description: Total actual shares to expense, as reported by the ingested file.
+        total_estimated_shares_to_expense:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total estimated shares to expense, as reported by the ingested file.
+      required:
+      - id
+      - row_hash
+      - plan_name
+      - award_type
+      - created_at
+      - grant_date
+      - grant_name
+      - updated_at
+      - base_shares
+      - grant_price
+      - base_expense
+      - factor_shares
+      - source_file_id
+      - employee_number
+      - hris_profile_id
+      - occurrence_index
+      - valuation_status
+      - actual_forfeitures
+      - fair_value_per_share
+      - last_seen_dataset_id
+      - unvested_repurchased
+      - employee_grant_number
+      - estimated_forfeitures
+      - forfeiture_rate_percent
+      - total_estimated_expense
+      - actual_performance_factor
+      - estimated_performance_factor
+      - total_actual_expense_to_accrue
+      - total_actual_shares_to_expense
+      - total_estimated_shares_to_expense
+      title: EquityExpensesGetResponsesContentApplicationJsonSchemaDataItems
+    ListEquityAwards-v2026-09-09RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAwardsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityAwards-v2026-09-09RequestUnauthorizedError
+    EquityOptionLedgerGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, if applicable.
+        message:
+          type: string
+          description: Human-readable explanation
+      required:
+      - message
+      title: EquityOptionLedgerGetResponsesContentApplicationJsonSchemaErrorsItems
+    ListEquityAmortizations-v2026-09-09RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAmortizationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityAmortizations-v2026-09-09RequestForbiddenError
+    Equity_Tokens_listEquityParticipants-v2026-09-08_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityParticipantsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of equity participant records, one per Shareworks employee number.
+        has_more:
+          type: boolean
+          description: Whether another page of results is available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page. Null when has_more is false.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      title: Equity Tokens_listEquityParticipants-v2026-09-08_Response_200
+    ListEquityAmortizations-v2026-09-09RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAmortizationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityAmortizations-v2026-09-09RequestBadRequestError
+    ListEquityValuations-v2026-09-09RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityValuationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityValuations-v2026-09-09RequestNotFoundError
+    EquityAwardsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the record.
+        row_hash:
+          type: string
+          description: Hash of the reported values on this record. Compare it between syncs to detect a change without diffing every field.
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: Employee last name, as reported by the ingested file.
+        plan_name:
+          type:
+          - string
+          - 'null'
+          description: Equity plan name, as reported by the ingested file.
+        total_fmv:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total fair market value of the grant, as reported by the ingested file.
+        award_name:
+          type:
+          - string
+          - 'null'
+          description: Award template name, as reported by the ingested file.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was first ingested.
+        first_name:
+          type:
+          - string
+          - 'null'
+          description: Employee first name, as reported by the ingested file.
+        grant_date:
+          type: string
+          format: date
+          description: Date the grant was issued, as reported by the ingested file.
+        grant_name:
+          type: string
+          description: Grant name, as reported by the ingested file.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was last upserted, for incremental sync.
+        grant_price:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Strike/grant price per unit, as reported by the ingested file.
+        employee_type:
+          type:
+          - string
+          - 'null'
+          description: Employee type (e.g. Employee, Consultant), as reported by the ingested file.
+        grant_quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of shares/units granted, as reported by the ingested file.
+        source_file_id:
+          type: string
+          format: uuid
+          description: Identifier of the ingested Shareworks report file this record was last upserted from.
+        employee_number:
+          type: string
+          description: Shareworks employee number, as reported by the ingested file. The intended join key for this record. Some values are non-numeric for legacy or masked records.
+        hris_profile_id:
+          type:
+          - integer
+          - 'null'
+          description: Matched HRIS profile id, if employee_number could be resolved to one. Null when unmatched, or when employee_number is non-numeric or blank.
+        state_exemption:
+          type:
+          - string
+          - 'null'
+          description: State exemption, as reported by the ingested file.
+        occurrence_index:
+          type: integer
+          description: Discriminates several records the source file reports for the same natural key. Starts at 1, in the order the rows appear in the file.
+        federal_exemption:
+          type:
+          - string
+          - 'null'
+          description: Federal exemption, as reported by the ingested file.
+        is_under_rule_701:
+          type:
+          - string
+          - 'null'
+          description: Whether the grant is under Rule 701, as reported by the ingested file (verbatim text, e.g. Yes/No).
+        state_of_exemption:
+          type:
+          - string
+          - 'null'
+          description: State of exemption, as reported by the ingested file.
+        vest_schedule_name:
+          type:
+          - string
+          - 'null'
+          description: Vesting schedule name, as reported by the ingested file.
+        vesting_start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Vesting start date, as reported by the ingested file.
+        allow_early_exercise:
+          type:
+          - string
+          - 'null'
+          description: Whether early exercise is allowed, as reported by the ingested file (verbatim text, e.g. Yes/No).
+        compensation_benefit:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Compensation benefit amount, as reported by the ingested file.
+        last_seen_dataset_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Identifier of the most recent ingested dataset in which this record still appeared. Null for records ingested before dataset tracking began.
+        state_exemption_date:
+          type:
+          - string
+          - 'null'
+          description: State exemption date, as reported by the ingested file.
+        total_exercise_price:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total exercise price for the grant, as reported by the ingested file.
+        federal_exemption_date:
+          type:
+          - string
+          - 'null'
+          description: Federal exemption date, as reported by the ingested file.
+        fmv_per_share_at_grant_date:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Fair market value per share at grant date, as reported by the ingested file.
+      required:
+      - id
+      - row_hash
+      - last_name
+      - plan_name
+      - total_fmv
+      - award_name
+      - created_at
+      - first_name
+      - grant_date
+      - grant_name
+      - updated_at
+      - grant_price
+      - employee_type
+      - grant_quantity
+      - source_file_id
+      - employee_number
+      - hris_profile_id
+      - state_exemption
+      - occurrence_index
+      - federal_exemption
+      - is_under_rule_701
+      - state_of_exemption
+      - vest_schedule_name
+      - vesting_start_date
+      - allow_early_exercise
+      - compensation_benefit
+      - last_seen_dataset_id
+      - state_exemption_date
+      - total_exercise_price
+      - federal_exemption_date
+      - fmv_per_share_at_grant_date
+      title: EquityAwardsGetResponsesContentApplicationJsonSchemaDataItems
+    ListEquityAmortizations-v2026-09-09RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAmortizationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityAmortizations-v2026-09-09RequestUnauthorizedError
+    EquityAmortizationsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the record.
+        row_hash:
+          type: string
+          description: Hash of the reported values on this record. Compare it between syncs to detect a change without diffing every field.
+        plan_name:
+          type: string
+          description: Equity plan name, as reported by the ingested file.
+        award_type:
+          type: string
+          description: Award type (e.g. Restricted Stock - Standard), as reported by the ingested file.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was first ingested.
+        grant_date:
+          type: string
+          format: date
+          description: Date the grant was issued, as reported by the ingested file.
+        grant_name:
+          type: string
+          description: Grant name, as reported by the ingested file.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was last upserted, for incremental sync.
+        grant_price:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Strike/grant price per unit, as reported by the ingested file.
+        source_file_id:
+          type: string
+          format: uuid
+          description: Identifier of the ingested Shareworks report file this record was last upserted from.
+        employee_number:
+          type: string
+          description: Shareworks employee number, as reported by the ingested file. The intended join key for this record. Some values are non-numeric for legacy or masked records.
+        hris_profile_id:
+          type:
+          - integer
+          - 'null'
+          description: Matched HRIS profile id, if employee_number could be resolved to one. Null when unmatched, or when employee_number is non-numeric or blank.
+        occurrence_index:
+          type: integer
+          description: Discriminates several records the source file reports for the same natural key. Starts at 1, in the order the rows appear in the file.
+        valuation_status:
+          type:
+          - string
+          - 'null'
+          description: Valuation status (e.g. Approved, Do Not Expense), as reported by the ingested file.
+        fair_value_per_share:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Fair market value per share, as reported by the ingested file.
+        last_seen_dataset_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Identifier of the most recent ingested dataset in which this record still appeared. Null for records ingested before dataset tracking began.
+        employee_grant_number:
+          type: string
+          description: Shareworks grant number for this employee, as reported by the ingested file.
+        total_estimated_expense:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total estimated expense, as reported by the ingested file.
+        actual_performance_factor:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: 'Actual performance factor applied, as reported by the ingested file. Sparsely populated (measured: 5 of 11,863 real rows).'
+        estimated_performance_factor:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Estimated performance factor, as reported by the ingested file.
+        within_period_shares_vesting:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Within Period > Shares Vesting, as reported by the ingested file.
+        period_end_unamortized_shares:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Period End > Unamortized Shares, as reported by the ingested file.
+        period_end_unamortized_expense:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Period End > Unamortized Expense, as reported by the ingested file.
+        before_period_unamortized_shares:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Before Period > Unamortized Shares, as reported by the ingested file.
+        before_period_unamortized_expense:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Before Period > Unamortized Expense, as reported by the ingested file.
+        total_estimated_shares_to_expense:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total estimated shares to expense, as reported by the ingested file.
+        before_period_total_shares_accrued:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Before Period > Total Shares Accrued, as reported by the ingested file.
+        within_period_total_shares_accrued:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Within Period > Total Shares Accrued, as reported by the ingested file.
+        before_period_total_expense_accrued:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Before Period > Total Expense Accrued, as reported by the ingested file.
+        within_period_total_expense_accrued:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Within Period > Total Expense Accrued, as reported by the ingested file.
+        within_period_shares_exercised_released:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Within Period > Shares Exercised / Released, as reported by the ingested file.
+        within_period_expense_fv_of_shares_vesting:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Within Period > Expense (Fair Value) of Shares Vesting, as reported by the ingested file.
+        within_period_shares_early_exercised_vested:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: 'Within Period > Shares Early Exercised Vested, as reported by the ingested file. Sparsely populated (measured: 13 of 11,863 real rows).'
+        period_end_life_to_date_total_shares_accrued:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Period End > Life-to-Date Total Shares Accrued, as reported by the ingested file.
+        period_end_life_to_date_total_expense_accrued:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Period End > Life-to-Date Total Expense Accrued, as reported by the ingested file.
+        period_end_weighted_avg_remaining_recognition_period:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Period End > Weighted Average Remaining Recognition Period, as reported by the ingested file.
+        within_period_expense_fv_of_shares_exercised_released:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Within Period > Expense (Fair Value) of Shares Exercised / Released, as reported by the ingested file.
+        within_period_expense_fv_of_shares_early_exercised_vested:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Within Period > Expense (Fair Value) of Shares Early Exercised Vested, as reported by the ingested file. Sparsely populated.
+        within_period_agg_grant_price_of_shares_exercised_in_period:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Within Period > Aggregate Grant Price of Shares Exercised in Period, as reported by the ingested file.
+        within_period_agg_grant_price_of_shares_early_exercised_vested:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Within Period > Aggregate Grant Price of Shares Early Exercised Vested, as reported by the ingested file. Sparsely populated.
+      required:
+      - id
+      - row_hash
+      - plan_name
+      - award_type
+      - created_at
+      - grant_date
+      - grant_name
+      - updated_at
+      - grant_price
+      - source_file_id
+      - employee_number
+      - hris_profile_id
+      - occurrence_index
+      - valuation_status
+      - fair_value_per_share
+      - last_seen_dataset_id
+      - employee_grant_number
+      - total_estimated_expense
+      - actual_performance_factor
+      - estimated_performance_factor
+      - within_period_shares_vesting
+      - period_end_unamortized_shares
+      - period_end_unamortized_expense
+      - before_period_unamortized_shares
+      - before_period_unamortized_expense
+      - total_estimated_shares_to_expense
+      - before_period_total_shares_accrued
+      - within_period_total_shares_accrued
+      - before_period_total_expense_accrued
+      - within_period_total_expense_accrued
+      - within_period_shares_exercised_released
+      - within_period_expense_fv_of_shares_vesting
+      - within_period_shares_early_exercised_vested
+      - period_end_life_to_date_total_shares_accrued
+      - period_end_life_to_date_total_expense_accrued
+      - period_end_weighted_avg_remaining_recognition_period
+      - within_period_expense_fv_of_shares_exercised_released
+      - within_period_expense_fv_of_shares_early_exercised_vested
+      - within_period_agg_grant_price_of_shares_exercised_in_period
+      - within_period_agg_grant_price_of_shares_early_exercised_vested
+      title: EquityAmortizationsGetResponsesContentApplicationJsonSchemaDataItems
+    EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaDataMethodOfTaxCoverage:
+      type: string
+      enum:
+      - AD_HOC
+      - BIK_REPORTING_ONLY
+      - BIK_WITHHOLDING_AT_SOURCE_CLIENT
+      - BIK_WITHHOLDING_AT_SOURCE_CLIENT_REVERSE
+      - BIK_WITHHOLDING_GROSSED_UP_BONUS
+      - BIK_WITHHOLDING_NET_SETTLEMENT
+      - BIK_WITHHOLDING_SALARY_DEDUCTION
+      - BIK_WITHHOLDING_WORKER
+      - NO_BIK_NO_WITHHOLDING
+      description: The method used to cover the taxes
+      title: EquitiesTokensTaxEventsPostRequestBodyContentApplicationJsonSchemaDataMethodOfTaxCoverage
+    EquityExercisesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, if applicable.
+        message:
+          type: string
+          description: Human-readable explanation
+      required:
+      - message
+      title: EquityExercisesGetResponsesContentApplicationJsonSchemaErrorsItems
+    Equity_Tokens_listEquityExpenses-v2026-09-09_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityExpensesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of total expense records, one per grant occurrence.
+        has_more:
+          type: boolean
+          description: Whether another page of results is available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page. Null when has_more is false.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      title: Equity Tokens_listEquityExpenses-v2026-09-09_Response_200
+    ListEquityValuations-v2026-09-09RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityValuationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityValuations-v2026-09-09RequestBadRequestError
+    ListEquityAwards-v2026-09-09RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquityAwardsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListEquityAwards-v2026-09-09RequestBadRequestError
+    EquityOptionLedgerGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the record.
+        notes:
+          type:
+          - string
+          - 'null'
+          description: Free-form notes, as reported by the ingested file.
+        row_hash:
+          type: string
+          description: Hash of the reported values on this record. Compare it between syncs to detect a change without diffing every field.
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: Employee last name, as reported by the ingested file.
+        plan_name:
+          type:
+          - string
+          - 'null'
+          description: Equity plan name, as reported by the ingested file.
+        total_fmv:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total fair market value of the grant, as reported by the ingested file.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was first ingested.
+        first_name:
+          type:
+          - string
+          - 'null'
+          description: Employee first name, as reported by the ingested file.
+        grant_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date the grant was issued, as reported by the ingested file.
+        grant_name:
+          type:
+          - string
+          - 'null'
+          description: Grant name, as reported by the ingested file.
+        grant_type:
+          type:
+          - string
+          - 'null'
+          description: Grant type (e.g. Options (NQ)), as reported by the ingested file.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp this record was last upserted, for incremental sync.
+        expire_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Grant expiration date, as reported by the ingested file.
+        middle_name:
+          type:
+          - string
+          - 'null'
+          description: Employee middle name, as reported by the ingested file.
+        grant_reason:
+          type:
+          - string
+          - 'null'
+          description: Grant reason, as reported by the ingested file.
+        shares_expired:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Shares expired, as reported by the ingested file.
+        source_file_id:
+          type: string
+          format: uuid
+          description: Identifier of the ingested Shareworks report file this record was last upserted from.
+        tax_identifier:
+          type:
+          - string
+          - 'null'
+          description: Tax identifier, as reported by the ingested file.
+        employee_number:
+          type:
+          - string
+          - 'null'
+          description: Shareworks employee number, as reported by the ingested file. The intended join key for this record. Some values are non-numeric for legacy or masked records.
+        hris_profile_id:
+          type:
+          - integer
+          - 'null'
+          description: Matched HRIS profile id, if employee_number could be resolved to one. Null when unmatched, or when employee_number is non-numeric or blank.
+        state_exemption:
+          type:
+          - string
+          - 'null'
+          description: State exemption, as reported by the ingested file.
+        occurrence_index:
+          type: integer
+          description: Discriminates several records the source file reports for the same natural key. Starts at 1, in the order the rows appear in the file.
+        shares_cancelled:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Shares cancelled, as reported by the ingested file.
+        vesting_schedule:
+          type:
+          - string
+          - 'null'
+          description: Vesting schedule name, as reported by the ingested file.
+        federal_exemption:
+          type:
+          - string
+          - 'null'
+          description: Federal exemption, as reported by the ingested file.
+        is_under_rule_701:
+          type:
+          - string
+          - 'null'
+          description: Whether the grant is under Rule 701, as reported by the ingested file (verbatim text, e.g. Yes/No).
+        outstanding_vested:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Outstanding vested shares, as reported by the ingested file.
+        shares_outstanding:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Shares outstanding, as reported by the ingested file.
+        shares_repurchased:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Shares repurchased, as reported by the ingested file.
+        vesting_start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Vesting start date, as reported by the ingested file.
+        no_of_shares_vested:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of shares vested, as reported by the ingested file.
+        compensation_benefit:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Compensation benefit amount, as reported by the ingested file.
+        last_seen_dataset_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Identifier of the most recent ingested dataset in which this record still appeared. Null for records ingested before dataset tracking began.
+        no_of_shares_granted:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of shares/units granted, as reported by the ingested file.
+        outstanding_unvested:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Outstanding unvested shares, as reported by the ingested file.
+        total_exercise_price:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Total exercise price for the grant, as reported by the ingested file.
+        employee_grant_number:
+          type: string
+          description: Shareworks grant number for this employee, as reported by the ingested file.
+        no_of_shares_unvested:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of shares unvested, as reported by the ingested file.
+        preferred_share_price:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Preferred share price, as reported by the ingested file.
+        early_exercise_allowed:
+          type:
+          - string
+          - 'null'
+          description: Whether early exercise is allowed, as reported by the ingested file (verbatim text, e.g. Yes/No).
+        formatted_home_address:
+          type:
+          - string
+          - 'null'
+          description: Formatted home address, as reported by the ingested file.
+        outstanding_exercisable:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Outstanding exercisable shares, as reported by the ingested file.
+        exercise_price_per_share:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Exercise price per share, as reported by the ingested file.
+        shares_exercised_released:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Shares exercised/released, as reported by the ingested file.
+        carta_grant_acceptance_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Carta - Grant Acceptance Date, as reported by the ingested file.
+        fmv_per_share_at_grant_date:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Fair market value per share at grant date, as reported by the ingested file.
+        split_employee_grant_number:
+          type:
+          - string
+          - 'null'
+          description: Split Employee Grant Number, as reported by the ingested file.
+        shares_subject_to_repurchase:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Shares subject to repurchase, as reported by the ingested file.
+        grant_agreement_template_name:
+          type:
+          - string
+          - 'null'
+          description: Grant agreement template name, as reported by the ingested file.
+        iso_csop_disqualification_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: ISO/CSOP disqualification date, as reported by the ingested file.
+        section_102_disqualification_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: '"102 Disqualification date" in the source file (Section 102 of the Israeli tax ordinance).'
+        shareworks_grant_agreement_print_instant:
+          type:
+          - string
+          - 'null'
+          description: Shareworks - Grant Agreement - Print Instant, as reported by the ingested file.
+        stock_options_and_awards_employee_status:
+          type:
+          - string
+          - 'null'
+          description: Stock Options and Awards Employee Status, as reported by the ingested file.
+        shareworks_grant_agreement_agreement_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Shareworks - Grant Agreement - Agreement Date, as reported by the ingested file.
+        stock_options_and_awards_employee_status_effective_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Stock Options and Awards Employee Status (Effective Date), as reported by the ingested file.
+      required:
+      - id
+      - notes
+      - row_hash
+      - last_name
+      - plan_name
+      - total_fmv
+      - created_at
+      - first_name
+      - grant_date
+      - grant_name
+      - grant_type
+      - updated_at
+      - expire_date
+      - middle_name
+      - grant_reason
+      - shares_expired
+      - source_file_id
+      - tax_identifier
+      - employee_number
+      - hris_profile_id
+      - state_exemption
+      - occurrence_index
+      - shares_cancelled
+      - vesting_schedule
+      - federal_exemption
+      - is_under_rule_701
+      - outstanding_vested
+      - shares_outstanding
+      - shares_repurchased
+      - vesting_start_date
+      - no_of_shares_vested
+      - compensation_benefit
+      - last_seen_dataset_id
+      - no_of_shares_granted
+      - outstanding_unvested
+      - total_exercise_price
+      - employee_grant_number
+      - no_of_shares_unvested
+      - preferred_share_price
+      - early_exercise_allowed
+      - formatted_home_address
+      - outstanding_exercisable
+      - exercise_price_per_share
+      - shares_exercised_released
+      - carta_grant_acceptance_date
+      - fmv_per_share_at_grant_date
+      - split_employee_grant_number
+      - shares_subject_to_repurchase
+      - grant_agreement_template_name
+      - iso_csop_disqualification_date
+      - section_102_disqualification_date
+      - shareworks_grant_agreement_print_instant
+      - stock_options_and_awards_employee_status
+      - shareworks_grant_agreement_agreement_date
+      - stock_options_and_awards_employee_status_effective_date
+      title: EquityOptionLedgerGetResponsesContentApplicationJsonSchemaDataItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

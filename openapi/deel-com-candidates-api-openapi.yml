@@ -1,127 +1,223 @@
 openapi: 3.2.0
 info:
-  title: Deel ATS Candidates API
-  description: 'Applicant Tracking System API for managing the full recruiting pipeline — jobs and
-
-    job postings, candidates, applications, attachments, offers, departments, locations,
-
-    email templates, hiring members, employment types, application sources, tags, and
-
-    reasons — with an end-to-end candidate-to-contract flow via Deel Hire.'
-  version: '2026-05-25'
-  contact:
-    name: Deel Developer Support
-    url: https://developer.deel.com/api/ats-guides/introduction
+  title: Endpoints Candidates API
+  version: 1.0.0
+  description: API endpoints related to Candidates.
 servers:
-- url: https://api.letsdeel.com/rest/v2
+- url: https://api.letsdeel.com/rest
   description: Production
-- url: https://api-sandbox.demo.deel.com/rest/v2
-  description: Sandbox
-security:
-- BearerAuth: []
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
 tags:
 - name: Candidates
-  description: Candidate records and resume attachments
+  description: API endpoints related to Candidates.
 paths:
-  /ats/candidates:
-    get:
-      operationId: getAtsCandidates
-      summary: List ATS Candidates
+  /candidates:
+    post:
+      operationId: candidates_addCandidate-v2026-01-01
+      summary: Add Candidate
+      description: 'Creates a candidate record for contractor onboarding outside of an ATS flow. The returned record can be used in subsequent contract creation calls.
+
+
+        **Token scopes**: `candidates:write`'
       tags:
       - Candidates
-      parameters:
-      - name: search
-        in: query
-        schema:
-          type: string
       responses:
-        '200':
-          description: Candidates
+        '201':
+          description: Successful operation.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AtsCandidate'
-    post:
-      operationId: createAtsCandidate
-      summary: Create ATS Candidate
-      tags:
-      - Candidates
+                $ref: '#/components/schemas/Candidates_addCandidate-v2026-01-01_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
       requestBody:
-        required: true
+        description: Add a candidate to Deel
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AtsCandidateCreate'
-      responses:
-        '201':
-          description: Candidate created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AtsCandidate'
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/CandidatesPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Details of candidate to create
+              required:
+              - data
+      security:
+      - deelToken: []
 components:
   schemas:
-    AtsCandidate:
+    CandidatesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+          description: Indicates if the candidate was created successfully.
+      required:
+      - created
+      title: CandidatesPostResponsesContentApplicationJsonSchemaData
+    CandidatesPostRequestBodyContentApplicationJsonSchemaData:
       type: object
       properties:
         id:
           type: string
-        first_name:
+          description: Unique identifier of candidate in your ATS.
+        link:
           type: string
-        last_name:
-          type: string
+          description: Link to candidate's profile in ATS.
         email:
           type: string
           format: email
-        phone:
+          minLength: 5
+          description: Worker's work email address.
+        state:
           type: string
-        location:
+          minLength: 1
+          maxLength: 50
+          description: Job location state.
+        status:
+          $ref: '#/components/schemas/CandidatesPostRequestBodyContentApplicationJsonSchemaDataStatus'
+          description: Offer status
+        country:
           type: string
-        resume_url:
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country code.
+        job_title:
           type: string
-          format: uri
-        linkedin_url:
+          description: Job Title.
+        last_name:
           type: string
-          format: uri
-        source_id:
+          description: Candidate's last name.
+        first_name:
           type: string
-        tags:
+          description: Candidate's first name.
+        start_date:
+          type: string
+          format: date
+          description: Short date in format ISO-8601 (YYYY-MM-DD).
+        nationality:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: Nationality of the worker.
+        personal_email:
+          type: string
+          format: email
+          minLength: 5
+          description: Worker's personal email address.
+      required:
+      - id
+      - link
+      - status
+      - last_name
+      - first_name
+      - start_date
+      description: Details of candidate to create
+      title: CandidatesPostRequestBodyContentApplicationJsonSchemaData
+    Candidates_addCandidate-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CandidatesPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Candidates_addCandidate-v2026-01-01_Response_201
+    CandidatesPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - offer-accepted
+      - offer-sent
+      - offer-declined
+      - offer-deleted
+      description: Offer status
+      title: CandidatesPostRequestBodyContentApplicationJsonSchemaDataStatus
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
           type: array
           items:
-            type: string
-        created_at:
-          type: string
-          format: date-time
-    AtsCandidateCreate:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
       type: object
-      required:
-      - first_name
-      - last_name
-      - email
       properties:
-        first_name:
+        message:
           type: string
-        last_name:
+          description: A description of the returned error
+        path:
           type: string
-        email:
-          type: string
-          format: email
-        phone:
-          type: string
-        location:
-          type: string
-        linkedin_url:
-          type: string
-          format: uri
-        source_id:
-          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
   securitySchemes:
-    BearerAuth:
+    deelToken:
       type: http
       scheme: bearer
-      bearerFormat: opaque
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

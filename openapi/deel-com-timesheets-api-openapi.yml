@@ -1,170 +1,2277 @@
 openapi: 3.2.0
 info:
-  title: Deel Contractors Timesheets API
-  description: 'Independent Contractor (IC), Pay-As-You-Go, Milestone, and COR (Contractor of Record)
-
-    APIs covering contract creation, amendments, bulk signing, timesheets, milestones,
-
-    IC invoicing taxes, off-cycle payments, bonuses, expense reimbursements, and onboarding.'
-  version: '2026-05-25'
-  contact:
-    name: Deel Developer Support
-    url: https://developer.deel.com/api/contractors/introduction
+  title: Endpoints Timesheets API
+  version: 1.0.0
+  description: API endpoints related to Timesheets.
 servers:
-- url: https://api.letsdeel.com/rest/v2
+- url: https://api.letsdeel.com/rest
   description: Production
-- url: https://api-sandbox.demo.deel.com/rest/v2
-  description: Sandbox
-security:
-- BearerAuth: []
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
 tags:
 - name: Timesheets
-  description: Submit, approve, and manage contractor timesheets
+  description: API endpoints related to Timesheets.
 paths:
   /timesheets:
+    post:
+      operationId: timesheets_createTimesheet
+      summary: Create a timesheet entry
+      description: 'Creates a timesheet entry for an hourly contractor, recording the contract, date, hours worked, and an optional description. The entry is immediately placed into a review workflow upon creation.
+
+
+        **Token scopes**: `timesheets:write`'
+      tags:
+      - Timesheets
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timesheets_createTimesheet_Response_201'
+        '400':
+          description: Bad Request - The request payload failed validation or violated a business rule for timesheet entries.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateATimesheetEntry-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error - The timesheet entry could not be created due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateATimesheetEntry-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Timesheet object that needs to be created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimesheetsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Payload attributes required to create one timesheet entry with optional approval, preset, and grouping metadata.
+              required:
+              - data
+      security:
+      - deelToken: []
     get:
-      operationId: getTimesheets
-      summary: List Timesheets
+      operationId: timesheets_getTimesheets
+      summary: List of timesheets
+      description: 'Returns a paginated list of timesheets in the account, optionally filtered by contract_id, contract_types, statuses, reporter_id, or date range.
+
+
+        **Token scopes**: `timesheets:read`'
       tags:
       - Timesheets
       parameters:
       - name: contract_id
         in: query
+        description: Filter results to timesheets belonging to this Deel contract ID.
+        required: false
         schema:
           type: string
-      - name: status
+      - name: contract_types
         in: query
+        description: Filter results to timesheets associated with the specified contract types.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsGetParametersContractTypesSchemaItems'
+      - name: statuses
+        in: query
+        description: Filter results to timesheets with the specified statuses.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsGetParametersStatusesSchemaItems'
+      - name: reporter_id
+        in: query
+        description: Filter results to timesheets submitted by this user ID.
+        required: false
         schema:
           type: string
-          enum:
-          - pending
-          - approved
-          - declined
-      - name: from
+          format: uuid
+      - name: date_from
         in: query
+        description: 'Filter results to timesheets submitted on or after this date (inclusive). Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        required: false
         schema:
           type: string
           format: date
-      - name: to
+      - name: date_to
         in: query
+        description: 'Filter results to timesheets submitted before this date (exclusive). Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        required: false
         schema:
           type: string
           format: date
+      - name: limit
+        in: query
+        description: 'Maximum number of records to return per page. NOTE: query parameters are passed as strings.'
+        required: false
+        schema:
+          type: string
+          pattern: ^[0-9]+$
+      - name: offset
+        in: query
+        description: 'Number of records to skip before starting to return results. NOTE: query parameters are passed as strings.'
+        required: false
+        schema:
+          type: string
+          pattern: ^[0-9]+$
       responses:
         '200':
-          description: Timesheets
+          description: Successful operation.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Timesheet'
+                $ref: '#/components/schemas/timesheets_getTimesheets_Response_200'
+        '400':
+          description: Bad Request - Validation error or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfTimesheets-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /timesheets/{id}/reviews:
     post:
-      operationId: createTimesheet
-      summary: Create Timesheet
+      operationId: timesheets_createTimesheetReview
+      summary: Create Timesheet Review
       tags:
       - Timesheets
       parameters:
-      - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
+      - name: id
+        in: path
         required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TimesheetCreate'
+        schema:
+          type: string
       responses:
-        '201':
-          description: Timesheet created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Timesheet'
-  /timesheets/{timesheet_id}/review:
-    post:
-      operationId: reviewTimesheet
-      summary: Review Timesheet
-      description: Approve or decline a contractor timesheet.
+        '200':
+          description: Successful response
+  /timesheets/{timesheet_id}:
+    delete:
+      operationId: timesheets_deleteTimesheetById-v2026-01-01
+      summary: Delete a timesheet entry
+      description: 'Permanently deletes a timesheet entry. An optional `reason` query parameter may be provided to record the rationale for deletion.
+
+
+        **Token scopes**: `timesheets:write`'
       tags:
       - Timesheets
       parameters:
       - name: timesheet_id
         in: path
+        description: ID of an existing timesheet
         required: true
         schema:
           type: string
-      requestBody:
+      - name: reason
+        in: query
+        description: Reason for deleting an existing task
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheets_deleteTimesheetById-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request - The timesheet cannot be deleted given its current status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteTimesheetById-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - The specified timesheet does not exist or the requester does not have access to it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteTimesheetById-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found - The specified timesheet does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteTimesheetById-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The timesheet could not be deleted due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteTimesheetById-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+    get:
+      operationId: timesheets_getTimesheetById-v2026-01-01
+      summary: Retrieve a single timesheet entry
+      description: 'Returns a single timesheet entry.
+
+
+        **Token scopes**: `timesheets:read`'
+      tags:
+      - Timesheets
+      parameters:
+      - name: timesheet_id
+        in: path
+        description: ID of an existing timesheet
         required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheets_getTimesheetById-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request - The id parameter failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTimesheetById-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - The specified timesheet does not exist or the requester does not have access to it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTimesheetById-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error - The timesheet could not be retrieved due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTimesheetById-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+    patch:
+      operationId: timesheets_updateATimesheetEntry-v2026-01-01
+      summary: Update a timesheet entry
+      description: 'Partially updates an existing timesheet entry; only fields supplied in the request body are modified. Both clients and contractors may perform this operation.
+
+
+        **Token scopes**: `timesheets:write`'
+      tags:
+      - Timesheets
+      parameters:
+      - name: timesheet_id
+        in: path
+        description: ID of an existing timesheet.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheets_updateATimesheetEntry-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request - The request payload failed validation or violated a business rule for the timesheet entry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateATimesheetEntry-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - The specified timesheet does not exist or the requester does not have access to it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateATimesheetEntry-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found - The specified timesheet does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateATimesheetEntry-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The timesheet could not be updated due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateATimesheetEntry-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Details of the timesheet to update. Both a client or a contractor may update a timesheet.
         content:
           application/json:
             schema:
               type: object
-              required:
-              - decision
               properties:
-                decision:
-                  type: string
-                  enum:
-                  - approve
-                  - decline
-                notes:
-                  type: string
+                data:
+                  $ref: '#/components/schemas/TimesheetsTimesheetIdPatchRequestBodyContentApplicationJsonSchemaData'
+                  description: Fields to update on the existing timesheet entry.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /timesheets/{id}:
+    get:
+      operationId: timesheets_getTimesheetById
+      summary: Get Timesheet By Id
+      tags:
+      - Timesheets
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
-          description: Timesheet reviewed
+          description: Successful response
+    patch:
+      operationId: timesheets_updateTimesheet
+      summary: Update Timesheet
+      tags:
+      - Timesheets
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+  /contracts/{contract_id}/timesheets:
+    get:
+      operationId: timesheets_getContractTimesheets
+      summary: List of timesheets by contract
+      description: 'Returns timesheets associated with the specified contract, with optional filtering by contract type, status, reporter, and date range.
+
+
+        **Token scopes**: `timesheets:read`'
+      tags:
+      - Timesheets
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: contract_types
+        in: query
+        description: Filter results to timesheets associated with the specified contract types.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTimesheetsGetParametersContractTypesSchemaItems'
+      - name: statuses
+        in: query
+        description: Filter results to timesheets with the specified statuses.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTimesheetsGetParametersStatusesSchemaItems'
+      - name: reporter_id
+        in: query
+        description: Filter results to timesheets submitted by this user ID.
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: date_from
+        in: query
+        description: 'Filter results to timesheets submitted on or after this date (inclusive). Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        description: 'Filter results to timesheets submitted before this date (exclusive). Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        description: 'Maximum number of records to return per page. NOTE: query parameters are passed as strings.'
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: 'Number of records to skip before starting to return results. NOTE: query parameters are passed as strings.'
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timesheets_getContractTimesheets_Response_200'
+        '400':
+          description: Bad Request - Validation error or invalid parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTimesheetsByContract-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - The requester does not have access to the specified contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTimesheetsByContract-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found - The specified contract does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTimesheetsByContract-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The contract timesheets could not be listed due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTimesheetsByContract-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /timesheets/{timesheet_id}/reviews:
+    post:
+      operationId: timesheets_createTimesheetReview-v2026-01-01
+      summary: Review a single timesheet
+      description: 'Submits an approve or reject decision for a timesheet entry. Approved timesheets are queued for inclusion in the next payment cycle.
+
+
+        **Token scopes**: `timesheets:write`'
+      tags:
+      - Timesheets
+      parameters:
+      - name: timesheet_id
+        in: path
+        description: ID of an existing timesheet
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheets_createTimesheetReview-v2026-01-01_Response_201'
+        '400':
+          description: Bad Request - The request payload failed validation or violated a business rule for the timesheet review.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTimesheetReview-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found - The specified timesheet id could not be found for review.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTimesheetReview-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The timesheet review could not be processed due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTimesheetReview-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimesheetsTimesheetIdReviewsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Review decision payload to apply to the timesheet entry.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /timesheets/many/reviews:
+    post:
+      operationId: timesheets_createtimesheetreviews-v2026-01-01
+      summary: Review multiple timesheets
+      description: 'Review a batch of timesheets to approve or reject submitted work.
+
+
+        **Token scopes**: `timesheets:write`'
+      tags:
+      - Timesheets
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheets_createtimesheetreviews-v2026-01-01_Response_201'
+        '400':
+          description: Bad Request - The request payload failed validation or violated a business rule for the timesheet reviews.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Createtimesheetreviews-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - The caller does not hold a client role on this organization (bare text/html body), or has no access to the contract (JSON error envelope).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Createtimesheetreviews-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found - None of the supplied ids has a pending approval request to review.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Createtimesheetreviews-v2026-01-01RequestNotFoundError'
+        '409':
+          description: Conflict - A previous batch approval for this approver is still being processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Createtimesheetreviews-v2026-01-01RequestConflictError'
+        '500':
+          description: Internal Server Error - The timesheet reviews could not be processed due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Createtimesheetreviews-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Timesheet review objects that need to be created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TimesheetsManyReviewsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
 components:
-  parameters:
-    IdempotencyKey:
-      name: Idempotency-Key
-      in: header
-      required: false
-      schema:
-        type: string
-        format: uuid
   schemas:
-    Timesheet:
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaErrorsItems
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract:
       type: object
       properties:
         id:
           type: string
-        contract_id:
+          description: Unique identifier of the contract.
+        type:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType'
+          description: Type of a contract
+        title:
           type: string
-        date:
+          description: Human-readable title of the contract.
+      required:
+      - id
+      - type
+      - title
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract
+    CreateATimesheetEntry-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the timesheet entry cannot be processed.
+      required:
+      - errors
+      title: CreateATimesheetEntry-v2026-01-01RequestInternalServerError
+    GetTimesheetsByContract-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the contract could not be found.
+      required:
+      - errors
+      title: GetTimesheetsByContract-v2026-01-01RequestNotFoundError
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      type: object
+      properties:
+        id:
           type: string
-          format: date
-        hours:
+          format: uuid
+          description: Unique identifier of the reporting user.
+        full_name:
+          type: string
+          description: Full name of the user who submitted the timesheet.
+      required:
+      - id
+      description: User who submitted the timesheet.
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the contract.
+        type:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType'
+          description: Type of a contract
+        title:
+          type: string
+          description: Human-readable title of the contract.
+      required:
+      - id
+      - type
+      - title
+      description: Contract associated with this timesheet.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract
+    DeleteTimesheetById-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the timesheet cannot be deleted.
+      required:
+      - errors
+      title: DeleteTimesheetById-v2026-01-01RequestInternalServerError
+    TimesheetsManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      description: The status to set for the timesheets
+      title: TimesheetsManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus
+    ContractsContractIdTimesheetsGetParametersStatusesSchemaItems:
+      type: string
+      enum:
+      - approved
+      - declined
+      - new
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Current processing status of the timesheet.
+      title: ContractsContractIdTimesheetsGetParametersStatusesSchemaItems
+    UpdateATimesheetEntry-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the timesheet cannot be updated.
+      required:
+      - errors
+      title: UpdateATimesheetEntry-v2026-01-01RequestInternalServerError
+    GetTimesheetsByContract-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation errors describing why the contract timesheets could not be listed.
+      required:
+      - errors
+      title: GetTimesheetsByContract-v2026-01-01RequestBadRequestError
+    GetTimesheetById-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation errors describing why the timesheet could not be retrieved.
+      required:
+      - errors
+      title: GetTimesheetById-v2026-01-01RequestBadRequestError
+    GetTimesheetById-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the timesheet cannot be retrieved.
+      required:
+      - errors
+      title: GetTimesheetById-v2026-01-01RequestInternalServerError
+    CreateTimesheetReview-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdReviewsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the timesheet to review could not be found.
+      required:
+      - errors
+      title: CreateTimesheetReview-v2026-01-01RequestNotFoundError
+    CreateTimesheetReview-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdReviewsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation or business rule errors describing why the timesheet review could not be processed, such as invalid input or the organization requiring the approval-requests workflow instead.
+      required:
+      - errors
+      title: CreateTimesheetReview-v2026-01-01RequestBadRequestError
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: Unique identifier of the related timesheet preset.
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Hourly rate of the related timesheet preset.
+        title:
+          type:
+          - string
+          - 'null'
+          description: Title of the related timesheet preset.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description of the related timesheet preset.
+      description: Timesheet preset linked to this entry, if any.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset
+    timesheets_getContractTimesheets_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of timesheet entries associated with the specified contract.
+        page:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaPage'
+          description: Pagination metadata for the response.
+      required:
+      - data
+      - page
+      title: timesheets_getContractTimesheets_Response_200
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle:
+      type: object
+      properties:
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: End date of the payment cycle (ISO-8601).
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Start date of the payment cycle (ISO-8601).
+      description: Payment cycle associated with this timesheet.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Status of this entry.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataStatus
+    TimesheetsTimesheetIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        quantity:
           type: number
+          format: double
+          description: Number of work units (typically hours) to record based on the scale defined in the associated contract work statement.
         description:
           type: string
-        status:
+          maxLength: 255
+          description: Detailed human-readable explanation of the work performed.
+        hourly_report_preset_id:
+          type:
+          - string
+          - 'null'
+          description: Id of an existing timesheets preset. Created through /rest/v2/timesheets/presets
+      required:
+      - quantity
+      - description
+      description: Fields to update on the existing timesheet entry.
+      title: TimesheetsTimesheetIdPatchRequestBodyContentApplicationJsonSchemaData
+    TimesheetsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
           type: string
-          enum:
-          - pending
-          - approved
-          - declined
-        submitted_at:
+          description: Stable machine-readable error code identifying the upstream or internal failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition that prevented completing the request.
+      required:
+      - message
+      title: TimesheetsPostResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        total_rows:
+          type: number
+          format: double
+          description: Total number of records available.
+      required:
+      - total_rows
+      description: Pagination metadata for the response.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaPage
+    TimesheetsTimesheetIdReviewsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: TimesheetsTimesheetIdReviewsPostResponsesContentApplicationJsonSchemaErrorsItems
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataId'
+          description: Unique identifier of this resource.
+        type:
+          type: string
+          description: Deprecated - it is always "work"
+        scale:
+          type:
+          - string
+          - 'null'
+          description: Predefined scale used to calculate the timesheet amount (e.g. hourly, daily, custom).
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: Status of this entry.
+        contract:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataContract'
+          description: Contract associated with this timesheet.
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Quantity of work units (hours, days, etc.) used to calculate the total amount.
+        worksheet:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataWorksheet'
+          - type: 'null'
+          description: Breakdown of time worked across different units.
+        attachment:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataAttachment'
+          - type: 'null'
+          description: This object is used for linking file attachments to your records.
+        created_at:
+          type: string
+          description: Timestamp when the timesheet was created (ISO-8601).
+        description:
+          type: string
+          description: Human-readable description of the work performed.
+        reported_by:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReportedBy'
+          description: User who submitted the timesheet.
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewedBy'
+          - type: 'null'
+          description: Reviewer information if the timesheet has been reviewed.
+        custom_scale:
+          type:
+          - string
+          - 'null'
+          description: Custom scale label defined by the client for non-standard billing rates.
+        total_amount:
+          type: string
+          description: is equal to quantity times rate of active work statement + bonus in this record
+        currency_code:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: ISO 4217 currency code used for the amount.
+        payment_cycle:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataPaymentCycle'
+          description: Payment cycle associated with this timesheet.
+        date_submitted:
           type: string
           format: date-time
-    TimesheetCreate:
-      type: object
+          description: Long date-time format following ISO-8601
+        hourly_report_preset:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataHourlyReportPreset'
+          - type: 'null'
+          description: Timesheet preset linked to this entry, if any.
+        approvers:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataApproversItems'
+          description: List of approvers and their decisions recorded against this timesheet.
       required:
-      - contract_id
-      - date
-      - hours
+      - id
+      - type
+      - status
+      - contract
+      - quantity
+      - worksheet
+      - attachment
+      - created_at
+      - description
+      - reported_by
+      - reviewed_by
+      - total_amount
+      - currency_code
+      - date_submitted
+      - approvers
+      description: Timesheet entry combining its core fields with any approver decisions recorded against it.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaData
+    TimesheetsTimesheetIdReviewsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
       properties:
-        contract_id:
-          type: string
-        date:
-          type: string
-          format: date
+        reason:
+          type:
+          - string
+          - 'null'
+          description: Optional reason accompanying the review decision, typically used when declining a timesheet.
+        status:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus'
+          description: Review decision to apply to the timesheet.
+      required:
+      - status
+      description: Review decision payload to apply to the timesheet entry.
+      title: TimesheetsTimesheetIdReviewsPostRequestBodyContentApplicationJsonSchemaData
+    DeleteTimesheetById-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Business rule errors describing why the timesheet could not be deleted, such as its current status or type.
+      required:
+      - errors
+      title: DeleteTimesheetById-v2026-01-01RequestBadRequestError
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataWorksheet:
+      type: object
+      properties:
+        days:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of days reported.
         hours:
           type: number
+          format: double
+          minimum: 0
+          description: Number of hours reported.
+        weeks:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of weeks reported.
+        minutes:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of minutes reported.
+      required:
+      - days
+      - hours
+      - weeks
+      - minutes
+      description: Breakdown of time worked across different units.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataWorksheet
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataHourlyReportPreset:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: unique identifier of the related timesheet preset
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: the hourly rate of the related timesheet preset
+        title:
+          type:
+          - string
+          - 'null'
+          description: the title of the related timesheet preset
+        description:
+          type:
+          - string
+          - 'null'
+          description: the description of the related timesheet preset
+      description: Timesheet preset linked to this entry, if any.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataHourlyReportPreset
+    Createtimesheetreviews-v2026-01-01RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsManyReviewsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the batch review conflicts with work already in progress.
+      required:
+      - errors
+      title: Createtimesheetreviews-v2026-01-01RequestConflictError
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment:
+      type: object
+      properties:
+        key:
+          type: string
+          description: You can call attachments end-point, get key and URL to upload your file.
+        filename:
+          type: string
+          description: Original filename you used to upload using attachments end-point.
+      required:
+      - key
+      - filename
+      description: This object is used for linking file attachments to your records.
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - new
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Current processing status of the timesheet.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    Createtimesheetreviews-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsManyReviewsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why none of the referenced timesheets could be reviewed.
+      required:
+      - errors
+      title: Createtimesheetreviews-v2026-01-01RequestNotFoundError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    CreateATimesheetEntry-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation or business rule errors describing why the timesheet entry could not be created.
+      required:
+      - errors
+      title: CreateATimesheetEntry-v2026-01-01RequestBadRequestError
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContractType
+    TimesheetsTimesheetIdDeleteResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: TimesheetsTimesheetIdDeleteResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsContractIdTimesheetsGetParametersContractTypesSchemaItems:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: ContractsContractIdTimesheetsGetParametersContractTypesSchemaItems
+    TimesheetsGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: Method of the API
+        status:
+          type: number
+          format: double
+          description: Status of API response
+      description: Error request details
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaRequest
+    DeleteTimesheetById-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the timesheet could not be found or accessed.
+      required:
+      - errors
+      title: DeleteTimesheetById-v2026-01-01RequestForbiddenError
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataPaymentCycle:
+      type: object
+      properties:
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+      description: Payment cycle associated with this timesheet.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataPaymentCycle
+    TimesheetsPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Current processing status assigned to the timesheet entry after the create workflow finishes executing.
+      title: TimesheetsPostResponsesContentApplicationJsonSchemaDataStatus
+    TimesheetsTimesheetIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        updated:
+          type: boolean
+          description: Confirms the update.
+      required:
+      - updated
+      description: Container object confirming the outcome of the update operation.
+      title: TimesheetsTimesheetIdPatchResponsesContentApplicationJsonSchemaData
+    GetTimesheetsByContract-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the contract timesheets cannot be listed.
+      required:
+      - errors
+      title: GetTimesheetsByContract-v2026-01-01RequestInternalServerError
+    Timesheets_createtimesheetreviews-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsManyReviewsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Timesheets_createtimesheetreviews-v2026-01-01_Response_201
+    TimesheetsTimesheetIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      description: Review decision to apply to the timesheet.
+      title: TimesheetsTimesheetIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus
+    timesheets_getTimesheets_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaPage'
+          description: Pagination metadata for the response.
+      required:
+      - data
+      - page
+      title: timesheets_getTimesheets_Response_200
+    TimesheetsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error response
+      required:
+      - message
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaErrorsItems
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      description: Unique identifier of the reviewer.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewedById
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataContractType:
+      type: string
+      enum:
+      - ongoing_time_based
+      - milestones
+      - time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      - eor
+      - unknown
+      - employee
+      - global_payroll
+      - shield_msa
+      - hris_direct_employee
+      - peo
+      description: Type of a contract
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataContractType
+    TimesheetsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        total_rows:
+          type: number
+          format: double
+          description: Total number of records available.
+      required:
+      - total_rows
+      description: Pagination metadata for the response.
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaPage
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the reviewer.
+        remarks:
+          type: string
+          description: Reviewer remarks or decision notes.
+        full_name:
+          type: string
+          description: Full name of the reviewer.
+        reviewed_at:
+          type: string
+          description: Timestamp when the review occurred (ISO-8601).
+      required:
+      - id
+      - remarks
+      - reviewed_at
+      description: Reviewer information if the timesheet has been reviewed.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy
+    Createtimesheetreviews-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsManyReviewsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation or business rule errors describing why the timesheet reviews could not be created.
+      required:
+      - errors
+      title: Createtimesheetreviews-v2026-01-01RequestBadRequestError
+    CreateTimesheetReview-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdReviewsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the timesheet review cannot be processed.
+      required:
+      - errors
+      title: CreateTimesheetReview-v2026-01-01RequestInternalServerError
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReportedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      description: Unique identifier of the reporting user.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReportedById
+    TimesheetsGetParametersContractTypesSchemaItems:
+      type: string
+      enum:
+      - ongoing_time_based
+      - pay_as_you_go_time_based
+      - payg_milestones
+      - payg_tasks
+      description: Type of a contract
+      title: TimesheetsGetParametersContractTypesSchemaItems
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        type:
+          type: string
+          description: Deprecated - it is always "work"
+        scale:
+          type:
+          - string
+          - 'null'
+          description: Predefined scale used to calculate the timesheet amount (e.g. hourly, daily, custom).
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          - type: 'null'
+          description: Current processing status of the timesheet.
+        contract:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract'
+          description: Contract associated with this timesheet.
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Quantity of work units (hours, days, etc.) used to calculate the total amount.
+        worksheet:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet'
+          - type: 'null'
+          description: Breakdown of time worked across different units.
+        attachment:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment'
+          - type: 'null'
+          description: This object is used for linking file attachments to your records.
+        created_at:
+          type: string
+          description: Timestamp when the timesheet was created (ISO-8601).
         description:
           type: string
+          description: Human-readable description of the work performed.
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy'
+          description: User who submitted the timesheet.
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy'
+          - type: 'null'
+          description: Reviewer information if the timesheet has been reviewed.
+        custom_scale:
+          type:
+          - string
+          - 'null'
+          description: Custom scale label defined by the client for non-standard billing rates.
+        total_amount:
+          type: string
+          description: Total monetary value equal to quantity times rate of active work statement plus any bonus.
+        currency_code:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: ISO 4217 currency code used for the amount.
+        payment_cycle:
+          $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle'
+          description: Payment cycle associated with this timesheet.
+        date_submitted:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the timesheet was submitted for review (ISO-8601).
+        hourly_report_preset:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset'
+          - type: 'null'
+          description: Timesheet preset linked to this entry, if any.
+      required:
+      - id
+      - type
+      - status
+      - contract
+      - quantity
+      - worksheet
+      - created_at
+      - description
+      - reported_by
+      - total_amount
+      - currency_code
+      - date_submitted
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItems
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewedById'
+          description: Unique identifier of the reviewer.
+        remarks:
+          type: string
+          description: Reviewer remarks or decision notes.
+        full_name:
+          type: string
+          description: Full name of the reviewer.
+        reviewed_at:
+          type: string
+          description: Timestamp when the review occurred (ISO-8601).
+      required:
+      - id
+      - remarks
+      - reviewed_at
+      description: Reviewer information if the timesheet has been reviewed.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReviewedBy
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the reviewer.
+        remarks:
+          type: string
+          description: Reviewer remarks or decision notes.
+        full_name:
+          type: string
+          description: Full name of the reviewer.
+        reviewed_at:
+          type: string
+          format: date-time
+          description: Timestamp when the review occurred (ISO-8601).
+      required:
+      - id
+      - remarks
+      - reviewed_at
+      description: Reviewer information if the timesheet has been reviewed.
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy
+    TimesheetsGetParametersStatusesSchemaItems:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Current processing status of the timesheet.
+      title: TimesheetsGetParametersStatusesSchemaItems
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Current processing status of the timesheet.
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    TimesheetsManyReviewsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+          description: Indicates if the timesheet review was created successfully
+      required:
+      - created
+      title: TimesheetsManyReviewsPostResponsesContentApplicationJsonSchemaData
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        type:
+          type: string
+          description: Deprecated - it is always "work"
+        scale:
+          type:
+          - string
+          - 'null'
+          description: Predefined scale used to calculate the timesheet amount (e.g. hourly, daily, custom).
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          - type: 'null'
+          description: Current processing status of the timesheet.
+        contract:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsContract'
+        quantity:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Quantity of work units (hours, days, etc.) used to calculate the total amount.
+        worksheet:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet'
+          - type: 'null'
+          description: Breakdown of time worked across different units.
+        attachment:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment'
+          - type: 'null'
+          description: This object is used for linking file attachments to your records.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the timesheet was created (ISO-8601).
+        description:
+          type: string
+          description: Human-readable description of the work performed.
+        reported_by:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy'
+          description: User who submitted the timesheet.
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy'
+          - type: 'null'
+          description: Reviewer information if the timesheet has been reviewed.
+        custom_scale:
+          type:
+          - string
+          - 'null'
+          description: Custom scale label defined by the client for non-standard billing rates.
+        total_amount:
+          type: string
+          description: Total monetary value equal to quantity times rate of active work statement plus any bonus.
+        currency_code:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: ISO 4217 currency code used for the amount.
+        payment_cycle:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle'
+          description: Payment cycle associated with this timesheet.
+        date_submitted:
+          type: string
+          format: date-time
+          description: Timestamp when the timesheet was submitted for review (ISO-8601).
+        hourly_report_preset:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset'
+          - type: 'null'
+          description: Timesheet preset linked to this entry, if any.
+      required:
+      - id
+      - type
+      - status
+      - contract
+      - quantity
+      - worksheet
+      - created_at
+      - description
+      - reported_by
+      - total_amount
+      - currency_code
+      - date_submitted
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItems
+    TimesheetsManyReviewsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: TimesheetsManyReviewsPostResponsesContentApplicationJsonSchemaErrorsItems
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataApproversItems:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email address of the approver.
+        approved:
+          type: boolean
+          description: Whether the approver has approved the timesheet.
+        full_name:
+          type: string
+          description: Full name of the approver.
+      required:
+      - approved
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataApproversItems
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    TimesheetsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        quantity:
+          type: number
+          format: double
+          minimum: 0.01
+          description: Number of work units (typically hours) to record based on the scale defined in the associated contract work statement.
+        group_key:
+          type:
+          - string
+          - 'null'
+          maxLength: 300
+          description: When provided, timesheets sharing the same group_key within the same payment cycle are merged into a single aggregated line item on the invoice. Requires is_auto_approved to be true.
+        contract_id:
+          type: string
+          description: Unique Deel contract identifier (public id) that receives this timesheet entry line item.
+        description:
+          type: string
+          default: ''
+          description: Detailed human-readable explanation of the work performed that appears on the invoice and audit records.
+        date_submitted:
+          type: string
+          format: date
+          description: Date the work was performed in ISO-8601 short-date format (YYYY-MM-DD) used for filtering and approvals.
+        is_auto_approved:
+          type: boolean
+          description: When true, the created timesheet entry skips manual approval and is approved immediately on creation.
+        hourly_report_preset_id:
+          type:
+          - string
+          - 'null'
+          description: Identifier of an existing timesheet preset used to link a standardized hourly rate and label to this entry.
+      required:
+      - quantity
+      - contract_id
+      - description
+      - date_submitted
+      description: Payload attributes required to create one timesheet entry with optional approval, preset, and grouping metadata.
+      title: TimesheetsPostRequestBodyContentApplicationJsonSchemaData
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: Unique identifier of the related timesheet preset.
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Hourly rate of the related timesheet preset.
+        title:
+          type:
+          - string
+          - 'null'
+          description: Title of the related timesheet preset.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description of the related timesheet preset.
+      description: Timesheet preset linked to this entry, if any.
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsHourlyReportPreset
+    Createtimesheetreviews-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsManyReviewsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the caller may not review these timesheets, emitted when contract access is denied.
+      required:
+      - errors
+      title: Createtimesheetreviews-v2026-01-01RequestForbiddenError
+    Timesheets_createTimesheetReview-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdReviewsPostResponsesContentApplicationJsonSchemaData'
+          description: Container object confirming the outcome of the review operation.
+      required:
+      - data
+      title: Timesheets_createTimesheetReview-v2026-01-01_Response_201
+    Timesheets_getTimesheetById-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaData'
+          description: Timesheet entry combining its core fields with any approver decisions recorded against it.
+      required:
+      - data
+      title: Timesheets_getTimesheetById-v2026-01-01_Response_200
+    Timesheets_deleteTimesheetById-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdDeleteResponsesContentApplicationJsonSchemaData'
+          description: Container object confirming the outcome of the delete operation.
+      required:
+      - data
+      title: Timesheets_deleteTimesheetById-v2026-01-01_Response_200
+    GetTimesheetById-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the timesheet could not be found or accessed.
+      required:
+      - errors
+      title: GetTimesheetById-v2026-01-01RequestForbiddenError
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment:
+      type: object
+      properties:
+        key:
+          type: string
+          description: You can call attachments end-point, get key and URL to upload your file.
+        filename:
+          type: string
+          description: Original filename you used to upload using attachments end-point.
+      required:
+      - key
+      - filename
+      description: This object is used for linking file attachments to your records.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsAttachment
+    TimesheetsTimesheetIdReviewsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+          description: Confirms the review was recorded.
+      required:
+      - created
+      description: Container object confirming the outcome of the review operation.
+      title: TimesheetsTimesheetIdReviewsPostResponsesContentApplicationJsonSchemaData
+    UpdateATimesheetEntry-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the timesheet could not be found or accessed.
+      required:
+      - errors
+      title: UpdateATimesheetEntry-v2026-01-01RequestForbiddenError
+    DeleteTimesheetById-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the timesheet could not be found.
+      required:
+      - errors
+      title: DeleteTimesheetById-v2026-01-01RequestNotFoundError
+    UpdateATimesheetEntry-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the timesheet could not be found.
+      required:
+      - errors
+      title: UpdateATimesheetEntry-v2026-01-01RequestNotFoundError
+    TimesheetsTimesheetIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms the deletion.
+      required:
+      - deleted
+      description: Container object confirming the outcome of the delete operation.
+      title: TimesheetsTimesheetIdDeleteResponsesContentApplicationJsonSchemaData
+    GetTimesheetsByContract-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the contract timesheets could not be accessed.
+      required:
+      - errors
+      title: GetTimesheetsByContract-v2026-01-01RequestForbiddenError
+    Createtimesheetreviews-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsManyReviewsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the timesheet reviews cannot be processed.
+      required:
+      - errors
+      title: Createtimesheetreviews-v2026-01-01RequestInternalServerError
+    ListOfTimesheets-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Error messages
+        request:
+          $ref: '#/components/schemas/TimesheetsGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details
+      required:
+      - errors
+      title: ListOfTimesheets-v2026-01-01RequestBadRequestError
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet:
+      type: object
+      properties:
+        days:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of days reported.
+        hours:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of hours reported.
+        weeks:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of weeks reported.
+        minutes:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of minutes reported.
+      required:
+      - days
+      - hours
+      - weeks
+      - minutes
+      description: Breakdown of time worked across different units.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet
+    UpdateATimesheetEntry-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetsTimesheetIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation or business rule errors describing why the timesheet could not be updated, such as invalid input or its current status.
+      required:
+      - errors
+      title: UpdateATimesheetEntry-v2026-01-01RequestBadRequestError
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet:
+      type: object
+      properties:
+        days:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of days reported.
+        hours:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of hours reported.
+        weeks:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of weeks reported.
+        minutes:
+          type: number
+          format: double
+          minimum: 0
+          description: Number of minutes reported.
+      required:
+      - days
+      - hours
+      - weeks
+      - minutes
+      description: Breakdown of time worked across different units.
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsWorksheet
+    TimesheetsTimesheetIdPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: TimesheetsTimesheetIdPatchResponsesContentApplicationJsonSchemaErrorsItems
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    Timesheets_updateATimesheetEntry-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdPatchResponsesContentApplicationJsonSchemaData'
+          description: Container object confirming the outcome of the update operation.
+      required:
+      - data
+      title: Timesheets_updateATimesheetEntry-v2026-01-01_Response_200
+    TimesheetsManyReviewsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+        reason:
+          type:
+          - string
+          - 'null'
+          description: The reason for review status
+        status:
+          $ref: '#/components/schemas/TimesheetsManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus'
+          description: The status to set for the timesheets
+      required:
+      - ids
+      - status
+      title: TimesheetsManyReviewsPostRequestBodyContentApplicationJsonSchemaData
+    TimesheetsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier returned for the created timesheet entry resource after persistence succeeds.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/TimesheetsPostResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: Current processing status assigned to the timesheet entry after the create workflow finishes executing.
+        created:
+          type: boolean
+          description: Flag indicating whether the timesheet entry record was successfully persisted by this request.
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: ISO-8601 timestamp recording the exact moment the timesheet entry was created in the system.
+      required:
+      - created
+      description: Container object with identifiers, status, and creation metadata for the newly created timesheet entry.
+      title: TimesheetsPostResponsesContentApplicationJsonSchemaData
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataAttachment:
+      type: object
+      properties:
+        key:
+          type: string
+          description: You can call attachments end-point, get key and URL to upload your file.
+        filename:
+          type: string
+          description: Original filename you used to upload using attachments end-point.
+      required:
+      - key
+      - filename
+      description: This object is used for linking file attachments to your records.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataAttachment
+    ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the reporting user.
+        full_name:
+          type: string
+          description: Full name of the user who submitted the timesheet.
+      required:
+      - id
+      description: User who submitted the timesheet.
+      title: ContractsContractIdTimesheetsGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+    TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle:
+      type: object
+      properties:
+        end_date:
+          type: string
+          format: date-time
+          description: End date of the payment cycle (ISO-8601).
+        start_date:
+          type: string
+          format: date-time
+          description: Start date of the payment cycle (ISO-8601).
+      description: Payment cycle associated with this timesheet.
+      title: TimesheetsGetResponsesContentApplicationJsonSchemaDataItemsPaymentCycle
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      description: Unique identifier of this resource.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataId
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataContract:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the contract.
+        type:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataContractType'
+          description: Type of a contract
+        title:
+          type: string
+          description: Human-readable title of the contract.
+      required:
+      - id
+      - type
+      - title
+      description: Contract associated with this timesheet.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataContract
+    timesheets_createTimesheet_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TimesheetsPostResponsesContentApplicationJsonSchemaData'
+          description: Container object with identifiers, status, and creation metadata for the newly created timesheet entry.
+      required:
+      - data
+      title: timesheets_createTimesheet_Response_201
+    TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReportedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReportedById'
+          description: Unique identifier of the reporting user.
+        full_name:
+          type: string
+          description: Full name of the user who submitted the timesheet.
+      required:
+      - id
+      description: User who submitted the timesheet.
+      title: TimesheetsTimesheetIdGetResponsesContentApplicationJsonSchemaDataReportedBy
   securitySchemes:
-    BearerAuth:
+    deelToken:
       type: http
       scheme: bearer
-      bearerFormat: opaque
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

@@ -1,0 +1,309 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Tags API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsTags
+paths:
+  /ats/tags:
+    get:
+      operationId: atsTags_listTags-v2026-02-27
+      summary: List tags
+      description: 'Returns a paginated list of tags associated with the organization, filterable by label and `tag_group_slug`; when `include_counts` is true, each tag includes a count of associated candidates.
+
+
+        **Token scopes**: `ats:read`, `worker:read`'
+      tags:
+      - atsTags
+      parameters:
+      - name: search_text
+        in: query
+        description: Filter tags by label (case-insensitive partial match)
+        required: false
+        schema:
+          type: string
+          maxLength: 50
+      - name: tag_group_slug
+        in: query
+        description: Filter by tag group. Use CANDIDATE for candidate tags.
+        required: false
+        schema:
+          $ref: '#/components/schemas/AtsTagsGetParametersTagGroupSlug'
+      - name: include_archived
+        in: query
+        description: If true, archived tags are included in the response; they are excluded by default.
+        required: false
+        schema:
+          type: string
+      - name: include_counts
+        in: query
+        description: When true, each tag includes candidates_count (number of candidates with that tag)
+        required: false
+        schema:
+          $ref: '#/components/schemas/AtsTagsGetParametersIncludeCounts'
+          default: 'false'
+      - name: cursor
+        in: query
+        description: Opaque cursor for pagination. Use the value from next_cursor of the previous response to fetch the next page.
+        required: false
+        schema:
+          type: string
+          maxLength: 1000
+      - name: limit
+        in: query
+        description: 'Maximum number of tags to return per page (default: 20, max: 100).'
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: Successful operation. Returns the list of tags for the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-tags_listTags-v2026-02-27_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTags-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTags-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTags-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    AtsTagsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsTagsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ListTags-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsTagsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: ListTags-v2026-01-01RequestInternalServerError
+    ListTags-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsTagsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: ListTags-v2026-01-01RequestBadRequestError
+    AtsTagsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the tag.
+        label:
+          type: string
+          description: Display name of the tag.
+        created_at:
+          type: string
+          format: date-time
+          description: When the tag was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: When the tag was last updated.
+        archived_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the tag was archived; null while the tag is active and selectable.
+        tag_group_slug:
+          $ref: '#/components/schemas/AtsTagsGetResponsesContentApplicationJsonSchemaDataItemsTagGroupSlug'
+          description: Tag group. Use CANDIDATE for candidate tags.
+        candidates_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of candidates with this tag. Present only when include_counts=true.
+        created_by_hris_organization_user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: ID of the user who created the tag, if any.
+        updated_by_hris_organization_user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: ID of the user who last updated the tag, if any.
+      required:
+      - id
+      - created_at
+      - updated_at
+      title: AtsTagsGetResponsesContentApplicationJsonSchemaDataItems
+    ListTags-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsTagsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: ListTags-v2026-01-01RequestForbiddenError
+    ats-tags_listTags-v2026-02-27_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsTagsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of tags.
+        has_more:
+          type: boolean
+          description: Whether more results exist (pagination).
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          maxLength: 1000
+          description: Cursor for the next page of results, or null if none.
+        total_count:
+          type: integer
+          minimum: 0
+          description: Total number of tags returned.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: ats-tags_listTags-v2026-02-27_Response_200
+    AtsTagsGetResponsesContentApplicationJsonSchemaDataItemsTagGroupSlug:
+      type: string
+      enum:
+      - CANDIDATE
+      description: Tag group. Use CANDIDATE for candidate tags.
+      title: AtsTagsGetResponsesContentApplicationJsonSchemaDataItemsTagGroupSlug
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    AtsTagsGetParametersIncludeCounts:
+      type: string
+      enum:
+      - 'true'
+      - 'false'
+      default: 'false'
+      title: AtsTagsGetParametersIncludeCounts
+    AtsTagsGetParametersTagGroupSlug:
+      type: string
+      enum:
+      - CANDIDATE
+      title: AtsTagsGetParametersTagGroupSlug
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

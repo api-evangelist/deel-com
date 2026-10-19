@@ -1,0 +1,247 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Email Templates API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsEmailTemplates
+paths:
+  /ats/email-templates:
+    get:
+      operationId: atsEmailTemplates_retrieveAListOfPublishedAtsEmailTemplates-v2026-02-11
+      summary: Retrieve a list of published ATS email templates
+      description: 'Lists the published email templates of the organization. Use it to see which templates exist, or to keep a local copy in sync by fetching only those updated since your last check. Drafts and template bodies are not included.
+
+
+        **Token scopes**: `ats:read`, `worker:read`'
+      tags:
+      - atsEmailTemplates
+      parameters:
+      - name: cursor
+        in: query
+        description: Cursor for pagination. Use the nextCursor value from the previous response to get the next page of results.
+        required: false
+        schema:
+          type: string
+          maxLength: 1000
+      - name: limit
+        in: query
+        description: Maximum number of email templates to return per page
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: updated_after
+        in: query
+        description: Return only email templates that were updated after this timestamp (ISO 8601 format)
+        required: false
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Successfully retrieved email templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-email-templates_retrieveAListOfPublishedAtsEmailTemplates-v2026-02-11_Response_200'
+        '400':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfPublishedAtsEmailTemplates-v2026-02-11RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfPublishedAtsEmailTemplates-v2026-02-11RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfPublishedAtsEmailTemplates-v2026-02-11RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    AtsEmailTemplatesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsEmailTemplatesGetResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveAListOfPublishedAtsEmailTemplates-v2026-02-11RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsEmailTemplatesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfPublishedAtsEmailTemplates-v2026-02-11RequestInternalServerError
+    ats-email-templates_retrieveAListOfPublishedAtsEmailTemplates-v2026-02-11_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsEmailTemplatesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of email templates.
+        has_more:
+          type: boolean
+          description: Whether more pages are available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to fetch the next page; null when there are no more pages.
+        total_count:
+          type: integer
+          description: Total number of email templates matching filters.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: ats-email-templates_retrieveAListOfPublishedAtsEmailTemplates-v2026-02-11_Response_200
+    RetrieveAListOfPublishedAtsEmailTemplates-v2026-02-11RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsEmailTemplatesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfPublishedAtsEmailTemplates-v2026-02-11RequestForbiddenError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    RetrieveAListOfPublishedAtsEmailTemplates-v2026-02-11RequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: array
+          items:
+            type: string
+        statusCode:
+          type: number
+          format: double
+      title: RetrieveAListOfPublishedAtsEmailTemplates-v2026-02-11RequestBadRequestError
+    AtsEmailTemplatesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Email template unique identifier
+        title:
+          type: string
+          description: Email template title
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the email template was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the email template was last updated
+      required:
+      - id
+      - title
+      - created_at
+      - updated_at
+      title: AtsEmailTemplatesGetResponsesContentApplicationJsonSchemaDataItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

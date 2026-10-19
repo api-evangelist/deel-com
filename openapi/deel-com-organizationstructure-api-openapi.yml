@@ -1,0 +1,1159 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Organization Structure API
+  version: 1.0.0
+  description: API endpoints related to Organization structure.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: organizationStructure
+  description: API endpoints related to Organization structure.
+paths:
+  /hris/organization_structures:
+    post:
+      operationId: organizationStructure_createOrganizationStructure
+      summary: Create a new HRIS Organization Structure
+      description: 'Creates a new organization structure within the HRIS, returning the created record including its assigned `id` and `organization_id`. The `is_multi_select` and `enable_roles` flags on the request body control whether the structure supports multiple team assignments and role management respectively.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - organizationStructure
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization-structure_createOrganizationStructure_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateANewHrisOrganizationStructure-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateANewHrisOrganizationStructure-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisOrganizationStructuresPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+    get:
+      operationId: organizationStructure_getOrganizationStructures
+      summary: Get Organization Structures
+      description: 'Returns the organization''s hierarchical structure, including departments and teams, with offset-based pagination.
+
+
+        **Token scopes**: `organizations:read`'
+      tags:
+      - organizationStructure
+      parameters:
+      - name: offset
+        in: query
+        description: Return a page of results with given number of records.
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 999999999
+          default: 0
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records.
+        required: false
+        schema:
+          type: number
+          format: double
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization-structure_getOrganizationStructures_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /hris/organization_structures/{hris_org_structure_id}:
+    delete:
+      operationId: organizationStructure_deleteOrganizationStructure
+      summary: Delete an Org Structure from the Organization
+      description: 'Delete an Org Structure from the Organization. Use the force flag to bypass validation checks and remove the structure even when profiles are still assigned to it.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - organizationStructure
+      parameters:
+      - name: hris_org_structure_id
+        in: path
+        description: Org Structure
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization-structure_deleteOrganizationStructure_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteAnOrgStructureFromTheOrganization-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteAnOrgStructureFromTheOrganization-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+    get:
+      operationId: organizationStructure_getOrganizationStructure
+      summary: Get Organization Structure
+      description: 'Retrieves detailed information about a specific organizational structure including its teams and roles.
+
+
+        **Token scopes**: `organizations:read`'
+      tags:
+      - organizationStructure
+      parameters:
+      - name: hris_org_structure_id
+        in: path
+        description: HRIS Organization Structure ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization-structure_getOrganizationStructure_Response_200'
+        '400':
+          description: Bad request - The provided hrisOrgStructureId is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchAnOrgStructureFromTheOrganization-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not found - No organization structure exists for the provided ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchAnOrgStructureFromTheOrganization-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    patch:
+      operationId: organizationStructure_updateOrganizationStructure
+      summary: Update an existing HRIS Org Structure
+      description: 'Update an existing HRIS Org Structure including its name, settings, and teams hierarchy.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - organizationStructure
+      parameters:
+      - name: hris_org_structure_id
+        in: path
+        description: Org Structure
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization-structure_updateOrganizationStructure_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAnExistingHrisOrgStructure-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAnExistingHrisOrgStructure-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdPatchRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /hris/organization_structures/external/{external_id}:
+    delete:
+      operationId: organizationStructure_deleteOrganizationStructureByExternalId
+      summary: Delete an Org Structure from the Organization by external ID
+      description: 'Permanently removes an organization structure from the organization.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - organizationStructure
+      parameters:
+      - name: external_id
+        in: path
+        description: External ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization-structure_deleteOrganizationStructureByExternalId_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    get:
+      operationId: organizationStructure_getOrganizationStructureByExternalId
+      summary: Get Organization Structure by External ID
+      description: 'Fetches a single organization structure, returning associated roles and teams alongside structure metadata.
+
+
+        **Token scopes**: `organizations:read`'
+      tags:
+      - organizationStructure
+      parameters:
+      - name: external_id
+        in: path
+        description: External ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization-structure_getOrganizationStructureByExternalId_Response_200'
+        '400':
+          description: Bad request - The provided hrisOrgStructureId is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchAnOrgStructureFromTheOrganization-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not found - No organization structure exists for the provided ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchAnOrgStructureFromTheOrganization-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    patch:
+      operationId: organizationStructure_updateOrganizationStructureByExternalId
+      summary: Update an existing HRIS Org Structure by external ID
+      description: 'Applies a partial update to an existing organization structure. Only fields provided in the request body are modified; omitted fields retain their current values.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - organizationStructure
+      parameters:
+      - name: external_id
+        in: path
+        description: External ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization-structure_updateOrganizationStructureByExternalId_Response_200'
+        '400':
+          description: Bad request - The request body is invalid or missing required fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAnExistingHrisOrgStructureByExternalId-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not found - No organization structure exists for the provided externalId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAnExistingHrisOrgStructureByExternalId-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisOrganizationStructuresExternalExternalIdPatchRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /people/{id}/department:
+    put:
+      operationId: organizationStructure_updatePersonDepartment
+      summary: Update organization structure
+      description: 'Assigns a worker to a department by their HRIS profile ID. By default the new assignment appends to existing positions; set `replace_other_positions` to true to replace all current positions instead.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - organizationStructure
+      parameters:
+      - name: id
+        in: path
+        description: Hris profile ID
+        required: true
+        schema:
+          type: string
+      - name: replace_other_positions
+        in: query
+        description: Indicates if this department position should replace all other positions or only append to the existing ones.
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization-structure_updatePersonDepartment_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/PeopleIdDepartmentPutRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /hris/organization-structures/teams/{team_id}/custom-fields:
+    patch:
+      operationId: organizationStructure_updateTeamCustomFields
+      summary: Update Team Custom Fields
+      tags:
+      - organizationStructure
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+components:
+  schemas:
+    organization-structure_updatePersonDepartment_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PeopleIdDepartmentPutResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: organization-structure_updatePersonDepartment_Response_200
+    organization-structure_getOrganizationStructure_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaData'
+      title: organization-structure_getOrganizationStructure_Response_200
+    HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItemsTeamsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the Team.
+        name:
+          type: string
+          description: The name of the Team.
+        parent:
+          type:
+          - string
+          - 'null'
+          description: The name of the parent Org Structure.
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItemsTeamsItemsChildrenItems'
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the Org Structure was created.
+        name_route:
+          type:
+          - string
+          - 'null'
+          description: The route name of the Team.
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: The external identifier of the Team.
+      title: HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItemsTeamsItems
+    FetchAnOrgStructureFromTheOrganization-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchAnOrgStructureFromTheOrganization-v2026-01-01RequestNotFoundError
+    HrisOrganizationStructuresPostRequestBodyContentApplicationJsonSchemaDataTeamsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the team.
+        external_id:
+          type: string
+          description: The external identifier of the team.
+      title: HrisOrganizationStructuresPostRequestBodyContentApplicationJsonSchemaDataTeamsItems
+    HrisOrganizationStructuresPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the organization structure.
+        name:
+          type: string
+          description: The name of the organization structure.
+        type:
+          type: string
+          description: The type of the organization structure.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the organization structure was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the organization structure was last updated.
+        external_id:
+          type: string
+          description: The external identifier of the organization structure.
+        enable_roles:
+          type: boolean
+          description: Whether roles are enabled for the organization structure.
+        is_multi_select:
+          type: boolean
+          description: Whether multiple selection is enabled for the organization structure.
+        organization_id:
+          type: integer
+          description: The unique identifier of the organization.
+      title: HrisOrganizationStructuresPostResponsesContentApplicationJsonSchemaData
+    HrisOrganizationStructuresHrisOrgStructureIdDeleteResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: HrisOrganizationStructuresHrisOrgStructureIdDeleteResponsesContentApplicationJsonSchemaErrorsItems
+    HrisOrganizationStructuresExternalExternalIdPatchRequestBodyContentApplicationJsonSchemaDataTeamsItems:
+      type: object
+      properties: {}
+      title: HrisOrganizationStructuresExternalExternalIdPatchRequestBodyContentApplicationJsonSchemaDataTeamsItems
+    HrisOrganizationStructuresExternalExternalIdGetResponsesContentApplicationJsonSchemaDataRolesItems:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Role ID
+        name:
+          type: string
+          description: Role name
+      title: HrisOrganizationStructuresExternalExternalIdGetResponsesContentApplicationJsonSchemaDataRolesItems
+    organization-structure_getOrganizationStructures_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItems'
+      title: organization-structure_getOrganizationStructures_Response_200
+    HrisOrganizationStructuresHrisOrgStructureIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the Org Structure
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdPatchRequestBodyContentApplicationJsonSchemaDataTeamsItems'
+        external_id:
+          type: string
+          description: External ID of the Org Structure
+        enable_roles:
+          type: boolean
+          description: Enable roles for the Org Structure
+        is_multiselect:
+          type: boolean
+          description: Enable multiselect for the Org Structure
+      required:
+      - teams
+      title: HrisOrganizationStructuresHrisOrgStructureIdPatchRequestBodyContentApplicationJsonSchemaData
+    organization-structure_deleteOrganizationStructureByExternalId_Response_200:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: organization-structure_deleteOrganizationStructureByExternalId_Response_200
+    HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: HRIS Organization Structure ID
+        name:
+          type: string
+          description: HRIS Organization Structure Name
+        type:
+          type: string
+          description: HRIS Organization Structure Type
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaDataRolesItems'
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaDataTeamsItems'
+        external_id:
+          type: string
+          description: HRIS Organization Structure External ID
+        teams_count:
+          type: integer
+          description: HRIS Organization Structure Teams Count
+        enable_roles:
+          type: boolean
+          description: HRIS Organization Structure Enable Roles
+        is_multiselect:
+          type: boolean
+          description: HRIS Organization Structure Is Multiselect
+      title: HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaData
+    UpdateAnExistingHrisOrgStructure-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateAnExistingHrisOrgStructure-v2026-01-01RequestBadRequestError
+    CreateANewHrisOrganizationStructure-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateANewHrisOrganizationStructure-v2026-01-01RequestInternalServerError
+    UpdateAnExistingHrisOrgStructureByExternalId-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresExternalExternalIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UpdateAnExistingHrisOrgStructureByExternalId-v2026-01-01RequestBadRequestError
+    HrisOrganizationStructuresExternalExternalIdPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: HrisOrganizationStructuresExternalExternalIdPatchResponsesContentApplicationJsonSchemaErrorsItems
+    CreateANewHrisOrganizationStructure-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateANewHrisOrganizationStructure-v2026-01-01RequestBadRequestError
+    HrisOrganizationStructuresHrisOrgStructureIdPatchRequestBodyContentApplicationJsonSchemaDataTeamsItems:
+      type: object
+      properties: {}
+      title: HrisOrganizationStructuresHrisOrgStructureIdPatchRequestBodyContentApplicationJsonSchemaDataTeamsItems
+    HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItemsRolesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the Role.
+        name:
+          type: string
+          description: The name of the Role.
+      title: HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItemsRolesItems
+    organization-structure_getOrganizationStructureByExternalId_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/HrisOrganizationStructuresExternalExternalIdGetResponsesContentApplicationJsonSchemaData'
+      title: organization-structure_getOrganizationStructureByExternalId_Response_200
+    HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the Org Structure.
+        name:
+          type: string
+          description: The name of the Org Structure.
+        type:
+          type: string
+          description: The type of the Org Structure.
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItemsRolesItems'
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItemsTeamsItems'
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the Org Structure was created.
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: The external identifier of the Org Structure.
+        teams_count:
+          type: integer
+          description: The number of Teams in the Org Structure.
+        enable_roles:
+          type: boolean
+          description: Whether the Org Structure has Roles enabled.
+        is_multiselect:
+          type: boolean
+          description: Whether the Org Structure is multiselect.
+      title: HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItems
+    PeopleIdDepartmentPutRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        department_id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        effective_date:
+          type: string
+          format: date
+          description: Effective date in YYYY-MM-DD format.
+      required:
+      - department_id
+      title: PeopleIdDepartmentPutRequestBodyContentApplicationJsonSchemaData
+    HrisOrganizationStructuresPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: HrisOrganizationStructuresPostResponsesContentApplicationJsonSchemaErrorsItems
+    HrisOrganizationStructuresExternalExternalIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Organization ID
+        name:
+          type: string
+          description: Organization name
+        type:
+          type: string
+          description: Organization type
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresExternalExternalIdGetResponsesContentApplicationJsonSchemaDataRolesItems'
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresExternalExternalIdGetResponsesContentApplicationJsonSchemaDataTeamsItems'
+        external_id:
+          type: string
+          description: External ID
+        teams_count:
+          type: integer
+          description: Number of teams in the organization
+        enable_roles:
+          type: boolean
+          description: Flag to enable roles in the organization
+        is_multiselect:
+          type: boolean
+          description: Flag to enable multiselect in the organization
+      title: HrisOrganizationStructuresExternalExternalIdGetResponsesContentApplicationJsonSchemaData
+    HrisOrganizationStructuresHrisOrgStructureIdPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: HrisOrganizationStructuresHrisOrgStructureIdPatchResponsesContentApplicationJsonSchemaErrorsItems
+    organization-structure_updateOrganizationStructure_Response_200:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: organization-structure_updateOrganizationStructure_Response_200
+    FetchAnOrgStructureFromTheOrganization-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchAnOrgStructureFromTheOrganization-v2026-01-01RequestBadRequestError
+    organization-structure_deleteOrganizationStructure_Response_200:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: organization-structure_deleteOrganizationStructure_Response_200
+    UpdateAnExistingHrisOrgStructureByExternalId-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresExternalExternalIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UpdateAnExistingHrisOrgStructureByExternalId-v2026-01-01RequestNotFoundError
+    HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    organization-structure_createOrganizationStructure_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/HrisOrganizationStructuresPostResponsesContentApplicationJsonSchemaData'
+      title: organization-structure_createOrganizationStructure_Response_200
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    UpdateAnExistingHrisOrgStructure-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateAnExistingHrisOrgStructure-v2026-01-01RequestInternalServerError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    DeleteAnOrgStructureFromTheOrganization-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteAnOrgStructureFromTheOrganization-v2026-01-01RequestBadRequestError
+    HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItemsTeamsItemsChildrenItems:
+      type: object
+      properties: {}
+      title: HrisOrganizationStructuresGetResponsesContentApplicationJsonSchemaDataItemsTeamsItemsChildrenItems
+    organization-structure_updateOrganizationStructureByExternalId_Response_200:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: organization-structure_updateOrganizationStructureByExternalId_Response_200
+    HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaDataRolesItems:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Role ID
+        name:
+          type: string
+          description: Role Name
+      title: HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaDataRolesItems
+    DeleteAnOrgStructureFromTheOrganization-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresHrisOrgStructureIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteAnOrgStructureFromTheOrganization-v2026-01-01RequestInternalServerError
+    PeopleIdDepartmentPutResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        updated:
+          type: boolean
+          description: Indicates if the resource was updated successfully.
+      required:
+      - updated
+      title: PeopleIdDepartmentPutResponsesContentApplicationJsonSchemaData
+    HrisOrganizationStructuresExternalExternalIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the organization
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresExternalExternalIdPatchRequestBodyContentApplicationJsonSchemaDataTeamsItems'
+        external_id:
+          type: string
+          description: External ID
+        enable_roles:
+          type: boolean
+          description: Enable roles
+        is_multiselect:
+          type: boolean
+          description: Is multiselect
+      required:
+      - teams
+      title: HrisOrganizationStructuresExternalExternalIdPatchRequestBodyContentApplicationJsonSchemaData
+    HrisOrganizationStructuresPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the organization structure.
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisOrganizationStructuresPostRequestBodyContentApplicationJsonSchemaDataTeamsItems'
+        external_id:
+          type: string
+          description: The external identifier of the organization structure.
+        enable_roles:
+          type: boolean
+          default: true
+          description: Whether roles are enabled for the organization structure.
+        is_multiple_select:
+          type: boolean
+          default: true
+          description: Whether multiple selection is enabled for the organization structure.
+      title: HrisOrganizationStructuresPostRequestBodyContentApplicationJsonSchemaData
+    HrisOrganizationStructuresExternalExternalIdGetResponsesContentApplicationJsonSchemaDataTeamsItems:
+      type: object
+      properties: {}
+      title: HrisOrganizationStructuresExternalExternalIdGetResponsesContentApplicationJsonSchemaDataTeamsItems
+    HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaDataTeamsItems:
+      type: object
+      properties: {}
+      title: HrisOrganizationStructuresHrisOrgStructureIdGetResponsesContentApplicationJsonSchemaDataTeamsItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

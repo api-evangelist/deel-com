@@ -1,0 +1,357 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Terminations API
+  version: 1.0.0
+  description: API endpoints related to Terminations.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: Terminations
+  description: API endpoints related to Terminations.
+paths:
+  /contracts/{contract_id}/terminations:
+    delete:
+      operationId: terminations_deleteContractTermination
+      summary: Delete Contract Termination Request
+      description: 'Cancels a pending termination request for the specified contract, reverting the contract to its pre-termination state. Only termination requests that have not yet reached their effective date can be cancelled.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - Terminations
+      parameters:
+      - name: contract_id
+        in: path
+        description: Unique identifier for the contract
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteContractTerminationRequest-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteContractTerminationRequest-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+    post:
+      operationId: terminations_createContractTermination
+      summary: Terminate contract
+      description: 'Initiates termination of an active contract, recording the termination reason, effective date, and any final payment details. Can only be called on contracts that are currently active.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - Terminations
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the contractor contract
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/terminations_createContractTermination_Response_201'
+        '400':
+          description: 'Validation or business-rule failure. Possible codes: invalid_parameter (Joi schema violation, e.g. missing completion_date when terminate_now is false); contract_not_active (contract is not in an active state and cannot be terminated); invalid_completion_date (completion_date is in the past or otherwise invalid); invalid_termination_reason (termination_reason_id does not exist or is not applicable).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminateContract-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Missing or invalid bearer token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminateContract-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Caller lacks permission to terminate this contract. Either the caller does not have the contracts.terminate permission, is not a CLIENT profile, or does not have access to the specified contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminateContract-v2026-01-01RequestForbiddenError'
+        '404':
+          description: No active contract was found for the provided contract_id, or the caller does not have access to it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminateContract-v2026-01-01RequestNotFoundError'
+        '409':
+          description: A termination request already exists for this contract and cannot be duplicated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminateContract-v2026-01-01RequestConflictError'
+        '500':
+          description: Unhandled server error or downstream service failure during contract termination. The transaction is rolled back and no termination is persisted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminateContract-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: 'Termination data. At minimum, you must provide either terminate_now: true (for immediate termination) OR completion_date (for scheduled termination).'
+              required:
+              - data
+      security:
+      - deelToken: []
+components:
+  schemas:
+    ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Contract id
+        completion_date:
+          type: string
+          format: date-time
+          description: Contract completion date
+      title: ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData
+    TerminateContract-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: TerminateContract-v2026-01-01RequestInternalServerError
+    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        message:
+          type: string
+          maxLength: 1000
+          description: Optional message to include with the termination
+        terminate_now:
+          type: boolean
+          default: false
+          description: If true, terminates the contract immediately. If false, completion_date is required.
+        completion_date:
+          type: string
+          format: date
+          description: Contract completion date (YYYY-MM-DD). Required when terminate_now is false or not provided. Since terminate_now defaults to false, this field is required unless you explicitly set terminate_now to true.
+        termination_type:
+          $ref: '#/components/schemas/ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType'
+          description: The type of termination. Specifies whether it is a resignation (contractor-initiated), termination (client-initiated), or end of contract (mutual/planned).
+        eligible_for_rehire:
+          $ref: '#/components/schemas/ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire'
+          description: Indicates whether the contractor is eligible for rehire in the future.
+        termination_reason_id:
+          type: string
+          format: uuid
+          description: The UUID of the termination reason. Use GET /contracts/termination-reasons to retrieve the list of available reasons.
+        eligible_for_rehire_reason:
+          type: string
+          maxLength: 255
+          description: Provides context when eligible_for_rehire is 'DONT_KNOW'. Should be empty or null for other values.
+        termination_reason_description:
+          type: string
+          maxLength: 1000
+          description: Free-form text providing additional context about the termination reason. Can be provided independently without termination_reason_id, or used to add context to a selected reason.
+      description: 'Termination data. At minimum, you must provide either terminate_now: true (for immediate termination) OR completion_date (for scheduled termination).'
+      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaData
+    TerminateContract-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: TerminateContract-v2026-01-01RequestNotFoundError
+    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire:
+      type: string
+      enum:
+      - 'YES'
+      - 'NO'
+      - DONT_KNOW
+      description: Indicates whether the contractor is eligible for rehire in the future.
+      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataEligibleForRehire
+    DeleteContractTerminationRequest-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteContractTerminationRequest-v2026-01-01RequestBadRequestError
+    ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaErrorsItems
+    terminations_createContractTermination_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaData'
+      title: terminations_createContractTermination_Response_201
+    ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType:
+      type: string
+      enum:
+      - RESIGNATION
+      - TERMINATION
+      - END_OF_CONTRACT
+      description: The type of termination. Specifies whether it is a resignation (contractor-initiated), termination (client-initiated), or end of contract (mutual/planned).
+      title: ContractsContractIdTerminationsPostRequestBodyContentApplicationJsonSchemaDataTerminationType
+    TerminateContract-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: TerminateContract-v2026-01-01RequestUnauthorizedError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    TerminateContract-v2026-01-01RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: TerminateContract-v2026-01-01RequestConflictError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    TerminateContract-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: TerminateContract-v2026-01-01RequestBadRequestError
+    DeleteContractTerminationRequest-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteContractTerminationRequest-v2026-01-01RequestInternalServerError
+    TerminateContract-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTerminationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: TerminateContract-v2026-01-01RequestForbiddenError
+    ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ContractsContractIdTerminationsDeleteResponsesContentApplicationJsonSchemaErrorsItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

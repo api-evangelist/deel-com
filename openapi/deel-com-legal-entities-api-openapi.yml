@@ -1,113 +1,4068 @@
 openapi: 3.2.0
 info:
-  title: Deel Core Legal Entities API
-  description: 'Core organizational, contract, and people APIs for Deel. Covers organizations,
-
-    legal entities, departments, groups, managers, cost centers, contracts (IC, EOR,
-
-    Global Payroll), invoice adjustments, lookups, magic links, tasks, and custom fields.
-
-
-    Authentication uses bearer Organization or Personal API tokens generated from the
-
-    Deel Developer Center. Production base URL is https://api.letsdeel.com/rest/v2 and
-
-    the sandbox is https://api-sandbox.demo.deel.com/rest/v2.'
-  version: '2026-05-25'
-  contact:
-    name: Deel Developer Support
-    url: https://developer.deel.com/
-  termsOfService: https://www.deel.com/legal/terms-of-service/
-  license:
-    name: Deel Developer Terms
-    url: https://www.deel.com/legal/
+  title: Endpoints Legal Entities API
+  version: 1.0.0
 servers:
-- url: https://api.letsdeel.com/rest/v2
+- url: https://api.letsdeel.com/rest
   description: Production
-- url: https://api-sandbox.demo.deel.com/rest/v2
-  description: Sandbox
-security:
-- BearerAuth: []
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
 tags:
 - name: Legal Entities
-  description: Client legal entities, industries
 paths:
   /legal-entities:
-    get:
-      operationId: getLegalEntities
-      summary: List Legal Entities
-      description: Returns the client legal entities registered under the organization.
+    post:
+      operationId: legalEntities_createLegalEntity
+      summary: Create a new legal entity
+      description: 'Creates a new legal entity under the organization and returns the entity record including its assigned id.
+
+
+        **Token scopes**: `legal-entity:write`, `legal-entity:read`'
       tags:
       - Legal Entities
       responses:
         '200':
-          description: Legal entity list
+          description: Successfully created legal entity.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LegalEntityListResponse'
-    post:
-      operationId: createLegalEntity
-      summary: Create A New Legal Entity
-      tags:
-      - Legal Entities
+                $ref: '#/components/schemas/legal-entities_createLegalEntity_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateLegalEntity-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Permission denied. User must have the `entities.manage` permission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateLegalEntity-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LegalEntityCreate'
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/LegalEntitiesPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+    get:
+      operationId: legalEntities_getLegalEntities
+      summary: List of legal entities
+      description: 'Lists the legal entities under the calling organization so an integration can resolve which entity a worker, contract, payroll cycle or invoice belongs to. The ids returned are the legal entity ids other Deel endpoints expect; use the single-entity endpoint when you already hold an id and need the full record.
+
+
+        **Token scopes**: `organizations:read`, `accounting:read`'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: limit
+        in: query
+        description: The number of results to return per page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 100
+      - name: sort_order
+        in: query
+        description: Sorting order of the results.
+        required: false
+        schema:
+          $ref: '#/components/schemas/LegalEntitiesGetParametersSortOrder'
+          default: ASC
+      - name: cursor
+        in: query
+        description: Cursor for pagination.
+        required: false
+        schema:
+          type: string
+      - name: include_archived
+        in: query
+        description: Whether to include archived legal entities in the results.
+        required: false
+        schema:
+          type: boolean
+          default: true
+      - name: legal_entity_id
+        in: query
+        description: Filter by specific legal entity ID.
+        required: false
+        schema:
+          type: string
+      - name: global_payroll
+        in: query
+        description: Filter by global payroll flag.
+        required: false
+        schema:
+          type: boolean
+      - name: type
+        in: query
+        description: Filter by entity type.
+        required: false
+        schema:
+          type: string
+      - name: country
+        in: query
+        description: Filter by country.
+        required: false
+        schema:
+          type: string
+      - name: include_payroll_settings
+        in: query
+        description: Whether to include payroll settings in the response.
+        required: false
+        schema:
+          type: boolean
       responses:
-        '201':
-          description: Legal entity created
+        '200':
+          description: Successful operation.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LegalEntity'
+                $ref: '#/components/schemas/legal-entities_getLegalEntities_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfLegalEntities-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /legal-entities/{id}:
+    delete:
+      operationId: legalEntities_deleteLegalEntity
+      summary: Delete a legal entity
+      description: 'Archives the legal entity identified by id, marking it as inactive without permanently removing it; the response includes the archived_at timestamp.
+
+
+        **Token scopes**: `legal-entity:read`, `legal-entity:write`'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the legal entity to archive.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully archived the legal entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/legal-entities_deleteLegalEntity_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteLegalEntity-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Permission denied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteLegalEntity-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    patch:
+      operationId: legalEntities_updateLegalEntity
+      summary: Edit a legal entity
+      description: 'Applies a partial update to an existing legal entity identified by id; only fields included in the request body are modified.
+
+
+        **Token scopes**: `legal-entity:write`'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the legal entity to update.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully updated the legal entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/legal-entities_updateLegalEntity_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditALegalEntity-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Permission denied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditALegalEntity-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/LegalEntitiesIdPatchRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /legal-entities/country-fields/{country_code}:
+    get:
+      operationId: legalEntities_getCountryFieldsForALegalEntity-v2026-09-11
+      summary: Get registration/tax identifier fields for a country
+      description: 'Retrieve which registration and tax identifier fields a country requires before you submit a legal entity to Deel, so you can collect the right values ahead of the entity-creation call. Each field returns its name, kind (`registration_id`/`tax_id`), an optional validation regex, and a requirement level (`mandatory`/`optional`/`bypass`).
+
+
+        **Token scopes**: `legal-entity:read`'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: country_code
+        in: path
+        description: ISO 3166-1 alpha-2 country code. Case-insensitive.
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z]{2}$
+      responses:
+        '200':
+          description: Registration/tax identifier fields for the given country.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Legal_Entities_getCountryFieldsForALegalEntity-v2026-09-11_Response_200'
+        '400':
+          description: Malformed country code (not two ASCII letters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCountryFieldsForALegalEntity-v2026-09-11RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Well-formed country code that is not a recognized ISO 3166-1 alpha-2 country.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCountryFieldsForALegalEntity-v2026-09-11RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /industries:
+    get:
+      operationId: legalEntities_getIndustries
+      summary: List all industry subcategories
+      description: 'Lists industry subcategories with their parent category details and NAICS codes, supporting cursor-based pagination and sorting by category or subcategory name.
+
+
+        **Token scopes**: `legal-entity:read`'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of items to return per page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+      - name: order
+        in: query
+        description: Sorting order of the results.
+        required: false
+        schema:
+          $ref: '#/components/schemas/IndustriesGetParametersOrder'
+          default: ASC
+      - name: sort_by
+        in: query
+        description: Field used to sort the results.
+        required: false
+        schema:
+          $ref: '#/components/schemas/IndustriesGetParametersSortBy'
+          default: categoryName
+      - name: cursor
+        in: query
+        description: Cursor used for paginating to the next page of results.
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of industry subcategories.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/legal-entities_getIndustries_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAllIndustrySubcategories-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /legal-entities/{legal_entity_id}:
+    get:
+      operationId: legalEntities_getLegalEntity-v2026-09-09
+      summary: Retrieve a legal entity
+      description: 'Returns the full record for a single legal entity by id: registration and tax identifiers, address, industry, incorporation date and lifecycle status. `cdd_status` carries the raw Customer Due Diligence value (coalesced to `PENDING` when CDD is required, `NOT_REQUIRED` for Tier-0/SaaS entities before verification starts) and `status` the mapped lifecycle status, so integrations can poll entity clearance.
+
+
+        **Token scopes**: `legal-entity:read`'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: The ID of the legal entity to retrieve.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Legal_Entities_getLegalEntity-v2026-09-09_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLegalEntity-v2026-09-09RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: The legal entity belongs to another organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLegalEntity-v2026-09-09RequestForbiddenError'
+        '404':
+          description: Legal entity not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLegalEntity-v2026-09-09RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /legal-entities/{legal_entity_id}/kyb:
+    get:
+      operationId: legalEntities_getLegalEntityKybState-v2026-10-01
+      summary: Retrieve the KYB state of a legal entity
+      description: 'Returns the Know Your Business (entity verification) state of a legal entity: the verification status, whether the client must act, the outstanding requirements including Proof of Authority, which company documents have been supplied, the declared persons of significant control, when the entity was rejected, and the open enhanced due diligence (EDD) request with its questions while the entity is in EDD. Use it to drive an automated verification flow instead of finishing KYB in the Deel app.
+
+
+        **Token scopes**: `legal-entity:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-01.'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: Public id of the legal entity. The entity must belong to the authenticated organization; any other id answers 404.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetParametersXBeta'
+      responses:
+        '200':
+          description: The KYB state of the legal entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Legal_Entities_getLegalEntityKybState-v2026-10-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Unauthorized. The request token is missing or invalid. The API gateway rejects an unauthenticated call before it reaches Deel; a call that reaches Deel without a valid session is rejected by the access middleware, whose error item carries a message and no code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLegalEntityKybState-v2026-10-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden. The token lacks the `legal-entity:read` scope or the actor cannot view entities of this organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLegalEntityKybState-v2026-10-01RequestForbiddenError'
+        '404':
+          description: Not found. The legal entity does not exist or does not belong to the authenticated organization. The two cases are deliberately indistinguishable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLegalEntityKybState-v2026-10-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    post:
+      operationId: legalEntities_submitLegalEntityKyb-v2026-10-12
+      summary: Submit KYB information for a legal entity
+      description: 'Submits the Know Your Business (entity verification) information for a legal entity — company facts, required declarations, documents, and declared persons of significant control. Only accepted while the entity is `PENDING` or `DRAFT`; refused once it is `REJECTED`, already under review, approved, or when verification isn''t required. Returns the resulting KYB state after submission.
+
+
+        **Token scopes**: `legal-entity:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-12.'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: Public id of the legal entity. The entity must belong to the authenticated organization; any other id answers 404.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostParametersXBeta'
+      responses:
+        '200':
+          description: The submission was accepted. The KYB state after the submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Legal_Entities_submitLegalEntityKyb-v2026-10-12_Response_200'
+        '400':
+          description: 'Bad request. Codes: VALIDATION_ERROR (the request body failed validation; the error item also carries a details object naming the offending key), GENERIC_ERROR (the submitted domain could not be normalised, or the authenticated organization is not set up for deal registration). The API gateway rejects a schema-invalid request body before it reaches Deel; each error item of that response carries a path field and no code, and the body also carries a request object that describes the failed call.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitLegalEntityKyb-v2026-10-12RequestBadRequestError'
+        '401':
+          description: Unauthorized. The request token is missing or invalid. The API gateway rejects an unauthenticated call before it reaches Deel; a call that reaches Deel without a valid session is rejected by the access middleware, whose error item carries a message and no code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitLegalEntityKyb-v2026-10-12RequestUnauthorizedError'
+        '403':
+          description: 'Forbidden. Codes: GENERIC_ERROR (the token lacks the `legal-entity:write` scope, or the actor cannot submit verification for this organization), KYB_SERVICE_ACCOUNT_MISSING (the organization has no service account to act as; contact Deel support).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitLegalEntityKyb-v2026-10-12RequestForbiddenError'
+        '404':
+          description: Not found. The legal entity does not exist or does not belong to the authenticated organization. The two cases are deliberately indistinguishable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitLegalEntityKyb-v2026-10-12RequestNotFoundError'
+        '409':
+          description: 'Conflict. Codes: KYB_SUBMISSION_IN_REVIEW (a submission is under review; poll the KYB state or subscribe to the `legal-entity.kyb.changed` webhook), KYB_ALREADY_APPROVED, KYB_NOT_REQUIRED, KYB_ENTITY_REJECTED (the verification was rejected; resubmission after a rejection is not yet supported over the public API).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitLegalEntityKyb-v2026-10-12RequestConflictError'
+        '422':
+          description: 'Unprocessable. Codes: KYB_DOCUMENT_REFERENCE_INVALID (`details.keys` names every offending field; nothing was submitted), KYB_SUBMISSION_REJECTED (the verification service rejected the record; `details.reason` carries its message when available, and the document handles remain usable).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitLegalEntityKyb-v2026-10-12RequestUnprocessableEntityError'
+        '429':
+          description: Too many requests. The verification service is rate-limiting submissions; nothing was submitted. Retry after a delay.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitLegalEntityKyb-v2026-10-12RequestTooManyRequestsError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '503':
+          description: Service unavailable. The verification status could not be read, so the submission was not attempted. Retry later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitLegalEntityKyb-v2026-10-12RequestServiceUnavailableError'
+      requestBody:
+        description: The verification information for the legal entity.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /legal-entities/{legal_entity_id}/kyb/edd:
+    post:
+      operationId: legalEntities_answerLegalEntityKybEdd-v2026-10-16
+      summary: Submit EDD request answers for a legal entity
+      description: 'Answers the open enhanced due diligence (EDD) request of a legal entity with one answer per question listed in the `edd` block of the KYB state. The request then shows as `ANSWERED` in the KYB state until Deel resumes the review. Refused when the entity has no open EDD request, when the request is not the one the KYB state lists, and when the form cannot be answered over the API. Returns the KYB state after the answers.
+
+
+        **Token scopes**: `legal-entity:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-16.'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: Public id of the legal entity. The entity must belong to the authenticated organization; any other id answers 404.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostParametersXBeta'
+      responses:
+        '200':
+          description: The answers were recorded. The KYB state after the answers.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Legal_Entities_answerLegalEntityKybEdd-v2026-10-16_Response_200'
+        '400':
+          description: 'Bad request. Codes: VALIDATION_ERROR (the body failed validation), KYB_EDD_ANSWERS_INVALID (an answer is missing, does not match its question, or names an unknown question; `details.keys` lists the question keys). Nothing was recorded.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerLegalEntityKybEdd-v2026-10-16RequestBadRequestError'
+        '401':
+          description: Unauthorized. The request token is missing or invalid. The API gateway rejects an unauthenticated call before it reaches Deel; a call that reaches Deel without a valid session is rejected by the access middleware, whose error item carries a message and no code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerLegalEntityKybEdd-v2026-10-16RequestUnauthorizedError'
+        '403':
+          description: 'Forbidden. Codes: GENERIC_ERROR (the token lacks the `legal-entity:write` scope, or the actor cannot submit verification for this organization), KYB_SERVICE_ACCOUNT_MISSING (the organization has no service account to act as; contact Deel support).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerLegalEntityKybEdd-v2026-10-16RequestForbiddenError'
+        '404':
+          description: Not found. The legal entity does not exist or does not belong to the authenticated organization. The two cases are deliberately indistinguishable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerLegalEntityKybEdd-v2026-10-16RequestNotFoundError'
+        '409':
+          description: 'Conflict. Codes: KYB_EDD_NOT_OPEN (the entity is not in EDD, or the request was already answered), KYB_EDD_REQUEST_MISMATCH (`edd_request_id` is not the open request; read the KYB state again), KYB_EDD_NOT_ANSWERABLE (the form has a required unsupported question, or it is addressed to another submitter, such as a person who submitted verification in the Deel app; `details.keys` lists blocking question keys when any).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerLegalEntityKybEdd-v2026-10-16RequestConflictError'
+        '422':
+          description: 'Unprocessable. Codes: KYB_EDD_ANSWERS_REJECTED (the form service did not record the answers; the request stays open; `details.reason` carries the form service''s reason when it gave one and does not name the question), KYB_EDD_DOCUMENT_REFERENCE_INVALID (a document handle is unknown, expired, already used, belongs to another legal entity or EDD request, answers a different question, or is used for more than one field; `details.keys` lists the question keys). Nothing was recorded and the other handles stay usable.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerLegalEntityKybEdd-v2026-10-16RequestUnprocessableEntityError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '503':
+          description: Service unavailable. The EDD request or its form could not be read or written. Read the KYB state before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerLegalEntityKybEdd-v2026-10-16RequestServiceUnavailableError'
+      requestBody:
+        description: The answers to the open EDD request.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /legal-entities/{legal_entity_id}/settings:
+    post:
+      operationId: legalEntities_updateLegalEntitySetting-v2026-09-02
+      summary: Update GP employee app access for a legal entity
+      description: 'Controls whether employees under this legal entity can access the Deel employee app for self-service tasks such as viewing payslips and managing personal information. Use this endpoint after you have finished configuring a Global Payroll legal entity and its workforce and are ready to grant or revoke employee app access. Set value to "true" to allow employees to log in to the app, or "false" to block access — for example, during a compliance review or when offboarding a cohort.
+
+
+        **Token scopes**: `legal-entity:write`'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: The ID of the legal entity.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successfully updated the setting.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Legal_Entities_updateLegalEntitySetting-v2026-09-02_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateLegalEntitySetting-v2026-09-02RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/LegalEntitiesLegalEntityIdSettingsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /legal-entities/{legal_entity_id}/kyb/edd/documents:
+    post:
+      operationId: legalEntities_uploadLegalEntityKybEddDocument-v2026-10-14
+      summary: Upload a document for an EDD request of a legal entity
+      description: 'Stores one document answering a `DOCUMENT_UPLOAD` question of the open enhanced due diligence (EDD) request of a legal entity, and returns an opaque handle. Reference the handle from `POST /rest/legal-entities/{legal_entity_id}/kyb/edd`. Handles are bound to the legal entity, the EDD request and the question, usable once, and expire after 24 hours if unused. The file itself is never returned.
+
+
+        **Token scopes**: `legal-entity:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-14.'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: Public id of the legal entity. The entity must belong to the authenticated organization; any other id answers 404.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostParametersXBeta'
+      responses:
+        '201':
+          description: The document was stored. Use the returned handle in an EDD answer.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Legal_Entities_uploadLegalEntityKybEddDocument-v2026-10-14_Response_201'
+        '400':
+          description: Bad request. No file was uploaded, or the multipart body could not be processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybEddDocument-v2026-10-14RequestBadRequestError'
+        '401':
+          description: Unauthorized. The request token is missing or invalid. The API gateway rejects an unauthenticated call before it reaches Deel; a call that reaches Deel without a valid session is rejected by the access middleware, whose error item carries a message and no code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybEddDocument-v2026-10-14RequestUnauthorizedError'
+        '403':
+          description: 'Forbidden. Codes: GENERIC_ERROR (the token lacks the `legal-entity:write` scope, or the actor cannot submit verification for this organization), KYB_SERVICE_ACCOUNT_MISSING (the organization has no service account to act as; contact Deel support).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybEddDocument-v2026-10-14RequestForbiddenError'
+        '404':
+          description: Not found. The legal entity does not exist or does not belong to the authenticated organization. The two cases are deliberately indistinguishable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybEddDocument-v2026-10-14RequestNotFoundError'
+        '409':
+          description: 'Conflict. Codes: KYB_EDD_NOT_OPEN (the entity is not in EDD, or the request was already answered), KYB_EDD_REQUEST_MISMATCH (`edd_request_id` is not the open request; read the KYB state again).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybEddDocument-v2026-10-14RequestConflictError'
+        '415':
+          description: Unsupported media type. The file content type is not accepted; `details.allowed` lists the accepted types (application/pdf, image/jpeg, image/png).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybEddDocument-v2026-10-14RequestUnsupportedMediaTypeError'
+        '422':
+          description: 'Unprocessable. Codes: KYB_EDD_DOCUMENT_QUESTION_INVALID (`question_key` is not a `DOCUMENT_UPLOAD` question of the open EDD request), KYB_EDD_DOCUMENT_CLAIM_FAILED (the verification service refused the file; upload it again).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybEddDocument-v2026-10-14RequestUnprocessableEntityError'
+        '429':
+          description: Too many requests. Either the per-organization upload rate limit was hit, or the EDD request already has 500 uploaded documents that no answer has used yet (code KYB_EDD_DOCUMENT_LIMIT_REACHED).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybEddDocument-v2026-10-14RequestTooManyRequestsError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '503':
+          description: Service unavailable. The EDD request or its form could not be read, so the question could not be checked. The file was not stored; retry later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybEddDocument-v2026-10-14RequestServiceUnavailableError'
+      requestBody:
+        description: One document answering a DOCUMENT_UPLOAD question of the open EDD request.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostRequestBodyContentMultipartFormDataSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /legal-entities/{legal_entity_id}/kyb/documents:
+    post:
+      operationId: legalEntities_uploadLegalEntityKybDocument-v2026-10-02
+      summary: Upload a KYB document for a legal entity
+      description: 'Stores one KYB document (a company document, a Proof of Authority, or one side of an identity document or selfie for a person of significant control) for a legal entity and returns an opaque handle. Reference the handle from `POST /rest/legal-entities/{legal_entity_id}/kyb`. Handles are bound to the legal entity, usable once, and expire after 24 hours if unused. The file itself is never returned.
+
+
+        **Token scopes**: `legal-entity:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-02.'
+      tags:
+      - Legal Entities
+      parameters:
+      - name: legal_entity_id
+        in: path
+        description: Public id of the legal entity. The entity must belong to the authenticated organization; any other id answers 404.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostParametersXBeta'
+      responses:
+        '201':
+          description: The document was stored and registered for verification. Use the returned handle in a KYB submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Legal_Entities_uploadLegalEntityKybDocument-v2026-10-02_Response_201'
+        '400':
+          description: Bad request. No file was uploaded, or the multipart body could not be processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybDocument-v2026-10-02RequestBadRequestError'
+        '401':
+          description: Unauthorized. The request token is missing or invalid. The API gateway rejects an unauthenticated call before it reaches Deel; a call that reaches Deel without a valid session is rejected by the access middleware, whose error item carries a message and no code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybDocument-v2026-10-02RequestUnauthorizedError'
+        '403':
+          description: 'Forbidden. Codes: GENERIC_ERROR (the token lacks the `legal-entity:write` scope, or the actor cannot submit verification for this organization), KYB_SERVICE_ACCOUNT_MISSING (the organization has no service account to act as; contact Deel support).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybDocument-v2026-10-02RequestForbiddenError'
+        '404':
+          description: Not found. The legal entity does not exist or does not belong to the authenticated organization. The two cases are deliberately indistinguishable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybDocument-v2026-10-02RequestNotFoundError'
+        '415':
+          description: Unsupported media type. The file content type is not accepted for the given document type; `details.allowed` lists the accepted types.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybDocument-v2026-10-02RequestUnsupportedMediaTypeError'
+        '422':
+          description: 'Unprocessable. Codes: KYB_DOCUMENT_TYPE_INVALID (unknown `document_type`; `details.allowed` lists the accepted values), KYB_DOCUMENT_CLAIM_FAILED (the verification service refused the file; upload it again).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybDocument-v2026-10-02RequestUnprocessableEntityError'
+        '429':
+          description: Too many requests. Either the per-organization upload rate limit was hit, or the legal entity already has 200 uploaded documents that no submission has used yet (code KYB_DOCUMENT_LIMIT_REACHED).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadLegalEntityKybDocument-v2026-10-02RequestTooManyRequestsError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: One KYB document and the type it should be recorded as.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostRequestBodyContentMultipartFormDataSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
 components:
   schemas:
-    LegalEntity:
+    LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaDataAnswersItemsValue3:
+      type: object
+      properties:
+        city:
+          type:
+          - string
+          - 'null'
+          description: '`ADDRESS` only.'
+        state:
+          type:
+          - string
+          - 'null'
+          description: '`ADDRESS` only.'
+        number:
+          type:
+          - string
+          - 'null'
+          description: '`ADDRESS` only.'
+        street:
+          type:
+          - string
+          - 'null'
+          description: '`ADDRESS` only.'
+        country:
+          type:
+          - string
+          - 'null'
+          description: '`ADDRESS` only. ISO 3166-1 alpha-2 code.'
+        end_date:
+          type:
+          - string
+          - 'null'
+          description: '`DATE_RANGE` only. `YYYY-MM-DD`.'
+        zip_code:
+          type:
+          - string
+          - 'null'
+          description: '`ADDRESS` only.'
+        start_date:
+          type:
+          - string
+          - 'null'
+          description: '`DATE_RANGE` only. `YYYY-MM-DD`.'
+      description: 'A date range (`DATE_RANGE`: `start_date` and `end_date`) or an address (`ADDRESS`: `country`, `state`, `city`, `street`, `number` and `zip_code`).'
+      title: LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaDataAnswersItemsValue3
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRepeatGroup:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the repeatable group this question belongs to.
+        index:
+          type: integer
+          description: Zero-based position of this question within its repeat group instance.
+        max_repeats:
+          type: integer
+          description: Maximum number of instances of this group the form allows.
+      required:
+      - name
+      - index
+      - max_repeats
+      description: Set when this question belongs to a repeatable group (e.g. "add another director"); null otherwise.
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRepeatGroup
+    AnswerLegalEntityKybEdd-v2026-10-16RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AnswerLegalEntityKybEdd-v2026-10-16RequestBadRequestError
+    DeleteLegalEntity-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message explaining what went wrong.
+      title: DeleteLegalEntity-v2026-01-01RequestBadRequestError
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        edd:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEdd'
+          - type: 'null'
+          description: 'The open enhanced due diligence (EDD) request while the entity is in EDD: Deel needs further answers from the client before it continues the review. Null otherwise, and null while the entity is in EDD when the questions could not be read (retry later).'
+        status:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: The mapped lifecycle status of the legal entity, the same vocabulary as `status` on `GET /rest/legal-entities/{legal_entity_id}`.
+        persons:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataPersonsItems'
+          description: 'Declared persons of significant control: directors, controlling officers, owners and the submitter. Identity documents are reported by presence only. Null when `is_detail_available` is false.'
+        documents:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataDocumentsItems'
+          description: Presence of every company-level document type. Null when `is_detail_available` is false.
+        rejection:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataRejection'
+          - type: 'null'
+          description: Present only when the entity was rejected; null otherwise.
+        approved_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the entity was approved; null otherwise.
+        rejected_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the entity was last rejected; null otherwise.
+        requirements:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataRequirementsItems'
+          description: Everything the verification service currently requires for this entity, with whether each item is already satisfied. Empty when verification is not required. Null when `is_detail_available` is false.
+        submitted_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the verification record was created; null before the first submission.
+        legal_entity_id:
+          type: string
+          format: uuid
+          description: Public id of the legal entity.
+        verification_type:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataVerificationType'
+          - type: 'null'
+          description: Depth of verification the entity is subject to, when known.
+        is_action_required:
+          type: boolean
+          description: 'True while the entity is waiting on the client: `PENDING`, `DRAFT`, or `EDD` (enhanced due diligence — Ops needs something further from the client). False while Deel is reviewing or once the entity is approved, rejected or exempt.'
+        is_detail_available:
+          type: boolean
+          description: False when the verification service could not be read. Every detail block (`requirements`, `documents`, `proof_of_authority`, `persons`, `rejection`) is then null. Retry later; the status fields are still authoritative.
+      required:
+      - edd
+      - status
+      - persons
+      - documents
+      - rejection
+      - approved_at
+      - rejected_at
+      - requirements
+      - submitted_at
+      - legal_entity_id
+      - verification_type
+      - is_action_required
+      - is_detail_available
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaData
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddStatus:
+      type: string
+      enum:
+      - AWAITING_ANSWERS
+      - ANSWERED
+      description: '`AWAITING_ANSWERS` until the answers are sent; `ANSWERED` once they are, until the entity is back in review.'
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddStatus
+    LegalEntitiesPostRequestBodyContentApplicationJsonSchemaDataCompanyIdentifiers:
+      type: object
+      properties:
+        tax_number:
+          type: string
+          description: Tax number of the entity.
+        registration_number:
+          type: string
+          description: Registration number of the entity.
+      required:
+      - tax_number
+      - registration_number
+      title: LegalEntitiesPostRequestBodyContentApplicationJsonSchemaDataCompanyIdentifiers
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataDocuments:
+      type: object
+      properties:
+        company_bank_statement:
+          type: string
+          format: uuid
+          description: Handle of a document uploaded as `COMPANY_BANK_STATEMENT`.
+        articles_of_incorporation:
+          type: string
+          format: uuid
+          description: Handle of a document uploaded as `ARTICLES_OF_INCORPORATION`.
+        certificate_of_good_standing:
+          type: string
+          format: uuid
+          description: Handle of a document uploaded as `CERTIFICATE_OF_GOOD_STANDING`.
+        ultimate_beneficial_owner_form:
+          type: string
+          format: uuid
+          description: Handle of a document uploaded as `ULTIMATE_BENEFICIAL_OWNER_FORM`.
+      description: Company documents as handles from the upload endpoint. Supply the ones the KYB state lists as required.
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataDocuments
+    LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The request field the error refers to.
+        keys:
+          type: array
+          items:
+            type: string
+          description: Every offending request field, for a multi-field error.
+        allowed:
+          type: array
+          items:
+            type: string
+          description: Accepted values for the field.
+      description: Which request field the error refers to and, for a content-type or document-type error, the accepted values.
+      title: LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataRequirementsItemsCategory:
+      type: string
+      enum:
+      - FIELD
+      - DOCUMENT
+      - PERSON
+      description: 'What kind of input satisfies the requirement: a company field, a company document, or an attribute of a declared person.'
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataRequirementsItemsCategory
+    UploadLegalEntityKybEddDocument-v2026-10-14RequestServiceUnavailableError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybEddDocument-v2026-10-14RequestServiceUnavailableError
+    IndustriesGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
         id:
           type: string
+          format: uuid
+          description: UUID of the subcategory.
         name:
+          type: string
+          description: Name of the industry subcategory.
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the subcategory was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Date and time when the subcategory was last updated.
+        category_name:
+          type:
+          - string
+          - 'null'
+          description: Name of the associated industry category.
+      required:
+      - id
+      - name
+      - created_at
+      - updated_at
+      - category_name
+      title: IndustriesGetResponsesContentApplicationJsonSchemaDataItems
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - archived
+      - active
+      - draft
+      - processing
+      - processing_draft
+      - pending_verification
+      - awaiting_review
+      - unknown
+      description: The mapped lifecycle status of the legal entity, the same vocabulary as `status` on `GET /rest/legal-entities/{legal_entity_id}`.
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataStatus
+    LegalEntitiesLegalEntityIdSettingsPostRequestBodyContentApplicationJsonSchemaDataValue:
+      type: string
+      enum:
+      - 'true'
+      - 'false'
+      description: Set to "true" to grant employees access to the Deel app, or "false" to revoke it.
+      title: LegalEntitiesLegalEntityIdSettingsPostRequestBodyContentApplicationJsonSchemaDataValue
+    LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataFieldsItems:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataFieldsItemsKind'
+          description: Whether this field is a registration or tax identifier.
+        name:
+          type: string
+          description: Human-readable name of the identifier field.
+        requirement:
+          $ref: '#/components/schemas/LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataFieldsItemsRequirement'
+          description: '`mandatory` — must be collected and submitted. `optional` — may be submitted but is not required. `bypass` — not required; clients should omit it unless they have a value, since if provided it may still be validated.'
+        validation_regex:
+          type:
+          - string
+          - 'null'
+          description: Regex the submitted value must match. `null` when the field has no format restriction.
+      title: LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataFieldsItems
+    LegalEntitiesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifier
+        field:
+          type: string
+          description: Name of the field that failed validation
+        details:
+          $ref: '#/components/schemas/LegalEntitiesGetResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          description: Additional error details
+        message:
+          type: string
+          description: Human-readable error message
+      title: LegalEntitiesGetResponsesContentApplicationJsonSchemaErrorsItems
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataRejection:
+      type: object
+      properties:
+        rejected_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the rejection was recorded.
+      required:
+      - rejected_at
+      description: Present only when the entity was rejected; null otherwise.
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataRejection
+    LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The request field the error refers to.
+        keys:
+          type: array
+          items:
+            type: string
+          description: Every offending request field, for a multi-field error.
+        allowed:
+          type: array
+          items:
+            type: string
+          description: Accepted values for the field.
+      description: Which request field the error refers to and, for a content-type or document-type error, the accepted values.
+      title: LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    Legal_Entities_updateLegalEntitySetting-v2026-09-02_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdSettingsPostResponsesContentApplicationJsonSchemaData'
+      title: Legal Entities_updateLegalEntitySetting-v2026-09-02_Response_200
+    Legal_Entities_getLegalEntity-v2026-09-09_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaData'
+      title: Legal Entities_getLegalEntity-v2026-09-09_Response_200
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataPersonsItems:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Public id of the declared person, when the verification service has assigned one.
+        last_name:
+          type: string
+          description: Last name as declared.
+        first_name:
+          type: string
+          description: First name as declared.
+        responsibilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems'
+          description: Roles the person holds in the entity.
+        ownership_percentage:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Declared ownership percentage for owners; null otherwise.
+      required:
+      - id
+      - last_name
+      - first_name
+      - responsibilities
+      - ownership_percentage
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataPersonsItems
+    LegalEntitiesLegalEntityIdKybDocumentsPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: LegalEntitiesLegalEntityIdKybDocumentsPostParametersXBeta
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddStatus:
+      type: string
+      enum:
+      - AWAITING_ANSWERS
+      - ANSWERED
+      description: '`AWAITING_ANSWERS` until the answers are sent; `ANSWERED` once they are, until the entity is back in review.'
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddStatus
+    LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id of the legal entity
+        name:
+          type: string
+          description: Name of the legal entity
+        phone:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        status:
+          $ref: '#/components/schemas/LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: The mapped legal entity lifecycle status, the same value as on the single legal entity endpoint. Returned only when the feature is enabled for the organization.
+        vat_id:
+          type:
+          - string
+          - 'null'
+          description: VAT ID
+        address:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItemsAddress'
+          - type: 'null'
+        country:
+          type:
+          - string
+          - 'null'
+          description: Country of the legal entity
+        created_at:
+          type: string
+          format: date-time
+          description: Created date
+        sic_number:
+          type:
+          - string
+          - 'null'
+          description: SIC Company Identifier
+        updated_at:
+          type: string
+          format: date-time
+          description: Updated date
+        archived_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Archived date
+        entity_type:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItemsEntityType'
+          - type: 'null'
+          description: Entity type
+        industry_name:
+          type:
+          - string
+          - 'null'
+          description: Industry name
+        entity_subtype:
+          type: string
+          description: Entity sub type
+        registrationNumber:
+          type:
+          - string
+          - 'null'
+          description: Registration number
+      title: LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItems
+    Legal_Entities_uploadLegalEntityKybEddDocument-v2026-10-14_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Legal Entities_uploadLegalEntityKybEddDocument-v2026-10-14_Response_201
+    LegalEntitiesIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the legal entity.
+        phone:
+          type: string
+          description: The phone number of the legal entity.
+        address:
+          $ref: '#/components/schemas/LegalEntitiesIdPatchRequestBodyContentApplicationJsonSchemaDataAddress'
+        sic_number:
+          type: string
+          description: The SIC number of the legal entity.
+        entity_type:
+          type: string
+          description: The type of the legal entity.
+        industry_name:
+          type: string
+          description: The industry name of the legal entity.
+        company_identifiers:
+          $ref: '#/components/schemas/LegalEntitiesIdPatchRequestBodyContentApplicationJsonSchemaDataCompanyIdentifiers'
+          description: Identifiers associated with the legal entity.
+        deel_industry_subcategory_id:
+          type: string
+          description: Reference to the Deel Industry Code (NAICS).
+      title: LegalEntitiesIdPatchRequestBodyContentApplicationJsonSchemaData
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsIdentificationDocumentType:
+      type: string
+      enum:
+      - PASSPORT
+      - DRIVERS_LICENSE
+      - ID_DOCUMENT
+      description: Type of the identity document supplied in `identity_documents`.
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsIdentificationDocumentType
+    IndustriesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: IndustriesGetResponsesContentApplicationJsonSchemaErrorsItems
+    LegalEntitiesIdPatchResponsesContentApplicationJsonSchemaDataCompanyIdentifiers:
+      type: object
+      properties:
+        tax_number:
+          type: string
+          description: The tax identification number of the legal entity.
+        registration_number:
+          type: string
+          description: The registration number of the legal entity.
+      title: LegalEntitiesIdPatchResponsesContentApplicationJsonSchemaDataCompanyIdentifiers
+    LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItemsAddress:
+      type: object
+      properties:
+        zip:
+          type:
+          - string
+          - 'null'
+          description: Zip code
+        city:
+          type:
+          - string
+          - 'null'
+          description: City
+        state:
+          type:
+          - string
+          - 'null'
+          description: State
+        street:
+          type:
+          - string
+          - 'null'
+          description: Street
+        country:
+          type:
+          - string
+          - 'null'
+          description: Country
+      title: LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItemsAddress
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataRejection:
+      type: object
+      properties:
+        rejected_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the rejection was recorded.
+      required:
+      - rejected_at
+      description: Present only when the entity was rejected; null otherwise.
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataRejection
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataRequirementsItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: 'Requirement key as published by the verification service, e.g. `FORMATION_DATE`, `ARTICLES_OF_INCORPORATION`, `PROOF_OF_AUTHORITY`, `UBO_NAME`, `DIRECTOR_KYC_DOCUMENT`. Person-level keys are prefixed with the role they constrain: `DIRECTOR_`, `CONTROLLING_OFFICER_`, `UBO_` or `SUBMITTER_`.'
+        category:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataRequirementsItemsCategory'
+          description: 'What kind of input satisfies the requirement: a company field, a company document, or an attribute of a declared person.'
+        is_satisfied:
+          type: boolean
+          description: Whether the current submission already satisfies the requirement.
+      required:
+      - key
+      - category
+      - is_satisfied
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataRequirementsItems
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItemsCode:
+      type: string
+      enum:
+      - KYB_VERIFICATION_UNAVAILABLE
+      description: Machine-readable error code.
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItemsCode
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItemsCode'
+          description: Machine-readable error code.
+        details:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          description: Which request field the error refers to and, for a content-type or document-type error, the accepted values.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItems
+    LegalEntitiesPostResponsesContentApplicationJsonSchemaDataAddress:
+      type: object
+      properties:
+        zip:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        street:
           type: string
         country:
           type: string
-        registration_number:
+      description: The entity's address.
+      title: LegalEntitiesPostResponsesContentApplicationJsonSchemaDataAddress
+    LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataFieldsItemsRequirement:
+      type: string
+      enum:
+      - mandatory
+      - optional
+      - bypass
+      description: '`mandatory` — must be collected and submitted. `optional` — may be submitted but is not required. `bypass` — not required; clients should omit it unless they have a value, since if provided it may still be validated.'
+      title: LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataFieldsItemsRequirement
+    LegalEntitiesIdPatchRequestBodyContentApplicationJsonSchemaDataAddress:
+      type: object
+      properties:
+        city:
           type: string
-        industry:
+          description: The city.
+        state:
           type: string
-        currency:
+          description: The state.
+        street:
           type: string
-    LegalEntityListResponse:
+          description: The street address.
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          description: The ISO 2-letter country code.
+      title: LegalEntitiesIdPatchRequestBodyContentApplicationJsonSchemaDataAddress
+    LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataCddStatus:
+      type: string
+      enum:
+      - NOT_REQUIRED
+      - PENDING
+      - PENDING_ASYNC_TASKS
+      - DRAFT
+      - SUBMITTED
+      - APPROVED
+      - REJECTED
+      - EDD
+      description: 'The raw CDD verification status. When verification has not started it is coalesced to a tier-dependent initial value: PENDING when CDD is required, NOT_REQUIRED for Tier-0/SaaS entities.'
+      title: LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataCddStatus
+    LegalEntitiesLegalEntityIdKybGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: LegalEntitiesLegalEntityIdKybGetParametersXBeta
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - archived
+      - active
+      - draft
+      - processing
+      - processing_draft
+      - pending_verification
+      - awaiting_review
+      - unknown
+      description: The mapped lifecycle status of the legal entity, the same vocabulary as `status` on `GET /rest/legal-entities/{legal_entity_id}`.
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataStatus
+    LegalEntitiesLegalEntityIdSettingsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdSettingsPostRequestBodyContentApplicationJsonSchemaDataKey'
+          description: The setting key to update. Only ALLOW_GP_EMPLOYEE_APP_ACCESS is supported today.
+        value:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdSettingsPostRequestBodyContentApplicationJsonSchemaDataValue'
+          description: Set to "true" to grant employees access to the Deel app, or "false" to revoke it.
+      required:
+      - key
+      - value
+      title: LegalEntitiesLegalEntityIdSettingsPostRequestBodyContentApplicationJsonSchemaData
+    SubmitLegalEntityKyb-v2026-10-12RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: SubmitLegalEntityKyb-v2026-10-12RequestForbiddenError
+    Legal_Entities_getCountryFieldsForALegalEntity-v2026-09-11_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaData'
+      title: Legal Entities_getCountryFieldsForALegalEntity-v2026-09-11_Response_200
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataDocumentsItemsMetaType:
+      type: string
+      enum:
+      - POWER_OF_ATTORNEY
+      - RESOLUTION_OR_MINUTES
+      - OTHER
+      description: Kind of Proof of Authority document, when this entry's type is PROOF_OF_AUTHORITY. Null for every other document type.
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataDocumentsItemsMetaType
+    LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsCode'
+          description: Machine-readable error code.
+        details:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          description: Which request field the error refers to and, for a content-type or document-type error, the accepted values.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems
+    LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsCode:
+      type: string
+      enum:
+      - KYB_DOCUMENT_LIMIT_REACHED
+      description: Machine-readable error code.
+      title: LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsCode
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataDocumentsItemsType:
+      type: string
+      enum:
+      - PROOF_OF_AUTHORITY
+      - ARTICLES_OF_INCORPORATION
+      - COMPANY_BANK_STATEMENT
+      - LIST_OF_DIRECTORS
+      - CERTIFICATE_OF_GOOD_STANDING
+      - ULTIMATE_BENEFICIAL_OWNER_FORM
+      description: Company-level document type.
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataDocumentsItemsType
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEdd:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Public id of the EDD request. Send it as `edd_request_id` when answering.
+        status:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddStatus'
+          description: '`AWAITING_ANSWERS` until the answers are sent; `ANSWERED` once they are, until the entity is back in review.'
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItems'
+          description: Every question of the EDD form, in form order.
+        requested_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When Deel requested the EDD.
+        is_answerable_over_api:
+          type: boolean
+          description: False when the form has a required unsupported question. Contact Deel support to clear such a request.
+      required:
+      - id
+      - status
+      - questions
+      - requested_at
+      - is_answerable_over_api
+      description: 'The open enhanced due diligence (EDD) request while the entity is in EDD: Deel needs further answers from the client before it continues the review. Null otherwise, and null while the entity is in EDD when the questions could not be read (retry later).'
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEdd
+    legal-entities_getLegalEntities_Response_200:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/LegalEntity'
-    LegalEntityCreate:
+            $ref: '#/components/schemas/LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/LegalEntitiesGetResponsesContentApplicationJsonSchemaPage'
+      title: legal-entities_getLegalEntities_Response_200
+    IndustriesGetResponsesContentApplicationJsonSchemaRequest:
       type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: IndustriesGetResponsesContentApplicationJsonSchemaRequest
+    UploadLegalEntityKybEddDocument-v2026-10-14RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
       required:
-      - name
-      - country
+      - errors
+      title: UploadLegalEntityKybEddDocument-v2026-10-14RequestUnauthorizedError
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataDocumentsItemsMetaType:
+      type: string
+      enum:
+      - POWER_OF_ATTORNEY
+      - RESOLUTION_OR_MINUTES
+      - OTHER
+      description: Kind of Proof of Authority document, when this entry's type is PROOF_OF_AUTHORITY. Null for every other document type.
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataDocumentsItemsMetaType
+    EditALegalEntity-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message explaining why access is denied.
+      title: EditALegalEntity-v2026-01-01RequestForbiddenError
+    UpdateLegalEntitySetting-v2026-09-02RequestBadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message explaining what went wrong.
+      title: UpdateLegalEntitySetting-v2026-09-02RequestBadRequestError
+    LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties: {}
+      description: Additional error details
+      title: LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEdd:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Public id of the EDD request. Send it as `edd_request_id` when answering.
+        status:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddStatus'
+          description: '`AWAITING_ANSWERS` until the answers are sent; `ANSWERED` once they are, until the entity is back in review.'
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItems'
+          description: Every question of the EDD form, in form order.
+        requested_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When Deel requested the EDD.
+        is_answerable_over_api:
+          type: boolean
+          description: False when the form has a required unsupported question. Contact Deel support to clear such a request.
+      required:
+      - id
+      - status
+      - questions
+      - requested_at
+      - is_answerable_over_api
+      description: 'The open enhanced due diligence (EDD) request while the entity is in EDD: Deel needs further answers from the client before it continues the review. Null otherwise, and null while the entity is in EDD when the questions could not be read (retry later).'
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEdd
+    LegalEntitiesLegalEntityIdKybEddDocumentsPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: LegalEntitiesLegalEntityIdKybEddDocumentsPostParametersXBeta
+    AnswerLegalEntityKybEdd-v2026-10-16RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AnswerLegalEntityKybEdd-v2026-10-16RequestForbiddenError
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        edd:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEdd'
+          - type: 'null'
+          description: 'The open enhanced due diligence (EDD) request while the entity is in EDD: Deel needs further answers from the client before it continues the review. Null otherwise, and null while the entity is in EDD when the questions could not be read (retry later).'
+        status:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: The mapped lifecycle status of the legal entity, the same vocabulary as `status` on `GET /rest/legal-entities/{legal_entity_id}`.
+        persons:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataPersonsItems'
+          description: 'Declared persons of significant control: directors, controlling officers, owners and the submitter. Identity documents are reported by presence only. Null when `is_detail_available` is false.'
+        documents:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataDocumentsItems'
+          description: Presence of every company-level document type. Null when `is_detail_available` is false.
+        rejection:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataRejection'
+          - type: 'null'
+          description: Present only when the entity was rejected; null otherwise.
+        approved_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the entity was approved; null otherwise.
+        rejected_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the entity was last rejected; null otherwise.
+        requirements:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataRequirementsItems'
+          description: Everything the verification service currently requires for this entity, with whether each item is already satisfied. Empty when verification is not required. Null when `is_detail_available` is false.
+        submitted_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the verification record was created; null before the first submission.
+        legal_entity_id:
+          type: string
+          format: uuid
+          description: Public id of the legal entity.
+        verification_type:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataVerificationType'
+          - type: 'null'
+          description: Depth of verification the entity is subject to, when known.
+        is_action_required:
+          type: boolean
+          description: 'True while the entity is waiting on the client: `PENDING`, `DRAFT`, or `EDD` (enhanced due diligence — Ops needs something further from the client). False while Deel is reviewing or once the entity is approved, rejected or exempt.'
+        is_detail_available:
+          type: boolean
+          description: False when the verification service could not be read. Every detail block (`requirements`, `documents`, `proof_of_authority`, `persons`, `rejection`) is then null. Retry later; the status fields are still authoritative.
+      required:
+      - edd
+      - status
+      - persons
+      - documents
+      - rejection
+      - approved_at
+      - rejected_at
+      - requirements
+      - submitted_at
+      - legal_entity_id
+      - verification_type
+      - is_action_required
+      - is_detail_available
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaData
+    UploadLegalEntityKybDocument-v2026-10-02RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybDocument-v2026-10-02RequestUnprocessableEntityError
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataDocumentsItems:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataDocumentsItemsType'
+          description: Company-level document type.
+        meta_type:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataDocumentsItemsMetaType'
+          - type: 'null'
+          description: Kind of Proof of Authority document, when this entry's type is PROOF_OF_AUTHORITY. Null for every other document type.
+        is_provided:
+          type: boolean
+          description: Whether a file for this document has been submitted. File contents and URLs are never returned.
+        is_required:
+          type: boolean
+          description: Whether the verification service currently requires this document.
+      required:
+      - type
+      - meta_type
+      - is_provided
+      - is_required
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataDocumentsItems
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - archived
+      - active
+      - draft
+      - processing
+      - processing_draft
+      - pending_verification
+      - awaiting_review
+      - unknown
+      description: The mapped lifecycle status of the legal entity, the same vocabulary as `status` on `GET /rest/legal-entities/{legal_entity_id}`.
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataStatus
+    LegalEntitiesGetResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties: {}
+      description: Additional error details
+      title: LegalEntitiesGetResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Key of the question within this EDD request, in form order. Send it as `question_key` when answering.
+        type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsType'
+          description: What kind of answer the question takes. `COUNTRY` takes an ISO 3166-1 alpha-2 code (e.g. `US`), `CURRENCY` an ISO 4217 code (e.g. `USD`) and `STATE` a state name (e.g. `California`), each as a string, or a list of strings when the form allows several. `DOCUMENT_UPLOAD` questions are answered with a list of document handles from `POST /rest/legal-entities/{legal_entity_id}/kyb/edd/documents`. `UNSUPPORTED` questions cannot be answered over the API; when one of them is required, `is_answerable_over_api` is false.
+        title:
+          type: string
+          description: The question as the reviewer wrote it.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: For `SINGLE_CHOICE` and `MULTIPLE_CHOICE` questions, the option titles to answer with. Null for every other type.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Helper text for the question, when any.
+        is_required:
+          type: boolean
+          description: Whether the question must currently be answered.
+        repeat_group:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRepeatGroup'
+          - type: 'null'
+          description: Set when this question belongs to a repeatable group (e.g. "add another director"); null otherwise.
+        revealed_when:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRevealedWhenItems'
+          description: Conditions under which this question applies, met if any one of them does. Null when the question always applies. Only answer it when a condition is met.
+      required:
+      - key
+      - type
+      - title
+      - options
+      - description
+      - is_required
+      - repeat_group
+      - revealed_when
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItems
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataRequirementsItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: 'Requirement key as published by the verification service, e.g. `FORMATION_DATE`, `ARTICLES_OF_INCORPORATION`, `PROOF_OF_AUTHORITY`, `UBO_NAME`, `DIRECTOR_KYC_DOCUMENT`. Person-level keys are prefixed with the role they constrain: `DIRECTOR_`, `CONTROLLING_OFFICER_`, `UBO_` or `SUBMITTER_`.'
+        category:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataRequirementsItemsCategory'
+          description: 'What kind of input satisfies the requirement: a company field, a company document, or an attribute of a declared person.'
+        is_satisfied:
+          type: boolean
+          description: Whether the current submission already satisfies the requirement.
+      required:
+      - key
+      - category
+      - is_satisfied
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataRequirementsItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    SubmitLegalEntityKyb-v2026-10-12RequestServiceUnavailableError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: SubmitLegalEntityKyb-v2026-10-12RequestServiceUnavailableError
+    LegalEntitiesLegalEntityIdKybPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: LegalEntitiesLegalEntityIdKybPostParametersXBeta
+    SubmitLegalEntityKyb-v2026-10-12RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: SubmitLegalEntityKyb-v2026-10-12RequestUnauthorizedError
+    LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaDataAnswersItems'
+          description: One answer per question key. Every required question needs an answer.
+        edd_request_id:
+          type: string
+          format: uuid
+          description: The `edd.id` from the KYB state. A request that is no longer the open one is refused.
+      required:
+      - answers
+      - edd_request_id
+      title: LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaData
+    EditALegalEntity-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message explaining what went wrong.
+      title: EditALegalEntity-v2026-01-01RequestBadRequestError
+    LegalEntitiesGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor link
+      title: LegalEntitiesGetResponsesContentApplicationJsonSchemaPage
+    LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataFieldsItems'
+          description: Empty when the country is recognized but has no configured identifier fields.
+        country_code:
+          type: string
+          description: ISO 3166-1 alpha-2 country code, uppercased.
+      title: LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaData
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItems:
+      type: object
+      properties:
+        tax_id:
+          type: string
+          maxLength: 64
+          description: Personal tax identifier.
+        address:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsAddress'
+          description: Residential address.
+        job_title:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsJobTitle'
+          description: Role of the person in the company, from the verification service vocabulary; required for controlling officers when the verification service asks for it.
+        last_name:
+          type: string
+          maxLength: 255
+          description: Last name.
+        first_name:
+          type: string
+          maxLength: 255
+          description: First name.
+        citizenship:
+          type: string
+          description: Citizenship as an ISO 3166-1 alpha-2 country code.
+        middle_name:
+          type:
+          - string
+          - 'null'
+          maxLength: 255
+          description: Middle name, when any.
+        date_of_birth:
+          type: string
+          format: date
+          description: Date of birth, `YYYY-MM-DD`.
+        responsibilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems'
+          description: Roles the person holds in the entity. `submitter` marks the person who authorised the submission on the client side.
+        identity_documents:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsIdentityDocuments'
+          description: Identity document sides and selfie for the person, as upload handles.
+        ownership_percentage:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Ownership percentage; required for owners when the verification service asks for it.
+        identification_document_type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsIdentificationDocumentType'
+          description: Type of the identity document supplied in `identity_documents`.
+      required:
+      - last_name
+      - first_name
+      - responsibilities
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItems
+    LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - archived
+      - active
+      - draft
+      - processing
+      - processing_draft
+      - pending_verification
+      - awaiting_review
+      - unknown
+      description: The mapped legal entity lifecycle status.
+      title: LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataStatus
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems:
+      type: string
+      enum:
+      - submitter
+      - controllingOfficer
+      - owner
+      - director
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems
+    UploadLegalEntityKybDocument-v2026-10-02RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybDocument-v2026-10-02RequestUnauthorizedError
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItemsCode:
+      type: string
+      enum:
+      - KYB_VERIFICATION_UNAVAILABLE
+      description: Machine-readable error code.
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItemsCode
+    UploadLegalEntityKybEddDocument-v2026-10-14RequestUnsupportedMediaTypeError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybEddDocument-v2026-10-14RequestUnsupportedMediaTypeError
+    LegalEntitiesLegalEntityIdKybDocumentsPostRequestBodyContentMultipartFormDataSchemaDataDocumentType:
+      type: string
+      enum:
+      - ARTICLES_OF_INCORPORATION
+      - COMPANY_BANK_STATEMENT
+      - CERTIFICATE_OF_GOOD_STANDING
+      - ULTIMATE_BENEFICIAL_OWNER_FORM
+      - PROOF_OF_AUTHORITY
+      - IDENTITY_DOCUMENT_FRONT
+      - IDENTITY_DOCUMENT_BACK
+      - SELFIE
+      description: 'What the file is. Company documents: `ARTICLES_OF_INCORPORATION`, `COMPANY_BANK_STATEMENT`, `CERTIFICATE_OF_GOOD_STANDING`, `ULTIMATE_BENEFICIAL_OWNER_FORM`, `PROOF_OF_AUTHORITY` (a power of attorney, a board resolution or minutes, or another document evidencing authority). Person documents, one per side: `IDENTITY_DOCUMENT_FRONT`, `IDENTITY_DOCUMENT_BACK`, `SELFIE`. A list of directors is not yet accepted by the verification service over the API.'
+      title: LegalEntitiesLegalEntityIdKybDocumentsPostRequestBodyContentMultipartFormDataSchemaDataDocumentType
+    LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifier
+        field:
+          type: string
+          description: Name of the field that failed validation
+        details:
+          $ref: '#/components/schemas/LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          description: Additional error details
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      title: LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems
+    LegalEntitiesIdPatchRequestBodyContentApplicationJsonSchemaDataCompanyIdentifiers:
+      type: object
+      properties:
+        tax_number:
+          type: string
+          description: The tax identification number of the legal entity.
+        registration_number:
+          type: string
+          description: The registration number of the legal entity.
+      description: Identifiers associated with the legal entity.
+      title: LegalEntitiesIdPatchRequestBodyContentApplicationJsonSchemaDataCompanyIdentifiers
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataDocumentsItemsType:
+      type: string
+      enum:
+      - PROOF_OF_AUTHORITY
+      - ARTICLES_OF_INCORPORATION
+      - COMPANY_BANK_STATEMENT
+      - LIST_OF_DIRECTORS
+      - CERTIFICATE_OF_GOOD_STANDING
+      - ULTIMATE_BENEFICIAL_OWNER_FORM
+      description: Company-level document type.
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataDocumentsItemsType
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsType:
+      type: string
+      enum:
+      - TEXT
+      - LONG_TEXT
+      - NUMBER
+      - EMAIL
+      - PHONE_NUMBER
+      - DATE
+      - DATE_RANGE
+      - ADDRESS
+      - SINGLE_CHOICE
+      - MULTIPLE_CHOICE
+      - COUNTRY
+      - STATE
+      - CURRENCY
+      - DOCUMENT_UPLOAD
+      - UNSUPPORTED
+      description: What kind of answer the question takes. `COUNTRY` takes an ISO 3166-1 alpha-2 code (e.g. `US`), `CURRENCY` an ISO 4217 code (e.g. `USD`) and `STATE` a state name (e.g. `California`), each as a string, or a list of strings when the form allows several. `DOCUMENT_UPLOAD` questions are answered with a list of document handles from `POST /rest/legal-entities/{legal_entity_id}/kyb/edd/documents`. `UNSUPPORTED` questions cannot be answered over the API; when one of them is required, `is_answerable_over_api` is false.
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsType
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEdd:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Public id of the EDD request. Send it as `edd_request_id` when answering.
+        status:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddStatus'
+          description: '`AWAITING_ANSWERS` until the answers are sent; `ANSWERED` once they are, until the entity is back in review.'
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItems'
+          description: Every question of the EDD form, in form order.
+        requested_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When Deel requested the EDD.
+        is_answerable_over_api:
+          type: boolean
+          description: False when the form has a required unsupported question. Contact Deel support to clear such a request.
+      required:
+      - id
+      - status
+      - questions
+      - requested_at
+      - is_answerable_over_api
+      description: 'The open enhanced due diligence (EDD) request while the entity is in EDD: Deel needs further answers from the client before it continues the review. Null otherwise, and null while the entity is in EDD when the questions could not be read (retry later).'
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEdd
+    LegalEntitiesIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the legal entity.
+        name:
+          type: string
+          description: The name of the legal entity.
+        phone:
+          type: string
+          description: The phone number of the legal entity.
+        address:
+          $ref: '#/components/schemas/LegalEntitiesIdPatchResponsesContentApplicationJsonSchemaDataAddress'
+        sic_number:
+          type: string
+          description: The SIC number of the legal entity.
+        entity_type:
+          type: string
+          description: The type of the legal entity.
+        industry_name:
+          type: string
+          description: The industry name of the legal entity.
+        company_identifiers:
+          $ref: '#/components/schemas/LegalEntitiesIdPatchResponsesContentApplicationJsonSchemaDataCompanyIdentifiers'
+      title: LegalEntitiesIdPatchResponsesContentApplicationJsonSchemaData
+    AnswerLegalEntityKybEdd-v2026-10-16RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AnswerLegalEntityKybEdd-v2026-10-16RequestConflictError
+    ListOfLegalEntities-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListOfLegalEntities-v2026-01-01RequestBadRequestError
+    LegalEntitiesLegalEntityIdSettingsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The setting key that was updated.
+        value:
+          type: string
+          description: The setting value that was applied.
+      title: LegalEntitiesLegalEntityIdSettingsPostResponsesContentApplicationJsonSchemaData
+    legal-entities_updateLegalEntity_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LegalEntitiesIdPatchResponsesContentApplicationJsonSchemaData'
+      title: legal-entities_updateLegalEntity_Response_200
+    LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaDataAnswersItems:
+      type: object
+      properties:
+        value:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaDataAnswersItemsValue'
+          description: 'The answer. `TEXT`, `LONG_TEXT`, `EMAIL`, `PHONE_NUMBER`: a string. `NUMBER`: a number. `DATE`: `YYYY-MM-DD`. `DATE_RANGE`: an object with `start_date` and `end_date`. `ADDRESS`: an object with `country` (ISO 3166-1 alpha-2 code), `state`, `city`, `street`, `number` and `zip_code`; all six are required when the question is required. `SINGLE_CHOICE`: one option title. `MULTIPLE_CHOICE`: a list of option titles. `DOCUMENT_UPLOAD`: a list of document handles from `POST /rest/legal-entities/{legal_entity_id}/kyb/edd/documents`. An empty value leaves an optional question unanswered.'
+        question_key:
+          type: string
+          maxLength: 16
+          description: The `key` of the question being answered.
+      required:
+      - value
+      - question_key
+      title: LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaDataAnswersItems
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRevealedWhenItems:
+      type: object
+      properties:
+        equals:
+          type: string
+          description: Option title `question` must be answered with for this question to apply.
+        question:
+          type: string
+          description: Key of the question whose answer gates this one.
+      required:
+      - equals
+      - question
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRevealedWhenItems
+    UploadLegalEntityKybEddDocument-v2026-10-14RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybEddDocument-v2026-10-14RequestUnprocessableEntityError
+    GetCountryFieldsForALegalEntity-v2026-09-11RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetCountryFieldsForALegalEntity-v2026-09-11RequestNotFoundError
+    UploadLegalEntityKybDocument-v2026-10-02RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybDocument-v2026-10-02RequestForbiddenError
+    DeleteLegalEntity-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message explaining why access is denied.
+      title: DeleteLegalEntity-v2026-01-01RequestForbiddenError
+    legal-entities_getIndustries_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndustriesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of industry subcategories.
+        has_more:
+          type: boolean
+          description: Indicates if there are more results available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to fetch the next page of results.
+        total_count:
+          type: integer
+          description: Total number of results matching the query.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: legal-entities_getIndustries_Response_200
+    UploadLegalEntityKybEddDocument-v2026-10-14RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybEddDocument-v2026-10-14RequestBadRequestError
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataVerificationType:
+      type: string
+      enum:
+      - NONE
+      - LIGHT
+      - FULL
+      description: Depth of verification the entity is subject to, when known.
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataVerificationType
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRevealedWhenItems:
+      type: object
+      properties:
+        equals:
+          type: string
+          description: Option title `question` must be answered with for this question to apply.
+        question:
+          type: string
+          description: Key of the question whose answer gates this one.
+      required:
+      - equals
+      - question
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRevealedWhenItems
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItemsCode'
+          description: Machine-readable error code.
+        details:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          description: Which request field the error refers to and, for a content-type or document-type error, the accepted values.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItems
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItemsType:
+      type: string
+      enum:
+      - TEXT
+      - LONG_TEXT
+      - NUMBER
+      - EMAIL
+      - PHONE_NUMBER
+      - DATE
+      - DATE_RANGE
+      - ADDRESS
+      - SINGLE_CHOICE
+      - MULTIPLE_CHOICE
+      - COUNTRY
+      - STATE
+      - CURRENCY
+      - DOCUMENT_UPLOAD
+      - UNSUPPORTED
+      description: What kind of answer the question takes. `COUNTRY` takes an ISO 3166-1 alpha-2 code (e.g. `US`), `CURRENCY` an ISO 4217 code (e.g. `USD`) and `STATE` a state name (e.g. `California`), each as a string, or a list of strings when the form allows several. `DOCUMENT_UPLOAD` questions are answered with a list of document handles from `POST /rest/legal-entities/{legal_entity_id}/kyb/edd/documents`. `UNSUPPORTED` questions cannot be answered over the API; when one of them is required, `is_answerable_over_api` is false.
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItemsType
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddStatus:
+      type: string
+      enum:
+      - AWAITING_ANSWERS
+      - ANSWERED
+      description: '`AWAITING_ANSWERS` until the answers are sent; `ANSWERED` once they are, until the entity is back in review.'
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddStatus
+    ListAllIndustrySubcategories-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndustriesGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/IndustriesGetResponsesContentApplicationJsonSchemaRequest'
+      title: ListAllIndustrySubcategories-v2026-01-01RequestBadRequestError
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems:
+      type: string
+      enum:
+      - submitter
+      - controllingOfficer
+      - owner
+      - director
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems
+    LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the legal entity.
+        name:
+          type: string
+          description: The name of the legal entity.
+        phone:
+          type:
+          - string
+          - 'null'
+          description: The phone number of the legal entity.
+        status:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: The mapped legal entity lifecycle status.
+        vat_id:
+          type:
+          - string
+          - 'null'
+          description: The VAT identifier of the legal entity.
+        address:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataAddress'
+          - type: 'null'
+        country:
+          type:
+          - string
+          - 'null'
+          description: The country of the legal entity (ISO 2-letter code).
+        cdd_status:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataCddStatus'
+          - type: 'null'
+          description: 'The raw CDD verification status. When verification has not started it is coalesced to a tier-dependent initial value: PENDING when CDD is required, NOT_REQUIRED for Tier-0/SaaS entities.'
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the legal entity was created.
+        legal_name:
+          type:
+          - string
+          - 'null'
+          description: The registered legal name of the entity.
+        legal_type:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataLegalType'
+          - type: 'null'
+          description: The legal type of the entity.
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the legal entity was last updated.
+        archived_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The timestamp when the legal entity was archived, if any.
+        entity_type:
+          type:
+          - string
+          - 'null'
+          description: The entity subtype.
+        industry_name:
+          type:
+          - string
+          - 'null'
+          description: The industry name of the legal entity.
+        incorporation_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The incorporation date of the legal entity.
+        registration_number:
+          type:
+          - string
+          - 'null'
+          description: The registration number of the legal entity.
+      title: LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaData
+    LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataLegalType:
+      type: string
+      enum:
+      - individual
+      - company
+      - light
+      description: The legal type of the entity.
+      title: LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataLegalType
+    legal-entities_deleteLegalEntity_Response_200:
+      type: object
+      properties:
+        archived_at:
+          type: string
+          format: date-time
+          description: The timestamp when the legal entity was archived.
+      title: legal-entities_deleteLegalEntity_Response_200
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataDocumentsItems:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataDocumentsItemsType'
+          description: Company-level document type.
+        meta_type:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataDocumentsItemsMetaType'
+          - type: 'null'
+          description: Kind of Proof of Authority document, when this entry's type is PROOF_OF_AUTHORITY. Null for every other document type.
+        is_provided:
+          type: boolean
+          description: Whether a file for this document has been submitted. File contents and URLs are never returned.
+        is_required:
+          type: boolean
+          description: Whether the verification service currently requires this document.
+      required:
+      - type
+      - meta_type
+      - is_provided
+      - is_required
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataDocumentsItems
+    GetCountryFieldsForALegalEntity-v2026-09-11RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetCountryFieldsForALegalEntity-v2026-09-11RequestBadRequestError
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsIdentityDocuments:
+      type: object
+      properties:
+        back:
+          type: string
+          format: uuid
+          description: Handle of a document uploaded as `IDENTITY_DOCUMENT_BACK`. Not needed for passports.
+        front:
+          type: string
+          format: uuid
+          description: Handle of a document uploaded as `IDENTITY_DOCUMENT_FRONT`.
+        selfie:
+          type: string
+          format: uuid
+          description: Handle of a document uploaded as `SELFIE`.
+      description: Identity document sides and selfie for the person, as upload handles.
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsIdentityDocuments
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataTransactionMonthlyVolume:
+      type: string
+      enum:
+      - LESS_THAN_1K
+      - BETWEEN_1K_AND_10K
+      - BETWEEN_10K_AND_100K
+      - BETWEEN_100K_AND_1M
+      - GREATER_THAN_1M
+      description: Expected monthly transaction volume range.
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataTransactionMonthlyVolume
+    LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Opaque handle for the uploaded document. Pass it in the matching document field of `POST /rest/legal-entities/{legal_entity_id}/kyb`. Valid only for this legal entity, usable once, and expires if unused.
+        file_name:
+          type:
+          - string
+          - 'null'
+          description: Original file name, when the upload carried one.
+        created_at:
+          type: string
+          format: date-time
+          description: When the document was uploaded.
+        expires_at:
+          type: string
+          format: date-time
+          description: When the handle stops being accepted if it has not been used in a submission.
+        content_type:
+          type: string
+          description: MIME type of the stored file.
+        document_type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaDataDocumentType'
+          description: The document type the file was uploaded as. The handle can only be used for this type.
+      required:
+      - id
+      - file_name
+      - created_at
+      - expires_at
+      - content_type
+      - document_type
+      title: LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaData
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsType:
+      type: string
+      enum:
+      - TEXT
+      - LONG_TEXT
+      - NUMBER
+      - EMAIL
+      - PHONE_NUMBER
+      - DATE
+      - DATE_RANGE
+      - ADDRESS
+      - SINGLE_CHOICE
+      - MULTIPLE_CHOICE
+      - COUNTRY
+      - STATE
+      - CURRENCY
+      - DOCUMENT_UPLOAD
+      - UNSUPPORTED
+      description: What kind of answer the question takes. `COUNTRY` takes an ISO 3166-1 alpha-2 code (e.g. `US`), `CURRENCY` an ISO 4217 code (e.g. `USD`) and `STATE` a state name (e.g. `California`), each as a string, or a list of strings when the form allows several. `DOCUMENT_UPLOAD` questions are answered with a list of document handles from `POST /rest/legal-entities/{legal_entity_id}/kyb/edd/documents`. `UNSUPPORTED` questions cannot be answered over the API; when one of them is required, `is_answerable_over_api` is false.
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsType
+    UploadLegalEntityKybEddDocument-v2026-10-14RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybEddDocument-v2026-10-14RequestNotFoundError
+    UploadLegalEntityKybEddDocument-v2026-10-14RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybEddDocument-v2026-10-14RequestForbiddenError
+    LegalEntitiesLegalEntityIdSettingsPostRequestBodyContentApplicationJsonSchemaDataKey:
+      type: string
+      enum:
+      - ALLOW_GP_EMPLOYEE_APP_ACCESS
+      description: The setting key to update. Only ALLOW_GP_EMPLOYEE_APP_ACCESS is supported today.
+      title: LegalEntitiesLegalEntityIdSettingsPostRequestBodyContentApplicationJsonSchemaDataKey
+    GetLegalEntity-v2026-09-09RequestNotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message returned when the legal entity does not exist.
+      title: GetLegalEntity-v2026-09-09RequestNotFoundError
+    SubmitLegalEntityKyb-v2026-10-12RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: SubmitLegalEntityKyb-v2026-10-12RequestUnprocessableEntityError
+    AnswerLegalEntityKybEdd-v2026-10-16RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AnswerLegalEntityKybEdd-v2026-10-16RequestUnauthorizedError
+    CreateLegalEntity-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message explaining the lack of permission.
+      title: CreateLegalEntity-v2026-01-01RequestForbiddenError
+    LegalEntitiesLegalEntityIdKybDocumentsPostRequestBodyContentMultipartFormDataSchemaData:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The document. Company documents accept PDF, JPEG and PNG. Identity documents and selfies accept JPEG and PNG only.
+        document_type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostRequestBodyContentMultipartFormDataSchemaDataDocumentType'
+          description: 'What the file is. Company documents: `ARTICLES_OF_INCORPORATION`, `COMPANY_BANK_STATEMENT`, `CERTIFICATE_OF_GOOD_STANDING`, `ULTIMATE_BENEFICIAL_OWNER_FORM`, `PROOF_OF_AUTHORITY` (a power of attorney, a board resolution or minutes, or another document evidencing authority). Person documents, one per side: `IDENTITY_DOCUMENT_FRONT`, `IDENTITY_DOCUMENT_BACK`, `SELFIE`. A list of directors is not yet accepted by the verification service over the API.'
+      required:
+      - file
+      - document_type
+      title: LegalEntitiesLegalEntityIdKybDocumentsPostRequestBodyContentMultipartFormDataSchemaData
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    CreateLegalEntity-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message explaining what went wrong.
+      title: CreateLegalEntity-v2026-01-01RequestBadRequestError
+    LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsCode'
+          description: Machine-readable error code.
+        details:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsDetails'
+          description: Which request field the error refers to and, for a content-type or document-type error, the accepted values.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems
+    LegalEntitiesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
       properties:
         name:
           type: string
+          description: The legal name of the entity.
+        phone:
+          type: string
+          description: Contact phone number for the entity.
+        address:
+          $ref: '#/components/schemas/LegalEntitiesPostRequestBodyContentApplicationJsonSchemaDataAddress'
+          description: The physical address of the entity.
+        sic_number:
+          type: string
+          description: The SIC number for the entity.
+        entity_type:
+          type: string
+          description: Type of the entity.
+        company_identifiers:
+          $ref: '#/components/schemas/LegalEntitiesPostRequestBodyContentApplicationJsonSchemaDataCompanyIdentifiers'
+      required:
+      - name
+      - phone
+      - address
+      - sic_number
+      - entity_type
+      - company_identifiers
+      title: LegalEntitiesPostRequestBodyContentApplicationJsonSchemaData
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataDocumentsItemsMetaType:
+      type: string
+      enum:
+      - POWER_OF_ATTORNEY
+      - RESOLUTION_OR_MINUTES
+      - OTHER
+      description: Kind of Proof of Authority document, when this entry's type is PROOF_OF_AUTHORITY. Null for every other document type.
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataDocumentsItemsMetaType
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRevealedWhenItems:
+      type: object
+      properties:
+        equals:
+          type: string
+          description: Option title `question` must be answered with for this question to apply.
+        question:
+          type: string
+          description: Key of the question whose answer gates this one.
+      required:
+      - equals
+      - question
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRevealedWhenItems
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRepeatGroup:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the repeatable group this question belongs to.
+        index:
+          type: integer
+          description: Zero-based position of this question within its repeat group instance.
+        max_repeats:
+          type: integer
+          description: Maximum number of instances of this group the form allows.
+      required:
+      - name
+      - index
+      - max_repeats
+      description: Set when this question belongs to a repeatable group (e.g. "add another director"); null otherwise.
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRepeatGroup
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems:
+      type: string
+      enum:
+      - submitter
+      - controllingOfficer
+      - owner
+      - director
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems
+    UploadLegalEntityKybEddDocument-v2026-10-14RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybEddDocument-v2026-10-14RequestTooManyRequestsError
+    LegalEntitiesLegalEntityIdKybEddPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: LegalEntitiesLegalEntityIdKybEddPostParametersXBeta
+    SubmitLegalEntityKyb-v2026-10-12RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: SubmitLegalEntityKyb-v2026-10-12RequestTooManyRequestsError
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRepeatGroup:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the repeatable group this question belongs to.
+        index:
+          type: integer
+          description: Zero-based position of this question within its repeat group instance.
+        max_repeats:
+          type: integer
+          description: Maximum number of instances of this group the form allows.
+      required:
+      - name
+      - index
+      - max_repeats
+      description: Set when this question belongs to a repeatable group (e.g. "add another director"); null otherwise.
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRepeatGroup
+    UploadLegalEntityKybDocument-v2026-10-02RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybDocument-v2026-10-02RequestBadRequestError
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The request field the error refers to.
+        keys:
+          type: array
+          items:
+            type: string
+          description: Every offending request field, for a multi-field error.
+        allowed:
+          type: array
+          items:
+            type: string
+          description: Accepted values for the field.
+      description: Which request field the error refers to and, for a content-type or document-type error, the accepted values.
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    UploadLegalEntityKybDocument-v2026-10-02RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybDocument-v2026-10-02RequestNotFoundError
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems:
+      type: string
+      enum:
+      - submitter
+      - controllingOfficer
+      - owner
+      - director
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems
+    UploadLegalEntityKybDocument-v2026-10-02RequestUnsupportedMediaTypeError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybDocument-v2026-10-02RequestUnsupportedMediaTypeError
+    GetLegalEntityKybState-v2026-10-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetLegalEntityKybState-v2026-10-01RequestForbiddenError
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataRequirementsItemsCategory:
+      type: string
+      enum:
+      - FIELD
+      - DOCUMENT
+      - PERSON
+      description: 'What kind of input satisfies the requirement: a company field, a company document, or an attribute of a declared person.'
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataRequirementsItemsCategory
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataDocumentsItemsType:
+      type: string
+      enum:
+      - PROOF_OF_AUTHORITY
+      - ARTICLES_OF_INCORPORATION
+      - COMPANY_BANK_STATEMENT
+      - LIST_OF_DIRECTORS
+      - CERTIFICATE_OF_GOOD_STANDING
+      - ULTIMATE_BENEFICIAL_OWNER_FORM
+      description: Company-level document type.
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataDocumentsItemsType
+    legal-entities_createLegalEntity_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LegalEntitiesPostResponsesContentApplicationJsonSchemaData'
+      title: legal-entities_createLegalEntity_Response_200
+    LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataAddress:
+      type: object
+      properties:
+        zip:
+          type:
+          - string
+          - 'null'
+          description: The zip code.
+        city:
+          type:
+          - string
+          - 'null'
+          description: The city.
+        state:
+          type:
+          - string
+          - 'null'
+          description: The state.
+        street:
+          type:
+          - string
+          - 'null'
+          description: The street address.
+        country:
+          type:
+          - string
+          - 'null'
+          description: The ISO 2-letter country code.
+      title: LegalEntitiesLegalEntityIdGetResponsesContentApplicationJsonSchemaDataAddress
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaErrorsItems
+    AnswerLegalEntityKybEdd-v2026-10-16RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AnswerLegalEntityKybEdd-v2026-10-16RequestUnprocessableEntityError
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Key of the question within this EDD request, in form order. Send it as `question_key` when answering.
+        type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItemsType'
+          description: What kind of answer the question takes. `COUNTRY` takes an ISO 3166-1 alpha-2 code (e.g. `US`), `CURRENCY` an ISO 4217 code (e.g. `USD`) and `STATE` a state name (e.g. `California`), each as a string, or a list of strings when the form allows several. `DOCUMENT_UPLOAD` questions are answered with a list of document handles from `POST /rest/legal-entities/{legal_entity_id}/kyb/edd/documents`. `UNSUPPORTED` questions cannot be answered over the API; when one of them is required, `is_answerable_over_api` is false.
+        title:
+          type: string
+          description: The question as the reviewer wrote it.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: For `SINGLE_CHOICE` and `MULTIPLE_CHOICE` questions, the option titles to answer with. Null for every other type.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Helper text for the question, when any.
+        is_required:
+          type: boolean
+          description: Whether the question must currently be answered.
+        repeat_group:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRepeatGroup'
+          - type: 'null'
+          description: Set when this question belongs to a repeatable group (e.g. "add another director"); null otherwise.
+        revealed_when:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRevealedWhenItems'
+          description: Conditions under which this question applies, met if any one of them does. Null when the question always applies. Only answer it when a condition is met.
+      required:
+      - key
+      - type
+      - title
+      - options
+      - description
+      - is_required
+      - repeat_group
+      - revealed_when
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEddQuestionsItems
+    Legal_Entities_uploadLegalEntityKybDocument-v2026-10-02_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Legal Entities_uploadLegalEntityKybDocument-v2026-10-02_Response_201
+    LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Opaque handle for the uploaded document. Pass it in the matching answer of `POST /rest/legal-entities/{legal_entity_id}/kyb/edd`. Valid only for this legal entity, EDD request and question, usable once, and expires if unused.
+        created_at:
+          type: string
+          format: date-time
+          description: When the document was uploaded.
+        expires_at:
+          type: string
+          format: date-time
+          description: When the handle stops being accepted if it has not been used in an answer.
+        question_key:
+          type: string
+          description: The EDD question key the file was uploaded for. The handle can only be used for this question.
+      required:
+      - id
+      - created_at
+      - expires_at
+      - question_key
+      title: LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaData
+    LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - archived
+      - active
+      - draft
+      - processing
+      - processing_draft
+      - pending_verification
+      - awaiting_review
+      - unknown
+      description: The mapped legal entity lifecycle status, the same value as on the single legal entity endpoint. Returned only when the feature is enabled for the organization.
+      title: LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsAddress:
+      type: object
+      properties:
+        zip:
+          type: string
+          maxLength: 32
+          description: Postal code.
+        city:
+          type: string
+          maxLength: 255
+          description: City.
+        state:
+          type:
+          - string
+          - 'null'
+          maxLength: 64
+          description: State or province. Required for US addresses, as a 2-letter ISO 3166-2 code (e.g. `CA`).
+        street:
+          type: string
+          maxLength: 255
+          description: Street address.
         country:
           type: string
-          description: ISO 3166-1 alpha-2
-        registration_number:
+          description: ISO 3166-1 alpha-2 country code.
+      required:
+      - zip
+      - city
+      - street
+      - country
+      description: Residential address.
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsAddress
+    GetLegalEntityKybState-v2026-10-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetLegalEntityKybState-v2026-10-01RequestUnauthorizedError
+    IndustriesGetParametersSortBy:
+      type: string
+      enum:
+      - subcategoryName
+      - categoryName
+      default: categoryName
+      title: IndustriesGetParametersSortBy
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataVerificationType:
+      type: string
+      enum:
+      - NONE
+      - LIGHT
+      - FULL
+      description: Depth of verification the entity is subject to, when known.
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataVerificationType
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItemsDetails:
+      type: object
+      properties:
+        key:
           type: string
-        industry:
+          description: The request field the error refers to.
+        keys:
+          type: array
+          items:
+            type: string
+          description: Every offending request field, for a multi-field error.
+        allowed:
+          type: array
+          items:
+            type: string
+          description: Accepted values for the field.
+      description: Which request field the error refers to and, for a content-type or document-type error, the accepted values.
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItemsDetails
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataPersonsItems:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Public id of the declared person, when the verification service has assigned one.
+        last_name:
           type: string
-        currency:
+          description: Last name as declared.
+        first_name:
           type: string
+          description: First name as declared.
+        responsibilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems'
+          description: Roles the person holds in the entity.
+        ownership_percentage:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Declared ownership percentage for owners; null otherwise.
+      required:
+      - id
+      - last_name
+      - first_name
+      - responsibilities
+      - ownership_percentage
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataPersonsItems
+    GetLegalEntityKybState-v2026-10-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetLegalEntityKybState-v2026-10-01RequestNotFoundError
+    IndustriesGetParametersOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      default: ASC
+      title: IndustriesGetParametersOrder
+    LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItemsEntityType:
+      type: string
+      enum:
+      - individual
+      - company
+      - light
+      description: Entity type
+      title: LegalEntitiesGetResponsesContentApplicationJsonSchemaDataItemsEntityType
+    SubmitLegalEntityKyb-v2026-10-12RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: SubmitLegalEntityKyb-v2026-10-12RequestNotFoundError
+    LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsCode:
+      type: string
+      enum:
+      - KYB_VERIFICATION_UNAVAILABLE
+      description: Machine-readable error code.
+      title: LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItemsCode
+    LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaDataAnswersItemsValue:
+      oneOf:
+      - type: string
+        maxLength: 10000
+      - type: number
+        format: double
+      - type: array
+        items:
+          type: string
+      - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaDataAnswersItemsValue3'
+      description: 'The answer. `TEXT`, `LONG_TEXT`, `EMAIL`, `PHONE_NUMBER`: a string. `NUMBER`: a number. `DATE`: `YYYY-MM-DD`. `DATE_RANGE`: an object with `start_date` and `end_date`. `ADDRESS`: an object with `country` (ISO 3166-1 alpha-2 code), `state`, `city`, `street`, `number` and `zip_code`; all six are required when the question is required. `SINGLE_CHOICE`: one option title. `MULTIPLE_CHOICE`: a list of option titles. `DOCUMENT_UPLOAD`: a list of document handles from `POST /rest/legal-entities/{legal_entity_id}/kyb/edd/documents`. An empty value leaves an optional question unanswered.'
+      title: LegalEntitiesLegalEntityIdKybEddPostRequestBodyContentApplicationJsonSchemaDataAnswersItemsValue
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataPersonsItems:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Public id of the declared person, when the verification service has assigned one.
+        last_name:
+          type: string
+          description: Last name as declared.
+        first_name:
+          type: string
+          description: First name as declared.
+        responsibilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataPersonsItemsResponsibilitiesItems'
+          description: Roles the person holds in the entity.
+        ownership_percentage:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Declared ownership percentage for owners; null otherwise.
+      required:
+      - id
+      - last_name
+      - first_name
+      - responsibilities
+      - ownership_percentage
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataPersonsItems
+    LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataFieldsItemsKind:
+      type: string
+      enum:
+      - registration_id
+      - tax_id
+      description: Whether this field is a registration or tax identifier.
+      title: LegalEntitiesCountryFieldsCountryCodeGetResponsesContentApplicationJsonSchemaDataFieldsItemsKind
+    LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Key of the question within this EDD request, in form order. Send it as `question_key` when answering.
+        type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsType'
+          description: What kind of answer the question takes. `COUNTRY` takes an ISO 3166-1 alpha-2 code (e.g. `US`), `CURRENCY` an ISO 4217 code (e.g. `USD`) and `STATE` a state name (e.g. `California`), each as a string, or a list of strings when the form allows several. `DOCUMENT_UPLOAD` questions are answered with a list of document handles from `POST /rest/legal-entities/{legal_entity_id}/kyb/edd/documents`. `UNSUPPORTED` questions cannot be answered over the API; when one of them is required, `is_answerable_over_api` is false.
+        title:
+          type: string
+          description: The question as the reviewer wrote it.
+        options:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: For `SINGLE_CHOICE` and `MULTIPLE_CHOICE` questions, the option titles to answer with. Null for every other type.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Helper text for the question, when any.
+        is_required:
+          type: boolean
+          description: Whether the question must currently be answered.
+        repeat_group:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRepeatGroup'
+          - type: 'null'
+          description: Set when this question belongs to a repeatable group (e.g. "add another director"); null otherwise.
+        revealed_when:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItemsRevealedWhenItems'
+          description: Conditions under which this question applies, met if any one of them does. Null when the question always applies. Only answer it when a condition is met.
+      required:
+      - key
+      - type
+      - title
+      - options
+      - description
+      - is_required
+      - repeat_group
+      - revealed_when
+      title: LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaDataEddQuestionsItems
+    AnswerLegalEntityKybEdd-v2026-10-16RequestServiceUnavailableError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AnswerLegalEntityKybEdd-v2026-10-16RequestServiceUnavailableError
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataDocumentsItems:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataDocumentsItemsType'
+          description: Company-level document type.
+        meta_type:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataDocumentsItemsMetaType'
+          - type: 'null'
+          description: Kind of Proof of Authority document, when this entry's type is PROOF_OF_AUTHORITY. Null for every other document type.
+        is_provided:
+          type: boolean
+          description: Whether a file for this document has been submitted. File contents and URLs are never returned.
+        is_required:
+          type: boolean
+          description: Whether the verification service currently requires this document.
+      required:
+      - type
+      - meta_type
+      - is_provided
+      - is_required
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataDocumentsItems
+    LegalEntitiesPostRequestBodyContentApplicationJsonSchemaDataAddress:
+      type: object
+      properties:
+        zip:
+          type: string
+          description: Zip code.
+        city:
+          type: string
+          description: City name.
+        state:
+          type: string
+          description: 'State '
+        street:
+          type: string
+          description: Street address.
+        country:
+          type: string
+          description: Country code.
+      required:
+      - zip
+      - city
+      - street
+      - country
+      description: The physical address of the entity.
+      title: LegalEntitiesPostRequestBodyContentApplicationJsonSchemaDataAddress
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataProofOfAuthority:
+      type: object
+      properties:
+        document:
+          type: string
+          format: uuid
+          description: Handle of a document uploaded as `PROOF_OF_AUTHORITY`.
+        meta_type:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataProofOfAuthorityMetaType'
+          description: 'What kind of document evidences the authority: a power of attorney, a board resolution or minutes, or another document.'
+      required:
+      - document
+      - meta_type
+      description: Proof of Authority for the person acting on behalf of the entity. Required when the KYB state lists `PROOF_OF_AUTHORITY` as outstanding, unless `is_person_with_significant_control` is `true`.
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataProofOfAuthority
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataProofOfAuthorityMetaType:
+      type: string
+      enum:
+      - POWER_OF_ATTORNEY
+      - RESOLUTION_OR_MINUTES
+      - OTHER
+      description: 'What kind of document evidences the authority: a power of attorney, a board resolution or minutes, or another document.'
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataProofOfAuthorityMetaType
+    Legal_Entities_answerLegalEntityKybEdd-v2026-10-16_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Legal Entities_answerLegalEntityKybEdd-v2026-10-16_Response_200
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataVerificationType:
+      type: string
+      enum:
+      - NONE
+      - LIGHT
+      - FULL
+      description: Depth of verification the entity is subject to, when known.
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataVerificationType
+    GetLegalEntity-v2026-09-09RequestForbiddenError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message explaining why access is denied.
+      title: GetLegalEntity-v2026-09-09RequestForbiddenError
+    UploadLegalEntityKybEddDocument-v2026-10-14RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybEddDocument-v2026-10-14RequestConflictError
+    SubmitLegalEntityKyb-v2026-10-12RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: SubmitLegalEntityKyb-v2026-10-12RequestConflictError
+    GetLegalEntity-v2026-09-09RequestBadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message explaining what went wrong.
+      title: GetLegalEntity-v2026-09-09RequestBadRequestError
+    LegalEntitiesLegalEntityIdKybEddDocumentsPostRequestBodyContentMultipartFormDataSchemaData:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The document. Accepts application/pdf, image/jpeg, image/png.
+        question_key:
+          type: string
+          description: The `key` of the `DOCUMENT_UPLOAD` question being answered.
+        edd_request_id:
+          type: string
+          format: uuid
+          description: The `edd.id` from the KYB state.
+      required:
+      - file
+      - question_key
+      - edd_request_id
+      title: LegalEntitiesLegalEntityIdKybEddDocumentsPostRequestBodyContentMultipartFormDataSchemaData
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataRejection:
+      type: object
+      properties:
+        rejected_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the rejection was recorded.
+      required:
+      - rejected_at
+      description: Present only when the entity was rejected; null otherwise.
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataRejection
+    AnswerLegalEntityKybEdd-v2026-10-16RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AnswerLegalEntityKybEdd-v2026-10-16RequestNotFoundError
+    Legal_Entities_submitLegalEntityKyb-v2026-10-12_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Legal Entities_submitLegalEntityKyb-v2026-10-12_Response_200
+    UploadLegalEntityKybDocument-v2026-10-02RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UploadLegalEntityKybDocument-v2026-10-02RequestTooManyRequestsError
+    LegalEntitiesIdPatchResponsesContentApplicationJsonSchemaDataAddress:
+      type: object
+      properties:
+        city:
+          type: string
+          description: The city.
+        state:
+          type: string
+          description: The state.
+        street:
+          type: string
+          description: The street address.
+        country:
+          type: string
+          description: The ISO 2-letter country code.
+      title: LegalEntitiesIdPatchResponsesContentApplicationJsonSchemaDataAddress
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        persons:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItems'
+          description: 'Persons of significant control: directors, controlling officers, owners and the client-side submitter.'
+        documents:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataDocuments'
+          description: Company documents as handles from the upload endpoint. Supply the ones the KYB state lists as required.
+        formation_date:
+          type: string
+          format: date
+          description: Company formation date, `YYYY-MM-DD`.
+        proof_of_authority:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataProofOfAuthority'
+          description: Proof of Authority for the person acting on behalf of the entity. Required when the KYB state lists `PROOF_OF_AUTHORITY` as outstanding, unless `is_person_with_significant_control` is `true`.
+        is_declaration_confirmed:
+          type: boolean
+          description: 'Must be true: the client confirms the information is accurate and complete.'
+        transaction_monthly_volume:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataTransactionMonthlyVolume'
+          description: Expected monthly transaction volume range.
+        is_terms_and_conditions_accepted:
+          type: boolean
+          description: 'Must be true: the client accepts the verification terms and conditions.'
+        is_person_with_significant_control:
+          type: boolean
+          description: 'Declares that the submitter personally holds significant control of the company (an owner, director or controlling officer) — the declared submitter in `persons[]` should hold one of those responsibilities too. An alternative to `proof_of_authority`: when `true`, the verification service waives the Proof of Authority document requirement. Omit or set `false` if the submitter is acting on the company''s behalf without significant control themselves.'
+      required:
+      - persons
+      - is_declaration_confirmed
+      - is_terms_and_conditions_accepted
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaData
+    SubmitLegalEntityKyb-v2026-10-12RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: SubmitLegalEntityKyb-v2026-10-12RequestBadRequestError
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataRequirementsItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: 'Requirement key as published by the verification service, e.g. `FORMATION_DATE`, `ARTICLES_OF_INCORPORATION`, `PROOF_OF_AUTHORITY`, `UBO_NAME`, `DIRECTOR_KYC_DOCUMENT`. Person-level keys are prefixed with the role they constrain: `DIRECTOR_`, `CONTROLLING_OFFICER_`, `UBO_` or `SUBMITTER_`.'
+        category:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataRequirementsItemsCategory'
+          description: 'What kind of input satisfies the requirement: a company field, a company document, or an attribute of a declared person.'
+        is_satisfied:
+          type: boolean
+          description: Whether the current submission already satisfies the requirement.
+      required:
+      - key
+      - category
+      - is_satisfied
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataRequirementsItems
+    LegalEntitiesGetParametersSortOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      default: ASC
+      title: LegalEntitiesGetParametersSortOrder
+    LegalEntitiesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the legal entity.
+        name:
+          type: string
+          description: The name of the entity.
+        phone:
+          type: string
+          description: The contact number of the entity.
+        address:
+          $ref: '#/components/schemas/LegalEntitiesPostResponsesContentApplicationJsonSchemaDataAddress'
+          description: The entity's address.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the entity was created.
+        sic_number:
+          type: string
+          description: The SIC number of the entity.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the entity was last updated.
+        entity_type:
+          type: string
+          description: Type of the entity.
+      title: LegalEntitiesPostResponsesContentApplicationJsonSchemaData
+    LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        edd:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataEdd'
+          - type: 'null'
+          description: 'The open enhanced due diligence (EDD) request while the entity is in EDD: Deel needs further answers from the client before it continues the review. Null otherwise, and null while the entity is in EDD when the questions could not be read (retry later).'
+        status:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: The mapped lifecycle status of the legal entity, the same vocabulary as `status` on `GET /rest/legal-entities/{legal_entity_id}`.
+        persons:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataPersonsItems'
+          description: 'Declared persons of significant control: directors, controlling officers, owners and the submitter. Identity documents are reported by presence only. Null when `is_detail_available` is false.'
+        documents:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataDocumentsItems'
+          description: Presence of every company-level document type. Null when `is_detail_available` is false.
+        rejection:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataRejection'
+          - type: 'null'
+          description: Present only when the entity was rejected; null otherwise.
+        approved_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the entity was approved; null otherwise.
+        rejected_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the entity was last rejected; null otherwise.
+        requirements:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataRequirementsItems'
+          description: Everything the verification service currently requires for this entity, with whether each item is already satisfied. Empty when verification is not required. Null when `is_detail_available` is false.
+        submitted_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the verification record was created; null before the first submission.
+        legal_entity_id:
+          type: string
+          format: uuid
+          description: Public id of the legal entity.
+        verification_type:
+          oneOf:
+          - $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaDataVerificationType'
+          - type: 'null'
+          description: Depth of verification the entity is subject to, when known.
+        is_action_required:
+          type: boolean
+          description: 'True while the entity is waiting on the client: `PENDING`, `DRAFT`, or `EDD` (enhanced due diligence — Ops needs something further from the client). False while Deel is reviewing or once the entity is approved, rejected or exempt.'
+        is_detail_available:
+          type: boolean
+          description: False when the verification service could not be read. Every detail block (`requirements`, `documents`, `proof_of_authority`, `persons`, `rejection`) is then null. Retry later; the status fields are still authoritative.
+      required:
+      - edd
+      - status
+      - persons
+      - documents
+      - rejection
+      - approved_at
+      - rejected_at
+      - requirements
+      - submitted_at
+      - legal_entity_id
+      - verification_type
+      - is_action_required
+      - is_detail_available
+      title: LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaData
+    LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaDataDocumentType:
+      type: string
+      enum:
+      - ARTICLES_OF_INCORPORATION
+      - COMPANY_BANK_STATEMENT
+      - CERTIFICATE_OF_GOOD_STANDING
+      - ULTIMATE_BENEFICIAL_OWNER_FORM
+      - PROOF_OF_AUTHORITY
+      - IDENTITY_DOCUMENT_FRONT
+      - IDENTITY_DOCUMENT_BACK
+      - SELFIE
+      description: The document type the file was uploaded as. The handle can only be used for this type.
+      title: LegalEntitiesLegalEntityIdKybDocumentsPostResponsesContentApplicationJsonSchemaDataDocumentType
+    LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsJobTitle:
+      type: string
+      enum:
+      - FOUNDER
+      - MAJOR_SHAREHOLDER
+      - MINORITY_SHAREHOLDER
+      - EQUITY_PARTNER
+      - EXECUTIVE_C_LEVEL
+      - MANAGING_DIRECTOR
+      - DIRECTOR
+      - PRESIDENT
+      - VICE_PRESIDENT
+      - SENIOR_MANAGEMENT_OFFICIAL
+      - AUTHORIZED_SIGNATORY
+      - OTHER
+      description: Role of the person in the company, from the verification service vocabulary; required for controlling officers when the verification service asks for it.
+      title: LegalEntitiesLegalEntityIdKybPostRequestBodyContentApplicationJsonSchemaDataPersonsItemsJobTitle
+    LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataRequirementsItemsCategory:
+      type: string
+      enum:
+      - FIELD
+      - DOCUMENT
+      - PERSON
+      description: 'What kind of input satisfies the requirement: a company field, a company document, or an attribute of a declared person.'
+      title: LegalEntitiesLegalEntityIdKybEddPostResponsesContentApplicationJsonSchemaDataRequirementsItemsCategory
+    Legal_Entities_getLegalEntityKybState-v2026-10-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LegalEntitiesLegalEntityIdKybGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Legal Entities_getLegalEntityKybState-v2026-10-01_Response_200
   securitySchemes:
-    BearerAuth:
+    deelToken:
       type: http
       scheme: bearer
-      bearerFormat: opaque
-      description: Deel Organization or Personal API token issued from the Developer Center.
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

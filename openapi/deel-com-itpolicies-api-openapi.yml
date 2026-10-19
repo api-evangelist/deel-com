@@ -1,0 +1,1117 @@
+openapi: 3.2.0
+info:
+  title: Endpoints It Policies API
+  version: 1.0.0
+  description: API endpoints related to IT policies.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: itPolicies
+  description: API endpoints related to IT policies.
+paths:
+  /it/policies/{it_policy_id}/assign:
+    post:
+      operationId: itPolicies_assignWorkersToItHardwarePolicy-v2026-09-17
+      summary: Assign workers to an IT hardware policy
+      description: 'Use this from onboarding or HRIS automations to put workers on the IT hardware policy that governs what equipment they can order; resolve the policy id via `GET /rest/it/policies`. Assigns the listed workers, identified by their Deel HRIS profile ids, to this policy. Accepts between 1 and 100 ids per call. The call is all-or-nothing: if any id is not found in your organization the whole request fails and no worker is moved. Workers already on the policy are left unchanged; for per-seat organizations, seat allocation follows your organization''s seat assignment setting.
+
+
+        **Token scopes**: `it-policies:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-17.'
+      tags:
+      - itPolicies
+      parameters:
+      - name: it_policy_id
+        in: path
+        description: Unique identifier of the IT policy
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItPoliciesItPolicyIdAssignPostParametersXBeta'
+      responses:
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItHardwarePolicy-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItHardwarePolicy-v2026-09-17RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItHardwarePolicy-v2026-09-17RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItHardwarePolicy-v2026-09-17RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItHardwarePolicy-v2026-09-17RequestConflictError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItHardwarePolicy-v2026-09-17RequestInternalServerError'
+      requestBody:
+        description: Workers to assign
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ItPoliciesItPolicyIdAssignPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Workers to assign to the IT policy.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /it/policies:
+    get:
+      operationId: itPolicies_listItHardwarePolicies-v2026-01-01
+      summary: List IT hardware policies
+      description: 'Lists your organization''s IT hardware policies, which cap what equipment each worker is eligible to order. Call this to resolve a worker''s policy and the products it allows before raising an equipment request on their behalf.
+
+
+        **Token scopes**: `it-policies:read`'
+      tags:
+      - itPolicies
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_policies_listItHardwarePolicies-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItHardwarePolicies-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItHardwarePolicies-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/policies/{policy_id}/users:
+    get:
+      operationId: itPolicies_listItPolicyUsers-v2026-09-17
+      summary: List users assigned to an IT policy
+      description: 'Lists the workers assigned to one of your organization''s IT hardware policies. Use it to resolve which workers a policy applies to before raising equipment requests on their behalf, or to audit policy membership. Results are cursor-paginated.
+
+
+        **Token scopes**: `it-policies:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-17.'
+      tags:
+      - itPolicies
+      parameters:
+      - name: policy_id
+        in: path
+        description: IT policy identifier
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: cursor
+        in: query
+        description: Indicates where the next page of results starts, as returned in a paginated list response
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: hris_profile_id
+        in: query
+        description: Filter by the worker's HRIS Profile ID, to find which policy a specific worker is attached to. Repeat the key to filter on multiple values.
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItPoliciesPolicyIdUsersGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_policies_listItPolicyUsers-v2026-09-17_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItPolicyUsers-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItPolicyUsers-v2026-09-17RequestNotFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItPolicyUsers-v2026-09-17RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/policies/{policy_id}/seats:
+    get:
+      operationId: itPolicies_listItPolicyUsers-v2026-09-25
+      summary: List users assigned to an IT policy
+      description: 'Lists the workers assigned to one of your organization''s IT hardware policies. Use it to resolve which workers a policy applies to before raising equipment requests on their behalf, or to audit policy membership.
+
+
+        **Token scopes**: `it-policies:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-25.'
+      tags:
+      - itPolicies
+      parameters:
+      - name: policy_id
+        in: path
+        description: IT policy identifier
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: cursor
+        in: query
+        description: Indicates where the next page of results starts, as returned in a paginated list response
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: hris_profile_id
+        in: query
+        description: Filter by the worker's HRIS Profile ID, to find which policy a specific worker is attached to. Repeat the key to filter on multiple values.
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItPoliciesPolicyIdSeatsGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_policies_listItPolicyUsers-v2026-09-25_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItPolicyUsers-v2026-09-25RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItPolicyUsers-v2026-09-25RequestNotFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItPolicyUsers-v2026-09-25RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    AssignWorkersToItHardwarePolicy-v2026-09-17RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesItPolicyIdAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItHardwarePolicy-v2026-09-17RequestUnauthorizedError
+    ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItemsAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItemsAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItemsAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      required:
+      - id
+      - city
+      - type
+      - line1
+      - line2
+      - state
+      - country
+      - is_valid
+      - post_code
+      - phone_number
+      - date_of_birth
+      - tax_id_number
+      - passport_number
+      - delivery_instructions
+      description: User address details
+      title: ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItemsAddress
+    AssignWorkersToItHardwarePolicy-v2026-09-17RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesItPolicyIdAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItHardwarePolicy-v2026-09-17RequestForbiddenError
+    AssignWorkersToItHardwarePolicy-v2026-09-17RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesItPolicyIdAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItHardwarePolicy-v2026-09-17RequestInternalServerError
+    ItPoliciesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItPoliciesGetResponsesContentApplicationJsonSchemaErrorsItems
+    AssignWorkersToItHardwarePolicy-v2026-09-17RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesItPolicyIdAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItHardwarePolicy-v2026-09-17RequestNotFoundError
+    AssignWorkersToItHardwarePolicy-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesItPolicyIdAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItHardwarePolicy-v2026-09-17RequestBadRequestError
+    ItPoliciesPolicyIdUsersGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItPoliciesPolicyIdUsersGetParametersXBeta
+    ItPoliciesItPolicyIdAssignPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItPoliciesItPolicyIdAssignPostParametersXBeta
+    ListItPolicyUsers-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItPolicyUsers-v2026-09-17RequestBadRequestError
+    ListItPolicyUsers-v2026-09-25RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesPolicyIdSeatsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItPolicyUsers-v2026-09-25RequestInternalServerError
+    IT_policies_listItPolicyUsers-v2026-09-25_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesPolicyIdSeatsGetResponsesContentApplicationJsonSchemaDataItems'
+        has_more:
+          type: boolean
+          description: Whether there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to the next page
+        total_count:
+          type: integer
+          format: int64
+          description: Total number of records
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: IT policies_listItPolicyUsers-v2026-09-25_Response_200
+    ItPoliciesItPolicyIdAssignPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItPoliciesItPolicyIdAssignPostResponsesContentApplicationJsonSchemaErrorsItems
+    ListItPolicyUsers-v2026-09-17RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItPolicyUsers-v2026-09-17RequestInternalServerError
+    ListItHardwarePolicies-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItHardwarePolicies-v2026-01-01RequestInternalServerError
+    ListItPolicyUsers-v2026-09-25RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesPolicyIdSeatsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItPolicyUsers-v2026-09-25RequestBadRequestError
+    IT_policies_listItHardwarePolicies-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: IT policies_listItHardwarePolicies-v2026-01-01_Response_200
+    AssignWorkersToItHardwarePolicy-v2026-09-17RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesItPolicyIdAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItHardwarePolicy-v2026-09-17RequestConflictError
+    ListItHardwarePolicies-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItHardwarePolicies-v2026-01-01RequestBadRequestError
+    ItPoliciesPolicyIdSeatsGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItPoliciesPolicyIdSeatsGetParametersXBeta
+    ItPoliciesPolicyIdSeatsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItPoliciesPolicyIdSeatsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItemsAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItemsAddressCountry
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    IT_policies_listItPolicyUsers-v2026-09-17_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItems'
+        has_more:
+          type: boolean
+          description: Whether there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to the next page
+        total_count:
+          type: integer
+          format: int64
+          description: Total number of records
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: IT policies_listItPolicyUsers-v2026-09-17_Response_200
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ItPoliciesPolicyIdSeatsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - last_name
+      - first_name
+      - hris_profile_id
+      title: ItPoliciesPolicyIdSeatsGetResponsesContentApplicationJsonSchemaDataItems
+    ItPoliciesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the policy
+        name:
+          type: string
+          description: Policy name
+        is_default:
+          type: boolean
+          description: Whether this is the organization's default policy, applied to workers not explicitly assigned to another one
+      required:
+      - id
+      - name
+      - is_default
+      title: ItPoliciesGetResponsesContentApplicationJsonSchemaDataItems
+    ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaErrorsItems
+    ListItPolicyUsers-v2026-09-17RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItPolicyUsers-v2026-09-17RequestNotFoundError
+    ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItemsAddressType:
+      type: string
+      enum:
+      - BILLING
+      - COLLECTION
+      - DELIVERY
+      - ENTITY
+      - PARTIAL
+      - PII
+      - SUPPLIER
+      description: Type of the address
+      title: ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItemsAddressType
+    ListItPolicyUsers-v2026-09-25RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItPoliciesPolicyIdSeatsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItPolicyUsers-v2026-09-25RequestNotFoundError
+    ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        address:
+          $ref: '#/components/schemas/ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItemsAddress'
+          description: User address details
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - address
+      - last_name
+      - first_name
+      - hris_profile_id
+      title: ItPoliciesPolicyIdUsersGetResponsesContentApplicationJsonSchemaDataItems
+    ItPoliciesItPolicyIdAssignPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        hris_profile_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: HRIS profile identifiers of the workers to assign. Between 1 and 100 unique ids per request; the whole request is rejected when any id is not found in your organization.
+      required:
+      - hris_profile_ids
+      description: Workers to assign to the IT policy.
+      title: ItPoliciesItPolicyIdAssignPostRequestBodyContentApplicationJsonSchemaData
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

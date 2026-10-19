@@ -1,190 +1,1462 @@
 openapi: 3.2.0
 info:
-  title: Deel Webhooks API
-  description: 'Webhook management API and event catalog for real-time notifications across contracts,
-
-    invoices, payroll, time off, EOR onboarding, ATS, and worker lifecycle events. Webhook
-
-    payloads are HMAC-SHA256 signed and can be simulated from the Developer Center without
-
-    affecting production data.'
-  version: '2026-05-25'
-  contact:
-    name: Deel Developer Support
-    url: https://developer.deel.com/api/webhooks/introduction
+  title: Endpoints Webhooks API
+  version: 1.0.0
 servers:
-- url: https://api.letsdeel.com/rest/v2
+- url: https://api.letsdeel.com/rest
   description: Production
-- url: https://api-sandbox.demo.deel.com/rest/v2
-  description: Sandbox
-security:
-- BearerAuth: []
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
 tags:
 - name: Webhooks
-  description: Create, list, update, and delete webhook subscriptions
 paths:
   /webhooks:
-    get:
-      operationId: getWebhooks
-      summary: List Of Webhooks
-      tags:
-      - Webhooks
-      responses:
-        '200':
-          description: Webhooks
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Webhook'
     post:
-      operationId: createWebhook
-      summary: Create A Webhook
+      operationId: webhooks_createWebhook
+      summary: Create a webhook
+      description: 'Creates a new webhook subscription with the specified URL, events, and configuration. Returns the created webhook, including its signing key for verifying incoming event payloads.
+
+
+        **Token scopes**: `webhooks:write`'
       tags:
       - Webhooks
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WebhookCreate'
       responses:
         '201':
-          description: Webhook created
+          description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Webhook'
-  /webhooks/{webhook_id}:
-    get:
-      operationId: getWebhook
-      summary: Retrieve A Single Webhook
-      tags:
-      - Webhooks
-      parameters:
-      - name: webhook_id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Webhook
+                $ref: '#/components/schemas/webhooks_createWebhook_Response_201'
+        '400':
+          description: Bad Request. The request could not be understood or was missing required parameters.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Webhook'
-    patch:
-      operationId: updateWebhook
-      summary: Edit A Webhook
-      tags:
-      - Webhooks
-      parameters:
-      - name: webhook_id
-        in: path
-        required: true
-        schema:
-          type: string
+                $ref: '#/components/schemas/CreateWebhook-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized. Authentication credentials were missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhook-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden. You do not have permission to access this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhook-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found. The requested resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhook-v2026-01-01RequestNotFoundError'
+        '405':
+          description: Method Not Allowed. The HTTP method is not supported for this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhook-v2026-01-01RequestMethodNotAllowedError'
+        '429':
+          description: Too Many Requests. The rate limit has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhook-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal Server Error. An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhook-v2026-01-01RequestInternalServerError'
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WebhookUpdate'
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: Endpoint to receive webhook.
+                name:
+                  type:
+                  - string
+                  - 'null'
+                  description: Webhook subscription name.
+                events:
+                  type: array
+                  items:
+                    type: string
+                  description: The list of events to enable for this subscription.
+                status:
+                  $ref: '#/components/schemas/WebhooksPostRequestBodyContentApplicationJsonSchemaStatus'
+                  description: Status of webhook.
+                api_version:
+                  type: string
+                  default: v2
+                  description: Deel API version. Only v2 is accepted.
+                description:
+                  type:
+                  - string
+                  - 'null'
+                  description: Webhook subscription description.
+                signing_key:
+                  type:
+                  - string
+                  - 'null'
+                  minLength: 32
+                  maxLength: 128
+                  description: The webhook's signing key, used to generate webhook signatures. Auto-generated if omitted.
+                include_child_orgs:
+                  type:
+                  - boolean
+                  - 'null'
+                  description: When true, the webhook will also receive events from child organizations.
+              required:
+              - url
+              - name
+              - events
+              - status
+              - api_version
+              - description
+      security:
+      - deelToken: []
+    get:
+      operationId: webhooks_getWebhooks
+      summary: List webhooks
+      description: 'Lists every webhook subscription configured for the organization. Use this to find the id of a specific subscription before retrieving, updating, or deleting it, or to audit which events are currently wired up.
+
+
+        **Token scopes**: `webhooks:read`'
+      tags:
+      - Webhooks
       responses:
         '200':
-          description: Webhook updated
+          description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Webhook'
+                $ref: '#/components/schemas/webhooks_getWebhooks_Response_200'
+        '400':
+          description: Bad Request. The request could not be understood or was missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhooks-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized. Authentication credentials were missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhooks-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden. You do not have permission to access this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhooks-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found. The requested resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhooks-v2026-01-01RequestNotFoundError'
+        '405':
+          description: Method Not Allowed. The HTTP method is not supported for this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhooks-v2026-01-01RequestMethodNotAllowedError'
+        '429':
+          description: Too Many Requests. The rate limit has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhooks-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal Server Error. An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhooks-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /webhooks/{id}:
     delete:
-      operationId: deleteWebhook
-      summary: Delete A Webhook
+      operationId: webhooks_deleteWebhook
+      summary: Delete a webhook
+      description: 'Permanently deletes the specified webhook subscription by its unique identifier. This action cannot be undone.
+
+
+        **Token scopes**: `webhooks:write`'
       tags:
       - Webhooks
       parameters:
-      - name: webhook_id
+      - name: id
         in: path
+        description: Unique identifier of the webhook subscription.
         required: true
         schema:
           type: string
       responses:
-        '204':
-          description: Webhook deleted
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhooks_deleteWebhook_Response_200'
+        '400':
+          description: Bad Request. The request could not be understood or was missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWebhookById-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized. Authentication credentials were missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWebhookById-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden. You do not have permission to access this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWebhookById-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found. The requested resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWebhookById-v2026-01-01RequestNotFoundError'
+        '405':
+          description: Method Not Allowed. The HTTP method is not supported for this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWebhookById-v2026-01-01RequestMethodNotAllowedError'
+        '429':
+          description: Too Many Requests. The rate limit has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWebhookById-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal Server Error. An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWebhookById-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+    get:
+      operationId: webhooks_getWebhook
+      summary: Retrieve a single webhook
+      description: 'Retrieves the full configuration of a single webhook subscription by its id, including its signing key for verifying incoming payload signatures. Use this to check the current status and events of a subscription before updating it via PATCH or deleting it via DELETE /rest/webhooks/{id}.
+
+
+        **Token scopes**: `webhooks:read`'
+      tags:
+      - Webhooks
+      parameters:
+      - name: id
+        in: path
+        description: Unique identifier of the webhook subscription.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhooks_getWebhook_Response_200'
+        '400':
+          description: Bad Request. The request could not be understood or was missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWebhookById-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized. Authentication credentials were missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWebhookById-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden. You do not have permission to access this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWebhookById-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found. The requested resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWebhookById-v2026-01-01RequestNotFoundError'
+        '405':
+          description: Method Not Allowed. The HTTP method is not supported for this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWebhookById-v2026-01-01RequestMethodNotAllowedError'
+        '429':
+          description: Too Many Requests. The rate limit has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWebhookById-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal Server Error. An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWebhookById-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+    patch:
+      operationId: webhooks_updateWebhook
+      summary: Update a webhook
+      description: 'Updates one or more fields of an existing webhook subscription without recreating it — for example, enabling or disabling delivery, changing the events it is subscribed to, or opting it in to also receive events from child organizations. Use this after creating a webhook via POST /rest/webhooks whenever its configuration needs to change.
+
+
+        **Token scopes**: `webhooks:write`'
+      tags:
+      - Webhooks
+      parameters:
+      - name: id
+        in: path
+        description: Unique identifier of the webhook subscription.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhooks_updateWebhook_Response_200'
+        '400':
+          description: Bad Request. The request could not be understood or was missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateWebhookById-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized. Authentication credentials were missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateWebhookById-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden. You do not have permission to access this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateWebhookById-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found. The requested resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateWebhookById-v2026-01-01RequestNotFoundError'
+        '405':
+          description: Method Not Allowed. The HTTP method is not supported for this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateWebhookById-v2026-01-01RequestMethodNotAllowedError'
+        '429':
+          description: Too Many Requests. The rate limit has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateWebhookById-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal Server Error. An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateWebhookById-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: Endpoint to receive webhook. Must use https.
+                name:
+                  type: string
+                  maxLength: 128
+                  description: Webhook subscription name.
+                events:
+                  type: array
+                  items:
+                    type: string
+                  description: Replaces the list of events enabled for this subscription. Retries scheduled for removed events are cancelled.
+                status:
+                  $ref: '#/components/schemas/WebhooksIdPatchRequestBodyContentApplicationJsonSchemaStatus'
+                  description: Status of webhook.
+                description:
+                  type:
+                  - string
+                  - 'null'
+                  description: Webhook subscription description.
+                include_child_orgs:
+                  type:
+                  - boolean
+                  - 'null'
+                  description: When true, the webhook will also receive events from child organizations.
+      security:
+      - deelToken: []
+  /webhooks/events/types:
+    get:
+      operationId: webhooks_getWebhookEvents
+      summary: List webhook event types
+      description: 'Lists the catalog of webhook event types available on the platform. Use this to discover valid event identifiers before populating the events array when creating a webhook via POST /rest/webhooks or updating one via PATCH /rest/webhooks/{id}
+
+
+        **Token scopes**: `webhooks:read`'
+      tags:
+      - Webhooks
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhooks_getWebhookEvents_Response_200'
+        '400':
+          description: Bad Request. The request could not be understood or was missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhookEventTypes-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized. Authentication credentials were missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhookEventTypes-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden. You do not have permission to access this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhookEventTypes-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found. The requested resource could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhookEventTypes-v2026-01-01RequestNotFoundError'
+        '405':
+          description: Method Not Allowed. The HTTP method is not supported for this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhookEventTypes-v2026-01-01RequestMethodNotAllowedError'
+        '429':
+          description: Too Many Requests. The rate limit has been exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhookEventTypes-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Internal Server Error. An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllWebhookEventTypes-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
 components:
   schemas:
-    WebhookUpdate:
+    GetAllWebhooks-v2026-01-01RequestBadRequestError:
       type: object
       properties:
-        name:
-          type: string
-        url:
-          type: string
-          format: uri
-        events:
+        errors:
           type: array
           items:
-            type: string
-        active:
-          type: boolean
-        secret:
-          type: string
-    WebhookCreate:
-      type: object
+            $ref: '#/components/schemas/WebhooksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
       required:
-      - name
-      - url
-      - events
-      properties:
-        name:
-          type: string
-        url:
-          type: string
-          format: uri
-        events:
-          type: array
-          items:
-            type: string
-        secret:
-          type: string
-          description: HMAC signing secret (write-only). If omitted, Deel generates one.
-        active:
-          type: boolean
-          default: true
-    Webhook:
+      - errors
+      title: GetAllWebhooks-v2026-01-01RequestBadRequestError
+    WebhooksIdGetResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
         id:
           type: string
-        name:
-          type: string
+          description: Unique identifier of this resource.
         url:
           type: string
-          format: uri
+          description: Endpoint to receive webhook.
+        name:
+          type:
+          - string
+          - 'null'
+          description: Webhook subscription name.
         events:
           type: array
           items:
             type: string
-        active:
+          description: The list of events to enable for this subscription.
+        hidden:
+          type:
+          - boolean
+          - 'null'
+          description: Property to hide the webhook from frontend view. Commonly by Deel 3rd party apps
+        status:
+          $ref: '#/components/schemas/WebhooksIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Status of webhook.
+        internal:
           type: boolean
-        secret_hint:
-          type: string
-          description: Last 4 chars of the HMAC signing secret
+          description: Indicates whether the webhook is internal to Deel.
         created_at:
           type: string
-          format: date-time
-        last_delivery_at:
+          description: Time at which the webhook was created.
+        deleted_at:
+          type:
+          - string
+          - 'null'
+          description: Time at which the webhook was deleted.
+        updated_at:
           type: string
-          format: date-time
-        last_delivery_status:
-          type: integer
+          description: Time at which the webhook was updated.
+        api_version:
+          type: string
+          default: v2
+          description: Deel API version. Currently Deel accepts v1 or v2 version.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Webhook subscription description.
+        signing_key:
+          type:
+          - string
+          - 'null'
+          description: The webhook's signing key, used to generate webhook signatures.
+        include_child_orgs:
+          type:
+          - boolean
+          - 'null'
+          description: When true, the webhook will also receive events from child organizations.
+      required:
+      - id
+      - url
+      - name
+      - events
+      - status
+      - created_at
+      - updated_at
+      - api_version
+      - description
+      - signing_key
+      description: The webhook subscription.
+      title: WebhooksIdGetResponsesContentApplicationJsonSchemaData
+    GetAllWebhookEventTypes-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhookEventTypes-v2026-01-01RequestInternalServerError
+    WebhooksGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error.
+        error_code:
+          type: string
+          description: Machine-readable error code.
+      required:
+      - message
+      title: WebhooksGetResponsesContentApplicationJsonSchemaErrorsItems
+    WebhooksPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - enabled
+      - disabled
+      description: Status of webhook.
+      title: WebhooksPostResponsesContentApplicationJsonSchemaDataStatus
+    WebhooksIdPatchResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - enabled
+      - disabled
+      description: Status of webhook.
+      title: WebhooksIdPatchResponsesContentApplicationJsonSchemaDataStatus
+    UpdateWebhookById-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: UpdateWebhookById-v2026-01-01RequestTooManyRequestsError
+    WebhooksIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms the deletion.
+      required:
+      - deleted
+      description: The result of the delete operation.
+      title: WebhooksIdDeleteResponsesContentApplicationJsonSchemaData
+    GetWebhookById-v2026-01-01RequestMethodNotAllowedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetWebhookById-v2026-01-01RequestMethodNotAllowedError
+    CreateWebhook-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateWebhook-v2026-01-01RequestNotFoundError
+    webhooks_deleteWebhook_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WebhooksIdDeleteResponsesContentApplicationJsonSchemaData'
+          description: The result of the delete operation.
+      required:
+      - data
+      title: webhooks_deleteWebhook_Response_200
+    CreateWebhook-v2026-01-01RequestMethodNotAllowedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateWebhook-v2026-01-01RequestMethodNotAllowedError
+    GetAllWebhooks-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhooks-v2026-01-01RequestTooManyRequestsError
+    GetAllWebhookEventTypes-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhookEventTypes-v2026-01-01RequestNotFoundError
+    WebhooksPostRequestBodyContentApplicationJsonSchemaStatus:
+      type: string
+      enum:
+      - enabled
+      - disabled
+      description: Status of webhook.
+      title: WebhooksPostRequestBodyContentApplicationJsonSchemaStatus
+    WebhooksGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of this resource.
+        url:
+          type: string
+          description: Endpoint to receive webhook.
+        name:
+          type:
+          - string
+          - 'null'
+          description: Webhook subscription name.
+        events:
+          type: array
+          items:
+            type: string
+          description: The list of events to enable for this subscription.
+        hidden:
+          type:
+          - boolean
+          - 'null'
+          description: Property to hide the webhook from frontend view. Commonly by Deel 3rd party apps
+        status:
+          $ref: '#/components/schemas/WebhooksGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Status of webhook.
+        internal:
+          type: boolean
+          description: Indicates whether the webhook is internal to Deel.
+        created_at:
+          type: string
+          description: Time at which the webhook was created.
+        deleted_at:
+          type:
+          - string
+          - 'null'
+          description: Time at which the webhook was deleted.
+        updated_at:
+          type: string
+          description: Time at which the webhook was updated.
+        api_version:
+          type: string
+          default: v2
+          description: Deel API version. Currently Deel accepts v1 or v2 version.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Webhook subscription description.
+        signing_key:
+          type:
+          - string
+          - 'null'
+          description: The webhook's signing key, used to generate webhook signatures.
+        include_child_orgs:
+          type:
+          - boolean
+          - 'null'
+          description: When true, the webhook will also receive events from child organizations.
+      required:
+      - id
+      - url
+      - name
+      - events
+      - status
+      - created_at
+      - updated_at
+      - api_version
+      - description
+      - signing_key
+      title: WebhooksGetResponsesContentApplicationJsonSchemaDataItems
+    GetAllWebhooks-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhooks-v2026-01-01RequestUnauthorizedError
+    CreateWebhook-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateWebhook-v2026-01-01RequestTooManyRequestsError
+    WebhooksIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - enabled
+      - disabled
+      description: Status of webhook.
+      title: WebhooksIdGetResponsesContentApplicationJsonSchemaDataStatus
+    GetAllWebhookEventTypes-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhookEventTypes-v2026-01-01RequestTooManyRequestsError
+    webhooks_getWebhook_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WebhooksIdGetResponsesContentApplicationJsonSchemaData'
+          description: The webhook subscription.
+      required:
+      - data
+      title: webhooks_getWebhook_Response_200
+    GetWebhookById-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetWebhookById-v2026-01-01RequestNotFoundError
+    GetWebhookById-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetWebhookById-v2026-01-01RequestBadRequestError
+    DeleteWebhookById-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: DeleteWebhookById-v2026-01-01RequestForbiddenError
+    WebhooksGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - enabled
+      - disabled
+      description: Status of webhook.
+      title: WebhooksGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    GetAllWebhooks-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhooks-v2026-01-01RequestNotFoundError
+    CreateWebhook-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateWebhook-v2026-01-01RequestBadRequestError
+    UpdateWebhookById-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: UpdateWebhookById-v2026-01-01RequestForbiddenError
+    CreateWebhook-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateWebhook-v2026-01-01RequestInternalServerError
+    DeleteWebhookById-v2026-01-01RequestMethodNotAllowedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: DeleteWebhookById-v2026-01-01RequestMethodNotAllowedError
+    GetWebhookById-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetWebhookById-v2026-01-01RequestTooManyRequestsError
+    UpdateWebhookById-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: UpdateWebhookById-v2026-01-01RequestUnauthorizedError
+    webhooks_updateWebhook_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WebhooksIdPatchResponsesContentApplicationJsonSchemaData'
+          description: The webhook subscription.
+      required:
+      - data
+      title: webhooks_updateWebhook_Response_200
+    webhooks_createWebhook_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WebhooksPostResponsesContentApplicationJsonSchemaData'
+          description: The webhook subscription.
+      required:
+      - data
+      title: webhooks_createWebhook_Response_201
+    webhooks_getWebhookEvents_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: The list of webhook event types.
+      title: webhooks_getWebhookEvents_Response_200
+    WebhooksIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of this resource.
+        url:
+          type: string
+          description: Endpoint to receive webhook.
+        name:
+          type:
+          - string
+          - 'null'
+          description: Webhook subscription name.
+        events:
+          type: array
+          items:
+            type: string
+          description: The list of events to enable for this subscription.
+        hidden:
+          type:
+          - boolean
+          - 'null'
+          description: Property to hide the webhook from frontend view. Commonly by Deel 3rd party apps
+        status:
+          $ref: '#/components/schemas/WebhooksIdPatchResponsesContentApplicationJsonSchemaDataStatus'
+          description: Status of webhook.
+        internal:
+          type: boolean
+          description: Indicates whether the webhook is internal to Deel.
+        created_at:
+          type: string
+          description: Time at which the webhook was created.
+        deleted_at:
+          type:
+          - string
+          - 'null'
+          description: Time at which the webhook was deleted.
+        updated_at:
+          type: string
+          description: Time at which the webhook was updated.
+        api_version:
+          type: string
+          default: v2
+          description: Deel API version. Currently Deel accepts v1 or v2 version.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Webhook subscription description.
+        signing_key:
+          type:
+          - string
+          - 'null'
+          description: The webhook's signing key, used to generate webhook signatures.
+        include_child_orgs:
+          type:
+          - boolean
+          - 'null'
+          description: When true, the webhook will also receive events from child organizations.
+      required:
+      - id
+      - url
+      - name
+      - events
+      - status
+      - created_at
+      - updated_at
+      - api_version
+      - description
+      - signing_key
+      description: The webhook subscription.
+      title: WebhooksIdPatchResponsesContentApplicationJsonSchemaData
+    GetAllWebhooks-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhooks-v2026-01-01RequestForbiddenError
+    WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: number
+          format: double
+          description: Event type unique identifier.
+        name:
+          type: string
+          description: Name of the webhook event.
+        created_at:
+          type: string
+          description: Time at which the event type was created.
+        updated_at:
+          type: string
+          description: Time at which the event type was updated.
+        description:
+          type: string
+          description: Describes the webhook event and other pertinent info.
+        module_name:
+          type: string
+          description: Name of the rabbit queue.
+        module_label:
+          type: string
+          description: Display name of the rabbit queue in Deel UI.
+        payload_example:
+          type:
+          - string
+          - 'null'
+          description: JSON payload example of the specific event.
+      required:
+      - id
+      - name
+      - description
+      - module_name
+      - module_label
+      title: WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaDataItems
+    WebhooksPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error.
+        error_code:
+          type: string
+          description: Machine-readable error code.
+      required:
+      - message
+      title: WebhooksPostResponsesContentApplicationJsonSchemaErrorsItems
+    GetAllWebhooks-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhooks-v2026-01-01RequestInternalServerError
+    UpdateWebhookById-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: UpdateWebhookById-v2026-01-01RequestNotFoundError
+    DeleteWebhookById-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: DeleteWebhookById-v2026-01-01RequestInternalServerError
+    WebhooksPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of this resource.
+        url:
+          type: string
+          description: Endpoint to receive webhook.
+        name:
+          type:
+          - string
+          - 'null'
+          description: Webhook subscription name.
+        events:
+          type: array
+          items:
+            type: string
+          description: The list of events to enable for this subscription.
+        hidden:
+          type:
+          - boolean
+          - 'null'
+          description: Property to hide the webhook from frontend view. Commonly by Deel 3rd party apps
+        status:
+          $ref: '#/components/schemas/WebhooksPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Status of webhook.
+        internal:
+          type: boolean
+          description: Indicates whether the webhook is internal to Deel.
+        created_at:
+          type: string
+          description: Time at which the webhook was created.
+        deleted_at:
+          type:
+          - string
+          - 'null'
+          description: Time at which the webhook was deleted.
+        updated_at:
+          type: string
+          description: Time at which the webhook was updated.
+        api_version:
+          type: string
+          default: v2
+          description: Deel API version. Currently Deel accepts v1 or v2 version.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Webhook subscription description.
+        signing_key:
+          type:
+          - string
+          - 'null'
+          description: The webhook's signing key, used to generate webhook signatures.
+        include_child_orgs:
+          type:
+          - boolean
+          - 'null'
+          description: When true, the webhook will also receive events from child organizations.
+      required:
+      - id
+      - url
+      - name
+      - events
+      - status
+      - created_at
+      - updated_at
+      - api_version
+      - description
+      - signing_key
+      description: The webhook subscription.
+      title: WebhooksPostResponsesContentApplicationJsonSchemaData
+    GetWebhookById-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetWebhookById-v2026-01-01RequestUnauthorizedError
+    WebhooksIdPatchRequestBodyContentApplicationJsonSchemaStatus:
+      type: string
+      enum:
+      - enabled
+      - disabled
+      description: Status of webhook.
+      title: WebhooksIdPatchRequestBodyContentApplicationJsonSchemaStatus
+    webhooks_getWebhooks_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksGetResponsesContentApplicationJsonSchemaDataItems'
+          description: The list of webhook subscriptions.
+      required:
+      - data
+      title: webhooks_getWebhooks_Response_200
+    CreateWebhook-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateWebhook-v2026-01-01RequestUnauthorizedError
+    DeleteWebhookById-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: DeleteWebhookById-v2026-01-01RequestBadRequestError
+    UpdateWebhookById-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: UpdateWebhookById-v2026-01-01RequestInternalServerError
+    GetAllWebhookEventTypes-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhookEventTypes-v2026-01-01RequestBadRequestError
+    WebhooksIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error.
+        error_code:
+          type: string
+          description: Machine-readable error code.
+      required:
+      - message
+      title: WebhooksIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    GetAllWebhookEventTypes-v2026-01-01RequestMethodNotAllowedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhookEventTypes-v2026-01-01RequestMethodNotAllowedError
+    WebhooksIdPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error.
+        error_code:
+          type: string
+          description: Machine-readable error code.
+      required:
+      - message
+      title: WebhooksIdPatchResponsesContentApplicationJsonSchemaErrorsItems
+    GetAllWebhookEventTypes-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhookEventTypes-v2026-01-01RequestForbiddenError
+    GetWebhookById-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetWebhookById-v2026-01-01RequestInternalServerError
+    DeleteWebhookById-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: DeleteWebhookById-v2026-01-01RequestNotFoundError
+    GetAllWebhooks-v2026-01-01RequestMethodNotAllowedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhooks-v2026-01-01RequestMethodNotAllowedError
+    CreateWebhook-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateWebhook-v2026-01-01RequestForbiddenError
+    GetWebhookById-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetWebhookById-v2026-01-01RequestForbiddenError
+    UpdateWebhookById-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: UpdateWebhookById-v2026-01-01RequestBadRequestError
+    UpdateWebhookById-v2026-01-01RequestMethodNotAllowedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: UpdateWebhookById-v2026-01-01RequestMethodNotAllowedError
+    WebhooksIdDeleteResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error.
+        error_code:
+          type: string
+          description: Machine-readable error code.
+      required:
+      - message
+      title: WebhooksIdDeleteResponsesContentApplicationJsonSchemaErrorsItems
+    DeleteWebhookById-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: DeleteWebhookById-v2026-01-01RequestUnauthorizedError
+    GetAllWebhookEventTypes-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: GetAllWebhookEventTypes-v2026-01-01RequestUnauthorizedError
+    DeleteWebhookById-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhooksIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: DeleteWebhookById-v2026-01-01RequestTooManyRequestsError
+    WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human-readable description of the error.
+        error_code:
+          type: string
+          description: Machine-readable error code.
+      required:
+      - message
+      title: WebhooksEventsTypesGetResponsesContentApplicationJsonSchemaErrorsItems
   securitySchemes:
-    BearerAuth:
+    deelToken:
       type: http
       scheme: bearer
-      bearerFormat: opaque
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

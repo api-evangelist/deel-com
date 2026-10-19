@@ -1,0 +1,4843 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Workers API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: Workers
+paths:
+  /onboarding/workers/individual:
+    post:
+      operationId: workers_completeIndividualContractorProfileSetup-v2026-01-01
+      summary: Complete individual contractor profile setup
+      description: 'Complete the profile setup for independent contractors including address, tax details, and legal status in a single call during the IC-embedded onboarding flow. This operation requires a worker session token obtained via the worker session endpoint.
+
+
+        **Token scopes**: `worker:write`'
+      tags:
+      - Workers
+      responses:
+        '200':
+          description: Individual profile setup completed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_completeIndividualContractorProfileSetup-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompleteIndividualContractorProfileSetup-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompleteIndividualContractorProfileSetup-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Individual contractor setup details including address, tax information, and legal status.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/OnboardingWorkersIndividualPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /worker:
+    post:
+      operationId: workers_createWorker-v2026-01-01
+      summary: Create a new worker
+      description: Use this endpoint to provision a new worker in a white-label DaaS setup. Provide the worker's personal details, contract association, profile type, and company information. On success, the response returns the `user_id`, `profile_id`, and `contract_id` identifiers needed for subsequent operations such as generating consent tokens or magic links.
+      tags:
+      - Workers
+      responses:
+        '201':
+          description: Worker created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_createWorker-v2026-01-01_Response_201'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWorker-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWorker-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/WorkerPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /workers/tax-forms:
+    post:
+      operationId: workers_createATaxFormForAWorker-v2026-01-01
+      summary: Create a tax form for the authenticated worker
+      description: 'Submit a new US tax form for the authenticated worker against a specific client legal entity, typically during onboarding or when a fresh form must be recorded for a worker/legal-entity pair. The worker is resolved from the access token; the target legal entity is set via client_legal_entity_id. Select the form type based on the worker''s US tax status: W-9 for US individuals or entities, W-8BEN for non-US individuals, W-8BEN-E for non-US entities. The worker must have an active (non-terminated) contract with the legal entity, and only one tax form may exist per worker/legal-entity pair.
+
+
+        **Token scopes**: `worker:write`'
+      tags:
+      - Workers
+      responses:
+        '201':
+          description: Tax form created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_createATaxFormForAWorker-v2026-01-01_Response_201'
+        '400':
+          description: Validation failed — for example a request body field is missing or malformed, the client_legal_entity_id does not exist, or the form_type does not match the contractor's tax residency (e.g. a W-8BEN submitted for a US contractor).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateATaxFormForAWorker-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: No live contract exists between the contractor and the specified client legal entity. A tax form can only be submitted for a contractor who has a non-terminated contract with that legal entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateATaxFormForAWorker-v2026-01-01RequestForbiddenError'
+        '404':
+          description: The authenticated worker was not found in the calling organization, or has no contractor profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateATaxFormForAWorker-v2026-01-01RequestNotFoundError'
+        '409':
+          description: A tax form already exists for this contractor and client legal entity. Only one tax form can exist per contractor/legal-entity pair.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateATaxFormForAWorker-v2026-01-01RequestConflictError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateATaxFormForAWorker-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: workers_listTaxFormsForAWorker-v2026-01-01
+      summary: List tax forms for the authenticated worker
+      description: 'List the tax forms of the worker resolved from the access token, ordered by creation date descending, using cursor pagination (limit + cursor). Each item contains the resource fields (id, created_at, updated_at, client_legal_entity_id, pdf_url) and the full form data in the same public shape the create endpoint accepts; the fields present depend on the item''s form_type. Each form appears once, carrying its current data. Tax identification numbers are unmasked because the authenticated worker owns the data.
+
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - Workers
+      parameters:
+      - name: limit
+        in: query
+        description: Maximum number of tax forms to return per page (1-100).
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: cursor
+        in: query
+        description: Opaque pagination cursor returned as next_cursor by a previous page. Omit to fetch the first page.
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A page of the worker's tax forms.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_listTaxFormsForAWorker-v2026-01-01_Response_200'
+        '400':
+          description: Validation failed — for example the cursor is malformed or the limit is out of range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTaxFormsForAWorker-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: The authenticated worker was not found in the calling organization, or has no contractor profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTaxFormsForAWorker-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTaxFormsForAWorker-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /workers/contracts/{contract_id}/compliance-documents/{document_id}:
+    delete:
+      operationId: workers_deleteWorkerContractComplianceDocumentSubmission-v2026-08-25
+      summary: Delete the submission of one compliance document of a worker contract
+      description: 'Deletes what the authenticated worker submitted against a compliance document of one of their Global Payroll contracts. This removes EVERY file of the requirement, not one file: there is no per-file delete on this endpoint. The action is permanent and the files cannot be recovered. The requirement itself is not removed — after the delete it is still listed, as a requirement with nothing submitted, and it can be submitted again. The response carries no body. Only Global Payroll contracts are supported.
+
+
+        **Token scopes**: `worker:write`'
+      tags:
+      - Workers
+      parameters:
+      - name: contract_id
+        in: path
+        description: Public id of the Global Payroll contract the documents belong to.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 64
+      - name: document_id
+        in: path
+        description: Public UUID of the compliance document requirement, as returned in `id` by the list endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Submission deleted successfully. No response body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad request — the requirement has nothing submitted against it, so there is nothing to delete.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestBadRequestError'
+        '401':
+          description: Unauthorized — the access token is missing, expired or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestUnauthorizedError'
+        '403':
+          description: Forbidden — the worker does not hold this contract, or the token lacks the required scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestForbiddenError'
+        '404':
+          description: Not found — `document_id` is not part of the contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestNotFoundError'
+        '422':
+          description: Unprocessable entity — the contract is not a Global Payroll contract, so compliance documents are not available on this endpoint. The error code is `WORKER_TYPE_NOT_SUPPORTED`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestUnprocessableEntityError'
+        '429':
+          description: 'Too many deletions from this worker in a short window. Deletions are rate limited per authenticated worker, on a budget separate from submissions: back off and retry rather than looping.'
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    get:
+      operationId: workers_getWorkerContractComplianceDocument-v2026-08-25
+      summary: Retrieve one compliance document of a worker contract
+      description: 'Returns a single compliance document of one of the authenticated worker Global Payroll contracts, in the same shape the list endpoint returns. Use it to poll one requirement after a submission instead of fetching the whole list. Only Global Payroll contracts are supported.
+
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - Workers
+      parameters:
+      - name: contract_id
+        in: path
+        description: Public id of the Global Payroll contract the documents belong to.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 64
+      - name: document_id
+        in: path
+        description: Public UUID of the compliance document requirement, as returned in `id` by the list endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Compliance document returned successfully. `created_at` and `updated_at` come from the submission; `created_at` carries the same value as `uploaded_at`, and all three are null until something is submitted against the requirement. The language of `name` and `description` follows the language preference of the authenticated worker. It cannot be selected per request, and the same document may read differently for two workers of the same organization. Text falls back to English when no published translation exists for that language.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_getWorkerContractComplianceDocument-v2026-08-25_Response_200'
+        '400':
+          description: Bad request — invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkerContractComplianceDocument-v2026-08-25RequestBadRequestError'
+        '401':
+          description: Unauthorized — the access token is missing, expired or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkerContractComplianceDocument-v2026-08-25RequestUnauthorizedError'
+        '403':
+          description: Forbidden — the worker does not hold this contract, or the token lacks the required scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkerContractComplianceDocument-v2026-08-25RequestForbiddenError'
+        '404':
+          description: Not found — `document_id` is not part of the contract, or it is a requirement that no longer applies to it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkerContractComplianceDocument-v2026-08-25RequestNotFoundError'
+        '422':
+          description: Unprocessable entity — the contract is not a Global Payroll contract, so compliance documents are not available on this endpoint. The error code is `WORKER_TYPE_NOT_SUPPORTED`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWorkerContractComplianceDocument-v2026-08-25RequestUnprocessableEntityError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    post:
+      operationId: workers_submitWorkerContractComplianceDocumentFiles-v2026-08-25
+      summary: Submit files for one compliance document of a worker contract
+      description: 'Submits one or more files against a compliance document of one of the authenticated worker Global Payroll contracts. Upload the bytes to the File Service first, then reference each file here by `file_id` and its `one_time_secret`; the Files endpoints of this API issue both. Side effects: the files replace whatever was previously submitted against the requirement, and the previous version is archived when document versioning is enabled for the organization. Only Global Payroll contracts are supported.
+
+
+        **Token scopes**: `worker:write`'
+      tags:
+      - Workers
+      parameters:
+      - name: contract_id
+        in: path
+        description: Public id of the Global Payroll contract the documents belong to.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 64
+      - name: document_id
+        in: path
+        description: Public UUID of the compliance document requirement, as returned in `id` by the list endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Files submitted successfully. No response body — read the document back through the list or the single document endpoint to confirm the filenames, where `submission_status` can read `REVIEWING` until the submission is final.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad request — an unusable `file_id` or `one_time_secret`, or a file type outside pdf, png, jpg, jpeg and heic. Multipart bodies and raw storage keys are not accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestBadRequestError'
+        '401':
+          description: Unauthorized — the access token is missing, expired or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestUnauthorizedError'
+        '403':
+          description: Forbidden — the requirement is not open for submission, the worker does not hold this contract, or the token lacks the required scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestForbiddenError'
+        '404':
+          description: Not found — `document_id` is not part of the contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestNotFoundError'
+        '412':
+          description: The files could not be stored against the requirement. Nothing was submitted, so the request can be retried.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '422':
+          description: Unprocessable entity — the contract is not a Global Payroll contract, so compliance documents are not available on this endpoint. The error code is `WORKER_TYPE_NOT_SUPPORTED`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestUnprocessableEntityError'
+        '429':
+          description: 'Too many submissions from this worker in a short window. Submissions are rate limited per authenticated worker: back off and retry rather than looping.'
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /workers/contracts/{contract_id}/compliance-documents/{document_id}/download:
+    get:
+      operationId: workers_downloadWorkerContractComplianceDocument-v2026-08-25
+      summary: Get a download URL for one compliance document of a worker contract
+      description: 'Returns a short-lived URL for the file submitted against a compliance document of one of the authenticated worker Global Payroll contracts. The URL is valid for about 15 minutes: fetch the file with it rather than storing the URL. Pass `file` to pick a specific file when several were submitted; the first file is returned by default. Documents in the `PASSPORT_OR_NATIONAL_ID` category are never downloadable through this API, for any token type. Only Global Payroll contracts are supported.
+
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - Workers
+      parameters:
+      - name: contract_id
+        in: path
+        description: Public id of the Global Payroll contract the documents belong to.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 64
+      - name: document_id
+        in: path
+        description: Public UUID of the compliance document requirement, as returned in `id` by the list endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: file
+        in: query
+        description: Zero-based index of the submitted file to download. Defaults to the first file.
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      responses:
+        '200':
+          description: Download URL returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_downloadWorkerContractComplianceDocument-v2026-08-25_Response_200'
+        '400':
+          description: Bad request — invalid or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadWorkerContractComplianceDocument-v2026-08-25RequestBadRequestError'
+        '401':
+          description: Unauthorized — the access token is missing, expired or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadWorkerContractComplianceDocument-v2026-08-25RequestUnauthorizedError'
+        '403':
+          description: Forbidden — the document is in the `PASSPORT_OR_NATIONAL_ID` category, the worker does not hold this contract, or the token lacks the required scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadWorkerContractComplianceDocument-v2026-08-25RequestForbiddenError'
+        '404':
+          description: Not found — `document_id` is not part of the contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadWorkerContractComplianceDocument-v2026-08-25RequestNotFoundError'
+        '412':
+          description: Nothing is submitted against this requirement, or the requested `file` index is beyond the submitted files.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '422':
+          description: Unprocessable entity — the contract is not a Global Payroll contract, so compliance documents are not available on this endpoint. The error code is `WORKER_TYPE_NOT_SUPPORTED`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadWorkerContractComplianceDocument-v2026-08-25RequestUnprocessableEntityError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /ic/workers/invoices/{invoice_id}:
+    get:
+      operationId: workers_getInvoiceDetailsById-v2026-04-27
+      summary: Get invoice details by ID
+      description: 'This endpoint retrieves invoice information by ID. Use it to access detailed invoice data for reference or verification.
+
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - Workers
+      parameters:
+      - name: invoice_id
+        in: path
+        description: Public invoice id for the invoice to return.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Invoice detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_getInvoiceDetailsById-v2026-04-27_Response_200'
+        '400':
+          description: Bad request (invalid query or path parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceDetailsById-v2026-04-27RequestBadRequestError'
+        '401':
+          description: Unauthorized (missing or invalid worker token).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceDetailsById-v2026-04-27RequestUnauthorizedError'
+        '403':
+          description: Forbidden (invoice not found or not accessible to this worker).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceDetailsById-v2026-04-27RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '412':
+          description: Precondition failed (e.g. `icEmbeddedWorkerSetup` is not enabled for the organization).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceDetailsById-v2026-04-27RequestPreconditionFailedError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetInvoiceDetailsById-v2026-04-27RequestInternalServerError'
+      security:
+      - deelToken: []
+  /workers/contracts/{contract_id}/compliance-documents:
+    get:
+      operationId: workers_listWorkerContractComplianceDocuments-v2026-08-25
+      summary: List compliance documents of a worker contract
+      description: 'Lists the compliance documents the authenticated worker has to satisfy on one of their Global Payroll contracts, together with what has already been submitted against each one. Use it to see what is still outstanding before payroll. Requirements with nothing submitted are included, with an empty `filenames` array and null timestamps. Retired requirements are excluded, except a retired I9, which stays listed while it can still be submitted. Only Global Payroll contracts are supported.
+
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - Workers
+      parameters:
+      - name: contract_id
+        in: path
+        description: Public id of the Global Payroll contract the documents belong to.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 64
+      - name: limit
+        in: query
+        description: Maximum number of documents to return per page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: cursor
+        in: query
+        description: Opaque `next_cursor` value from the previous response, passed back unchanged. Omit for the first page.
+        required: false
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9_-]+$
+          minLength: 1
+          maxLength: 512
+      responses:
+        '200':
+          description: 'Compliance documents returned successfully. `created_at` and `updated_at` come from the submission; `created_at` carries the same value as `uploaded_at`, and all three are null until something is submitted against the requirement. The language of `name` and `description` follows the language preference of the authenticated worker. It cannot be selected per request, and the same document may read differently for two workers of the same organization. Text falls back to English when no published translation exists for that language. `total_count`, `has_more` and `next_cursor` always describe the whole set of requirements for the contract rather than an estimate. `next_cursor` is an opaque token: pass it back unchanged and never construct or parse one. The set is small — expect tens of documents for one contract, not thousands.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_listWorkerContractComplianceDocuments-v2026-08-25_Response_200'
+        '400':
+          description: Bad request — `limit` is outside 1 to 100, or `cursor` is not a token a previous response handed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListWorkerContractComplianceDocuments-v2026-08-25RequestBadRequestError'
+        '401':
+          description: Unauthorized — the access token is missing, expired or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListWorkerContractComplianceDocuments-v2026-08-25RequestUnauthorizedError'
+        '403':
+          description: Forbidden — the worker does not hold this contract, or the token lacks the required scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListWorkerContractComplianceDocuments-v2026-08-25RequestForbiddenError'
+        '404':
+          description: Not found — no contract of the authenticated worker matches `contract_id`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListWorkerContractComplianceDocuments-v2026-08-25RequestNotFoundError'
+        '422':
+          description: Unprocessable entity — the contract is not a Global Payroll contract, so compliance documents are not available on this endpoint. The error code is `WORKER_TYPE_NOT_SUPPORTED`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListWorkerContractComplianceDocuments-v2026-08-25RequestUnprocessableEntityError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /workers/compliance-documents:
+    get:
+      operationId: workers_listOfWorkerComplianceDocuments-v2026-01-01
+      summary: List of worker compliance documents
+      description: 'Retrieve the list of compliance document requirements for a worker, grouped by country. Returns all required and optional documents with their current submission status. Applicable for both independent contractors and EOR employees.
+
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - Workers
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_listOfWorkerComplianceDocuments-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. The caller does not have the required profile type (employee or contractor).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfWorkerComplianceDocuments-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfWorkerComplianceDocuments-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /ic/workers/invoices/{invoice_id}/pdf:
+    get:
+      operationId: workers_icWorkersInvoicesInvoiceIdPdf-v2026-01-01
+      summary: Retrieve IC worker invoice PDF download link
+      description: 'This endpoint provides embedded worker flows access to download the PDF for a specific invoice, authenticated with a worker PAT token. It returns a signed, time-limited URL rather than the file itself.
+
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - Workers
+      parameters:
+      - name: invoice_id
+        in: path
+        description: Public invoice identifier (UUID) for the invoice whose PDF URL is returned.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Signed PDF URL for download.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_icWorkersInvoicesInvoiceIdPdf-v2026-01-01_Response_200'
+        '400':
+          description: Bad request (invalid query parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized (missing or invalid worker token).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden (invoice not found or not accessible to this worker).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '412':
+          description: Precondition failed (e.g. icEmbeddedWorkerSetup is not enabled for the organization).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestPreconditionFailedError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /workers/tax-forms/{tax_form_id}:
+    put:
+      operationId: workers_replaceATaxFormForAWorker-v2026-01-01
+      summary: Update a tax form for the authenticated worker
+      description: 'Replace the authenticated worker''s existing tax form with a corrected version, for example to fix a mistyped tax identification number, legal name or address. The worker is resolved from the access token and only their own forms are addressable. The body is the complete form rather than a partial update: an optional field left out is cleared, except contractor_signature, which keeps the value already on file when omitted — it must be supplied when the stored form carries no signature. client_legal_entity_id is not accepted — the legal entity is part of the form''s uniqueness key and can never be reassigned. The worker must have an active (non-terminated) contract with the form''s legal entity. Editing a form whose 1099 has already been filed with the IRS is permitted but does not refile it.
+
+
+        **Token scopes**: `worker:write`'
+      tags:
+      - Workers
+      parameters:
+      - name: tax_form_id
+        in: path
+        description: Public ID (UUID) of the tax form to replace, as returned by the create or list endpoints.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Tax form replaced successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers_replaceATaxFormForAWorker-v2026-01-01_Response_200'
+        '400':
+          description: Validation failed — for example a request body field is missing or malformed, client_legal_entity_id was supplied (the legal entity cannot be reassigned), contractor_signature was omitted for a form that has no signature on record, or the form_type does not match the contractor's tax residency (e.g. a W-8BEN submitted for a US contractor).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplaceATaxFormForAWorker-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: No live contract exists between the contractor and the tax form's client legal entity. A tax form can only be edited while the contractor has a non-terminated contract with that legal entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplaceATaxFormForAWorker-v2026-01-01RequestForbiddenError'
+        '404':
+          description: The tax form does not exist or does not belong to the authenticated worker, or the worker was not found in the calling organization or has no contractor profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplaceATaxFormForAWorker-v2026-01-01RequestNotFoundError'
+        '409':
+          description: The tax form was replaced by another request while this one was in flight. Fetch the current version and retry the edit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplaceATaxFormForAWorker-v2026-01-01RequestConflictError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplaceATaxFormForAWorker-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+components:
+  schemas:
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumberType'
+          description: Foreign tax ID type.
+        value:
+          type: string
+          maxLength: 20
+          description: Foreign tax identifying number.
+      required:
+      - type
+      - value
+      description: Foreign tax identifying number. At least one of us_tax_number, tax_number, or giin is required unless is_ftin_not_legally_required is true.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumber
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf0TaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      - EIN
+      description: Tax ID type.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf0TaxNumberType
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3FatcaStatus:
+      type: string
+      enum:
+      - ACTIVE_NFFE
+      - PASSIVE_NFFE
+      description: FATCA (Foreign Account Tax Compliance Act) status.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3FatcaStatus
+    WorkerPostRequestBodyContentApplicationJsonSchemaDataProfileType:
+      type: string
+      enum:
+      - CONTRACTOR
+      - EOR
+      description: Type of worker profile
+      title: WorkerPostRequestBodyContentApplicationJsonSchemaDataProfileType
+    SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestForbiddenError
+    Workers_downloadWorkerContractComplianceDocument-v2026-08-25_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Workers_downloadWorkerContractComplianceDocument-v2026-08-25_Response_200
+    GetWorkerContractComplianceDocument-v2026-08-25RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: GetWorkerContractComplianceDocument-v2026-08-25RequestUnprocessableEntityError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3UsTaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      description: US tax ID type.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3UsTaxNumberType
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2MailingAddress:
+      type: object
+      properties:
+        city:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 50
+          description: Mailing address city.
+        state:
+          type:
+          - string
+          - 'null'
+          maxLength: 10
+          description: Mailing address state.
+        address:
+          type: string
+          maxLength: 100
+          description: Mailing address.
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: ISO 3166-1 alpha-2 country code.
+        zip_code:
+          type: string
+          description: Mailing address ZIP/postal code.
+        address_line2:
+          type:
+          - string
+          - 'null'
+          maxLength: 100
+          description: Mailing address line 2.
+      required:
+      - address
+      - country
+      - zip_code
+      description: Mailing address if different from permanent residence.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2MailingAddress
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      description: US tax ID type.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumberType
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3MailingAddress:
+      type: object
+      properties:
+        city:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 50
+          description: Mailing address city.
+        state:
+          type:
+          - string
+          - 'null'
+          maxLength: 10
+          description: Mailing address state.
+        address:
+          type: string
+          maxLength: 100
+          description: Mailing address.
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: ISO 3166-1 alpha-2 country code.
+        zip_code:
+          type: string
+          description: Mailing address ZIP/postal code.
+        address_line2:
+          type:
+          - string
+          - 'null'
+          maxLength: 100
+          description: Mailing address line 2.
+      required:
+      - address
+      - country
+      - zip_code
+      description: Mailing address if different from permanent residence.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3MailingAddress
+    DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestNotFoundError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3FatcaStatus:
+      type: string
+      enum:
+      - ACTIVE_NFFE
+      - PASSIVE_NFFE
+      description: FATCA (Foreign Account Tax Compliance Act) status. Present on W8_BEN_E forms.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3FatcaStatus
+    WorkersContractsContractIdComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Time-limited download URL, valid for about 15 minutes. Fetch it rather than storing it.
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the URL stops working. Null when the URL is not time-limited.
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Reserved. Not populated on this endpoint today.
+        is_external_url:
+          type:
+          - boolean
+          - 'null'
+          description: Reserved. Not populated on this endpoint today.
+      required:
+      - url
+      - expires_at
+      title: WorkersContractsContractIdComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaData
+    GetInvoiceDetailsById-v2026-04-27RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaRequest'
+          description: Present for some public API responses (e.g. when `x-is-api-call` is set).
+      required:
+      - errors
+      title: GetInvoiceDetailsById-v2026-04-27RequestForbiddenError
+    WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the compliance document requirement.
+        name:
+          type: string
+          description: Display name of the compliance document.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus'
+          - type: 'null'
+          description: Review status of the uploaded document, null if no document has been uploaded yet.
+        country:
+          type:
+          - string
+          - 'null'
+          description: ISO 3166-1 alpha-2 country code where the document is required.
+        fillable:
+          type: boolean
+          description: Whether the document can be filled through the Deel platform.
+        filenames:
+          type: array
+          items:
+            type: string
+          description: List of uploaded file names. Empty array when no files have been uploaded.
+        description:
+          type: string
+          description: Description of the document requirement. Empty string when no description exists.
+        is_optional:
+          type: boolean
+          description: Whether the document is optional for the worker. Also true when the document is required within 30 days.
+        uploaded_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: ISO 8601 timestamp when the document was uploaded, null if no document has been uploaded.
+        has_template:
+          type: boolean
+          description: Whether a template is available for this document.
+        rejection_message:
+          type: string
+          description: Plain text message explaining why the document was rejected. Empty string when no rejection message exists.
+        is_consent_required:
+          type: boolean
+          description: Whether consent is required for acknowledgement-only documents. Only present when is_acknowledgement_only_document is true.
+        required_in_30_days:
+          type: boolean
+          description: Whether the document is required within 30 days of employment start.
+        is_acknowledgement_only_document:
+          type: boolean
+          description: Whether this document only requires acknowledgement without file upload.
+      required:
+      - id
+      - name
+      - status
+      - country
+      - fillable
+      - filenames
+      - description
+      - is_optional
+      - uploaded_at
+      - has_template
+      - rejection_message
+      - required_in_30_days
+      - is_acknowledgement_only_document
+      title: WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItems
+    GetInvoiceDetailsById-v2026-04-27RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetInvoiceDetailsById-v2026-04-27RequestInternalServerError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2TaxNumberType:
+      type: string
+      enum:
+      - FTIN
+      description: Tax ID type.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2TaxNumberType
+    DownloadWorkerContractComplianceDocument-v2026-08-25RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: DownloadWorkerContractComplianceDocument-v2026-08-25RequestUnprocessableEntityError
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsFormLimitationType:
+      type: string
+      enum:
+      - GOVERNMENT
+      - PENSION_TRUST
+      - TAX_EXEMPT
+      - PUBLICLY_TRADED_CORPORATION
+      - SUBSIDIARY
+      - OWNERSHIP_TEST
+      - DERIVATIVE_TEST
+      - ACTIVE_TRADE_TEST
+      - FAVORABLE
+      - NO_ARTICLE
+      - OTHER
+      description: Limitation on benefits (LOB) type.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsFormLimitationType
+    WorkersContractsContractIdComplianceDocumentsDocumentIdDeleteResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code.
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, when the error is about one.
+        message:
+          type: string
+          description: Human-readable explanation.
+      required:
+      - code
+      - message
+      title: WorkersContractsContractIdComplianceDocumentsDocumentIdDeleteResponsesContentApplicationJsonSchemaErrorsItems
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumberType'
+          description: US tax ID type.
+        value:
+          type: string
+          description: US tax ID value.
+      required:
+      - type
+      - value
+      description: US Taxpayer Identification Number.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumber
+    Workers_listOfWorkerComplianceDocuments-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Workers_listOfWorkerComplianceDocuments-v2026-01-01_Response_200
+    GetWorkerContractComplianceDocument-v2026-08-25RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: GetWorkerContractComplianceDocument-v2026-08-25RequestBadRequestError
+    CreateATaxFormForAWorker-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateATaxFormForAWorker-v2026-01-01RequestNotFoundError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3EntityType:
+      type: string
+      enum:
+      - CORPORATION
+      - DISREGARDED_ENTITY
+      - PARTNERSHIP
+      - SIMPLE_TRUST
+      - GRANTOR_TRUST
+      - COMPLEX_TRUST
+      - ESTATE
+      - GOVERNMENT
+      - CENTRAL_BANK_OF_ISSUE
+      - TAX_EXEMPT
+      - PRIVATE_FOUNDATION
+      - INTERNATIONAL
+      - FOREIGN_GOVERNMENT_CONTROLLED
+      - FOREIGN_GOVERNMENT_INTEGRAL
+      description: Chapter 3 entity type. Present on W8_BEN_E forms.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3EntityType
+    WorkersContractsContractIdComplianceDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code.
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, when the error is about one.
+        message:
+          type: string
+          description: Human-readable explanation.
+      required:
+      - code
+      - message
+      title: WorkersContractsContractIdComplianceDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1FederalTaxClassificationLlcClassification:
+      type: string
+      enum:
+      - P
+      - S
+      - C
+      description: LLC sub-classification. Present when type is 'LLC'.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1FederalTaxClassificationLlcClassification
+    WorkerPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        user_id:
+          type: string
+          minLength: 1
+          description: Created user ID
+        profile_id:
+          type: string
+          minLength: 1
+          description: Created profile ID
+        contract_id:
+          type: string
+          minLength: 1
+          description: Associated contract ID
+      required:
+      - user_id
+      - profile_id
+      - contract_id
+      title: WorkerPostResponsesContentApplicationJsonSchemaData
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2UsTaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2UsTaxNumberType'
+          description: US tax ID type.
+        value:
+          type: string
+          description: US tax ID value, unmasked.
+      description: US Taxpayer Identification Number. Present on W8_BEN and W8_BEN_E forms. Returned unmasked.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2UsTaxNumber
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumberType'
+          description: Tax ID type. SSN/ITIN for individuals; EIN also allowed for disregarded entities.
+        value:
+          type: string
+          description: Tax ID value.
+      required:
+      - type
+      - value
+      description: Taxpayer identification number.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumber
+    SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestUnprocessableEntityError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1FederalTaxClassificationType:
+      type: string
+      enum:
+      - C_CORPORATION
+      - S_CORPORATION
+      - OTHER
+      - PARTNERSHIP
+      - LLC
+      - TRUST_ESTATE
+      description: Federal tax classification type.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1FederalTaxClassificationType
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumberType'
+          description: Foreign tax ID type.
+        value:
+          type: string
+          maxLength: 20
+          description: Foreign tax identifying number.
+      required:
+      - type
+      - value
+      description: Foreign tax identifying number. At least one of us_tax_number or tax_number is required unless is_ftin_not_legally_required is true.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumber
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsForm:
+      type: object
+      properties:
+        details:
+          type: string
+          maxLength: 400
+          description: Additional details about the treaty claim.
+        type_of_income:
+          type: string
+          maxLength: 25
+          description: Type of income covered by the treaty.
+        limitation_type:
+          oneOf:
+          - $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsFormLimitationType'
+          - type: 'null'
+          description: Limitation on benefits (LOB) type.
+        withholding_rate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Withholding rate under the treaty (percentage).
+        article_and_paragraph:
+          type: string
+          maxLength: 100
+          description: Article and paragraph of the applicable tax treaty.
+        owner_resident_country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country of residence of the beneficial owner.
+        is_tax_residency_certified:
+          type:
+          - boolean
+          - 'null'
+          default: false
+          description: Whether tax residency is certified.
+        other_article_and_paragraph:
+          type:
+          - string
+          - 'null'
+          maxLength: 50
+          description: Other article and paragraph. Required when limitation_type is 'OTHER'.
+      description: Tax treaty benefits details.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsForm
+    ReplaceATaxFormForAWorker-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ReplaceATaxFormForAWorker-v2026-01-01RequestBadRequestError
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaData:
+      oneOf:
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W9_INDIVIDUAL
+            description: 'Discriminator value: W9_INDIVIDUAL'
+          city:
+            type: string
+            minLength: 1
+            maxLength: 40
+            description: City name.
+          state:
+            type:
+            - string
+            - 'null'
+            maxLength: 10
+            description: US state code.
+          address:
+            type: string
+            maxLength: 40
+            description: Street address. Maximum 40 characters for 1099 reporting compliance.
+          country:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code.
+          zip_code:
+            type: string
+            description: ZIP/postal code. Must be a valid US ZIP code for US addresses.
+          last_name:
+            type: string
+            maxLength: 40
+            description: Legal last name.
+          first_name:
+            type: string
+            maxLength: 40
+            description: Legal first name.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumber'
+            description: Taxpayer identification number.
+          middle_name:
+            type: string
+            maxLength: 100
+            description: Legal middle name.
+          business_name:
+            type:
+            - string
+            - 'null'
+            maxLength: 40
+            description: Business name. Only applicable when is_disregarded_entity is true.
+          contractor_signature:
+            type: string
+            minLength: 1
+            maxLength: 100
+            description: Contractor's digital signature.
+          is_disregarded_entity:
+            type: boolean
+            default: false
+            description: Whether this is a disregarded entity.
+          client_legal_entity_id:
+            type: string
+            format: uuid
+            description: Public ID of the client's legal entity.
+          is_subject_backup_withholding:
+            type: boolean
+            default: false
+            description: Whether the contractor is subject to backup withholding.
+        required:
+        - form_type
+        - city
+        - address
+        - country
+        - zip_code
+        - last_name
+        - first_name
+        - tax_number
+        - contractor_signature
+        - client_legal_entity_id
+        description: W9_INDIVIDUAL variant
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W9_COMPANY
+            description: 'Discriminator value: W9_COMPANY'
+          city:
+            type: string
+            minLength: 1
+            maxLength: 40
+            description: City name.
+          state:
+            type:
+            - string
+            - 'null'
+            maxLength: 10
+            description: US state code.
+          address:
+            type: string
+            maxLength: 40
+            description: Street address.
+          country:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code.
+          zip_code:
+            type: string
+            description: ZIP/postal code.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumber'
+            description: Taxpayer identification number.
+          business_name:
+            type: string
+            minLength: 1
+            maxLength: 40
+            description: Business name.
+          doing_business_as:
+            type:
+            - string
+            - 'null'
+            maxLength: 50
+            description: DBA name.
+          contractor_signature:
+            type: string
+            minLength: 1
+            maxLength: 100
+            description: Authorized signer's digital signature.
+          client_legal_entity_id:
+            type: string
+            format: uuid
+            description: Public ID of the client's legal entity.
+          federal_tax_classification:
+            $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassification'
+            description: Federal tax classification.
+          is_subject_backup_withholding:
+            type: boolean
+            default: false
+            description: Whether the contractor is subject to backup withholding.
+        required:
+        - form_type
+        - city
+        - address
+        - country
+        - zip_code
+        - tax_number
+        - business_name
+        - contractor_signature
+        - client_legal_entity_id
+        - federal_tax_classification
+        description: W9_COMPANY variant
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W8_BEN
+            description: 'Discriminator value: W8_BEN'
+          city:
+            type:
+            - string
+            - 'null'
+            minLength: 1
+            maxLength: 50
+            description: City name.
+          state:
+            type:
+            - string
+            - 'null'
+            maxLength: 10
+            description: State or province code.
+          address:
+            type: string
+            maxLength: 100
+            description: Street address.
+          country:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code of permanent residence.
+          zip_code:
+            type: string
+            description: ZIP/postal code.
+          last_name:
+            type: string
+            maxLength: 100
+            description: Legal last name.
+          first_name:
+            type: string
+            maxLength: 100
+            description: Legal first name.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumber'
+            description: Foreign tax identifying number. At least one of us_tax_number or tax_number is required unless is_ftin_not_legally_required is true.
+          middle_name:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Legal middle name.
+          address_line2:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Street address line 2.
+          date_of_birth:
+            type:
+            - string
+            - 'null'
+            format: date-time
+            description: Date of birth. Must be at least 18 years ago and no more than 100 years ago.
+          us_tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumber'
+            description: US Taxpayer Identification Number.
+          mailing_address:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2MailingAddress'
+            - type: 'null'
+            description: Mailing address if different from permanent residence.
+          contractor_signature:
+            type: string
+            minLength: 1
+            maxLength: 100
+            description: Contractor's digital signature.
+          print_name_of_signer:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Printed name of the signer.
+          is_disregarded_entity:
+            type: boolean
+            default: false
+            description: Whether this is a disregarded entity.
+          is_tax_treaty_enabled:
+            type:
+            - boolean
+            - 'null'
+            default: false
+            description: Whether the contractor claims tax treaty benefits.
+          client_legal_entity_id:
+            type: string
+            format: uuid
+            description: Public ID of the client's legal entity.
+          country_of_citizenship:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code of citizenship.
+          is_certified_and_agreed:
+            type:
+            - boolean
+            - 'null'
+            default: false
+            description: Certification that the signer has read and agrees with the certification information.
+          referencing_information:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Reference number for the form.
+          tax_treaty_benefits_form:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2TaxTreatyBenefitsForm'
+            - type: 'null'
+            description: Tax treaty benefits details. Applicable when is_tax_treaty_enabled is true.
+          is_ftin_not_legally_required:
+            type: boolean
+            default: false
+            description: Check if FTIN is not legally required in your country of residence.
+        required:
+        - form_type
+        - address
+        - country
+        - zip_code
+        - last_name
+        - first_name
+        - contractor_signature
+        - client_legal_entity_id
+        - country_of_citizenship
+        description: W8_BEN variant
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W8_BEN_E
+            description: 'Discriminator value: W8_BEN_E'
+          city:
+            type: string
+            minLength: 1
+            maxLength: 50
+            description: City of residence.
+          giin:
+            type:
+            - string
+            - 'null'
+            minLength: 19
+            maxLength: 19
+            description: Global Intermediary Identification Number (19 characters).
+          state:
+            type:
+            - string
+            - 'null'
+            maxLength: 10
+            description: State or province code.
+          address:
+            type: string
+            maxLength: 100
+            description: Street address.
+          country:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code of permanent residence.
+          zip_code:
+            type: string
+            description: ZIP/postal code.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumber'
+            description: Foreign tax identifying number. At least one of us_tax_number, tax_number, or giin is required unless is_ftin_not_legally_required is true.
+          entity_type:
+            $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3EntityType'
+            description: Chapter 3 entity type.
+          fatca_status:
+            $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3FatcaStatus'
+            description: FATCA (Foreign Account Tax Compliance Act) status.
+          address_line2:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Street address line 2.
+          date_of_birth:
+            type:
+            - string
+            - 'null'
+            format: date-time
+            description: Date of birth of the beneficial owner.
+          us_tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumber'
+            description: US Taxpayer Identification Number.
+          entity_country:
+            type:
+            - string
+            - 'null'
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code of the entity.
+          mailing_address:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3MailingAddress'
+            - type: 'null'
+            description: Mailing address if different from permanent residence.
+          contractor_signature:
+            type: string
+            minLength: 1
+            maxLength: 100
+            description: Authorized signer's digital signature.
+          name_of_organization:
+            type: string
+            maxLength: 100
+            description: Name of the organization.
+          print_name_of_signer:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Printed name of the authorized signer.
+          is_tax_treaty_enabled:
+            type:
+            - boolean
+            - 'null'
+            default: false
+            description: Whether the entity claims tax treaty benefits.
+          client_legal_entity_id:
+            type: string
+            format: uuid
+            description: Public ID of the client's legal entity.
+          country_of_citizenship:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code of incorporation/organization.
+          referencing_information:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Reference number for the form.
+          has_substantial_us_owner:
+            type: boolean
+            default: false
+            description: Whether the entity has a substantial US owner. Required when fatca_status is 'PASSIVE_NFFE'.
+          tax_treaty_benefits_form:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsForm'
+            - type: 'null'
+            description: Tax treaty benefits details.
+          name_of_disregarded_entity:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Name of the disregarded entity, if applicable.
+          is_ftin_not_legally_required:
+            type: boolean
+            default: false
+            description: Check if FTIN is not legally required in your country.
+          is_entity_certification_confirmed:
+            type:
+            - boolean
+            - 'null'
+            default: false
+            description: Certification that the entity is the beneficial owner of all income.
+        required:
+        - form_type
+        - city
+        - address
+        - country
+        - zip_code
+        - entity_type
+        - fatca_status
+        - entity_country
+        - contractor_signature
+        - name_of_organization
+        - client_legal_entity_id
+        - country_of_citizenship
+        description: W8_BEN_E variant
+      discriminator:
+        propertyName: form_type
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaData
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      - EIN
+      description: Tax ID type. SSN/ITIN for individuals; EIN also allowed for disregarded entities.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumberType
+    WorkersContractsContractIdComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code.
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, when the error is about one.
+        message:
+          type: string
+          description: Human-readable explanation.
+      required:
+      - code
+      - message
+      title: WorkersContractsContractIdComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    DownloadWorkerContractComplianceDocument-v2026-08-25RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: DownloadWorkerContractComplianceDocument-v2026-08-25RequestForbiddenError
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationLlcClassification:
+      type: string
+      enum:
+      - P
+      - S
+      - C
+      description: LLC sub-classification. Required when type is 'LLC'.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationLlcClassification
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumberType'
+          description: Tax ID type. EIN for most entities; SSN/ITIN/EIN for LLC.
+        value:
+          type: string
+          description: Tax ID value.
+      required:
+      - type
+      - value
+      description: Taxpayer identification number.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumber
+    WorkersTaxFormsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: WorkersTaxFormsPostResponsesContentApplicationJsonSchemaErrorsItems
+    ListWorkerContractComplianceDocuments-v2026-08-25RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListWorkerContractComplianceDocuments-v2026-08-25RequestUnauthorizedError
+    WorkersContractsContractIdComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code.
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, when the error is about one.
+        message:
+          type: string
+          description: Human-readable explanation.
+      required:
+      - code
+      - message
+      title: WorkersContractsContractIdComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems
+    GetWorkerContractComplianceDocument-v2026-08-25RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: GetWorkerContractComplianceDocument-v2026-08-25RequestForbiddenError
+    WorkersContractsContractIdComplianceDocumentsDocumentIdPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdPostRequestBodyContentApplicationJsonSchemaDataFilesItems'
+          description: 'Files to submit against the requirement. Allowed types: pdf, png, jpg, jpeg, heic.'
+      required:
+      - files
+      title: WorkersContractsContractIdComplianceDocumentsDocumentIdPostRequestBodyContentApplicationJsonSchemaData
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3EntityType:
+      type: string
+      enum:
+      - CORPORATION
+      - DISREGARDED_ENTITY
+      - PARTNERSHIP
+      - SIMPLE_TRUST
+      - GRANTOR_TRUST
+      - COMPLEX_TRUST
+      - ESTATE
+      - GOVERNMENT
+      - CENTRAL_BANK_OF_ISSUE
+      - TAX_EXEMPT
+      - PRIVATE_FOUNDATION
+      - INTERNATIONAL
+      - FOREIGN_GOVERNMENT_CONTROLLED
+      - FOREIGN_GOVERNMENT_INTEGRAL
+      description: Chapter 3 entity type.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3EntityType
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      - EIN
+      description: Tax ID type. EIN for most entities; SSN/ITIN/EIN for LLC.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumberType
+    DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestUnprocessableEntityError
+    DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestUnauthorizedError
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsFormLimitationType:
+      type: string
+      enum:
+      - GOVERNMENT
+      - PENSION_TRUST
+      - TAX_EXEMPT
+      - PUBLICLY_TRADED_CORPORATION
+      - SUBSIDIARY
+      - OWNERSHIP_TEST
+      - DERIVATIVE_TEST
+      - ACTIVE_TRADE_TEST
+      - FAVORABLE
+      - NO_ARTICLE
+      - OTHER
+      description: Limitation on benefits (LOB) type.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsFormLimitationType
+    WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyPersonal:
+      type: object
+      properties:
+        zip:
+          type: number
+          format: double
+          description: Zip/Postal code
+        city:
+          type: string
+          description: City
+        phone:
+          type: number
+          format: double
+          description: Phone number
+        street:
+          type: string
+          description: Street address
+        citizen:
+          type: string
+          description: Citizenship country code
+        country:
+          type: string
+          description: Country code
+        id_type:
+          type: string
+          description: Type of identification
+        province:
+          type:
+          - string
+          - 'null'
+          description: Province/State
+        timezone:
+          type: string
+          description: Personal timezone
+        personal_id:
+          type: number
+          format: double
+          description: Personal identification number
+        legal_status:
+          type: string
+          description: Legal status (required only when type is INDIVIDUAL)
+        tax_residence:
+          type: string
+          description: Tax residence country code
+        entity_tax_residence:
+          type: string
+          description: Entity tax residence (only applicable for company type)
+      required:
+      - zip
+      - city
+      - phone
+      - street
+      - citizen
+      - personal_id
+      title: WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyPersonal
+    CompleteIndividualContractorProfileSetup-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingWorkersIndividualPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CompleteIndividualContractorProfileSetup-v2026-01-01RequestInternalServerError
+    IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+        method:
+          type: string
+        status:
+          type: integer
+      description: Present for some public API responses (e.g. when `x-is-api-call` is set).
+      title: IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaRequest
+    ReplaceATaxFormForAWorker-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ReplaceATaxFormForAWorker-v2026-01-01RequestInternalServerError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2UsTaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      description: US tax ID type.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2UsTaxNumberType
+    ReplaceATaxFormForAWorker-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ReplaceATaxFormForAWorker-v2026-01-01RequestForbiddenError
+    WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus:
+      type: string
+      enum:
+      - AWAITING_EX_REVIEW
+      - AWAITING_EXTERNAL_REVIEW
+      - REJECTED
+      - APPROVED
+      - ON_HOLD
+      description: Review status of the uploaded document, null if no document has been uploaded yet.
+      title: WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItemsStatus
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumberType'
+          description: US tax ID type.
+        value:
+          type: string
+          description: US tax ID value.
+      required:
+      - type
+      - value
+      description: US Taxpayer Identification Number.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumber
+    Workers_getInvoiceDetailsById-v2026-04-27_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData'
+          description: Invoice summary (snake_case; display card fields, amounts, and payment display).
+      required:
+      - data
+      title: Workers_getInvoiceDetailsById-v2026-04-27_Response_200
+    ListTaxFormsForAWorker-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListTaxFormsForAWorker-v2026-01-01RequestBadRequestError
+    IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        details:
+          type: object
+          additionalProperties:
+            description: Any type
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems
+    WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyType:
+      type: string
+      enum:
+      - COMPANY
+      - INDIVIDUAL
+      description: Type of company registration
+      title: WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyType
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumberType'
+          description: Foreign tax ID type.
+        value:
+          type: string
+          maxLength: 20
+          description: Foreign tax identifying number.
+      required:
+      - type
+      - value
+      description: Foreign tax identifying number. At least one of us_tax_number, tax_number, or giin is required unless is_ftin_not_legally_required is true.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumber
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1FederalTaxClassification:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1FederalTaxClassificationType'
+          description: Federal tax classification type.
+        llc_classification:
+          $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1FederalTaxClassificationLlcClassification'
+          description: LLC sub-classification. Present when type is 'LLC'.
+        other_additional_information:
+          type: string
+          description: Additional information. Present when type is 'OTHER'.
+      description: Federal tax classification. Present on W9_COMPANY forms.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1FederalTaxClassification
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumberType'
+          description: Foreign tax ID type.
+        value:
+          type: string
+          maxLength: 20
+          description: Foreign tax identifying number.
+      required:
+      - type
+      - value
+      description: Foreign tax identifying number. At least one of us_tax_number or tax_number is required unless is_ftin_not_legally_required is true.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumber
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1TaxNumberType'
+          description: Tax ID type.
+        value:
+          type: string
+          description: Tax ID value, unmasked.
+      description: Taxpayer identification number. Returned unmasked.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1TaxNumber
+    IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestBadRequestError
+    SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestBadRequestError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3MailingAddress:
+      type: object
+      properties:
+        city:
+          type:
+          - string
+          - 'null'
+          description: Mailing address city.
+        state:
+          type:
+          - string
+          - 'null'
+          description: Mailing address state.
+        address:
+          type: string
+          description: Mailing address.
+        country:
+          type: string
+          description: ISO 3166-1 alpha-2 country code.
+        zip_code:
+          type: string
+          description: Mailing address ZIP/postal code.
+        address_line2:
+          type:
+          - string
+          - 'null'
+          description: Mailing address line 2.
+      description: Mailing address if different from permanent residence. Present on W8_BEN and W8_BEN_E forms.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3MailingAddress
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3FatcaStatus:
+      type: string
+      enum:
+      - ACTIVE_NFFE
+      - PASSIVE_NFFE
+      description: FATCA (Foreign Account Tax Compliance Act) status.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3FatcaStatus
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3UsTaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3UsTaxNumberType'
+          description: US tax ID type.
+        value:
+          type: string
+          description: US tax ID value, unmasked.
+      description: US Taxpayer Identification Number. Present on W8_BEN and W8_BEN_E forms. Returned unmasked.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3UsTaxNumber
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassification:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationType'
+          description: Federal tax classification type.
+        llc_classification:
+          $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationLlcClassification'
+          description: LLC sub-classification. Required when type is 'LLC'.
+        other_additional_information:
+          type: string
+          maxLength: 100
+          description: Additional information. Required when type is 'OTHER'.
+      required:
+      - type
+      description: Federal tax classification.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassification
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3EntityType:
+      type: string
+      enum:
+      - CORPORATION
+      - DISREGARDED_ENTITY
+      - PARTNERSHIP
+      - SIMPLE_TRUST
+      - GRANTOR_TRUST
+      - COMPLEX_TRUST
+      - ESTATE
+      - GOVERNMENT
+      - CENTRAL_BANK_OF_ISSUE
+      - TAX_EXEMPT
+      - PRIVATE_FOUNDATION
+      - INTERNATIONAL
+      - FOREIGN_GOVERNMENT_CONTROLLED
+      - FOREIGN_GOVERNMENT_INTEGRAL
+      description: Chapter 3 entity type.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3EntityType
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxTreatyBenefitsFormLimitationType:
+      type: string
+      enum:
+      - GOVERNMENT
+      - PENSION_TRUST
+      - TAX_EXEMPT
+      - PUBLICLY_TRADED_CORPORATION
+      - SUBSIDIARY
+      - OWNERSHIP_TEST
+      - DERIVATIVE_TEST
+      - ACTIVE_TRADE_TEST
+      - FAVORABLE
+      - NO_ARTICLE
+      - OTHER
+      description: Limitation on benefits (LOB) type.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxTreatyBenefitsFormLimitationType
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumberType:
+      type: string
+      enum:
+      - FTIN
+      description: Foreign tax ID type.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumberType
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationType:
+      type: string
+      enum:
+      - C_CORPORATION
+      - S_CORPORATION
+      - OTHER
+      - PARTNERSHIP
+      - LLC
+      - TRUST_ESTATE
+      description: Federal tax classification type.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationType
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumberType'
+          description: Tax ID type. SSN/ITIN for individuals; EIN also allowed for disregarded entities.
+        value:
+          type: string
+          description: Tax ID value.
+      required:
+      - type
+      - value
+      description: Taxpayer identification number.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumber
+    SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestUnauthorizedError
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationLlcClassification:
+      type: string
+      enum:
+      - P
+      - S
+      - C
+      description: LLC sub-classification. Required when type is 'LLC'.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationLlcClassification
+    WorkersTaxFormsTaxFormIdPutResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The public ID (UUID) of the tax form.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the tax form was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the tax form was last updated.
+      required:
+      - id
+      - created_at
+      - updated_at
+      title: WorkersTaxFormsTaxFormIdPutResponsesContentApplicationJsonSchemaData
+    CreateWorker-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateWorker-v2026-01-01RequestBadRequestError
+    WorkersContractsContractIdComplianceDocumentsDocumentIdPostRequestBodyContentApplicationJsonSchemaDataFilesItems:
+      type: object
+      properties:
+        file_id:
+          type: string
+          format: uuid
+          description: File Service file id.
+        content_type:
+          type: string
+          maxLength: 255
+          description: MIME type of the file.
+        one_time_secret:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          description: File Service one-time secret for that file.
+        original_filename:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Original filename, extension included.
+      required:
+      - file_id
+      - content_type
+      - one_time_secret
+      - original_filename
+      title: WorkersContractsContractIdComplianceDocumentsDocumentIdPostRequestBodyContentApplicationJsonSchemaDataFilesItems
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumberType:
+      type: string
+      enum:
+      - FTIN
+      description: Foreign tax ID type.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumberType
+    WorkersTaxFormsTaxFormIdPutResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: WorkersTaxFormsTaxFormIdPutResponsesContentApplicationJsonSchemaErrorsItems
+    ListWorkerContractComplianceDocuments-v2026-08-25RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListWorkerContractComplianceDocuments-v2026-08-25RequestNotFoundError
+    IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: HTTPS URL to download the invoice PDF.
+      required:
+      - url
+      description: Payload with the signed download URL.
+      title: IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaData
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      description: US tax ID type.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumberType
+    OnboardingWorkersIndividualPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        abn:
+          type: string
+          description: Australian Business Number (11 digits). Required when tax_residence is AU.
+        ssn:
+          type: string
+          description: Social Security Number (9 digits, no dashes). Required when tax_residence is US.
+        zip:
+          type: string
+          description: Postal or ZIP code.
+        city:
+          type: string
+          description: City of residence.
+        phone:
+          type: string
+          description: Phone number in E.164 format.
+        street:
+          type: string
+          description: Street address of the contractor.
+        citizen:
+          type: string
+          description: Citizenship country as an ISO 3166-1 alpha-2 code.
+        country:
+          type: string
+          description: Country of residence as an ISO 3166-1 alpha-2 code.
+        id_type:
+          type: string
+          description: Type of identification document provided.
+        province:
+          type: string
+          description: Province or state code within the country.
+        timezone:
+          type: string
+          description: IANA timezone identifier.
+        personal_id:
+          type: string
+          description: Passport or national ID number. Required when tax_residence is not US.
+        legal_status:
+          type: string
+          description: Legal status of the individual contractor.
+        address_valid:
+          type: boolean
+          description: Whether the provided address has been validated.
+        tax_residence:
+          type: string
+          description: Tax residence country as an ISO 3166-1 alpha-2 code. Defaults to the country field if omitted.
+        entity_tax_residence:
+          type: string
+          description: Tax residence country for the entity, if different from the individual.
+        address_confirmed_by_user:
+          type: boolean
+          description: Whether the user has confirmed the address is correct.
+      required:
+      - zip
+      - city
+      - street
+      - citizen
+      - country
+      - legal_status
+      title: OnboardingWorkersIndividualPostRequestBodyContentApplicationJsonSchemaData
+    ListWorkerContractComplianceDocuments-v2026-08-25RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListWorkerContractComplianceDocuments-v2026-08-25RequestForbiddenError
+    ListWorkerContractComplianceDocuments-v2026-08-25RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListWorkerContractComplianceDocuments-v2026-08-25RequestUnprocessableEntityError
+    CreateATaxFormForAWorker-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateATaxFormForAWorker-v2026-01-01RequestInternalServerError
+    IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Public invoice id.
+        title:
+          type: string
+          description: Display title.
+        total:
+          type:
+          - string
+          - 'null'
+          description: Total including fees.
+        amount:
+          type:
+          - string
+          - 'null'
+          description: Amount before fees.
+        status:
+          type: string
+          description: Invoice workflow status.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Three-letter currency code.
+        issued_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the invoice was issued, if applicable.
+        created_at:
+          type: string
+          format: date-time
+          description: When the invoice record was created (ISO-8601).
+        payment_display_status:
+          $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataPaymentDisplayStatus'
+          description: Derived payment display state for the invoice.
+      required:
+      - id
+      - status
+      - currency
+      - created_at
+      description: Invoice summary (snake_case; display card fields, amounts, and payment display).
+      title: IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaData
+    IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataPaymentDisplayStatus:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Stable machine key.
+        label:
+          type: string
+          description: Human-readable label.
+      required:
+      - key
+      - label
+      description: Derived payment display state for the invoice.
+      title: IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaDataPaymentDisplayStatus
+    IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestPreconditionFailedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestPreconditionFailedError
+    WorkersContractsContractIdComplianceDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Public UUID of the compliance document requirement. Use it as `document_id` on the other endpoints.
+        name:
+          type: string
+          description: Display name of the document, in the worker language.
+        country:
+          type:
+          - string
+          - 'null'
+          description: ISO 3166-1 alpha-2 country code the requirement applies to. Null for a requirement that applies everywhere.
+        filenames:
+          type: array
+          items:
+            type: string
+          description: Names of the files submitted against this requirement. Empty array when nothing has been submitted.
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the submission was created. Carries the same value as `uploaded_at`.
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the submission was last changed. Null when nothing has been submitted.
+        description:
+          type: string
+          description: What the document asks for, in the worker language. Empty string when the requirement has no description.
+        is_required:
+          type: boolean
+          description: 'Whether the worker has to submit this document. A requirement with a 30-day grace period after the employment start reads `true`: it is required, only not immediately.'
+        uploaded_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the submission was created. Null when nothing has been submitted.
+        has_template:
+          type: boolean
+          description: Whether a template is provided for this document.
+        submission_status:
+          type:
+          - string
+          - 'null'
+          description: Reads `REVIEWING` while a submission is not final yet. Null at every other time.
+        is_consent_required:
+          type: boolean
+          description: Whether the worker has to consent. Present only for acknowledgement-only documents that declare the flag.
+        is_acknowledgement_only_document:
+          type: boolean
+          description: Whether the document only has to be acknowledged, with no file to submit.
+      required:
+      - id
+      - name
+      - country
+      - filenames
+      - created_at
+      - updated_at
+      - description
+      - is_required
+      - uploaded_at
+      - has_template
+      - submission_status
+      - is_acknowledgement_only_document
+      title: WorkersContractsContractIdComplianceDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaData
+    ListWorkerContractComplianceDocuments-v2026-08-25RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: ListWorkerContractComplianceDocuments-v2026-08-25RequestBadRequestError
+    IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        field:
+          type: string
+          description: JSON pointer to the invalid field, when applicable.
+        details:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Optional structured context for the error.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestInternalServerError
+    CreateATaxFormForAWorker-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateATaxFormForAWorker-v2026-01-01RequestForbiddenError
+    GetInvoiceDetailsById-v2026-04-27RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetInvoiceDetailsById-v2026-04-27RequestBadRequestError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxTreatyBenefitsForm:
+      type: object
+      properties:
+        details:
+          type: string
+          description: Additional details about the treaty claim.
+        type_of_income:
+          type: string
+          description: Type of income covered by the treaty.
+        limitation_type:
+          oneOf:
+          - $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxTreatyBenefitsFormLimitationType'
+          - type: 'null'
+          description: Limitation on benefits (LOB) type.
+        withholding_rate:
+          type: number
+          format: double
+          description: Withholding rate under the treaty (percentage).
+        article_and_paragraph:
+          type: string
+          description: Article and paragraph of the applicable tax treaty.
+        owner_resident_country:
+          type: string
+          description: Country of residence of the beneficial owner.
+        is_tax_residency_certified:
+          type:
+          - boolean
+          - 'null'
+          description: Whether tax residency is certified.
+        other_article_and_paragraph:
+          type:
+          - string
+          - 'null'
+          description: Other article and paragraph. Present when limitation_type is 'OTHER'.
+      description: Tax treaty benefits details. Present when treaty benefits are claimed.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxTreatyBenefitsForm
+    GetWorkerContractComplianceDocument-v2026-08-25RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: GetWorkerContractComplianceDocument-v2026-08-25RequestNotFoundError
+    CreateATaxFormForAWorker-v2026-01-01RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateATaxFormForAWorker-v2026-01-01RequestConflictError
+    Workers_getWorkerContractComplianceDocument-v2026-08-25_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Workers_getWorkerContractComplianceDocument-v2026-08-25_Response_200
+    WorkersTaxFormsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The public ID (UUID) of the created tax form.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the tax form was created.
+      required:
+      - id
+      - created_at
+      title: WorkersTaxFormsPostResponsesContentApplicationJsonSchemaData
+    IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestUnauthorizedError
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3MailingAddress:
+      type: object
+      properties:
+        city:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 50
+          description: Mailing address city.
+        state:
+          type:
+          - string
+          - 'null'
+          maxLength: 10
+          description: Mailing address state.
+        address:
+          type: string
+          maxLength: 100
+          description: Mailing address.
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: ISO 3166-1 alpha-2 country code.
+        zip_code:
+          type: string
+          description: Mailing address ZIP/postal code.
+        address_line2:
+          type:
+          - string
+          - 'null'
+          maxLength: 100
+          description: Mailing address line 2.
+      required:
+      - address
+      - country
+      - zip_code
+      description: Mailing address if different from permanent residence.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3MailingAddress
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      description: US tax ID type.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumberType
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaData:
+      oneOf:
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W9_INDIVIDUAL
+            description: 'Discriminator value: W9_INDIVIDUAL'
+          city:
+            type: string
+            minLength: 1
+            maxLength: 40
+            description: City name.
+          state:
+            type:
+            - string
+            - 'null'
+            maxLength: 10
+            description: US state code.
+          address:
+            type: string
+            maxLength: 40
+            description: Street address. Maximum 40 characters for 1099 reporting compliance.
+          country:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code.
+          zip_code:
+            type: string
+            description: ZIP/postal code. Must be a valid US ZIP code for US addresses.
+          last_name:
+            type: string
+            maxLength: 40
+            description: Legal last name.
+          first_name:
+            type: string
+            maxLength: 40
+            description: Legal first name.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumber'
+            description: Taxpayer identification number.
+          middle_name:
+            type: string
+            maxLength: 100
+            description: Legal middle name.
+          business_name:
+            type:
+            - string
+            - 'null'
+            maxLength: 40
+            description: Business name. Only applicable when is_disregarded_entity is true.
+          contractor_signature:
+            type: string
+            minLength: 1
+            maxLength: 100
+            description: Contractor's digital signature.
+          is_disregarded_entity:
+            type: boolean
+            default: false
+            description: Whether this is a disregarded entity.
+          is_subject_backup_withholding:
+            type: boolean
+            default: false
+            description: Whether the contractor is subject to backup withholding.
+        required:
+        - form_type
+        - city
+        - address
+        - country
+        - zip_code
+        - last_name
+        - first_name
+        - tax_number
+        description: W9_INDIVIDUAL variant
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W9_COMPANY
+            description: 'Discriminator value: W9_COMPANY'
+          city:
+            type: string
+            minLength: 1
+            maxLength: 40
+            description: City name.
+          state:
+            type:
+            - string
+            - 'null'
+            maxLength: 10
+            description: US state code.
+          address:
+            type: string
+            maxLength: 40
+            description: Street address.
+          country:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code.
+          zip_code:
+            type: string
+            description: ZIP/postal code.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumber'
+            description: Taxpayer identification number.
+          business_name:
+            type: string
+            minLength: 1
+            maxLength: 40
+            description: Business name.
+          doing_business_as:
+            type:
+            - string
+            - 'null'
+            maxLength: 50
+            description: DBA name.
+          contractor_signature:
+            type: string
+            minLength: 1
+            maxLength: 100
+            description: Authorized signer's digital signature.
+          federal_tax_classification:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassification'
+            description: Federal tax classification.
+          is_subject_backup_withholding:
+            type: boolean
+            default: false
+            description: Whether the contractor is subject to backup withholding.
+        required:
+        - form_type
+        - city
+        - address
+        - country
+        - zip_code
+        - tax_number
+        - business_name
+        - federal_tax_classification
+        description: W9_COMPANY variant
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W8_BEN
+            description: 'Discriminator value: W8_BEN'
+          city:
+            type:
+            - string
+            - 'null'
+            minLength: 1
+            maxLength: 50
+            description: City name.
+          state:
+            type:
+            - string
+            - 'null'
+            maxLength: 10
+            description: State or province code.
+          address:
+            type: string
+            maxLength: 100
+            description: Street address.
+          country:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code of permanent residence.
+          zip_code:
+            type: string
+            description: ZIP/postal code.
+          last_name:
+            type: string
+            maxLength: 100
+            description: Legal last name.
+          first_name:
+            type: string
+            maxLength: 100
+            description: Legal first name.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumber'
+            description: Foreign tax identifying number. At least one of us_tax_number or tax_number is required unless is_ftin_not_legally_required is true.
+          middle_name:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Legal middle name.
+          address_line2:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Street address line 2.
+          date_of_birth:
+            type:
+            - string
+            - 'null'
+            format: date-time
+            description: Date of birth. Must be at least 18 years ago and no more than 100 years ago.
+          us_tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2UsTaxNumber'
+            description: US Taxpayer Identification Number.
+          mailing_address:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2MailingAddress'
+            - type: 'null'
+            description: Mailing address if different from permanent residence.
+          contractor_signature:
+            type: string
+            minLength: 1
+            maxLength: 100
+            description: Contractor's digital signature.
+          print_name_of_signer:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Printed name of the signer.
+          is_disregarded_entity:
+            type: boolean
+            default: false
+            description: Whether this is a disregarded entity.
+          is_tax_treaty_enabled:
+            type:
+            - boolean
+            - 'null'
+            default: false
+            description: Whether the contractor claims tax treaty benefits.
+          country_of_citizenship:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code of citizenship.
+          is_certified_and_agreed:
+            type:
+            - boolean
+            - 'null'
+            default: false
+            description: Certification that the signer has read and agrees with the certification information.
+          referencing_information:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Reference number for the form.
+          tax_treaty_benefits_form:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2TaxTreatyBenefitsForm'
+            - type: 'null'
+            description: Tax treaty benefits details. Applicable when is_tax_treaty_enabled is true.
+          is_ftin_not_legally_required:
+            type: boolean
+            default: false
+            description: Check if FTIN is not legally required in your country of residence.
+        required:
+        - form_type
+        - address
+        - country
+        - zip_code
+        - last_name
+        - first_name
+        - country_of_citizenship
+        description: W8_BEN variant
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W8_BEN_E
+            description: 'Discriminator value: W8_BEN_E'
+          city:
+            type: string
+            minLength: 1
+            maxLength: 50
+            description: City of residence.
+          giin:
+            type:
+            - string
+            - 'null'
+            minLength: 19
+            maxLength: 19
+            description: Global Intermediary Identification Number (19 characters).
+          state:
+            type:
+            - string
+            - 'null'
+            maxLength: 10
+            description: State or province code.
+          address:
+            type: string
+            maxLength: 100
+            description: Street address.
+          country:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code of permanent residence.
+          zip_code:
+            type: string
+            description: ZIP/postal code.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumber'
+            description: Foreign tax identifying number. At least one of us_tax_number, tax_number, or giin is required unless is_ftin_not_legally_required is true.
+          entity_type:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3EntityType'
+            description: Chapter 3 entity type.
+          fatca_status:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3FatcaStatus'
+            description: FATCA (Foreign Account Tax Compliance Act) status.
+          address_line2:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Street address line 2.
+          date_of_birth:
+            type:
+            - string
+            - 'null'
+            format: date-time
+            description: Date of birth of the beneficial owner.
+          us_tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumber'
+            description: US Taxpayer Identification Number.
+          entity_country:
+            type:
+            - string
+            - 'null'
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code of the entity.
+          mailing_address:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3MailingAddress'
+            - type: 'null'
+            description: Mailing address if different from permanent residence.
+          contractor_signature:
+            type: string
+            minLength: 1
+            maxLength: 100
+            description: Authorized signer's digital signature.
+          name_of_organization:
+            type: string
+            maxLength: 100
+            description: Name of the organization.
+          print_name_of_signer:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Printed name of the authorized signer.
+          is_tax_treaty_enabled:
+            type:
+            - boolean
+            - 'null'
+            default: false
+            description: Whether the entity claims tax treaty benefits.
+          country_of_citizenship:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: ISO 3166-1 alpha-2 country code of incorporation/organization.
+          referencing_information:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Reference number for the form.
+          has_substantial_us_owner:
+            type: boolean
+            default: false
+            description: Whether the entity has a substantial US owner. Required when fatca_status is 'PASSIVE_NFFE'.
+          tax_treaty_benefits_form:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsForm'
+            - type: 'null'
+            description: Tax treaty benefits details.
+          name_of_disregarded_entity:
+            type:
+            - string
+            - 'null'
+            maxLength: 100
+            description: Name of the disregarded entity, if applicable.
+          is_ftin_not_legally_required:
+            type: boolean
+            default: false
+            description: Check if FTIN is not legally required in your country.
+          is_entity_certification_confirmed:
+            type:
+            - boolean
+            - 'null'
+            default: false
+            description: Certification that the entity is the beneficial owner of all income.
+        required:
+        - form_type
+        - city
+        - address
+        - country
+        - zip_code
+        - entity_type
+        - fatca_status
+        - entity_country
+        - name_of_organization
+        - country_of_citizenship
+        description: W8_BEN_E variant
+      discriminator:
+        propertyName: form_type
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaData
+    ReplaceATaxFormForAWorker-v2026-01-01RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ReplaceATaxFormForAWorker-v2026-01-01RequestConflictError
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumberType:
+      type: string
+      enum:
+      - FTIN
+      description: Foreign tax ID type.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2TaxNumberType
+    ReplaceATaxFormForAWorker-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ReplaceATaxFormForAWorker-v2026-01-01RequestNotFoundError
+    Workers_createATaxFormForAWorker-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WorkersTaxFormsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Workers_createATaxFormForAWorker-v2026-01-01_Response_201
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaErrorsItems
+    WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        field:
+          type: string
+          description: Name of the field causing the error, if applicable.
+        message:
+          type: string
+          description: Human-readable error message.
+      required:
+      - code
+      - message
+      title: WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    Workers_createWorker-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WorkerPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Workers_createWorker-v2026-01-01_Response_201
+    GetInvoiceDetailsById-v2026-04-27RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetInvoiceDetailsById-v2026-04-27RequestUnauthorizedError
+    ListOfWorkerComplianceDocuments-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListOfWorkerComplianceDocuments-v2026-01-01RequestForbiddenError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1TaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      - EIN
+      description: Tax ID type.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1TaxNumberType
+    Workers_listWorkerContractComplianceDocuments-v2026-08-25_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Documents on this page.
+        has_more:
+          type: boolean
+          description: Whether another page follows this one.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Opaque token to pass as `cursor` to fetch the next page. Null on the last page. Never construct or parse one.
+        total_count:
+          type: integer
+          minimum: 0
+          description: Total number of documents for the contract, across every page.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: Workers_listWorkerContractComplianceDocuments-v2026-08-25_Response_200
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsForm:
+      type: object
+      properties:
+        details:
+          type: string
+          maxLength: 400
+          description: Additional details about the treaty claim.
+        type_of_income:
+          type: string
+          maxLength: 25
+          description: Type of income covered by the treaty.
+        limitation_type:
+          oneOf:
+          - $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsFormLimitationType'
+          - type: 'null'
+          description: Limitation on benefits (LOB) type.
+        withholding_rate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Withholding rate under the treaty (percentage).
+        article_and_paragraph:
+          type: string
+          maxLength: 100
+          description: Article and paragraph of the applicable tax treaty.
+        owner_resident_country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country of residence of the beneficial owner.
+        is_tax_residency_certified:
+          type:
+          - boolean
+          - 'null'
+          default: false
+          description: Whether tax residency is certified.
+        other_article_and_paragraph:
+          type:
+          - string
+          - 'null'
+          maxLength: 50
+          description: Other article and paragraph. Required when limitation_type is 'OTHER'.
+      description: Tax treaty benefits details.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxTreatyBenefitsForm
+    Workers_replaceATaxFormForAWorker-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Workers_replaceATaxFormForAWorker-v2026-01-01_Response_200
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      description: US tax ID type.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumberType
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxNumberType:
+      type: string
+      enum:
+      - FTIN
+      description: Tax ID type.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxNumberType
+    Workers_completeIndividualContractorProfileSetup-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OnboardingWorkersIndividualPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Workers_completeIndividualContractorProfileSetup-v2026-01-01_Response_200
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      - EIN
+      description: Tax ID type. EIN for most entities; SSN/ITIN/EIN for LLC.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumberType
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumberType'
+          description: US tax ID type.
+        value:
+          type: string
+          description: US tax ID value.
+      required:
+      - type
+      - value
+      description: US Taxpayer Identification Number.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumber
+    WorkersContractsContractIdComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: Machine-readable error code.
+        field:
+          type:
+          - string
+          - 'null'
+          description: Field that caused the error, when the error is about one.
+        message:
+          type: string
+          description: Human-readable explanation.
+      required:
+      - code
+      - message
+      title: WorkersContractsContractIdComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems
+    DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestBadRequestError
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2MailingAddress:
+      type: object
+      properties:
+        city:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 50
+          description: Mailing address city.
+        state:
+          type:
+          - string
+          - 'null'
+          maxLength: 10
+          description: Mailing address state.
+        address:
+          type: string
+          maxLength: 100
+          description: Mailing address.
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: ISO 3166-1 alpha-2 country code.
+        zip_code:
+          type: string
+          description: Mailing address ZIP/postal code.
+        address_line2:
+          type:
+          - string
+          - 'null'
+          maxLength: 100
+          description: Mailing address line 2.
+      required:
+      - address
+      - country
+      - zip_code
+      description: Mailing address if different from permanent residence.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2MailingAddress
+    Workers_icWorkersInvoicesInvoiceIdPdf-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaData'
+          description: Payload with the signed download URL.
+      required:
+      - data
+      description: Envelope containing a time-limited signed URL to the invoice PDF.
+      title: Workers_icWorkersInvoicesInvoiceIdPdf-v2026-01-01_Response_200
+    IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+        method:
+          type: string
+        status:
+          type: integer
+      description: Present for some public API responses (e.g. when x-is-api-call is set).
+      title: IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaRequest
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumberType'
+          description: US tax ID type.
+        value:
+          type: string
+          description: US tax ID value.
+      required:
+      - type
+      - value
+      description: US Taxpayer Identification Number.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3UsTaxNumber
+    ListTaxFormsForAWorker-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListTaxFormsForAWorker-v2026-01-01RequestNotFoundError
+    DownloadWorkerContractComplianceDocument-v2026-08-25RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: DownloadWorkerContractComplianceDocument-v2026-08-25RequestUnauthorizedError
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2TaxTreatyBenefitsForm:
+      type: object
+      properties:
+        details:
+          type: string
+          maxLength: 400
+          description: Additional details about the treaty claim.
+        type_of_income:
+          type: string
+          maxLength: 100
+          description: Type of income covered by the treaty.
+        withholding_rate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Withholding rate under the treaty (percentage).
+        article_and_paragraph:
+          type: string
+          maxLength: 100
+          description: Article and paragraph of the applicable tax treaty.
+        owner_resident_country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country of residence of the beneficial owner. Must be a US income tax treaty country.
+      description: Tax treaty benefits details. Applicable when is_tax_treaty_enabled is true.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf2TaxTreatyBenefitsForm
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf0TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf0TaxNumberType'
+          description: Tax ID type.
+        value:
+          type: string
+          description: Tax ID value, unmasked.
+      description: Taxpayer identification number. Returned unmasked.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf0TaxNumber
+    WorkersContractsContractIdComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Public UUID of the compliance document requirement. Use it as `document_id` on the other endpoints.
+        name:
+          type: string
+          description: Display name of the document, in the worker language.
+        country:
+          type:
+          - string
+          - 'null'
+          description: ISO 3166-1 alpha-2 country code the requirement applies to. Null for a requirement that applies everywhere.
+        filenames:
+          type: array
+          items:
+            type: string
+          description: Names of the files submitted against this requirement. Empty array when nothing has been submitted.
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the submission was created. Carries the same value as `uploaded_at`.
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the submission was last changed. Null when nothing has been submitted.
+        description:
+          type: string
+          description: What the document asks for, in the worker language. Empty string when the requirement has no description.
+        is_required:
+          type: boolean
+          description: 'Whether the worker has to submit this document. A requirement with a 30-day grace period after the employment start reads `true`: it is required, only not immediately.'
+        uploaded_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the submission was created. Null when nothing has been submitted.
+        has_template:
+          type: boolean
+          description: Whether a template is provided for this document.
+        submission_status:
+          type:
+          - string
+          - 'null'
+          description: Reads `REVIEWING` while a submission is not final yet. Null at every other time.
+        is_consent_required:
+          type: boolean
+          description: Whether the worker has to consent. Present only for acknowledgement-only documents that declare the flag.
+        is_acknowledgement_only_document:
+          type: boolean
+          description: Whether the document only has to be acknowledged, with no file to submit.
+      required:
+      - id
+      - name
+      - country
+      - filenames
+      - created_at
+      - updated_at
+      - description
+      - is_required
+      - uploaded_at
+      - has_template
+      - submission_status
+      - is_acknowledgement_only_document
+      title: WorkersContractsContractIdComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataItems
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumberType:
+      type: string
+      enum:
+      - SSN
+      - ITIN
+      - EIN
+      description: Tax ID type. SSN/ITIN for individuals; EIN also allowed for disregarded entities.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf0TaxNumberType
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItems:
+      oneOf:
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W9_INDIVIDUAL
+            description: 'Discriminator value: W9_INDIVIDUAL'
+          id:
+            type: string
+            format: uuid
+            description: The public ID (UUID) of the tax form.
+          city:
+            type:
+            - string
+            - 'null'
+            description: City name.
+          state:
+            type:
+            - string
+            - 'null'
+            description: State or province code.
+          address:
+            type: string
+            description: Street address of permanent residence.
+          country:
+            type: string
+            description: ISO 3166-1 alpha-2 country code of permanent residence.
+          pdf_url:
+            type:
+            - string
+            - 'null'
+            description: Pre-signed download URL for the generated form PDF. The link expires about 15 minutes after the response is issued — download promptly or request the list again. Null while the PDF has not been generated yet.
+          zip_code:
+            type: string
+            description: ZIP/postal code.
+          last_name:
+            type: string
+            description: Legal last name. Present on W9_INDIVIDUAL and W8_BEN forms.
+          created_at:
+            type: string
+            format: date-time
+            description: Timestamp of when the tax form was created.
+          first_name:
+            type: string
+            description: Legal first name. Present on W9_INDIVIDUAL and W8_BEN forms.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf0TaxNumber'
+            description: Taxpayer identification number. Returned unmasked.
+          updated_at:
+            type: string
+            format: date-time
+            description: Timestamp of when the tax form was last updated.
+          middle_name:
+            type: string
+            description: Legal middle name. Present on W9_INDIVIDUAL and W8_BEN forms.
+          business_name:
+            type:
+            - string
+            - 'null'
+            description: Business name. Present on W9_COMPANY forms and disregarded-entity W9_INDIVIDUAL forms.
+          contractor_signature:
+            type: string
+            description: The signer's digital signature.
+          is_disregarded_entity:
+            type: boolean
+            description: Whether this is a disregarded entity. Present on W9_INDIVIDUAL and W8_BEN forms.
+          client_legal_entity_id:
+            type: string
+            format: uuid
+            description: Public ID of the client's legal entity the form was submitted against.
+          is_subject_backup_withholding:
+            type: boolean
+            description: Whether the contractor is subject to backup withholding. Present on W-9 forms.
+        required:
+        - form_type
+        - id
+        - created_at
+        - updated_at
+        - client_legal_entity_id
+        description: W9_INDIVIDUAL variant
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W9_COMPANY
+            description: 'Discriminator value: W9_COMPANY'
+          id:
+            type: string
+            format: uuid
+            description: The public ID (UUID) of the tax form.
+          city:
+            type:
+            - string
+            - 'null'
+            description: City name.
+          state:
+            type:
+            - string
+            - 'null'
+            description: State or province code.
+          address:
+            type: string
+            description: Street address of permanent residence.
+          country:
+            type: string
+            description: ISO 3166-1 alpha-2 country code of permanent residence.
+          pdf_url:
+            type:
+            - string
+            - 'null'
+            description: Pre-signed download URL for the generated form PDF. The link expires about 15 minutes after the response is issued — download promptly or request the list again. Null while the PDF has not been generated yet.
+          zip_code:
+            type: string
+            description: ZIP/postal code.
+          created_at:
+            type: string
+            format: date-time
+            description: Timestamp of when the tax form was created.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1TaxNumber'
+            description: Taxpayer identification number. Returned unmasked.
+          updated_at:
+            type: string
+            format: date-time
+            description: Timestamp of when the tax form was last updated.
+          business_name:
+            type:
+            - string
+            - 'null'
+            description: Business name. Present on W9_COMPANY forms and disregarded-entity W9_INDIVIDUAL forms.
+          doing_business_as:
+            type:
+            - string
+            - 'null'
+            description: DBA name. Present on W9_COMPANY forms.
+          contractor_signature:
+            type: string
+            description: The signer's digital signature.
+          client_legal_entity_id:
+            type: string
+            format: uuid
+            description: Public ID of the client's legal entity the form was submitted against.
+          federal_tax_classification:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf1FederalTaxClassification'
+            description: Federal tax classification. Present on W9_COMPANY forms.
+          is_subject_backup_withholding:
+            type: boolean
+            description: Whether the contractor is subject to backup withholding. Present on W-9 forms.
+        required:
+        - form_type
+        - id
+        - created_at
+        - updated_at
+        - client_legal_entity_id
+        description: W9_COMPANY variant
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W8_BEN
+            description: 'Discriminator value: W8_BEN'
+          id:
+            type: string
+            format: uuid
+            description: The public ID (UUID) of the tax form.
+          city:
+            type:
+            - string
+            - 'null'
+            description: City name.
+          state:
+            type:
+            - string
+            - 'null'
+            description: State or province code.
+          address:
+            type: string
+            description: Street address of permanent residence.
+          country:
+            type: string
+            description: ISO 3166-1 alpha-2 country code of permanent residence.
+          pdf_url:
+            type:
+            - string
+            - 'null'
+            description: Pre-signed download URL for the generated form PDF. The link expires about 15 minutes after the response is issued — download promptly or request the list again. Null while the PDF has not been generated yet.
+          zip_code:
+            type: string
+            description: ZIP/postal code.
+          last_name:
+            type: string
+            description: Legal last name. Present on W9_INDIVIDUAL and W8_BEN forms.
+          created_at:
+            type: string
+            format: date-time
+            description: Timestamp of when the tax form was created.
+          first_name:
+            type: string
+            description: Legal first name. Present on W9_INDIVIDUAL and W8_BEN forms.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2TaxNumber'
+            description: Foreign taxpayer identification number. Returned unmasked.
+          updated_at:
+            type: string
+            format: date-time
+            description: Timestamp of when the tax form was last updated.
+          middle_name:
+            type: string
+            description: Legal middle name. Present on W9_INDIVIDUAL and W8_BEN forms.
+          address_line2:
+            type:
+            - string
+            - 'null'
+            description: Street address line 2. Present on W8_BEN and W8_BEN_E forms.
+          date_of_birth:
+            type:
+            - string
+            - 'null'
+            format: date-time
+            description: Date of birth. Present on W8_BEN and W8_BEN_E forms.
+          us_tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2UsTaxNumber'
+            description: US Taxpayer Identification Number. Present on W8_BEN and W8_BEN_E forms. Returned unmasked.
+          mailing_address:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2MailingAddress'
+            - type: 'null'
+            description: Mailing address if different from permanent residence. Present on W8_BEN and W8_BEN_E forms.
+          contractor_signature:
+            type: string
+            description: The signer's digital signature.
+          print_name_of_signer:
+            type:
+            - string
+            - 'null'
+            description: Printed name of the signer. Present on W-8 forms.
+          is_disregarded_entity:
+            type: boolean
+            description: Whether this is a disregarded entity. Present on W9_INDIVIDUAL and W8_BEN forms.
+          is_tax_treaty_enabled:
+            type:
+            - boolean
+            - 'null'
+            description: Whether tax treaty benefits are claimed. Present on W-8 forms.
+          client_legal_entity_id:
+            type: string
+            format: uuid
+            description: Public ID of the client's legal entity the form was submitted against.
+          country_of_citizenship:
+            type: string
+            description: ISO 3166-1 alpha-2 country code of citizenship (W8_BEN) or incorporation (W8_BEN_E).
+          is_certified_and_agreed:
+            type:
+            - boolean
+            - 'null'
+            description: Certification that the signer has read and agrees with the certification information. Present on W8_BEN forms.
+          referencing_information:
+            type:
+            - string
+            - 'null'
+            description: Reference number for the form. Present on W-8 forms.
+          tax_treaty_benefits_form:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2TaxTreatyBenefitsForm'
+            - type: 'null'
+            description: Tax treaty benefits details. Present when treaty benefits are claimed.
+          is_ftin_not_legally_required:
+            type: boolean
+            description: Whether an FTIN is not legally required in the country of residence. Present on W-8 forms.
+        required:
+        - form_type
+        - id
+        - created_at
+        - updated_at
+        - client_legal_entity_id
+        description: W8_BEN variant
+      - type: object
+        properties:
+          form_type:
+            type: string
+            enum:
+            - W8_BEN_E
+            description: 'Discriminator value: W8_BEN_E'
+          id:
+            type: string
+            format: uuid
+            description: The public ID (UUID) of the tax form.
+          city:
+            type:
+            - string
+            - 'null'
+            description: City name.
+          giin:
+            type:
+            - string
+            - 'null'
+            description: Global Intermediary Identification Number. Present on W8_BEN_E forms.
+          state:
+            type:
+            - string
+            - 'null'
+            description: State or province code.
+          address:
+            type: string
+            description: Street address of permanent residence.
+          country:
+            type: string
+            description: ISO 3166-1 alpha-2 country code of permanent residence.
+          pdf_url:
+            type:
+            - string
+            - 'null'
+            description: Pre-signed download URL for the generated form PDF. The link expires about 15 minutes after the response is issued — download promptly or request the list again. Null while the PDF has not been generated yet.
+          zip_code:
+            type: string
+            description: ZIP/postal code.
+          created_at:
+            type: string
+            format: date-time
+            description: Timestamp of when the tax form was created.
+          tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxNumber'
+            description: Foreign taxpayer identification number. Returned unmasked.
+          updated_at:
+            type: string
+            format: date-time
+            description: Timestamp of when the tax form was last updated.
+          entity_type:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3EntityType'
+            description: Chapter 3 entity type. Present on W8_BEN_E forms.
+          fatca_status:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3FatcaStatus'
+            description: FATCA (Foreign Account Tax Compliance Act) status. Present on W8_BEN_E forms.
+          address_line2:
+            type:
+            - string
+            - 'null'
+            description: Street address line 2. Present on W8_BEN and W8_BEN_E forms.
+          date_of_birth:
+            type:
+            - string
+            - 'null'
+            format: date-time
+            description: Date of birth. Present on W8_BEN and W8_BEN_E forms.
+          us_tax_number:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3UsTaxNumber'
+            description: US Taxpayer Identification Number. Present on W8_BEN and W8_BEN_E forms. Returned unmasked.
+          entity_country:
+            type:
+            - string
+            - 'null'
+            description: ISO 3166-1 alpha-2 country code of the entity. Present on W8_BEN_E forms.
+          mailing_address:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3MailingAddress'
+            - type: 'null'
+            description: Mailing address if different from permanent residence. Present on W8_BEN and W8_BEN_E forms.
+          contractor_signature:
+            type: string
+            description: The signer's digital signature.
+          name_of_organization:
+            type: string
+            description: Name of the organization. Present on W8_BEN_E forms.
+          print_name_of_signer:
+            type:
+            - string
+            - 'null'
+            description: Printed name of the signer. Present on W-8 forms.
+          is_tax_treaty_enabled:
+            type:
+            - boolean
+            - 'null'
+            description: Whether tax treaty benefits are claimed. Present on W-8 forms.
+          client_legal_entity_id:
+            type: string
+            format: uuid
+            description: Public ID of the client's legal entity the form was submitted against.
+          country_of_citizenship:
+            type: string
+            description: ISO 3166-1 alpha-2 country code of citizenship (W8_BEN) or incorporation (W8_BEN_E).
+          referencing_information:
+            type:
+            - string
+            - 'null'
+            description: Reference number for the form. Present on W-8 forms.
+          has_substantial_us_owner:
+            type: boolean
+            description: Whether the entity has a substantial US owner. Present on W8_BEN_E forms.
+          tax_treaty_benefits_form:
+            oneOf:
+            - $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxTreatyBenefitsForm'
+            - type: 'null'
+            description: Tax treaty benefits details. Present when treaty benefits are claimed.
+          name_of_disregarded_entity:
+            type:
+            - string
+            - 'null'
+            description: Name of the disregarded entity, if applicable. Present on W8_BEN_E forms.
+          is_ftin_not_legally_required:
+            type: boolean
+            description: Whether an FTIN is not legally required in the country of residence. Present on W-8 forms.
+          is_entity_certification_confirmed:
+            type:
+            - boolean
+            - 'null'
+            description: Certification that the entity is the beneficial owner of all income. Present on W8_BEN_E forms.
+        required:
+        - form_type
+        - id
+        - created_at
+        - updated_at
+        - client_legal_entity_id
+        description: W8_BEN_E variant
+      discriminator:
+        propertyName: form_type
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItems
+    WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaDataDocumentsItems'
+          description: List of compliance documents required for the worker.
+      required:
+      - documents
+      title: WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaData
+    CreateWorker-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateWorker-v2026-01-01RequestInternalServerError
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumberType:
+      type: string
+      enum:
+      - FTIN
+      description: Foreign tax ID type.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf3TaxNumberType
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassification:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationType'
+          description: Federal tax classification type.
+        llc_classification:
+          $ref: '#/components/schemas/WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationLlcClassification'
+          description: LLC sub-classification. Required when type is 'LLC'.
+        other_additional_information:
+          type: string
+          maxLength: 100
+          description: Additional information. Required when type is 'OTHER'.
+      required:
+      - type
+      description: Federal tax classification.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassification
+    WorkerPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 5
+          description: Worker's email address
+        company:
+          $ref: '#/components/schemas/WorkerPostRequestBodyContentApplicationJsonSchemaDataCompany'
+        timezone:
+          type: string
+          description: Worker's timezone
+        last_name:
+          type: string
+          minLength: 1
+          description: Worker's last name
+        first_name:
+          type: string
+          minLength: 1
+          description: Worker's first name
+        contract_id:
+          type: string
+          minLength: 1
+          description: Associated contract ID
+        middle_name:
+          type:
+          - string
+          - 'null'
+          description: Worker's middle name
+        profile_type:
+          $ref: '#/components/schemas/WorkerPostRequestBodyContentApplicationJsonSchemaDataProfileType'
+          description: Type of worker profile
+        preferred_name:
+          type:
+          - string
+          - 'null'
+          description: Worker's preferred name
+        preferred_lastName:
+          type:
+          - string
+          - 'null'
+          description: Worker's preferred last name
+        preferred_firstname:
+          type:
+          - string
+          - 'null'
+          description: Worker's preferred first name
+      required:
+      - email
+      - company
+      - timezone
+      - last_name
+      - first_name
+      - contract_id
+      - profile_type
+      title: WorkerPostRequestBodyContentApplicationJsonSchemaData
+    Workers_listTaxFormsForAWorker-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: The worker's tax forms, newest first.
+        has_more:
+          type: boolean
+          description: Whether more tax forms exist beyond this page.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to pass as the cursor query parameter to fetch the next page. Null when has_more is false.
+        total_count:
+          type: integer
+          description: Total number of the worker's tax forms across all pages.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: Workers_listTaxFormsForAWorker-v2026-01-01_Response_200
+    CompleteIndividualContractorProfileSetup-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingWorkersIndividualPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CompleteIndividualContractorProfileSetup-v2026-01-01RequestBadRequestError
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumberType'
+          description: Tax ID type. EIN for most entities; SSN/ITIN/EIN for LLC.
+        value:
+          type: string
+          description: Tax ID value.
+      required:
+      - type
+      - value
+      description: Taxpayer identification number.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1TaxNumber
+    GetInvoiceDetailsById-v2026-04-27RequestPreconditionFailedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetInvoiceDetailsById-v2026-04-27RequestPreconditionFailedError
+    DownloadWorkerContractComplianceDocument-v2026-08-25RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: DownloadWorkerContractComplianceDocument-v2026-08-25RequestBadRequestError
+    IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/IcWorkersInvoicesInvoiceIdPdfGetResponsesContentApplicationJsonSchemaRequest'
+          description: Present for some public API responses (e.g. when x-is-api-call is set).
+      required:
+      - errors
+      title: IcWorkersInvoicesInvoiceIdPdf-v2026-01-01RequestForbiddenError
+    WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationType:
+      type: string
+      enum:
+      - C_CORPORATION
+      - S_CORPORATION
+      - OTHER
+      - PARTNERSHIP
+      - LLC
+      - TRUST_ESTATE
+      description: Federal tax classification type.
+      title: WorkersTaxFormsPostRequestBodyContentApplicationJsonSchemaDataOneOf1FederalTaxClassificationType
+    DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: DeleteWorkerContractComplianceDocumentSubmission-v2026-08-25RequestForbiddenError
+    ListOfWorkerComplianceDocuments-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersComplianceDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListOfWorkerComplianceDocuments-v2026-01-01RequestInternalServerError
+    ListTaxFormsForAWorker-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListTaxFormsForAWorker-v2026-01-01RequestInternalServerError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2MailingAddress:
+      type: object
+      properties:
+        city:
+          type:
+          - string
+          - 'null'
+          description: Mailing address city.
+        state:
+          type:
+          - string
+          - 'null'
+          description: Mailing address state.
+        address:
+          type: string
+          description: Mailing address.
+        country:
+          type: string
+          description: ISO 3166-1 alpha-2 country code.
+        zip_code:
+          type: string
+          description: Mailing address ZIP/postal code.
+        address_line2:
+          type:
+          - string
+          - 'null'
+          description: Mailing address line 2.
+      description: Mailing address if different from permanent residence. Present on W8_BEN and W8_BEN_E forms.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2MailingAddress
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2TaxNumberType'
+          description: Tax ID type.
+        value:
+          type: string
+          description: Tax ID value, unmasked.
+      description: Foreign taxpayer identification number. Returned unmasked.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2TaxNumber
+    GetWorkerContractComplianceDocument-v2026-08-25RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: GetWorkerContractComplianceDocument-v2026-08-25RequestUnauthorizedError
+    CreateATaxFormForAWorker-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersTaxFormsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateATaxFormForAWorker-v2026-01-01RequestBadRequestError
+    OnboardingWorkersIndividualPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: OnboardingWorkersIndividualPostResponsesContentApplicationJsonSchemaErrorsItems
+    DownloadWorkerContractComplianceDocument-v2026-08-25RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdDownloadGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: DownloadWorkerContractComplianceDocument-v2026-08-25RequestNotFoundError
+    SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkersContractsContractIdComplianceDocumentsDocumentIdPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that occurred while processing the request.
+      required:
+      - errors
+      title: SubmitWorkerContractComplianceDocumentFiles-v2026-08-25RequestNotFoundError
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2TaxTreatyBenefitsForm:
+      type: object
+      properties:
+        details:
+          type: string
+          description: Additional details about the treaty claim.
+        type_of_income:
+          type: string
+          description: Type of income covered by the treaty.
+        withholding_rate:
+          type: number
+          format: double
+          description: Withholding rate under the treaty (percentage).
+        article_and_paragraph:
+          type: string
+          description: Article and paragraph of the applicable tax treaty.
+        owner_resident_country:
+          type: string
+          description: Country of residence of the beneficial owner.
+      description: Tax treaty benefits details. Present when treaty benefits are claimed.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf2TaxTreatyBenefitsForm
+    WorkerPostRequestBodyContentApplicationJsonSchemaDataCompany:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyType'
+          description: Type of company registration
+        personal:
+          $ref: '#/components/schemas/WorkerPostRequestBodyContentApplicationJsonSchemaDataCompanyPersonal'
+      required:
+      - type
+      - personal
+      title: WorkerPostRequestBodyContentApplicationJsonSchemaDataCompany
+    WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2TaxTreatyBenefitsForm:
+      type: object
+      properties:
+        details:
+          type: string
+          maxLength: 400
+          description: Additional details about the treaty claim.
+        type_of_income:
+          type: string
+          maxLength: 100
+          description: Type of income covered by the treaty.
+        withholding_rate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Withholding rate under the treaty (percentage).
+        article_and_paragraph:
+          type: string
+          maxLength: 100
+          description: Article and paragraph of the applicable tax treaty.
+        owner_resident_country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country of residence of the beneficial owner. Must be a US income tax treaty country.
+      description: Tax treaty benefits details. Applicable when is_tax_treaty_enabled is true.
+      title: WorkersTaxFormsTaxFormIdPutRequestBodyContentApplicationJsonSchemaDataOneOf2TaxTreatyBenefitsForm
+    OnboardingWorkersIndividualPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        abn:
+          type: string
+          description: Australian Business Number (11 digits).
+        ssn:
+          type: string
+          description: Social Security Number (9 digits).
+        zip:
+          type: string
+          description: Postal or ZIP code.
+        city:
+          type: string
+          description: City of residence.
+        phone:
+          type: string
+          description: Phone number in E.164 format.
+        street:
+          type: string
+          description: Street address of the contractor.
+        citizen:
+          type: string
+          description: Citizenship country as an ISO 3166-1 alpha-2 code.
+        country:
+          type: string
+          description: Country of residence as an ISO 3166-1 alpha-2 code.
+        id_type:
+          type: string
+          description: Type of identification document provided.
+        province:
+          type: string
+          description: Province or state code within the country.
+        timezone:
+          type: string
+          description: IANA timezone identifier.
+        profile_id:
+          type: integer
+          description: Internal profile identifier for the contractor.
+        personal_id:
+          type: string
+          description: Passport or national ID number.
+        company_type:
+          type: string
+          description: Type of company set up for the contractor.
+        legal_status:
+          type: string
+          description: Legal status of the individual contractor.
+        address_valid:
+          type: boolean
+          description: Whether the provided address has been validated.
+        tax_residence:
+          type: string
+          description: Tax residence country as an ISO 3166-1 alpha-2 code.
+        onboarding_step:
+          type:
+          - string
+          - 'null'
+          description: Current onboarding step after setup completes.
+        entity_tax_residence:
+          type: string
+          description: Tax residence country for the entity, if different from the individual.
+        address_confirmed_by_user:
+          type: boolean
+          description: Whether the user has confirmed the address is correct.
+      required:
+      - profile_id
+      - company_type
+      title: OnboardingWorkersIndividualPostResponsesContentApplicationJsonSchemaData
+    WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxNumber:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxNumberType'
+          description: Tax ID type.
+        value:
+          type: string
+          description: Tax ID value, unmasked.
+      description: Foreign taxpayer identification number. Returned unmasked.
+      title: WorkersTaxFormsGetResponsesContentApplicationJsonSchemaDataItemsOneOf3TaxNumber
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

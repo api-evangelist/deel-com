@@ -1,0 +1,3734 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Onboarding API
+  version: 1.0.0
+  description: API endpoints related to Onboarding.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: Onboarding
+  description: API endpoints related to Onboarding.
+paths:
+  /onboarding/tracker/hris_profile/{hris_profile_id}:
+    get:
+      operationId: onboarding_getOnboardingDetailsByEmployeeHrisProfileId-v2026-01-01
+      summary: Get onboarding details by employee HRIS profile ID
+      description: 'Use this endpoint to see where one worker is in onboarding and what is needed next, when you hold their HRIS profile ID, for example from `GET /people` or `hris_profile.oid` on the onboarding tracker list. It covers the worker''s main contract and lists their other contracts.
+
+
+        **Token scopes**: `contracts:read`, `people:read`'
+      tags:
+      - Onboarding
+      parameters:
+      - name: hris_profile_id
+        in: path
+        description: The unique identifier of the employee HRIS profile.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Onboarding overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Onboarding_getOnboardingDetailsByEmployeeHrisProfileId-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request. The HRIS profile ID is not a valid HRIS profile ID, returned as `errors.errors`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOnboardingDetailsByEmployeeHrisProfileId-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found - No onboarding exists for the provided HRIS profile ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOnboardingDetailsByEmployeeHrisProfileId-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /onboarding/tracker/{tracker_id}:
+    get:
+      operationId: onboarding_getOnboardingDetailsByOnboardingTrackerId-v2026-01-01
+      summary: Get onboarding details by onboarding tracker ID
+      description: 'Use this endpoint to see where one worker is in onboarding and what is needed next, when you hold their tracker ID, the `unique_id` of a row on the onboarding tracker list. It covers the contract that row is about and lists the worker''s other contracts.
+
+
+        **Token scopes**: `contracts:read`, `people:read`'
+      tags:
+      - Onboarding
+      parameters:
+      - name: tracker_id
+        in: path
+        description: The unique identifier of the onboarding tracker.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Onboarding overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Onboarding_getOnboardingDetailsByOnboardingTrackerId-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request. The tracker ID cannot be read, returned as `errors.errors`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOnboardingDetailsByOnboardingTrackerId-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found - No onboarding exists for the provided onboarding tracker ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOnboardingDetailsByOnboardingTrackerId-v2026-01-01RequestNotFoundError'
+        '412':
+          description: Precondition Failed. The tracker ID can be read but is not one the tracker returns
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOnboardingDetailsByOnboardingTrackerId-v2026-01-01RequestPreconditionFailedError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /onboarding/tracker:
+    get:
+      operationId: onboarding_listOnboardingEmployees-v2026-01-01
+      summary: List onboarding employees
+      description: 'Use this endpoint to monitor workers as they progress through onboarding and identify onboarding records that require follow-up.
+
+
+        **Token scopes**: `contracts:read`, `people:read`'
+      tags:
+      - Onboarding
+      parameters:
+      - name: search
+        in: query
+        description: Search term to filter contracts by name or other attributes
+        required: false
+        schema:
+          type: string
+          maxLength: 255
+      - name: contractOid
+        in: query
+        description: Search attribute to filter onboarding list by contract id
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          default: []
+      - name: hiringTypes
+        in: query
+        description: Search attribute to filter onboarding list by hiring type
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetParametersHiringTypesSchemaItems'
+          default: []
+      - name: progressStatuses
+        in: query
+        description: Search attribute to filter onboarding list by progress status
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetParametersProgressStatusesSchemaItems'
+          default: []
+      - name: countries
+        in: query
+        description: Filter by contract country. Uses ISO 3166-1 alpha-2 codes.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          default: []
+      - name: teams
+        in: query
+        description: Search attribute to filter onboarding list by team
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          default: []
+      - name: legalEntities
+        in: query
+        description: Search attribute to filter onboarding list by legal entity
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          default: []
+      - name: hrisDirectManagers
+        in: query
+        description: Search attribute to filter onboarding list by HRIS direct manager. Expects the manager's HRIS profile ID, as returned by `GET /people` in `employments[].team.direct_manager_id` — not a worker or contract ID.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+          default: []
+      - name: fromDate
+        in: query
+        description: Start date for filtering contracts
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: toDate
+        in: query
+        description: End date for filtering contracts
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: actions
+        in: query
+        description: Filter by whether the onboarding is waiting on an action from the client
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetParametersActionsSchemaItems'
+          default: []
+      - name: lifecycleStatuses
+        in: query
+        description: Filter by lifecycle status, the same value each item returns in `progress.lifecycle_status`
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetParametersLifecycleStatusesSchemaItems'
+          default: []
+      - name: waitingOnParties
+        in: query
+        description: Filter by the party the onboarding is waiting on, the same value each item returns in `progress.waiting_on`
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetParametersWaitingOnPartiesSchemaItems'
+          default: []
+      - name: card
+        in: query
+        description: Narrow the list to the workers one filter card counts. `STARTING_THIS_WEEK` also needs `weekFromDate` and `weekToDate`.
+        required: false
+        schema:
+          $ref: '#/components/schemas/OnboardingTrackerGetParametersCard'
+      - name: weekFromDate
+        in: query
+        description: First day of the week the `STARTING_THIS_WEEK` card counts, in the caller's timezone
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: weekToDate
+        in: query
+        description: Last day of the week the `STARTING_THIS_WEEK` card counts, in the caller's timezone. On or after `weekFromDate`
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        description: Number of results to return per page. Ignored when `cursor` is supplied — a cursor already carries the page size and filters of the request that produced it.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 20
+      - name: sort_by
+        in: query
+        description: Field to sort by
+        required: false
+        schema:
+          $ref: '#/components/schemas/OnboardingTrackerGetParametersSortBy'
+          default: progressStatusWeight
+      - name: sort_order
+        in: query
+        description: Sorting order
+        required: false
+        schema:
+          $ref: '#/components/schemas/OnboardingTrackerGetParametersSortOrder'
+          default: ASC
+      - name: cursor
+        in: query
+        description: Cursor for pagination, taken from `page.cursor` of the previous response. It replaces the other query parameters, which are carried over from the request that produced it.
+        required: false
+        schema:
+          type: string
+      - name: include_overview
+        in: query
+        description: Include an overview of the contract
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: A list of onboarding and their details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Onboarding_listOnboardingEmployees-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request. A query parameter outside its declared values, format or length returns `errors` as a list, one item per failing parameter. A combination of parameters the endpoint rejects, such as `card=STARTING_THIS_WEEK` without `weekFromDate`, returns `errors.errors`. A cursor that cannot be read returns `errors` as a list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOnboardingEmployees-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    Onboarding_getOnboardingDetailsByOnboardingTrackerId-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaData'
+      title: Onboarding_getOnboardingDetailsByOnboardingTrackerId-v2026-01-01_Response_200
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the legal entity
+        name:
+          type:
+          - string
+          - 'null'
+          description: The name of the legal entity. A Deel entity that a contractor of record works under ends in (COR)
+      description: The legal entity the contract sits under. Null when there is none
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsEntity
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractEmployeeAgreement:
+      type: object
+      properties:
+        phase:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractEmployeeAgreementPhase'
+          - type: 'null'
+          description: Signing-lifecycle phase that produced the current Employment Agreement PDF. Can be null if the EA has not yet been generated
+        status:
+          type:
+          - string
+          - 'null'
+          description: Status of the Employment Agreement. Can be null if the EA has not yet been generated
+        version_hash:
+          type:
+          - string
+          - 'null'
+          description: Version of the Employment Agreement. Can be null if the EA has not yet been generated
+      description: Information about the Employment Agreement
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractEmployeeAgreement
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractEor:
+      type: object
+      properties:
+        is_unassigned_candidate:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the candidate still waits to be assigned through the Deel interview process
+        has_additional_active_eor_contracts:
+          type: boolean
+          description: Whether the employee has other active EOR contracts
+      description: Only for an EOR contract
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractEor
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsGroup:
+      type: string
+      enum:
+      - COMPLETED
+      - OUTSTANDING
+      description: Whether the worker still owes the step
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsGroup
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProgress:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Current status of the onboarding process (e.g., ACTIVE)
+        sub_status:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProgressSubStatus'
+          - type: 'null'
+          description: Finer state within the status, when there is one
+        reference_date:
+          type: string
+          format: date-time
+          description: Reference date for the progress
+        subject_to_overdue:
+          type: boolean
+          description: Indicates if the onboarding is subject to overdue
+        reference_date_timezone:
+          type: string
+          description: Timezone of the reference date
+        is_action_required_from_client:
+          type: boolean
+          description: Indicates if action is required from the client
+      description: Progress of the onboarding process
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProgress
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAppExperience:
+      type: object
+      properties:
+        experience_type:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAppExperienceExperienceType'
+          - type: 'null'
+          description: The app experience the employee is given, when there is a specific one
+        is_minimal_requirements:
+          type: boolean
+          description: Whether the worker gets the minimal app experience, as a person without a contract does
+      description: The app experience of the employee
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAppExperience
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBanner:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBannerKey'
+          description: What the banner is about
+        action:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBannerAction'
+          - type: 'null'
+          description: What the client can do about it, when there is something
+        severity:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBannerSeverity'
+          description: How serious it is
+      description: The one thing worth saying about this worker, or null when there is nothing
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBanner
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataAppExperienceExperienceType:
+      type: string
+      enum:
+      - LIGHTWEIGHT
+      description: The app experience the employee is given, when there is a specific one
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataAppExperienceExperienceType
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsState:
+      type: string
+      enum:
+      - NOT_STARTED
+      - IN_PROGRESS
+      - IN_REVIEW
+      - COMPLETED
+      - OVERDUE
+      description: State of the step, reported the same way for every worker type
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsState
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklist:
+      type: object
+      properties:
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItems'
+          description: List of checklist steps
+        summary:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistSummary'
+          description: How far along the checklist is
+      description: List of checklist steps
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklist
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrors:
+      oneOf:
+      - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrors0'
+      - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrors1'
+      description: The errors, as an object with an `errors` list, or as the list
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrors
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoiceStatus:
+      type: string
+      enum:
+      - OPEN
+      - PENDING
+      - SKIPPED
+      - PREPROCESSING
+      - PROCESSING
+      - CREDITED
+      - PROCESSED
+      - PAID
+      - FAILED
+      - CANCELLED
+      - REFUNDED
+      - UNPAYABLE
+      - AWAITING_PAYMENT
+      description: Status of the invoice
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoiceStatus
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItemsDataEmailsItems:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItemsDataEmailsItemsMeta'
+          description: Email metadata
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItemsDataEmailsItems
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      - type: string
+        format: date-time
+      - type: object
+        additionalProperties:
+          description: Any type
+      description: Value of the summary item
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsValue
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsAppExperience:
+      type: object
+      properties:
+        experience_type:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsAppExperienceExperienceType'
+          - type: 'null'
+          description: The app experience the employee is given, when there is a specific one
+        is_minimal_requirements:
+          type: boolean
+          description: Indicates if the employee meets minimal requirements
+      description: The app experience of the employee
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsAppExperience
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgress:
+      type: object
+      properties:
+        steps:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressSteps'
+          - type: 'null'
+          description: 'Onboarding checklist step counts per state. Null when the counts are not available: the worker has no checklist yet, the row is a contractor draft or a draft quote, or the steps could not be read'
+        status:
+          type: string
+          description: Current status of the onboarding
+        sub_status:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressSubStatus'
+          - type: 'null'
+          description: Finer state within the status, when there is one
+        waiting_on:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressWaitingOn'
+          - type: 'null'
+          description: The party whose action the onboarding waits on. Null when nothing is outstanding, which includes a settled onboarding (READY_TO_START, ACTIVE, OFFBOARDING, INACTIVE) with no client action required
+        reference_date:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressReferenceDate'
+          description: The reference date determining the onboarding status
+        lifecycle_status:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressLifecycleStatus'
+          description: Lifecycle status of this contract, the same value the People list shows for it
+        people_list_status:
+          type: string
+          description: Status of the people list
+        subject_to_overdue:
+          type: boolean
+          description: Whether the onboarding is subject to overdue
+        onboarding_due_date:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressOnboardingDueDate'
+          description: Due date for onboarding
+        reference_date_type:
+          type:
+          - string
+          - 'null'
+          description: Type of the reference date (e.g., EFFECTIVE_DATE)
+        reference_date_timezone:
+          type:
+          - string
+          - 'null'
+          description: Timezone of the reference date
+        is_action_required_from_client:
+          type:
+          - boolean
+          - 'null'
+          description: Whether action is required from the client
+      description: The progress state of the onboarding
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgress
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBannerKey:
+      type: string
+      enum:
+      - DOCUMENT_REJECTED
+      - ONBOARDING_OVERDUE
+      - ONBOARDING_AT_RISK
+      - START_DATE_PASSED_WITHOUT_INVITE
+      - EMPLOYEE_AGREEMENT_AWAITING_REVIEW
+      - AWAITING_DEPOSIT_PAYMENT
+      - CONTRACT_REDLINING
+      - CONTRACT_AMENDMENTS_IN_PROGRESS
+      - QUOTE_REQUIRES_CHANGES
+      - DRAFT_QUOTE
+      - CONTRACT_DRAFT
+      - QUOTE_READY_TO_ACCEPT
+      - NO_APP_ACCESS
+      - NO_ONBOARDING_STEPS
+      - IN_REVIEW_WITH_DEEL
+      - IN_OFFER_STAGE
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      description: What the banner is about
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBannerKey
+    OnboardingTrackerGetParametersWaitingOnPartiesSchemaItems:
+      type: string
+      enum:
+      - WORKER
+      - CLIENT
+      - DEEL
+      description: Party the onboarding is waiting on
+      title: OnboardingTrackerGetParametersWaitingOnPartiesSchemaItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewAppExperience:
+      type: object
+      properties:
+        experience_type:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewAppExperienceExperienceType'
+          - type: 'null'
+          description: The app experience the employee is given, when there is a specific one
+        is_minimal_requirements:
+          type: boolean
+          description: Whether the worker gets the minimal app experience, as a person without a contract does
+      description: The app experience of the employee
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewAppExperience
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItemsStatus:
+      type: string
+      enum:
+      - SENT
+      - DISABLED
+      - SUSPENDED
+      - SCHEDULED
+      - FAILED
+      description: Status of the invitation
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItemsStatus
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal ID of the profile
+        name:
+          type: string
+          description: Name associated with the profile
+        email:
+          type: string
+          format: email
+          description: Email of the profile
+        country:
+          type:
+          - string
+          - 'null'
+          description: Country code
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the profile picture
+        last_login:
+          type: string
+          format: date-time
+          description: Last login timestamp
+        paid_invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfilePaidInvoicesItems'
+          description: A paid invoice on the contract, if any, at most one. Only for a contractor, empty for other worker types
+        previously_onboarded:
+          type: boolean
+          description: Indicates if the contractor has previously onboarded
+      description: Employee profile information
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfile
+    OnboardingTrackerGetParametersSortOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      default: ASC
+      title: OnboardingTrackerGetParametersSortOrder
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProgressSubStatus:
+      type: string
+      enum:
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      - AWAITING_CLIENT_REVIEW
+      - CANCELLED
+      - REJECTED
+      description: Finer state within the status, when there is one
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProgressSubStatus
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        banner:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBanner'
+          - type: 'null'
+          description: The one thing worth saying about this worker, or null when there is nothing
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataActionsItems'
+          description: Actions the caller can take on this onboarding
+        profile:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProfile'
+          - type: 'null'
+          description: Employee profile information
+        stepper:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItems'
+          description: List of stepper actions taken during the onboarding process
+        summary:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItems'
+          description: Summary of the onboarding process
+        contract:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContract'
+          description: Information about the contract
+        progress:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProgress'
+          description: Progress of the onboarding process
+        checklist:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklist'
+          description: List of checklist steps
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItems'
+          description: Every contract of the worker the caller can see, the main one first
+        hiring_type:
+          type: string
+          description: Hiring type (e.g., contractor)
+        hris_profile:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfile'
+          description: Employee HRIS profile information
+        app_experience:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataAppExperience'
+          description: The app experience of the employee
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaData
+    GetOnboardingDetailsByOnboardingTrackerId-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrors'
+          description: The errors the endpoint returned
+        request:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details
+      required:
+      - errors
+      title: GetOnboardingDetailsByOnboardingTrackerId-v2026-01-01RequestBadRequestError
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItems:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Details of the step, which vary by step
+        type:
+          type: string
+          description: The type of checklist step
+        group:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsGroup'
+          description: Whether the worker still owes the step
+        label:
+          type: string
+          description: The label for the checklist step
+        state:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsState'
+          description: State of the step, reported the same way for every worker type
+        status:
+          type: string
+          description: Status of the checklist step
+        ordinal:
+          type: integer
+          description: Position of the step in the onboarding sequence, starting at one
+        category:
+          type:
+          - string
+          - 'null'
+          description: Heading the step sits under
+        due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the step is due, when the source carries one
+        description:
+          type: string
+          description: What the step asks of the worker
+        display_key:
+          type:
+          - string
+          - 'null'
+          description: Stable identifier of the step, the same across every worker type. Null when the step has no catalogue entry
+        category_key:
+          type:
+          - string
+          - 'null'
+          description: Stable identifier of the heading, which keeps its value when the heading is renamed
+        completed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Completion timestamp of the checklist step
+        reject_reason:
+          type: string
+          description: Reason for rejecting the checklist step (It may contain HTML elements)
+      description: Checklist step information
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItems
+    OnboardingTrackerGetParametersProgressStatusesSchemaItems:
+      type: string
+      enum:
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - INVITED
+      - ONBOARDING
+      - READY_TO_START
+      - INACTIVE
+      - PENDING_INVITE
+      - ACTIVE
+      - DRAFT
+      - OFFBOARDING
+      - QUOTE_REQUIRES_CHANGES
+      - IN_REVIEW
+      - IN_OFFER_STAGE
+      description: Progress status of the contract
+      title: OnboardingTrackerGetParametersProgressStatusesSchemaItems
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreementPhase:
+      type: string
+      enum:
+      - unsigned
+      - employee_signed
+      - countersigned
+      description: Signing-lifecycle phase that produced the current Employment Agreement PDF. Can be null if the EA has not yet been generated
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreementPhase
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItemsMeta:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of email
+        email:
+          type: string
+          format: email
+          description: Email address
+        sent_at:
+          type: string
+          format: date-time
+          description: Timestamp when the email was sent
+      description: Email metadata
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItemsMeta
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsWorkerType:
+      type: string
+      enum:
+      - contractor
+      - direct_employee
+      - hris_direct_employee
+      - hris_direct_contractor
+      - eor
+      - peo
+      - person_without_contract
+      description: The worker type of the contract, as the hiring_types filter takes it
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsWorkerType
+    GetOnboardingDetailsByEmployeeHrisProfileId-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrors'
+          description: The errors, as an object with an `errors` list, or as the list
+        request:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details
+      required:
+      - errors
+      title: GetOnboardingDetailsByEmployeeHrisProfileId-v2026-01-01RequestNotFoundError
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoice:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique invoice ID
+        amount:
+          type: string
+          description: Invoice amount
+        status:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoiceStatus'
+          description: Status of the invoice
+        paid_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the invoice was paid, if applicable
+        currency:
+          type: string
+          description: Currency code for the invoice amount
+        due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Due date for the invoice
+        description:
+          type: string
+          description: Invoice description
+      description: Only applicable for EOR contracts. First early invoice (EOR funding statement) for the contract, if any
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoice
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfileDirectManager:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: HRIS profile OID of the manager
+        name:
+          type:
+          - string
+          - 'null'
+          description: Name of the manager
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the manager profile picture
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title of the manager
+        work_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Work email of the manager
+      description: The direct manager of the employee, when one is set
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfileDirectManager
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal ID of the profile
+        name:
+          type: string
+          description: Name associated with the profile
+        email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Email of the profile
+        country:
+          type:
+          - string
+          - 'null'
+          description: Country code
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the profile picture
+        last_login:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Last login timestamp
+        paid_invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProfilePaidInvoicesItems'
+          description: A paid invoice on the contract, if any, at most one. Only for a contractor, empty for other worker types
+        previously_onboarded:
+          type: boolean
+          description: Indicates if the contractor has previously onboarded
+      description: Employee profile information
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProfile
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistStepsItemsGroup:
+      type: string
+      enum:
+      - COMPLETED
+      - OUTSTANDING
+      description: Whether the worker still owes the step
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistStepsItemsGroup
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBannerKey:
+      type: string
+      enum:
+      - DOCUMENT_REJECTED
+      - ONBOARDING_OVERDUE
+      - ONBOARDING_AT_RISK
+      - START_DATE_PASSED_WITHOUT_INVITE
+      - EMPLOYEE_AGREEMENT_AWAITING_REVIEW
+      - AWAITING_DEPOSIT_PAYMENT
+      - CONTRACT_REDLINING
+      - CONTRACT_AMENDMENTS_IN_PROGRESS
+      - QUOTE_REQUIRES_CHANGES
+      - DRAFT_QUOTE
+      - CONTRACT_DRAFT
+      - QUOTE_READY_TO_ACCEPT
+      - NO_APP_ACCESS
+      - NO_ONBOARDING_STEPS
+      - IN_REVIEW_WITH_DEEL
+      - IN_OFFER_STAGE
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      description: What the banner is about
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBannerKey
+    Onboarding_listOnboardingEmployees-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaPage'
+      title: Onboarding_listOnboardingEmployees-v2026-01-01_Response_200
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrors1:
+      type: array
+      items:
+        $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrorsOneOf1Items'
+      description: The parameters outside their declared values, format or length, or the cursor error
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrors1
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name associated with the onboarding
+        worker:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsWorker'
+          description: The worker being onboarded
+        country:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsCountry'
+          description: The country of the contract
+        profile:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProfile'
+          description: Only when the worker has an avatar
+        contract:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContract'
+          description: The contract associated with the onboarding
+        overview:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverview'
+          - type: 'null'
+          description: Only with `include_overview`. The onboarding overview of the contract, as `GET /onboarding/tracker/{tracker_id}` returns it in `data`
+        progress:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgress'
+          description: The progress state of the onboarding
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItems'
+          description: 'Every contract of the worker the caller can see, the main one first, so each row of the worker lists the same contracts. A worker has one row per worker type, so the main contract can belong to another row: compare `contract_oid` with `contract.id`. Empty for a draft quote'
+        unique_id:
+          type: string
+          description: A unique identifier for the tracker
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The start date of the contract
+        hiring_type:
+          type: string
+          description: The type of hiring (e.g., contractor)
+        hris_profile:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsHrisProfile'
+          description: The profile associated with the onboarding
+        pending_steps:
+          type: string
+          description: Only with `include_overview`. The labels of the checklist steps not done yet, comma separated
+        app_experience:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsAppExperience'
+          description: The app experience of the employee
+        invitation_sent:
+          type: boolean
+          description: Only for a Global Payroll direct employee, when the organization sends app invitations. Whether the invitation to the app was sent and the employee has not signed up yet
+        can_send_invitation:
+          type: boolean
+          description: 'Only for a Global Payroll direct employee, when the organization sends app invitations. Whether the invitation to the app can be sent: the employee has app access and has not signed up yet'
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItems
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItemsData:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Checklist steps in total, on the checklist progress step
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItems'
+          description: List of emails sent during the stepper process
+        completed:
+          type: integer
+          description: Checklist steps completed, on the checklist progress step
+        remaining:
+          type: integer
+          description: Checklist steps remaining, on the checklist progress step
+        next_reminder_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Next reminder date, if applicable
+        onboarding_due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When onboarding is due, on the checklist progress step
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItemsData
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewActionsItems:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Details the action needs, which vary by action
+        type:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewActionsItemsType'
+          description: The action
+        available:
+          type: boolean
+          description: Whether the action can be taken now
+        last_execution_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the action was last taken, if ever
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewActionsItems
+    OnboardingTrackerGetParametersLifecycleStatusesSchemaItems:
+      type: string
+      enum:
+      - DRAFT
+      - IN_REVIEW
+      - QUOTE_REQUIRES_CHANGES
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - OFFBOARDING
+      - ONBOARDED
+      description: Lifecycle status of the onboarding
+      title: OnboardingTrackerGetParametersLifecycleStatusesSchemaItems
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the legal entity
+        name:
+          type:
+          - string
+          - 'null'
+          description: The name of the legal entity. A Deel entity that a contractor of record works under ends in (COR)
+      description: The legal entity the contract sits under. Null when there is none
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsEntity
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBannerSeverity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFO
+      description: How serious it is
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBannerSeverity
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBannerAction:
+      type: string
+      enum:
+      - CANCEL_CONTRACT
+      - REVIEW_EMPLOYEE_AGREEMENT
+      - PAY_DEPOSIT
+      - VIEW_CONTRACT
+      description: What the client can do about it, when there is something
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBannerAction
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The request URL
+        docs:
+          type: string
+          description: Link to the documentation of the endpoint, or `no match` when there is none
+        method:
+          type: string
+          description: Method of the API
+        source:
+          type: string
+          description: The source handler that produced the error
+        status:
+          type: number
+          format: double
+          description: Status of API response
+        api_req_id:
+          type: string
+          description: The request ID
+      description: Error request details
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaRequest
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItems:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: Invitation OID
+        status:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItemsStatus'
+          description: Status of the invitation
+        send_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the invitation is or was sent
+        timezone:
+          type:
+          - string
+          - 'null'
+          description: Timezone the invitation is scheduled in
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsAppExperienceExperienceType:
+      type: string
+      enum:
+      - LIGHTWEIGHT
+      description: The app experience the employee is given, when there is a specific one
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsAppExperienceExperienceType
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrors:
+      oneOf:
+      - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrors0'
+      - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrors1'
+      description: The errors, as an object with an `errors` list, or as the list
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrors
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfileDirectManager:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: HRIS profile OID of the manager
+        name:
+          type:
+          - string
+          - 'null'
+          description: Name of the manager
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the manager profile picture
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title of the manager
+        work_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Work email of the manager
+      description: The direct manager of the employee, when one is set
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfileDirectManager
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        banner:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBanner'
+          - type: 'null'
+          description: The one thing worth saying about this worker, or null when there is nothing
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataActionsItems'
+          description: Actions the caller can take on this onboarding
+        profile:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfile'
+          - type: 'null'
+          description: Employee profile information
+        stepper:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItems'
+          description: List of stepper actions taken during the onboarding process
+        summary:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataSummaryItems'
+          description: Summary of the onboarding process
+        contract:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContract'
+          description: Information about the contract
+        progress:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProgress'
+          description: Progress of the onboarding process
+        checklist:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklist'
+          description: List of checklist steps
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItems'
+          description: Every contract of the worker the caller can see, the main one first
+        hiring_type:
+          type: string
+          description: Hiring type (e.g., contractor)
+        hris_profile:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfile'
+          description: Employee HRIS profile information
+        app_experience:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAppExperience'
+          description: The app experience of the employee
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaData
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewAppExperienceExperienceType:
+      type: string
+      enum:
+      - LIGHTWEIGHT
+      description: The app experience the employee is given, when there is a specific one
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewAppExperienceExperienceType
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewSummaryItemsData:
+      type: object
+      properties:
+        country:
+          type: string
+          description: Country code for location-related summaries
+        timezone:
+          type: string
+          description: Timezone information
+        has_withdraw_methods:
+          type: boolean
+          description: Indicates if withdrawal methods exist
+      description: Additional data about the summary item
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewSummaryItemsData
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreement:
+      type: object
+      properties:
+        phase:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreementPhase'
+          - type: 'null'
+          description: Signing-lifecycle phase that produced the current Employment Agreement PDF. Can be null if the EA has not yet been generated
+        status:
+          type:
+          - string
+          - 'null'
+          description: Status of the Employment Agreement. Can be null if the EA has not yet been generated
+        version_hash:
+          type:
+          - string
+          - 'null'
+          description: Version of the Employment Agreement. Can be null if the EA has not yet been generated
+      description: Information about the Employment Agreement
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreement
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItems:
+      type: object
+      properties:
+        entity:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsEntity'
+          - type: 'null'
+          description: The legal entity the contract sits under. Null when there is none
+        status:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsStatus'
+          description: Current status of the onboarding on this contract
+        is_main:
+          type: boolean
+          description: 'Whether this is the main contract of the worker: the most urgent status, then a new contract before a person without a contract, then the latest start date, then the latest created contract'
+        is_pwac:
+          type: boolean
+          description: Whether the contract is the placeholder contract of a person without a contract
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title on the contract
+        is_current:
+          type: boolean
+          description: Whether this is the contract the overview is about
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The start date of the contract
+        tracker_id:
+          type: string
+          description: The tracker identifier that loads this contract
+        worker_type:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsWorkerType'
+          description: The worker type of the contract, as the hiring_types filter takes it
+        contract_oid:
+          type:
+          - string
+          - 'null'
+          description: The unique identifier for the contract
+        lifecycle_status:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsLifecycleStatus'
+          description: Lifecycle status of this contract, the same value the People list shows for it
+        is_attention_needed:
+          type: boolean
+          description: Whether the onboarding on this contract is overdue or at risk
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressWaitingOn:
+      type: string
+      enum:
+      - WORKER
+      - CLIENT
+      - DEEL
+      description: The party whose action the onboarding waits on. Null when nothing is outstanding, which includes a settled onboarding (READY_TO_START, ACTIVE, OFFBOARDING, INACTIVE) with no client action required
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressWaitingOn
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsLifecycleStatus:
+      type: string
+      enum:
+      - DRAFT
+      - IN_REVIEW
+      - QUOTE_REQUIRES_CHANGES
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - OFFBOARDING
+      - ONBOARDED
+      description: Lifecycle status of this contract, the same value the People list shows for it
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsLifecycleStatus
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContract:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique contract ID
+        oid:
+          type: string
+          description: Contract OID
+        name:
+          type: string
+          description: Contract name
+        status:
+          type: string
+          description: Contract status (e.g., in_progress)
+        is_pwac:
+          type: boolean
+          description: Whether the worker is a person without a contract
+        created_at:
+          type: string
+          format: date-time
+          description: Contract creation timestamp
+        first_sign:
+          type: string
+          description: The first sign (either 'client' or 'contractor')
+        completion_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The completion date of the contract, if applicable
+        client_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the client signed the contract
+        employee_agreement:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreement'
+          description: Information about the Employment Agreement
+        first_early_invoice:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoice'
+          - type: 'null'
+          description: Only applicable for EOR contracts. First early invoice (EOR funding statement) for the contract, if any
+        contractor_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the contractor signed the contract
+        invited_contractor_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Email of the invited contractor
+      description: Information about the contract
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContract
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContract:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: The unique identifier for the contract. Null for a person without a contract
+        eor:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractEor'
+          description: Only for an EOR contract
+        is_pwac:
+          type: boolean
+          description: Whether the worker is a person without a contract
+        effective_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The effective date of the contract. Null for a person without a contract
+        global_payroll:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractGlobalPayroll'
+          description: Only for a Global Payroll direct employee
+        offer_letter_id:
+          type: string
+          format: uuid
+          description: Only for an EOR contract with an offer letter. The identifier of the offer letter
+      description: The contract associated with the onboarding
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContract
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsStatus:
+      type: string
+      enum:
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - INVITED
+      - ONBOARDING
+      - READY_TO_START
+      - INACTIVE
+      - PENDING_INVITE
+      - ACTIVE
+      - DRAFT
+      - OFFBOARDING
+      - QUOTE_REQUIRES_CHANGES
+      - IN_REVIEW
+      - IN_OFFER_STAGE
+      description: Current status of the onboarding on this contract
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsStatus
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAppExperienceExperienceType:
+      type: string
+      enum:
+      - LIGHTWEIGHT
+      description: The app experience the employee is given, when there is a specific one
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAppExperienceExperienceType
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsStatus:
+      type: string
+      enum:
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - INVITED
+      - ONBOARDING
+      - READY_TO_START
+      - INACTIVE
+      - PENDING_INVITE
+      - ACTIVE
+      - DRAFT
+      - OFFBOARDING
+      - QUOTE_REQUIRES_CHANGES
+      - IN_REVIEW
+      - IN_OFFER_STAGE
+      description: Current status of the onboarding on this contract
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsStatus
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItems:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Details of the step, which vary by step
+        type:
+          type: string
+          description: The type of checklist step
+        group:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsGroup'
+          description: Whether the worker still owes the step
+        label:
+          type: string
+          description: The label for the checklist step
+        state:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsState'
+          description: State of the step, reported the same way for every worker type
+        status:
+          type: string
+          description: Status of the checklist step
+        ordinal:
+          type: integer
+          description: Position of the step in the onboarding sequence, starting at one
+        category:
+          type:
+          - string
+          - 'null'
+          description: Heading the step sits under
+        due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the step is due, when the source carries one
+        description:
+          type: string
+          description: What the step asks of the worker
+        display_key:
+          type:
+          - string
+          - 'null'
+          description: Stable identifier of the step, the same across every worker type. Null when the step has no catalogue entry
+        category_key:
+          type:
+          - string
+          - 'null'
+          description: Stable identifier of the heading, which keeps its value when the heading is renamed
+        completed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Completion timestamp of the checklist step
+        reject_reason:
+          type: string
+          description: Reason for rejecting the checklist step (It may contain HTML elements)
+      description: Checklist step information
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the legal entity
+        name:
+          type:
+          - string
+          - 'null'
+          description: The name of the legal entity. A Deel entity that a contractor of record works under ends in (COR)
+      description: The legal entity the contract sits under. Null when there is none
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsEntity
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfile:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: HRIS Profile OID
+        name:
+          type: string
+          description: HRIS Profile name
+        email:
+          type: string
+          format: email
+          description: Email of the HRIS profile
+        work_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Work email of the HRIS profile
+        invitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItems'
+          description: Invitations to the employee that are not sent yet
+        direct_manager:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfileDirectManager'
+          - type: 'null'
+          description: The direct manager of the employee, when one is set
+      description: Employee HRIS profile information
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfile
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistSummary:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Number of checklist steps
+        completed:
+          type: integer
+          description: Number of completed steps
+        outstanding:
+          type: integer
+          description: Number of steps the worker still owes
+      description: How far along the checklist is
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistSummary
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProgressSubStatus:
+      type: string
+      enum:
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      - AWAITING_CLIENT_REVIEW
+      - CANCELLED
+      - REJECTED
+      description: Finer state within the status, when there is one
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProgressSubStatus
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataActionsItemsType:
+      type: string
+      enum:
+      - MANAGE_INVITE
+      - RESEND_INVITE
+      - SEND_REMINDER
+      - CANCEL_CONTRACT
+      - END_CONTRACT
+      - GET_HELP
+      description: The action
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataActionsItemsType
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressSteps:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Number of checklist steps
+        overdue:
+          type: integer
+          description: Steps past their due date and not completed
+        completed:
+          type: integer
+          description: Completed steps
+        in_review:
+          type: integer
+          description: Steps waiting for a review
+        in_progress:
+          type: integer
+          description: Steps started but not completed
+        not_started:
+          type: integer
+          description: Steps not started yet
+      description: 'Onboarding checklist step counts per state. Null when the counts are not available: the worker has no checklist yet, the row is a contractor draft or a draft quote, or the steps could not be read'
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressSteps
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewSummaryItems:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewSummaryItemsData'
+          description: Additional data about the summary item
+        name:
+          type: string
+          description: Name of the summary item
+        type:
+          type: string
+          description: Type of the summary item
+        value:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewSummaryItemsValue'
+          description: Value of the summary item
+      description: Summary item information
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewSummaryItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractFirstEarlyInvoiceStatus:
+      type: string
+      enum:
+      - OPEN
+      - PENDING
+      - SKIPPED
+      - PREPROCESSING
+      - PROCESSING
+      - CREDITED
+      - PROCESSED
+      - PAID
+      - FAILED
+      - CANCELLED
+      - REFUNDED
+      - UNPAYABLE
+      - AWAITING_PAYMENT
+      - open
+      - pending
+      - skipped
+      - preprocessing
+      - processing
+      - credited
+      - processed
+      - paid
+      - failed
+      - cancelled
+      - refunded
+      - unpayable
+      - awaiting_payment
+      description: Status of the invoice
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractFirstEarlyInvoiceStatus
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProfile:
+      type: object
+      properties:
+        pic_url:
+          type: string
+          description: The avatar URL of the worker, the same value as `worker.avatar_url`
+      description: Only when the worker has an avatar
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProfile
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistStepsItems:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Details of the step, which vary by step
+        type:
+          type: string
+          description: The type of checklist step
+        group:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistStepsItemsGroup'
+          description: Whether the worker still owes the step
+        label:
+          type: string
+          description: The label for the checklist step
+        state:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistStepsItemsState'
+          description: State of the step, reported the same way for every worker type
+        status:
+          type: string
+          description: Status of the checklist step
+        ordinal:
+          type: integer
+          description: Position of the step in the onboarding sequence, starting at one
+        category:
+          type:
+          - string
+          - 'null'
+          description: Heading the step sits under
+        due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the step is due, when the source carries one
+        description:
+          type: string
+          description: What the step asks of the worker
+        display_key:
+          type:
+          - string
+          - 'null'
+          description: Stable identifier of the step, the same across every worker type. Null when the step has no catalogue entry
+        category_key:
+          type:
+          - string
+          - 'null'
+          description: Stable identifier of the heading, which keeps its value when the heading is renamed
+        completed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Completion timestamp of the checklist step
+        reject_reason:
+          type: string
+          description: Reason for rejecting the checklist step (It may contain HTML elements)
+      description: Checklist step information
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistStepsItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for pagination
+        total_rows:
+          type: integer
+          description: Total number of onboardings matching the filters. Stays the same across every page of a cursor walk.
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaPage
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsCountry:
+      type: object
+      properties:
+        code:
+          type:
+          - string
+          - 'null'
+          description: ISO 3166-1 alpha-2 country code
+        name:
+          type:
+          - string
+          - 'null'
+          description: The country display name
+      description: The country of the contract
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsCountry
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfileDirectManager:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: HRIS profile OID of the manager
+        name:
+          type:
+          - string
+          - 'null'
+          description: Name of the manager
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the manager profile picture
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title of the manager
+        work_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Work email of the manager
+      description: The direct manager of the employee, when one is set
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfileDirectManager
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the legal entity
+        name:
+          type:
+          - string
+          - 'null'
+          description: The name of the legal entity. A Deel entity that a contractor of record works under ends in (COR)
+      description: The legal entity the contract sits under. Null when there is none
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsEntity
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistSummary:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Number of checklist steps
+        completed:
+          type: integer
+          description: Number of completed steps
+        outstanding:
+          type: integer
+          description: Number of steps the worker still owes
+      description: How far along the checklist is
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistSummary
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsLifecycleStatus:
+      type: string
+      enum:
+      - DRAFT
+      - IN_REVIEW
+      - QUOTE_REQUIRES_CHANGES
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - OFFBOARDING
+      - ONBOARDED
+      description: Lifecycle status of this contract, the same value the People list shows for it
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsLifecycleStatus
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItems:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItemsMeta'
+          description: Email metadata
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItems
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrors1:
+      type: array
+      items:
+        $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrorsOneOf1Items'
+      description: Error messages
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrors1
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewActionsItemsType:
+      type: string
+      enum:
+      - MANAGE_INVITE
+      - RESEND_INVITE
+      - SEND_REMINDER
+      - CANCEL_CONTRACT
+      - END_CONTRACT
+      - GET_HELP
+      description: The action
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewActionsItemsType
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsWorker:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: The HRIS profile identifier of the worker. Null for a draft quote
+        name:
+          type:
+          - string
+          - 'null'
+          description: The full name of the worker
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title on the contract
+        avatar_url:
+          type:
+          - string
+          - 'null'
+          description: The avatar URL of the worker
+        is_entity_contractor:
+          type: boolean
+          description: Whether a contractor is engaged through a company rather than as an individual
+        is_contractor_of_record:
+          type: boolean
+          description: Whether a contractor is engaged through Contractor of Record
+      description: The worker being onboarded
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsWorker
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrors:
+      oneOf:
+      - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrors0'
+      - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrors1'
+      description: The errors, as an object for a combination of parameters the endpoint rejects, or as a list
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrors
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreement:
+      type: object
+      properties:
+        phase:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreementPhase'
+          - type: 'null'
+          description: Signing-lifecycle phase that produced the current Employment Agreement PDF. Can be null if the EA has not yet been generated
+        status:
+          type:
+          - string
+          - 'null'
+          description: Status of the Employment Agreement. Can be null if the EA has not yet been generated
+        version_hash:
+          type:
+          - string
+          - 'null'
+          description: Version of the Employment Agreement. Can be null if the EA has not yet been generated
+      description: Information about the Employment Agreement
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreement
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsData:
+      type: object
+      properties:
+        country:
+          type: string
+          description: Country code for location-related summaries
+        timezone:
+          type: string
+          description: Timezone information
+        has_withdraw_methods:
+          type: boolean
+          description: Indicates if withdrawal methods exist
+      description: Additional data about the summary item
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsData
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItems:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItemsData'
+        type:
+          type: string
+          description: Type of the stepper action
+        completed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Completion timestamp of the stepper action
+      description: Stepper action information
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItems
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        type:
+          type: string
+          description: Error category
+        context:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Additional error context
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - type
+      - message
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The request URL
+        docs:
+          type: string
+          description: Link to the documentation of the endpoint, or `no match` when there is none
+        method:
+          type: string
+          description: Method of the API
+        source:
+          type: string
+          description: The source handler that produced the error
+        status:
+          type: number
+          format: double
+          description: Status of API response
+        api_req_id:
+          type: string
+          description: The request ID
+      description: Error request details. Absent for a cursor that cannot be read
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaRequest
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsStatus:
+      type: string
+      enum:
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - INVITED
+      - ONBOARDING
+      - READY_TO_START
+      - INACTIVE
+      - PENDING_INVITE
+      - ACTIVE
+      - DRAFT
+      - OFFBOARDING
+      - QUOTE_REQUIRES_CHANGES
+      - IN_REVIEW
+      - IN_OFFER_STAGE
+      description: Current status of the onboarding on this contract
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsStatus
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfileInvitationsItems:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: Invitation OID
+        status:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfileInvitationsItemsStatus'
+          description: Status of the invitation
+        send_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the invitation is or was sent
+        timezone:
+          type:
+          - string
+          - 'null'
+          description: Timezone the invitation is scheduled in
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfileInvitationsItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItems:
+      type: object
+      properties:
+        entity:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsEntity'
+          - type: 'null'
+          description: The legal entity the contract sits under. Null when there is none
+        status:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsStatus'
+          description: Current status of the onboarding on this contract
+        is_main:
+          type: boolean
+          description: 'Whether this is the main contract of the worker: the most urgent status, then a new contract before a person without a contract, then the latest start date, then the latest created contract'
+        is_pwac:
+          type: boolean
+          description: Whether the contract is the placeholder contract of a person without a contract
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title on the contract
+        is_current:
+          type: boolean
+          description: Whether this is the contract the overview is about
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The start date of the contract
+        tracker_id:
+          type: string
+          description: The tracker identifier that loads this contract
+        worker_type:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsWorkerType'
+          description: The worker type of the contract, as the hiring_types filter takes it
+        contract_oid:
+          type:
+          - string
+          - 'null'
+          description: The unique identifier for the contract
+        lifecycle_status:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsLifecycleStatus'
+          description: Lifecycle status of this contract, the same value the People list shows for it
+        is_attention_needed:
+          type: boolean
+          description: Whether the onboarding on this contract is overdue or at risk
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItems
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsLifecycleStatus:
+      type: string
+      enum:
+      - DRAFT
+      - IN_REVIEW
+      - QUOTE_REQUIRES_CHANGES
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - OFFBOARDING
+      - ONBOARDED
+      description: Lifecycle status of this contract, the same value the People list shows for it
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsLifecycleStatus
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataSummaryItems:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsData'
+          description: Additional data about the summary item
+        name:
+          type: string
+          description: Name of the summary item
+        type:
+          type: string
+          description: Type of the summary item
+        value:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsValue'
+          description: Value of the summary item
+      description: Summary item information
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataSummaryItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProfilePaidInvoicesItems:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal ID of the invoice
+        status:
+          type: string
+          description: Status of the invoice
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProfilePaidInvoicesItems
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItems:
+      type: object
+      properties:
+        entity:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsEntity'
+          - type: 'null'
+          description: The legal entity the contract sits under. Null when there is none
+        status:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsStatus'
+          description: Current status of the onboarding on this contract
+        is_main:
+          type: boolean
+          description: 'Whether this is the main contract of the worker: the most urgent status, then a new contract before a person without a contract, then the latest start date, then the latest created contract'
+        is_pwac:
+          type: boolean
+          description: Whether the contract is the placeholder contract of a person without a contract
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title on the contract
+        is_current:
+          type: boolean
+          description: Whether this is the contract the overview is about
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The start date of the contract
+        tracker_id:
+          type: string
+          description: The tracker identifier that loads this contract
+        worker_type:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsWorkerType'
+          description: The worker type of the contract, as the hiring_types filter takes it
+        contract_oid:
+          type:
+          - string
+          - 'null'
+          description: The unique identifier for the contract
+        lifecycle_status:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsLifecycleStatus'
+          description: Lifecycle status of this contract, the same value the People list shows for it
+        is_attention_needed:
+          type: boolean
+          description: Whether the onboarding on this contract is overdue or at risk
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItems
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProgress:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Current status of the onboarding process (e.g., ACTIVE)
+        sub_status:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProgressSubStatus'
+          - type: 'null'
+          description: Finer state within the status, when there is one
+        reference_date:
+          type: string
+          format: date-time
+          description: Reference date for the progress
+        subject_to_overdue:
+          type: boolean
+          description: Indicates if the onboarding is subject to overdue
+        reference_date_timezone:
+          type: string
+          description: Timezone of the reference date
+        is_action_required_from_client:
+          type: boolean
+          description: Indicates if action is required from the client
+      description: Progress of the onboarding process
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProgress
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractEmployeeAgreementPhase:
+      type: string
+      enum:
+      - unsigned
+      - employee_signed
+      - countersigned
+      description: Signing-lifecycle phase that produced the current Employment Agreement PDF. Can be null if the EA has not yet been generated
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractEmployeeAgreementPhase
+    OnboardingTrackerGetParametersHiringTypesSchemaItems:
+      type: string
+      enum:
+      - contractor
+      - direct_employee
+      - hris_direct_employee
+      - hris_direct_contractor
+      - eor
+      - peo
+      - person_without_contract
+      description: Hiring type (e.g., contractor, eor)
+      title: OnboardingTrackerGetParametersHiringTypesSchemaItems
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItemsMeta:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of email
+        email:
+          type: string
+          format: email
+          description: Email address
+        sent_at:
+          type: string
+          format: date-time
+          description: Timestamp when the email was sent
+      description: Email metadata
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItemsMeta
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrorsOneOf1Items:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        path:
+          type: string
+          description: Where the request failed, for a parameter outside its declared values, format or length
+        type:
+          type: string
+          description: Error category, for the cursor error
+        details:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: The parameter that failed validation
+        message:
+          type: string
+          description: Error response
+      required:
+      - message
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrorsOneOf1Items
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProfilePaidInvoicesItems:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal ID of the invoice
+        status:
+          type: string
+          description: Status of the invoice
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProfilePaidInvoicesItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressLifecycleStatus:
+      type: string
+      enum:
+      - DRAFT
+      - IN_REVIEW
+      - QUOTE_REQUIRES_CHANGES
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - OFFBOARDING
+      - ONBOARDED
+      description: Lifecycle status of this contract, the same value the People list shows for it
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressLifecycleStatus
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal ID of the profile
+        name:
+          type: string
+          description: Name associated with the profile
+        email:
+          type: string
+          format: email
+          description: Email of the profile
+        country:
+          type:
+          - string
+          - 'null'
+          description: Country code
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the profile picture
+        last_login:
+          type: string
+          format: date-time
+          description: Last login timestamp
+        paid_invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProfilePaidInvoicesItems'
+          description: A paid invoice on the contract, if any, at most one. Only for a contractor, empty for other worker types
+        previously_onboarded:
+          type: boolean
+          description: Indicates if the contractor has previously onboarded
+      description: Employee profile information
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProfile
+    OnboardingTrackerGetParametersActionsSchemaItems:
+      type: string
+      enum:
+      - CLIENT_ACTION_REQUIRED
+      - CLIENT_ACTION_NOT_REQUIRED
+      title: OnboardingTrackerGetParametersActionsSchemaItems
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBannerAction:
+      type: string
+      enum:
+      - CANCEL_CONTRACT
+      - REVIEW_EMPLOYEE_AGREEMENT
+      - PAY_DEPOSIT
+      - VIEW_CONTRACT
+      description: What the client can do about it, when there is something
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBannerAction
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataAppExperience:
+      type: object
+      properties:
+        experience_type:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataAppExperienceExperienceType'
+          - type: 'null'
+          description: The app experience the employee is given, when there is a specific one
+        is_minimal_requirements:
+          type: boolean
+          description: Whether the worker gets the minimal app experience, as a person without a contract does
+      description: The app experience of the employee
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataAppExperience
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfilePaidInvoicesItems:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal ID of the invoice
+        status:
+          type: string
+          description: Status of the invoice
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfilePaidInvoicesItems
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrors0:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItems'
+          description: Error messages
+      description: The errors the endpoint returned
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrors0
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBanner:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBannerKey'
+          description: What the banner is about
+        action:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBannerAction'
+          - type: 'null'
+          description: What the client can do about it, when there is something
+        severity:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBannerSeverity'
+          description: How serious it is
+      description: The one thing worth saying about this worker, or null when there is nothing
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBanner
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataActionsItemsType:
+      type: string
+      enum:
+      - MANAGE_INVITE
+      - RESEND_INVITE
+      - SEND_REMINDER
+      - CANCEL_CONTRACT
+      - END_CONTRACT
+      - GET_HELP
+      description: The action
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataActionsItemsType
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsLifecycleStatus:
+      type: string
+      enum:
+      - DRAFT
+      - IN_REVIEW
+      - QUOTE_REQUIRES_CHANGES
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - OFFBOARDING
+      - ONBOARDED
+      description: Lifecycle status of this contract, the same value the People list shows for it
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsLifecycleStatus
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The request URL
+        docs:
+          type: string
+          description: Link to the documentation of the endpoint, or `no match` when there is none
+        method:
+          type: string
+          description: Method of the API
+        source:
+          type: string
+          description: The source handler that produced the error
+        status:
+          type: number
+          format: double
+          description: Status of API response
+        api_req_id:
+          type: string
+          description: The request ID
+      description: Error request details
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaRequest
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataActionsItems:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Details the action needs, which vary by action
+        type:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataActionsItemsType'
+          description: The action
+        available:
+          type: boolean
+          description: Whether the action can be taken now
+        last_execution_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the action was last taken, if ever
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataActionsItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItemsData:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Checklist steps in total, on the checklist progress step
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItemsDataEmailsItems'
+          description: List of emails sent during the stepper process
+        completed:
+          type: integer
+          description: Checklist steps completed, on the checklist progress step
+        remaining:
+          type: integer
+          description: Checklist steps remaining, on the checklist progress step
+        next_reminder_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Next reminder date, if applicable
+        onboarding_due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When onboarding is due, on the checklist progress step
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItemsData
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoiceStatus:
+      type: string
+      enum:
+      - OPEN
+      - PENDING
+      - SKIPPED
+      - PREPROCESSING
+      - PROCESSING
+      - CREDITED
+      - PROCESSED
+      - PAID
+      - FAILED
+      - CANCELLED
+      - REFUNDED
+      - UNPAYABLE
+      - AWAITING_PAYMENT
+      description: Status of the invoice
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoiceStatus
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractGlobalPayroll:
+      type: object
+      properties:
+        has_direct_employee_app:
+          type: boolean
+          description: Whether the employee has access to the app
+      description: Only for a Global Payroll direct employee
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractGlobalPayroll
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItems:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItemsMeta'
+          description: Email metadata
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressReferenceDate:
+      oneOf:
+      - type: string
+        format: date
+      - type: string
+        format: date-time
+      - type: string
+        maxLength: 0
+      description: The reference date determining the onboarding status
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressReferenceDate
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrorsOneOf1Items:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        type:
+          type: string
+          description: Error category
+        context:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Additional error context
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - type
+      - message
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrorsOneOf1Items
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsHrisProfile:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: The unique identifier for the HRIS profile
+        work_email:
+          type:
+          - string
+          - 'null'
+          description: The work email of the employee
+      description: The profile associated with the onboarding
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsHrisProfile
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsWorkerType:
+      type: string
+      enum:
+      - contractor
+      - direct_employee
+      - hris_direct_employee
+      - hris_direct_contractor
+      - eor
+      - peo
+      - person_without_contract
+      description: The worker type of the contract, as the hiring_types filter takes it
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsWorkerType
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItems:
+      type: object
+      properties:
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItemsData'
+          - type: 'null'
+        type:
+          type: string
+          description: Type of the stepper action
+        completed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Completion timestamp of the stepper action
+      description: Stepper action information
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItems
+    GetOnboardingDetailsByEmployeeHrisProfileId-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrors'
+          description: The errors the endpoint returned
+        request:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details
+      required:
+      - errors
+      title: GetOnboardingDetailsByEmployeeHrisProfileId-v2026-01-01RequestBadRequestError
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBannerAction:
+      type: string
+      enum:
+      - CANCEL_CONTRACT
+      - REVIEW_EMPLOYEE_AGREEMENT
+      - PAY_DEPOSIT
+      - VIEW_CONTRACT
+      description: What the client can do about it, when there is something
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBannerAction
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItems:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: Invitation OID
+        status:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItemsStatus'
+          description: Status of the invitation
+        send_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the invitation is or was sent
+        timezone:
+          type:
+          - string
+          - 'null'
+          description: Timezone the invitation is scheduled in
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItems
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractFirstEarlyInvoice:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique invoice ID
+        amount:
+          type: string
+          description: Invoice amount
+        status:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractFirstEarlyInvoiceStatus'
+          description: Status of the invoice
+        paid_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the invoice was paid, if applicable
+        currency:
+          type: string
+          description: Currency code for the invoice amount
+        due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Due date for the invoice
+        description:
+          type: string
+          description: Invoice description
+      description: Applicable only for EOR contracts. First early invoice (EOR funding statement) for the contract, if any
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractFirstEarlyInvoice
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        type:
+          type: string
+          description: Error category
+        context:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Additional error context
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - type
+      - message
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBannerKey:
+      type: string
+      enum:
+      - DOCUMENT_REJECTED
+      - ONBOARDING_OVERDUE
+      - ONBOARDING_AT_RISK
+      - START_DATE_PASSED_WITHOUT_INVITE
+      - EMPLOYEE_AGREEMENT_AWAITING_REVIEW
+      - AWAITING_DEPOSIT_PAYMENT
+      - CONTRACT_REDLINING
+      - CONTRACT_AMENDMENTS_IN_PROGRESS
+      - QUOTE_REQUIRES_CHANGES
+      - DRAFT_QUOTE
+      - CONTRACT_DRAFT
+      - QUOTE_READY_TO_ACCEPT
+      - NO_APP_ACCESS
+      - NO_ONBOARDING_STEPS
+      - IN_REVIEW_WITH_DEEL
+      - IN_OFFER_STAGE
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      description: What the banner is about
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBannerKey
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressSubStatus:
+      type: string
+      enum:
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      - AWAITING_CLIENT_REVIEW
+      - CANCELLED
+      - REJECTED
+      description: Finer state within the status, when there is one
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressSubStatus
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistStepsItemsState:
+      type: string
+      enum:
+      - NOT_STARTED
+      - IN_PROGRESS
+      - IN_REVIEW
+      - COMPLETED
+      - OVERDUE
+      description: State of the step, reported the same way for every worker type
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistStepsItemsState
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      - type: string
+        format: date-time
+      - type: object
+        additionalProperties:
+          description: Any type
+      description: Value of the summary item
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsValue
+    ListOnboardingEmployees-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrors'
+          description: The errors, as an object for a combination of parameters the endpoint rejects, or as a list
+        request:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details. Absent for a cursor that cannot be read
+      required:
+      - errors
+      title: ListOnboardingEmployees-v2026-01-01RequestBadRequestError
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The parameter that failed, with the position for a list
+        path:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItemsPathItems'
+          description: The parameter that failed, as a path
+        type:
+          type: string
+          description: The validation rule that failed
+        context:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Details of the failure, which vary by rule
+        message:
+          type: string
+          description: What is wrong with the value
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItems
+    GetOnboardingDetailsByOnboardingTrackerId-v2026-01-01RequestPreconditionFailedError:
+      type: object
+      properties:
+        errors:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: The request details again, with no message
+        request:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details
+      required:
+      - errors
+      title: GetOnboardingDetailsByOnboardingTrackerId-v2026-01-01RequestPreconditionFailedError
+    OnboardingTrackerGetParametersSortBy:
+      type: string
+      enum:
+      - progressStatusWeight
+      default: progressStatusWeight
+      title: OnboardingTrackerGetParametersSortBy
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataActionsItems:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Details the action needs, which vary by action
+        type:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataActionsItemsType'
+          description: The action
+        available:
+          type: boolean
+          description: Whether the action can be taken now
+        last_execution_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the action was last taken, if ever
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataActionsItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrors0:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItems'
+          description: One item per query parameter that failed
+      description: The parameters the endpoint rejects
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrors0
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBannerSeverity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFO
+      description: How serious it is
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataBannerSeverity
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItemsDataEmailsItemsMeta:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of email
+        email:
+          type: string
+          format: email
+          description: Email address
+        sent_at:
+          type: string
+          format: date-time
+          description: Timestamp when the email was sent
+      description: Email metadata
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItemsDataEmailsItemsMeta
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItems:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsData'
+          description: Additional data about the summary item
+        name:
+          type: string
+          description: Name of the summary item
+        type:
+          type: string
+          description: Type of the summary item
+        value:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsValue'
+          description: Value of the summary item
+      description: Summary item information
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItems
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressOnboardingDueDate:
+      oneOf:
+      - type: string
+        format: date
+      - type: string
+        format: date-time
+      description: Due date for onboarding
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsProgressOnboardingDueDate
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoice:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique invoice ID
+        amount:
+          type: string
+          description: Invoice amount
+        status:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoiceStatus'
+          description: Status of the invoice
+        paid_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the invoice was paid, if applicable
+        currency:
+          type: string
+          description: Currency code for the invoice amount
+        due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Due date for the invoice
+        description:
+          type: string
+          description: Invoice description
+      description: Applicable only for EOR contracts. First early invoice (EOR funding statement) for the contract, if any
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoice
+    OnboardingTrackerGetParametersCard:
+      type: string
+      enum:
+      - ACTION_REQUIRED
+      - OVERDUE
+      - WITH_DEEL_FOR_REVIEW
+      - READY_TO_START
+      - STARTING_THIS_WEEK
+      title: OnboardingTrackerGetParametersCard
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklist:
+      type: object
+      properties:
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistStepsItems'
+          description: List of checklist steps
+        summary:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistSummary'
+          description: How far along the checklist is
+      description: List of checklist steps
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklist
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrors0:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItems'
+          description: Error messages
+      description: The errors the endpoint returned
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrors0
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsGroup:
+      type: string
+      enum:
+      - COMPLETED
+      - OUTSTANDING
+      description: Whether the worker still owes the step
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsGroup
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreementPhase:
+      type: string
+      enum:
+      - unsigned
+      - employee_signed
+      - countersigned
+      description: Signing-lifecycle phase that produced the current Employment Agreement PDF. Can be null if the EA has not yet been generated
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreementPhase
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsWorkerType:
+      type: string
+      enum:
+      - contractor
+      - direct_employee
+      - hris_direct_employee
+      - hris_direct_contractor
+      - eor
+      - peo
+      - person_without_contract
+      description: The worker type of the contract, as the hiring_types filter takes it
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItemsWorkerType
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItems:
+      type: object
+      properties:
+        entity:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsEntity'
+          - type: 'null'
+          description: The legal entity the contract sits under. Null when there is none
+        status:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsStatus'
+          description: Current status of the onboarding on this contract
+        is_main:
+          type: boolean
+          description: 'Whether this is the main contract of the worker: the most urgent status, then a new contract before a person without a contract, then the latest start date, then the latest created contract'
+        is_pwac:
+          type: boolean
+          description: Whether the contract is the placeholder contract of a person without a contract
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title on the contract
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The start date of the contract
+        tracker_id:
+          type: string
+          description: The tracker identifier that loads this contract
+        worker_type:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsWorkerType'
+          description: The worker type of the contract, as the hiring_types filter takes it
+        contract_oid:
+          type:
+          - string
+          - 'null'
+          description: The unique identifier for the contract
+        lifecycle_status:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItemsLifecycleStatus'
+          description: Lifecycle status of this contract, the same value the People list shows for it
+        is_attention_needed:
+          type: boolean
+          description: Whether the onboarding on this contract is overdue or at risk
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsContractsItems
+    GetOnboardingDetailsByOnboardingTrackerId-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaErrors'
+          description: The errors, as an object with an `errors` list, or as the list
+        request:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaRequest'
+          description: Error request details
+      required:
+      - errors
+      title: GetOnboardingDetailsByOnboardingTrackerId-v2026-01-01RequestNotFoundError
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverview:
+      type: object
+      properties:
+        banner:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBanner'
+          - type: 'null'
+          description: The one thing worth saying about this worker, or null when there is nothing
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewActionsItems'
+          description: Actions the caller can take on this onboarding
+        profile:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProfile'
+          - type: 'null'
+          description: Employee profile information
+        stepper:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewStepperItems'
+          description: List of stepper actions taken during the onboarding process
+        summary:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewSummaryItems'
+          description: Summary of the onboarding process
+        contract:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContract'
+          description: Information about the contract
+        progress:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProgress'
+          description: Progress of the onboarding process
+        checklist:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklist'
+          description: List of checklist steps
+        contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractsItems'
+          description: Every contract of the worker the caller can see, the main one first
+        hiring_type:
+          type: string
+          description: Hiring type (e.g., contractor)
+        hris_profile:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfile'
+          - type: 'null'
+          description: Employee HRIS profile information
+        app_experience:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewAppExperience'
+          description: The app experience of the employee
+      description: Only with `include_overview`. The onboarding overview of the contract, as `GET /onboarding/tracker/{tracker_id}` returns it in `data`
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverview
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsData:
+      type: object
+      properties:
+        country:
+          type: string
+          description: Country code for location-related summaries
+        timezone:
+          type: string
+          description: Timezone information
+        has_withdraw_methods:
+          type: boolean
+          description: Indicates if withdrawal methods exist
+      description: Additional data about the summary item
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataSummaryItemsData
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItems:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItemsData'
+        type:
+          type: string
+          description: Type of the stepper action
+        completed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Completion timestamp of the stepper action
+      description: Stepper action information
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItems
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklist:
+      type: object
+      properties:
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItems'
+          description: List of checklist steps
+        summary:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklistSummary'
+          description: How far along the checklist is
+      description: List of checklist steps
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataChecklist
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewSummaryItemsValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      - type: string
+        format: date-time
+      - type: object
+        additionalProperties:
+          description: Any type
+      description: Value of the summary item
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewSummaryItemsValue
+    Onboarding_getOnboardingDetailsByEmployeeHrisProfileId-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaData'
+      title: Onboarding_getOnboardingDetailsByEmployeeHrisProfileId-v2026-01-01_Response_200
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfile:
+      type: object
+      properties:
+        oid:
+          type:
+          - string
+          - 'null'
+          description: HRIS Profile OID
+        name:
+          type:
+          - string
+          - 'null'
+          description: HRIS Profile name
+        email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Email of the HRIS profile
+        work_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Work email of the HRIS profile
+        invitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfileInvitationsItems'
+          description: Invitations to the employee that are not sent yet
+        direct_manager:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfileDirectManager'
+          - type: 'null'
+          description: The direct manager of the employee, when one is set
+      description: Employee HRIS profile information
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfile
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProgressSubStatus:
+      type: string
+      enum:
+      - PENDING_INVITE
+      - INVITED
+      - ONBOARDING
+      - AWAITING_CLIENT_REVIEW
+      - CANCELLED
+      - REJECTED
+      description: Finer state within the status, when there is one
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataProgressSubStatus
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsOneOf1Items:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        type:
+          type: string
+          description: Error category
+        context:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Additional error context
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - type
+      - message
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsOneOf1Items
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsStatus:
+      type: string
+      enum:
+      - ONBOARDING_AT_RISK
+      - ONBOARDING_OVERDUE
+      - INVITED
+      - ONBOARDING
+      - READY_TO_START
+      - INACTIVE
+      - PENDING_INVITE
+      - ACTIVE
+      - DRAFT
+      - OFFBOARDING
+      - QUOTE_REQUIRES_CHANGES
+      - IN_REVIEW
+      - IN_OFFER_STAGE
+      description: Current status of the onboarding on this contract
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractsItemsStatus
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistSummary:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Number of checklist steps
+        completed:
+          type: integer
+          description: Number of completed steps
+        outstanding:
+          type: integer
+          description: Number of steps the worker still owes
+      description: How far along the checklist is
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewChecklistSummary
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsWorkerType:
+      type: string
+      enum:
+      - contractor
+      - direct_employee
+      - hris_direct_employee
+      - hris_direct_contractor
+      - eor
+      - peo
+      - person_without_contract
+      description: The worker type of the contract, as the hiring_types filter takes it
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataContractsItemsWorkerType
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItemsData:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Checklist steps in total, on the checklist progress step
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItemsDataEmailsItems'
+          description: List of emails sent during the stepper process
+        completed:
+          type: integer
+          description: Checklist steps completed, on the checklist progress step
+        remaining:
+          type: integer
+          description: Checklist steps remaining, on the checklist progress step
+        next_reminder_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Next reminder date, if applicable
+        onboarding_due_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When onboarding is due, on the checklist progress step
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataStepperItemsData
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrors1:
+      type: array
+      items:
+        $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrorsOneOf1Items'
+      description: Error messages
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaErrors1
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItemsPathItems:
+      oneOf:
+      - type: string
+      - type: integer
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaErrorsOneOf0ErrorsItemsPathItems
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBannerSeverity:
+      type: string
+      enum:
+      - ERROR
+      - WARNING
+      - INFO
+      description: How serious it is
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataBannerSeverity
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBanner:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBannerKey'
+          description: What the banner is about
+        action:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBannerAction'
+          - type: 'null'
+          description: What the client can do about it, when there is something
+        severity:
+          $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBannerSeverity'
+          description: How serious it is
+      description: The one thing worth saying about this worker, or null when there is nothing
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewBanner
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsState:
+      type: string
+      enum:
+      - NOT_STARTED
+      - IN_PROGRESS
+      - IN_REVIEW
+      - COMPLETED
+      - OVERDUE
+      description: State of the step, reported the same way for every worker type
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataChecklistStepsItemsState
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProgress:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Current status of the onboarding process (e.g., ACTIVE)
+        sub_status:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProgressSubStatus'
+          - type: 'null'
+          description: Finer state within the status, when there is one
+        reference_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Reference date for the progress
+        subject_to_overdue:
+          type: boolean
+          description: Indicates if the onboarding is subject to overdue
+        reference_date_timezone:
+          type:
+          - string
+          - 'null'
+          description: Timezone of the reference date
+        is_action_required_from_client:
+          type: boolean
+          description: Indicates if action is required from the client
+      description: Progress of the onboarding process
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewProgress
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfileInvitationsItemsStatus:
+      type: string
+      enum:
+      - SENT
+      - DISABLED
+      - SUSPENDED
+      - SCHEDULED
+      - FAILED
+      description: Status of the invitation
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewHrisProfileInvitationsItemsStatus
+    OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfile:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: HRIS Profile OID
+        name:
+          type: string
+          description: HRIS Profile name
+        email:
+          type: string
+          format: email
+          description: Email of the HRIS profile
+        work_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Work email of the HRIS profile
+        invitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItems'
+          description: Invitations to the employee that are not sent yet
+        direct_manager:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfileDirectManager'
+          - type: 'null'
+          description: The direct manager of the employee, when one is set
+      description: Employee HRIS profile information
+      title: OnboardingTrackerHrisProfileHrisProfileIdGetResponsesContentApplicationJsonSchemaDataHrisProfile
+    OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContract:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique contract ID
+        oid:
+          type: string
+          description: Contract OID
+        name:
+          type: string
+          description: Contract name
+        status:
+          type:
+          - string
+          - 'null'
+          description: Contract status (e.g., in_progress)
+        is_pwac:
+          type: boolean
+          description: Whether the worker is a person without a contract
+        created_at:
+          type: string
+          format: date-time
+          description: Contract creation timestamp
+        first_sign:
+          type:
+          - string
+          - 'null'
+          description: The first sign (either 'client' or 'contractor')
+        completion_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The completion date of the contract, if applicable
+        client_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the client signed the contract
+        employee_agreement:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractEmployeeAgreement'
+          - type: 'null'
+          description: Information about the Employment Agreement
+        first_early_invoice:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContractFirstEarlyInvoice'
+          - type: 'null'
+          description: Applicable only for EOR contracts. First early invoice (EOR funding statement) for the contract, if any
+        contractor_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the contractor signed the contract
+        invited_contractor_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Email of the invited contractor
+      description: Information about the contract
+      title: OnboardingTrackerGetResponsesContentApplicationJsonSchemaDataItemsOverviewContract
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItemsStatus:
+      type: string
+      enum:
+      - SENT
+      - DISABLED
+      - SUSPENDED
+      - SCHEDULED
+      - FAILED
+      description: Status of the invitation
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataHrisProfileInvitationsItemsStatus
+    OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContract:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique contract ID
+        oid:
+          type: string
+          description: Contract OID
+        name:
+          type: string
+          description: Contract name
+        status:
+          type: string
+          description: Contract status (e.g., in_progress)
+        is_pwac:
+          type: boolean
+          description: Whether the worker is a person without a contract
+        created_at:
+          type: string
+          format: date-time
+          description: Contract creation timestamp
+        first_sign:
+          type: string
+          description: The first sign (either 'client' or 'contractor')
+        completion_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The completion date of the contract, if applicable
+        client_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the client signed the contract
+        employee_agreement:
+          $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractEmployeeAgreement'
+          description: Information about the Employment Agreement
+        first_early_invoice:
+          oneOf:
+          - $ref: '#/components/schemas/OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContractFirstEarlyInvoice'
+          - type: 'null'
+          description: Applicable only for EOR contracts. First early invoice (EOR funding statement) for the contract, if any
+        contractor_signed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the contractor signed the contract
+        invited_contractor_email:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Email of the invited contractor
+      description: Information about the contract
+      title: OnboardingTrackerTrackerIdGetResponsesContentApplicationJsonSchemaDataContract
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

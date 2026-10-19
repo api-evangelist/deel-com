@@ -1,0 +1,667 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Contractor Hiring API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: contractorHiring
+paths:
+  /contracts/{contract_id}/documents:
+    post:
+      operationId: contractorHiring_createContractDocument
+      summary: Attach a file to contract
+      description: 'Uploads a file and attaches it as a document to the specified contract by creating an amendment with the attachment. Only supported for ongoing_time_based, milestones, payg_tasks, time_based, pay_as_you_go_time_based, and eor contract types.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - contractorHiring
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/contractor-hiring_createContractDocument_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: A form to attach a file to contract document.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Upload the file you want to attach to this entry.
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/invite:
+    get:
+      operationId: contractorHiring_getContractInvite
+      summary: Get worker invite link
+      description: 'Retrieves the signing invitation link generated for the worker on a contract, with optional localization via the `locale` parameter.
+
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - contractorHiring
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: locale
+        in: query
+        description: Locale to use for the invite link.
+        required: false
+        schema:
+          type: string
+          pattern: ^[a-z]{2,5}$
+          minLength: 2
+          maxLength: 5
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/contractor-hiring_getContractInvite_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/preview:
+    get:
+      operationId: contractorHiring_getContractPreview
+      summary: Preview a contract agreement
+      description: 'Returns the rendered HTML content of an IC or EOR contract agreement for a given contract_id. If no templateId is provided, the default or currently assigned template is used. Global Payroll contract types are not supported.
+
+
+        **Token scopes**: `contracts:read`, `worker:read`'
+      tags:
+      - contractorHiring
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: templateId
+        in: query
+        description: ID of an existing contract template.
+        required: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/invitations:
+    delete:
+      operationId: contractorHiring_getContractInvitations
+      summary: Remove invite
+      description: 'Removes the active signing invitation from a contract to allow a new invitation to be issued to the worker.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - contractorHiring
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/contractor-hiring_getContractInvitations_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    post:
+      operationId: contractorHiring_createContractInvitation
+      summary: Send contract to worker
+      description: 'Sends a signing invitation email to a worker for the specified contract, setting their email as the expected signer. If the contract was previously rejected, resets its status back to a signing-eligible state. Can only be called if the worker has not already signed the contract.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - contractorHiring
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/contractor-hiring_createContractInvitation_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdInvitationsPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/payment_cycles:
+    get:
+      operationId: contractorHiring_getContractPaymentCycles
+      summary: Retrieve contractor payment dates
+      description: 'Fetches the scheduled payment dates and current status of each payment cycle for a specific contract.
+
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - contractorHiring
+      parameters:
+      - name: contract_id
+        in: path
+        description: The Deel contract ID for which payment dates are being retrieved.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response containing contractor payment dates.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/contractor-hiring_getContractPaymentCycles_Response_200'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/signatures:
+    post:
+      operationId: contractorHiring_createContractSignature
+      summary: Sign a contract
+      description: 'Signs a contract on behalf of the client (employer), advancing the contract through the hiring workflow. When the contract is awaiting the client signature, it transitions to a pending-contractor-signature state. Can also be used to sign a pending amendment on an already active contract.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - contractorHiring
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/contractor-hiring_createContractSignature_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    ContractsContractIdSignaturesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+      required:
+      - created
+      title: ContractsContractIdSignaturesPostResponsesContentApplicationJsonSchemaData
+    contractor-hiring_createContractInvitation_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdInvitationsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: contractor-hiring_createContractInvitation_Response_201
+    contractor-hiring_getContractInvitations_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdInvitationsDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: contractor-hiring_getContractInvitations_Response_200
+    ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the payment.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: The current status of the payment cycle.
+        due_date:
+          type: string
+          format: date-time
+          description: The date and time when the payment is due.
+      required:
+      - id
+      - status
+      - due_date
+      title: ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItems
+    ContractsContractIdInvitationsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: Worker email
+        locale:
+          $ref: '#/components/schemas/ContractsContractIdInvitationsPostRequestBodyContentApplicationJsonSchemaDataLocale'
+          default: en
+          description: Locale of the email
+        message:
+          type: string
+          description: Message to the worker
+      title: ContractsContractIdInvitationsPostRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdDocumentsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        key:
+          type: string
+          description: You can call attachments end-point, get key and URL to upload your file.
+        filename:
+          type: string
+          description: Original filename you used to upload using attachments end-point.
+      required:
+      - key
+      - filename
+      description: This object is used for linking file attachments to your records.
+      title: ContractsContractIdDocumentsPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - active
+      - upcoming
+      - awaiting_payment
+      - overdue
+      description: The current status of the payment cycle.
+      title: ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    contractor-hiring_createContractDocument_Response_201:
+      type: object
+      properties:
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdDocumentsPostResponsesContentApplicationJsonSchemaData'
+          - type: 'null'
+          description: This object is used for linking file attachments to your records.
+      required:
+      - data
+      title: contractor-hiring_createContractDocument_Response_201
+    contractor-hiring_createContractSignature_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdSignaturesPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: contractor-hiring_createContractSignature_Response_201
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ContractsContractIdInvitationsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+      required:
+      - created
+      title: ContractsContractIdInvitationsPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdInvitationsDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms the deletion.
+      required:
+      - deleted
+      title: ContractsContractIdInvitationsDeleteResponsesContentApplicationJsonSchemaData
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaDataContractTemplateId:
+      oneOf:
+      - type: number
+        format: double
+      - type: string
+      description: Please use null to use default Deel contract template; otherwise you can use the template you created and customized. If template ID is not in payload, template stays unchanged.
+      title: ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaDataContractTemplateId
+    ContractsContractIdInvitationsPostRequestBodyContentApplicationJsonSchemaDataLocale:
+      type: string
+      enum:
+      - en
+      - es
+      - fr
+      - de
+      - it
+      - pt
+      - pl
+      - nn
+      - nl
+      - da
+      - deAT
+      - fi
+      - sv
+      - nlBE
+      - ja
+      default: en
+      description: Locale of the email
+      title: ContractsContractIdInvitationsPostRequestBodyContentApplicationJsonSchemaDataLocale
+    contractor-hiring_getContractPaymentCycles_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdPaymentCyclesGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: contractor-hiring_getContractPaymentCycles_Response_200
+    ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        client_signature:
+          type: string
+          minLength: 2
+          description: Signature of client.
+        contract_template_id:
+          $ref: '#/components/schemas/ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaDataContractTemplateId'
+          description: Please use null to use default Deel contract template; otherwise you can use the template you created and customized. If template ID is not in payload, template stays unchanged.
+      required:
+      - client_signature
+      title: ContractsContractIdSignaturesPostRequestBodyContentApplicationJsonSchemaData
+    contractor-hiring_getContractInvite_Response_200:
+      type: object
+      properties:
+        data:
+          type: string
+      required:
+      - data
+      title: contractor-hiring_getContractInvite_Response_200
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

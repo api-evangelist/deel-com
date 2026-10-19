@@ -1,0 +1,276 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Off Cycle Payments API
+  version: 1.0.0
+  description: API endpoints related to Off-cycle Payments.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: offCyclePayments
+  description: API endpoints related to Off-cycle Payments.
+paths:
+  /contracts/{contract_id}/off-cycle-payments/{off_cycle_payment_id}:
+    get:
+      operationId: offCyclePayments_getOffCyclePaymentByContractAndId-v2026-01-01
+      summary: Retrieve a single off-cycle payment
+      description: 'Retrieves a single off-cycle payment identified by id within a specific contract.
+
+
+        **Token scopes**: `off-cycle-payments:read`'
+      tags:
+      - offCyclePayments
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: off_cycle_payment_id
+        in: path
+        description: Deel off-cycle payment id.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Off-cycle_Payments_getOffCyclePaymentByContractAndId-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request - The contract_id parameter failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOffCyclePaymentByContractAndId-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - The requesting token is not authorized to retrieve off-cycle payments as a client.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOffCyclePaymentByContractAndId-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found - The specified contract does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOffCyclePaymentByContractAndId-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The off-cycle payment could not be retrieved due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOffCyclePaymentByContractAndId-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    GetOffCyclePaymentByContractAndId-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the contract could not be found.
+      required:
+      - errors
+      title: GetOffCyclePaymentByContractAndId-v2026-01-01RequestNotFoundError
+    ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaDataReportedBy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the reporter.
+        full_name:
+          type: string
+          description: Full name of the person who reported the payment.
+      required:
+      - id
+      description: Details of the person who reported the off-cycle payment.
+      title: ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaDataReportedBy
+    GetOffCyclePaymentByContractAndId-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation errors describing why the off-cycle payment could not be retrieved.
+      required:
+      - errors
+      title: GetOffCyclePaymentByContractAndId-v2026-01-01RequestBadRequestError
+    GetOffCyclePaymentByContractAndId-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the off-cycle payment could not be accessed.
+      required:
+      - errors
+      title: GetOffCyclePaymentByContractAndId-v2026-01-01RequestForbiddenError
+    Off-cycle_Payments_getOffCyclePaymentByContractAndId-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaData'
+          description: Details of the off-cycle payment.
+      required:
+      - data
+      title: Off-cycle Payments_getOffCyclePaymentByContractAndId-v2026-01-01_Response_200
+    ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    GetOffCyclePaymentByContractAndId-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the off-cycle payment cannot be retrieved.
+      required:
+      - errors
+      title: GetOffCyclePaymentByContractAndId-v2026-01-01RequestInternalServerError
+    ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the off-cycle payment.
+        amount:
+          type: string
+          description: Amount of the off-cycle payment.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: Current status of the off-cycle payment.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the off-cycle payment was created.
+        description:
+          type: string
+          description: Description of the off-cycle payment.
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaDataReportedBy'
+          description: Details of the person who reported the off-cycle payment.
+        currency_code:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: ISO 4217 currency code of the payment.
+        date_submitted:
+          type: string
+          format: date-time
+          description: Timestamp of when the payment was submitted.
+      required:
+      - id
+      - amount
+      - status
+      - created_at
+      - description
+      - reported_by
+      - currency_code
+      - date_submitted
+      description: Details of the off-cycle payment.
+      title: ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaData
+    ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - new
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: Current status of the off-cycle payment.
+      title: ContractsContractIdOffCyclePaymentsOffCyclePaymentIdGetResponsesContentApplicationJsonSchemaDataStatus
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

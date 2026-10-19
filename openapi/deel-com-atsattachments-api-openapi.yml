@@ -1,0 +1,310 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Attachments API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsAttachments
+paths:
+  /ats/attachments/{attachable_type_slug}/{attachable_id}/{attachment_type_slug}:
+    get:
+      operationId: atsAttachments_retrievePaginatedListOfAtsAttachmentFiles-v2026-01-01
+      summary: Retrieve paginated list of ATS attachment files
+      description: 'Lists the files attached to an ATS record, each with a time-limited download URL. Use it to read back or download documents uploaded earlier; to add a file, use `POST /rest/ats/attachments/{attachable_type_slug}/{attachable_id}/{attachment_type_slug}`.
+
+
+        **Token scopes**: `ats:read`, `worker:read`'
+      tags:
+      - atsAttachments
+      parameters:
+      - name: attachable_type_slug
+        in: path
+        description: Type of the attachable entity
+        required: true
+        schema:
+          $ref: '#/components/schemas/AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetParametersAttachableTypeSlug'
+      - name: attachable_id
+        in: path
+        description: Unique identifier for the attachable entity
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: attachment_type_slug
+        in: path
+        description: Type of the attachment
+        required: true
+        schema:
+          $ref: '#/components/schemas/AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetParametersAttachmentTypeSlug'
+      - name: cursor
+        in: query
+        description: The cursor for pagination
+        required: false
+        schema:
+          type: string
+          maxLength: 1000
+      - name: limit
+        in: query
+        description: Maximum number of records returned in one response
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-attachments_retrievePaginatedListOfAtsAttachmentFiles-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievePaginatedListOfAtsAttachmentFiles-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievePaginatedListOfAtsAttachmentFiles-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievePaginatedListOfAtsAttachmentFiles-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    RetrievePaginatedListOfAtsAttachmentFiles-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrievePaginatedListOfAtsAttachmentFiles-v2026-01-01RequestForbiddenError
+    AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the attachment
+        url:
+          type: string
+          format: url
+          description: URL of the attachment
+        file_name:
+          type: string
+          description: Name of the file
+        ai_summary:
+          type:
+          - string
+          - 'null'
+          description: AI-generated summary of the attachment
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the attachment was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the attachment was last updated
+        attachable_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the attachable entity
+        file_content_type:
+          type: string
+          description: Content type of the file
+        attachable_type_slug:
+          type: string
+          description: Type of the attachable entity
+        attachment_type_slug:
+          type: string
+          description: Type of the attachment
+        created_by_hris_organization_user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: User ID who created the attachment
+      required:
+      - id
+      - file_name
+      - file_content_type
+      - attachable_type_slug
+      - attachment_type_slug
+      title: AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetResponsesContentApplicationJsonSchemaDataItems
+    AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetParametersAttachmentTypeSlug:
+      type: string
+      enum:
+      - CV
+      - LOGO
+      - OFFER_LETTER
+      - OTHER
+      title: AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetParametersAttachmentTypeSlug
+    RetrievePaginatedListOfAtsAttachmentFiles-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrievePaginatedListOfAtsAttachmentFiles-v2026-01-01RequestInternalServerError
+    AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetResponsesContentApplicationJsonSchemaErrorsItems
+    AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetParametersAttachableTypeSlug:
+      type: string
+      enum:
+      - CANDIDATE
+      - CAREER_PAGE_SETTING
+      - JOB_POSTING
+      - NOTE
+      - OFFER
+      - SENT_CANDIDATE_EMAIL
+      - EMAIL_MESSAGE
+      - TEMPORARY
+      - EMAIL_TEMPLATE
+      - JOB_ACTIVITY
+      title: AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetParametersAttachableTypeSlug
+    ats-attachments_retrievePaginatedListOfAtsAttachmentFiles-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Array of attachment objects
+        has_more:
+          type: boolean
+          description: Indicates if there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          maxLength: 1000
+          description: Cursor for pagination to fetch next page
+        total_count:
+          type: number
+          format: double
+          description: Total count of attachments
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: ats-attachments_retrievePaginatedListOfAtsAttachmentFiles-v2026-01-01_Response_200
+    RetrievePaginatedListOfAtsAttachmentFiles-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsAttachmentsAttachableTypeSlugAttachableIdAttachmentTypeSlugGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrievePaginatedListOfAtsAttachmentFiles-v2026-01-01RequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

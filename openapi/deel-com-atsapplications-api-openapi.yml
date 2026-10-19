@@ -1,0 +1,2855 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Applications API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsApplications
+paths:
+  /ats/applications/{application_id}:
+    get:
+      operationId: atsApplications_retrieveAtsApplication-v2026-01-01
+      summary: Retrieve ATS application
+      description: 'Retrieves one ATS application by application_id, including its full interview-stage timeline — when it entered and left each stage and who moved it — not just its current status. Use it to check where a candidate stands or to reconstruct how an application progressed.
+
+
+        **Token scopes**: `ats:read`, `worker:read`'
+      tags:
+      - atsApplications
+      parameters:
+      - name: application_id
+        in: path
+        description: Application ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successfully retrieved application
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-applications_retrieveAtsApplication-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAtsApplication-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAtsApplication-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAtsApplication-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /ats/applications/{application_id}/notes:
+    post:
+      operationId: atsApplications_addNoteToAnApplication-v2026-01-01
+      summary: Add note to an application
+      description: 'Adds a note to a specific application. The `author_id` must correspond to a valid HRIS user.
+
+
+        **Token scopes**: `ats:write`, `ats.applications.notes:write`'
+      tags:
+      - atsApplications
+      parameters:
+      - name: application_id
+        in: path
+        description: Id of the application which the note will be added
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: Application note created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-applications_addNoteToAnApplication-v2026-01-01_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddNoteToAnApplication-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddNoteToAnApplication-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddNoteToAnApplication-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AtsApplicationsApplicationIdNotesPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /ats/applications/{application_id}/interview-plan-stages:
+    post:
+      operationId: atsApplications_associateApplicationWithAnInterviewPlanStage-v2026-01-01
+      summary: Assign application to interview plan stage
+      description: 'Associates an application with a specific interview plan stage. Set `is_current_stage` to `true` to advance the application''s active stage, or `false` to record a historical stage entry without changing the current stage. Pass `applicable_job_activities` to selectively trigger activities, omit it to trigger all, or pass an empty array to trigger none; if archiving the candidate, include `candidate_archivation_reason_id` and optionally `candidate_archivation_email_template_id` to send a rejection email.
+
+
+        **Token scopes**: `ats:write`, `worker:write`'
+      tags:
+      - atsApplications
+      parameters:
+      - name: application_id
+        in: path
+        description: ID of the application to be associated with the interview plan stage
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: Application interview plan stage successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-applications_associateApplicationWithAnInterviewPlanStage-v2026-01-01_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssociateApplicationWithAnInterviewPlanStage-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssociateApplicationWithAnInterviewPlanStage-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssociateApplicationWithAnInterviewPlanStage-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /ats/applications:
+    post:
+      operationId: atsApplications_createAtsApplication-v2026-01-01
+      summary: Create ATS Application
+      description: 'Creates a new ATS application linking an existing candidate to an existing job. Both the candidate and job must exist prior to this call; the returned id can be used for subsequent operations such as adding notes or associating interview stages.
+
+
+        **Token scopes**: `ats:write`, `worker:write`'
+      tags:
+      - atsApplications
+      responses:
+        '201':
+          description: Successful response with application data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-applications_createAtsApplication-v2026-01-01_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateApplication-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateApplication-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateApplication-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Create application request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: atsApplications_retrieveAListOfAtsApplications-v2026-01-01
+      summary: Retrieve a list of ATS applications
+      description: 'Use this endpoint to trace where candidates stand in the hiring pipeline and how they got there — every interview plan stage an application has reached and when it entered and left each one.
+
+
+        **Token scopes**: `ats:read`, `worker:read`'
+      tags:
+      - atsApplications
+      parameters:
+      - name: cursor
+        in: query
+        description: Cursor for pagination. Use the nextCursor value from the previous response to get the next page of results.
+        required: false
+        schema:
+          type: string
+          maxLength: 1000
+      - name: limit
+        in: query
+        description: Maximum number of applications to return per page
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+          default: 20
+      - name: search_text
+        in: query
+        description: Search text to filter applications
+        required: false
+        schema:
+          type: string
+          maxLength: 500
+      - name: job_id
+        in: query
+        description: Filter by job ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: interview_plan_stage_ids
+        in: query
+        description: Filter by the CURRENT interview plan stage IDs (comma-separated). Applications that have since moved to another stage are excluded — use reached_interview_plan_stage_ids for those.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: reached_interview_plan_stage_ids
+        in: query
+        description: Filter by interview plan stage IDs the application has EVER been in (comma-separated), including applications that have since advanced, been hired or been archived.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: moved_to_current_stage_before
+        in: query
+        description: Return only applications that moved to their current stage strictly before this ISO 8601 datetime (stalled candidates)
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: archivation_reason_ids
+        in: query
+        description: Filter by archivation reason IDs (comma-separated); see GET /rest/ats/reasons with reason_group_slug=CANDIDATE_ARCHIVATION
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: candidate_tag_ids_operator
+        in: query
+        description: 'How candidate_tag_ids are combined: ANY (default) matches candidates with at least one of the tags, ALL requires every tag'
+        required: false
+        schema:
+          $ref: '#/components/schemas/AtsApplicationsGetParametersCandidateTagIdsOperator'
+      - name: include
+        in: query
+        description: Optional expansions to embed on each item. STAGE_HISTORY adds the full stage timeline with entered/exited timestamps.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsGetParametersIncludeSchemaItems'
+      - name: candidate_tag_ids
+        in: query
+        description: Filter by candidate tag IDs (comma-separated)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: source_slugs
+        in: query
+        description: Filter by application source (comma-separated)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: job_criterias_matchings
+        in: query
+        description: Filter applications by job criteria matching state
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsGetParametersJobCriteriasMatchingsSchemaItems'
+      - name: current_stage_category_type_slugs
+        in: query
+        description: Filter applications by current stage category type slugs. Accepted values are lead, active and completed, in either case — the job list reports them uppercase and this filter accepts that form too.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            maxLength: 50
+      - name: current_stage_default_type_slugs
+        in: query
+        description: Filter applications by current stage default type slugs (e.g. new_lead, application_review, offer, hired, archived), in either case. Use 'others' for custom stages.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            maxLength: 50
+      - name: updated_after
+        in: query
+        description: Filter applications updated after this timestamp (ISO 8601 format)
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: sort_by
+        in: query
+        description: Field to sort applications by
+        required: false
+        schema:
+          $ref: '#/components/schemas/AtsApplicationsGetParametersSortBy'
+      - name: sort_order
+        in: query
+        description: Sort order for applications
+        required: false
+        schema:
+          $ref: '#/components/schemas/AtsApplicationsGetParametersSortOrder'
+      responses:
+        '200':
+          description: Successfully retrieved applications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-applications_retrieveAListOfAtsApplications-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsApplications-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsApplications-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsApplications-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    AtsApplicationsGetParametersJobCriteriasMatchingsSchemaItems:
+      type: object
+      properties:
+        is_matched:
+          $ref: '#/components/schemas/AtsApplicationsGetParametersJobCriteriasMatchingsSchemaItemsIsMatched'
+        job_criteria_id:
+          type: string
+          format: uuid
+      required:
+      - is_matched
+      - job_criteria_id
+      title: AtsApplicationsGetParametersJobCriteriasMatchingsSchemaItems
+    AtsApplicationsGetParametersSortBy:
+      type: string
+      enum:
+      - APPLICATION_CREATION_DATE
+      - STAGE_CREATION_DATE
+      title: AtsApplicationsGetParametersSortBy
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationJobCriteriasMatchingsItemsIsMatched:
+      type: string
+      enum:
+      - MATCHED
+      - NOT_MATCHED
+      - UNDECIDED
+      description: Whether the criteria is matched
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationJobCriteriasMatchingsItemsIsMatched
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPostingPublication:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job posting publication unique identifier
+      required:
+      - id
+      description: Job posting publication details
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPostingPublication
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmissionAnswersItemsQuestionType:
+      type: string
+      enum:
+      - FREETEXT
+      - PARAGRAPH
+      - SINGLESELECTION
+      - MULTISELECTION
+      - DOCUMENTUPLOAD
+      - PRESETDROPDOWN
+      - CUSTOMDROPDOWN
+      - NUMBER
+      - DATEPICKER
+      - ADDRESS
+      - PHONENUMBER
+      - EMAIL
+      description: Type of the question (uppercase)
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmissionAnswersItemsQuestionType
+    AddNoteToAnApplication-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdNotesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: AddNoteToAnApplication-v2026-01-01RequestInternalServerError
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCurrentApplicationInterviewPlanStage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identifier of the application interview plan stage record
+        interview_plan_stage:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCurrentApplicationInterviewPlanStageInterviewPlanStage'
+          - type: 'null'
+      required:
+      - id
+      - interview_plan_stage
+      description: Current interview plan stage for the application
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCurrentApplicationInterviewPlanStage
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job employment type unique identifier
+        employment_type:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentTypeEmploymentType'
+      required:
+      - id
+      - employment_type
+      description: Employment type information for the job
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentType
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationJobCriteriasMatchingsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job criteria matching identifier
+        is_matched:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationJobCriteriasMatchingsItemsIsMatched'
+          description: Match status
+        description:
+          type: string
+          description: Match description
+        job_criteria:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationJobCriteriasMatchingsItemsJobCriteria'
+      required:
+      - id
+      - is_matched
+      - description
+      - job_criteria
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationJobCriteriasMatchingsItems
+    AtsApplicationsApplicationIdNotesPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsApplicationsApplicationIdNotesPostResponsesContentApplicationJsonSchemaErrorsItems
+    ? AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCurrentApplicationInterviewPlanStageInterviewPlanStage
+    : type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Interview plan stage unique identifier
+        name:
+          type: string
+          description: Interview plan stage name
+        position_number:
+          type: integer
+          description: Position of the stage in the interview plan
+        default_type_slug:
+          type:
+          - string
+          - 'null'
+          description: Default type slug
+        category_type_slug:
+          type: string
+          description: Category type slug
+      required:
+      - id
+      - name
+      - position_number
+      - default_type_slug
+      - category_type_slug
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCurrentApplicationInterviewPlanStageInterviewPlanStage
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        notes:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataNotesItems'
+          description: Array of notes to attach to the application
+        job_id:
+          type: string
+          format: uuid
+          description: The ID of the job for this application
+        source_slug:
+          type: string
+          description: The application source. Accepts any active source slug of the organization, e.g. SOURCED_INTERNALLY, SOURCED_EXTERNALLY, INTERNAL_REFERRAL_AWARE, INTERNAL_REFERRAL_NOT_AWARE, EXTERNAL_CAREER_PAGE or a custom source slug (case-insensitive). Defaults to the candidate origin source when omitted.
+        candidate_id:
+          type: string
+          format: uuid
+          description: The ID of the candidate applying
+        job_posting_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The ID of the job posting (optional)
+        job_employment_type_id:
+          type: string
+          format: uuid
+          description: The ID of the employment type for this job
+        application_form_submission_data:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems'
+          description: Array of form submission answers
+      required:
+      - job_id
+      - candidate_id
+      - job_employment_type_id
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaData
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataReferralFormSubmission:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Identifier of the referral form submission
+        form_builder_stringified:
+          type:
+          - string
+          - 'null'
+          description: Stringified JSON data for the referral form submission
+      required:
+      - id
+      - form_builder_stringified
+      description: Referral form submission metadata
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataReferralFormSubmission
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identifier of the application form submission
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmissionAnswersItems'
+          description: Array of question answers with parsed data
+      required:
+      - id
+      - answers
+      description: Application form submission data with mapped answers
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmission
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobEmploymentType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identifier of the job employment type record
+        employment_type:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobEmploymentTypeEmploymentType'
+          description: Employment type metadata
+      required:
+      - id
+      - employment_type
+      description: Employment type associated with the application
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobEmploymentType
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    AtsApplicationsApplicationIdInterviewPlanStagesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the created application interview plan stage record
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the record was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the record was last updated
+      required:
+      - id
+      - created_at
+      - updated_at
+      description: The created application interview plan stage record
+      title: AtsApplicationsApplicationIdInterviewPlanStagesPostResponsesContentApplicationJsonSchemaData
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ? AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItemsEvaluationResultItemsOperatorEnum
+    : type: string
+      enum:
+      - EQUALS
+      - NOT_EQUALS
+      - CONTAINS
+      - DOES_NOT_CONTAIN
+      - IS_EMPTY
+      - IS_NOT_EMPTY
+      - GREATER_THAN
+      - GREATER_THAN_OR_EQUAL
+      - LESS_THAN
+      - LESS_THAN_OR_EQUAL
+      description: Comparison operator
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItemsEvaluationResultItemsOperatorEnum
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems11:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf11Type'
+          description: Question type this answer belongs to.
+        email:
+          type: string
+          format: email
+          description: Email address
+        question_id:
+          type: string
+          description: Question identifier
+      required:
+      - type
+      - email
+      - question_id
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems11
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCandidateCandidateTagsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Candidate tag unique identifier
+        tag:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCandidateCandidateTagsItemsTag'
+      required:
+      - id
+      - tag
+      description: Candidate tag with label
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCandidateCandidateTagsItems
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf10Type:
+      type: string
+      enum:
+      - PHONENUMBER
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf10Type
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCurrentApplicationInterviewPlanStage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Application interview plan stage unique identifier
+        application_id:
+          type: string
+          format: uuid
+          description: Application unique identifier
+        interview_plan_stage:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCurrentApplicationInterviewPlanStageInterviewPlanStage'
+        interview_plan_stage_id:
+          type: string
+          format: uuid
+          description: Interview plan stage unique identifier
+      required:
+      - id
+      - application_id
+      - interview_plan_stage
+      - interview_plan_stage_id
+      description: Current interview plan stage information for the application
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCurrentApplicationInterviewPlanStage
+    CreateApplication-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateApplication-v2026-01-01RequestInternalServerError
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPostingPublicationStateStateSlug:
+      type: string
+      enum:
+      - PUBLISHED_BASIC
+      - PUBLISHED_PREMIUM
+      - UNPUBLISHED
+      - EXPIRED
+      - IN_PROGRESS
+      - FAILED
+      description: State of job posting publication
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPostingPublicationStateStateSlug
+    ats-applications_associateApplicationWithAnInterviewPlanStage-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdInterviewPlanStagesPostResponsesContentApplicationJsonSchemaData'
+          description: The created application interview plan stage record
+      required:
+      - data
+      title: ats-applications_associateApplicationWithAnInterviewPlanStage-v2026-01-01_Response_201
+    AssociateApplicationWithAnInterviewPlanStage-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdInterviewPlanStagesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: AssociateApplicationWithAnInterviewPlanStage-v2026-01-01RequestBadRequestError
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationJobCriteriasMatchingsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job criteria matching unique identifier
+        is_matched:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationJobCriteriasMatchingsItemsIsMatched'
+          description: Whether the criteria is matched
+        description:
+          type: string
+          description: Job criteria matching description
+        job_criteria_id:
+          type: string
+          format: uuid
+          description: Job criteria unique identifier
+      required:
+      - id
+      - is_matched
+      - description
+      - job_criteria_id
+      description: AI-generated job criteria matching result
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationJobCriteriasMatchingsItems
+    RetrieveAListOfAtsApplications-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsApplications-v2026-01-01RequestBadRequestError
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobBoard:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job board unique identifier
+        type:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobBoardType'
+          description: Type of job board
+      required:
+      - id
+      - type
+      description: Job board where application originated
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobBoard
+    AtsApplicationsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsApplicationsPostResponsesContentApplicationJsonSchemaErrorsItems
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCandidateCandidateTagsItemsTag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Tag unique identifier
+        label:
+          type: string
+          description: Tag label
+      required:
+      - id
+      - label
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCandidateCandidateTagsItemsTag
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCandidate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Candidate unique identifier
+        city:
+          type:
+          - string
+          - 'null'
+          description: Candidate city
+        email:
+          type: string
+          format: email
+          description: Candidate email address
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: Candidate profile picture URL
+        last_name:
+          type: string
+          description: Candidate last name
+        first_name:
+          type: string
+          description: Candidate first name
+        country_code:
+          type:
+          - string
+          - 'null'
+          description: Candidate country code (ISO 3166-1 alpha-2)
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Candidate phone number (may be empty string or null)
+        candidate_tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCandidateCandidateTagsItems'
+          description: Tags associated with the candidate
+      required:
+      - id
+      - email
+      - pic_url
+      - last_name
+      - first_name
+      - phone_number
+      - candidate_tags
+      description: Candidate information associated with the application
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCandidate
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems4:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf4Type'
+          description: Question type this answer belongs to.
+        question_id:
+          type: string
+          description: Question identifier
+        document_ids:
+          type: array
+          items:
+            type: string
+          description: Document IDs
+      required:
+      - type
+      - question_id
+      - document_ids
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems4
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems2:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf2Type'
+          description: Question type this answer belongs to.
+        question_id:
+          type: string
+          description: Question identifier
+        selected_option_id:
+          type: string
+          description: Selected option ID
+      required:
+      - type
+      - question_id
+      - selected_option_id
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems2
+    CreateApplication-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateApplication-v2026-01-01RequestBadRequestError
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf5Type:
+      type: string
+      enum:
+      - PRESETDROPDOWN
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf5Type
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf2Type:
+      type: string
+      enum:
+      - SINGLESELECTION
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf2Type
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJobPosting:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job posting unique identifier
+        title:
+          type: string
+          description: Job posting title
+      required:
+      - id
+      - title
+      description: Job posting information (if application came through a posting)
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJobPosting
+    ? AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataApplicableJobActivitiesItemsParticipantsItemsRoleSlug
+    : type: string
+      enum:
+      - REVIEWER
+      - INTERVIEWER
+      description: The role of the participant in the activity
+      title: AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataApplicableJobActivitiesItemsParticipantsItemsRoleSlug
+    AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataDelayUnit:
+      type: string
+      enum:
+      - hours
+      - days
+      - weeks
+      description: The unit of time for the delay. Must be provided together with delay_amount. Cannot be used together with scheduled_send_at.
+      title: AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataDelayUnit
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobEmploymentTypeEmploymentType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identifier of the employment type
+        name:
+          type: string
+          description: Human readable employment type
+      required:
+      - id
+      - name
+      description: Employment type metadata
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobEmploymentTypeEmploymentType
+    AddNoteToAnApplication-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdNotesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: AddNoteToAnApplication-v2026-01-01RequestBadRequestError
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the application
+        job:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJob'
+          description: Job details
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataNotesItems'
+          description: Notes on application
+        hired_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the application reached the hired stage; null otherwise
+        candidate:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidate'
+          description: Candidate details
+        job_board:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobBoard'
+          - type: 'null'
+          description: Job board where application originated
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the application was created
+        created_by:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier for the HRIS organization user who created the application
+        numeric_id:
+          type: integer
+          description: Numeric identifier for the application
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the application was last updated
+        job_posting:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPosting'
+          - type: 'null'
+          description: Job posting details
+        referred_by:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier for the HRIS organization user who referred the candidate
+        source_slug:
+          type:
+          - string
+          - 'null'
+          description: Source slug
+        archivation_reason:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataArchivationReason'
+          - type: 'null'
+          description: Archivation reason details; null unless archived
+        job_employment_type:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobEmploymentType'
+          - type: 'null'
+          description: Employment type associated with the application
+        submitter_ip_address:
+          type:
+          - string
+          - 'null'
+          description: IP address of the applicant who submitted the application
+        submitter_user_agent:
+          type:
+          - string
+          - 'null'
+          description: User agent of the applicant who submitted the application
+        archivation_reason_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Reason the application was archived; null unless archived
+        job_posting_publication:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPostingPublication'
+          - type: 'null'
+          description: Job posting publication details
+        referral_form_submission:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataReferralFormSubmission'
+          description: Referral form submission metadata
+        moved_to_current_stage_at:
+          type: string
+          format: date-time
+          description: Timestamp when the application moved to the current stage
+        application_form_submission:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmission'
+          - type: 'null'
+          description: Application form submission data with mapped answers
+        job_posting_publication_state:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPostingPublicationState'
+          - type: 'null'
+          description: Current state of job posting publication
+        application_job_criterias_matchings:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationJobCriteriasMatchingsItems'
+          description: Job criteria matchings
+        all_application_interview_plan_stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItems'
+          description: All interview plan stages
+        application_automation_rule_executions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItems'
+          description: Automation rule executions
+        current_application_interview_plan_stage:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCurrentApplicationInterviewPlanStage'
+          - type: 'null'
+          description: Current interview plan stage for the application
+      required:
+      - id
+      - job
+      - notes
+      - hired_at
+      - candidate
+      - job_board
+      - created_at
+      - created_by
+      - numeric_id
+      - updated_at
+      - job_posting
+      - referred_by
+      - source_slug
+      - archivation_reason
+      - job_employment_type
+      - archivation_reason_id
+      - job_posting_publication
+      - referral_form_submission
+      - moved_to_current_stage_at
+      - job_posting_publication_state
+      - application_job_criterias_matchings
+      - all_application_interview_plan_stages
+      - application_automation_rule_executions
+      - current_application_interview_plan_stage
+      description: Complete application details
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaData
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf3Type:
+      type: string
+      enum:
+      - MULTISELECTION
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf3Type
+    RetrieveAtsApplication-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAtsApplication-v2026-01-01RequestBadRequestError
+    ? AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItemsActionTypeEnum
+    : type: string
+      enum:
+      - ADD_CANDIDATE_TAG
+      - TRANSITION_APPLICATION
+      description: Type of action to execute
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItemsActionTypeEnum
+    ? AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsEmail
+    : type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the email message
+        subject:
+          type: string
+          description: Email subject line
+        body_html:
+          type: string
+          description: HTML body of the email
+        from_string:
+          type: string
+          description: Email sender address
+        recipients_cc:
+          type: array
+          items:
+            type: string
+          description: Array of CC recipient email addresses
+        recipients_to:
+          type: array
+          items:
+            type: string
+          description: Array of recipient email addresses
+        recipients_bcc:
+          type: array
+          items:
+            type: string
+          description: Array of BCC recipient email addresses
+      required:
+      - id
+      - subject
+      - body_html
+      - from_string
+      - recipients_cc
+      - recipients_to
+      - recipients_bcc
+      description: Email message associated with the offer
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsEmail
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems9:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf9Type'
+          description: Question type this answer belongs to.
+        question_id:
+          type: string
+          description: Question identifier
+        address_city:
+          type: string
+          description: City
+        address_state:
+          type: string
+          description: State
+        address_number:
+          type: string
+          description: Street number
+        address_street:
+          type: string
+          description: Street name
+        address_country:
+          type: string
+          description: Country
+        address_zip_code:
+          type: string
+          description: ZIP code
+      required:
+      - type
+      - question_id
+      - address_city
+      - address_state
+      - address_number
+      - address_street
+      - address_country
+      - address_zip_code
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems9
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmissionAnswersItemsAnswer:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmissionAnswersItemsAnswer
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidateCandidateTagsItemsTag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the tag
+        label:
+          type: string
+          description: Label of the tag
+      required:
+      - id
+      - label
+      description: Tag details
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidateCandidateTagsItemsTag
+    ? AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsCompensationPeriodSlug
+    : type: string
+      enum:
+      - ANNUALLY
+      - MONTHLY
+      - SEMIMONTHLY
+      - BIWEEKLY
+      - WEEKLY
+      - DAILY
+      - HOURLY
+      description: Compensation period
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsCompensationPeriodSlug
+    AtsApplicationsApplicationIdNotesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the application note
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the application note was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when the application note was last updated
+      required:
+      - id
+      - created_at
+      - updated_at
+      description: The created application note
+      title: AtsApplicationsApplicationIdNotesPostResponsesContentApplicationJsonSchemaData
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Candidate unique identifier
+        city:
+          type:
+          - string
+          - 'null'
+          description: Candidate city
+        email:
+          type: string
+          format: email
+          description: Candidate email address
+        last_name:
+          type: string
+          description: Candidate last name
+        first_name:
+          type: string
+          description: Candidate first name
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidateAttachmentsItems'
+          description: Array of attachments associated with the candidate (e.g., resume, cover letter)
+        country_code:
+          type:
+          - string
+          - 'null'
+          description: Candidate country code (ISO 3166-1 alpha-2)
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Candidate phone number
+        candidate_tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidateCandidateTagsItems'
+          description: Tags associated with the candidate
+        import_session_id:
+          type:
+          - string
+          - 'null'
+          description: Import session identifier if bulk imported
+        profile_picture_url:
+          type:
+          - string
+          - 'null'
+          description: Candidate profile picture URL
+      required:
+      - id
+      - email
+      - last_name
+      - first_name
+      - attachments
+      - phone_number
+      - candidate_tags
+      - import_session_id
+      - profile_picture_url
+      description: Candidate details
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidate
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobBoardType:
+      type: string
+      enum:
+      - INTERNAL_CAREER_PAGE
+      - EXTERNAL_CAREER_PAGE
+      - LINKEDIN
+      description: Type of job board
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobBoardType
+    RetrieveAtsApplication-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAtsApplication-v2026-01-01RequestInternalServerError
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationJobCriteriasMatchingsItemsJobCriteria:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job criteria identifier
+        title:
+          type: string
+          description: Job criteria title
+        description:
+          type: string
+          description: Job criteria description
+      required:
+      - id
+      - title
+      - description
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationJobCriteriasMatchingsItemsJobCriteria
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsStageHistoryItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identifier of the stage history record
+        exited_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the application left this stage; null while the application is still in it
+        entered_at:
+          type: string
+          format: date-time
+          description: Timestamp when the application entered this stage
+        is_current:
+          type: boolean
+          description: Whether this is the stage the application is currently in
+        interview_plan_stage:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsStageHistoryItemsInterviewPlanStage'
+          description: The interview plan stage this history record refers to
+        moved_by_hris_organization_user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: HRIS organization user who moved the application into this stage; null for automated moves
+      required:
+      - id
+      - exited_at
+      - entered_at
+      - is_current
+      - interview_plan_stage
+      - moved_by_hris_organization_user_id
+      description: One visit of the application to an interview plan stage, in chronological order
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsStageHistoryItems
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems3:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf3Type'
+          description: Question type this answer belongs to.
+        question_id:
+          type: string
+          description: Question identifier
+        selected_option_ids:
+          type: array
+          items:
+            type: string
+          description: Selected option IDs
+      required:
+      - type
+      - question_id
+      - selected_option_ids
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems3
+    ats-applications_retrieveAtsApplication-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaData'
+          description: Complete application details
+      required:
+      - data
+      description: Single application response
+      title: ats-applications_retrieveAtsApplication-v2026-01-01_Response_200
+    ? AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItemsEvaluationResultItems
+    : type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the evaluation result
+        group_id:
+          type: integer
+          description: Group identifier for the condition
+        operator_enum:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItemsEvaluationResultItemsOperatorEnum'
+          description: Comparison operator
+        comparison_value:
+          type: string
+          description: Value to compare against
+        is_condition_met:
+          type: boolean
+          description: Whether the condition is met
+        form_builder_question_data_binding_id:
+          type: string
+          description: Form builder question data binding identifier
+      required:
+      - id
+      - group_id
+      - operator_enum
+      - comparison_value
+      - is_condition_met
+      - form_builder_question_data_binding_id
+      description: Evaluation result for automation rule
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItemsEvaluationResultItems
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPostingPublicationState:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job posting publication state identifier
+        state_slug:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPostingPublicationStateStateSlug'
+          description: State of job posting publication
+      required:
+      - id
+      - state_slug
+      description: Current state of job posting publication
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPostingPublicationState
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidateAttachmentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the attachment
+        ai_summary:
+          type:
+          - string
+          - 'null'
+          description: AI-generated summary of the attachment content
+      required:
+      - id
+      - ai_summary
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidateAttachmentsItems
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmissionAnswersItemsAnswer:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: The answer value
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmissionAnswersItemsAnswer
+    RetrieveAtsApplication-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAtsApplication-v2026-01-01RequestForbiddenError
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf7Type:
+      type: string
+      enum:
+      - NUMBER
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf7Type
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems:
+      oneOf:
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems0'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems1'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems2'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems3'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems4'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems5'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems6'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems7'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems8'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems9'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems10'
+      - $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems11'
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentTypeEmploymentType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Employment type unique identifier
+        name:
+          type: string
+          description: Employment type name
+      required:
+      - id
+      - name
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentTypeEmploymentType
+    AssociateApplicationWithAnInterviewPlanStage-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdInterviewPlanStagesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: AssociateApplicationWithAnInterviewPlanStage-v2026-01-01RequestInternalServerError
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems7:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf7Type'
+          description: Question type this answer belongs to.
+        value:
+          type: string
+          description: Numeric value
+        question_id:
+          type: string
+          description: Question identifier
+      required:
+      - type
+      - value
+      - question_id
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems7
+    AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        creator_id:
+          type: string
+          format: uuid
+          description: HRIS Organization User ID of the user creating the resource
+        delay_unit:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataDelayUnit'
+          description: The unit of time for the delay. Must be provided together with delay_amount. Cannot be used together with scheduled_send_at.
+        delay_amount:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: The amount of time to delay the archivation email. Must be provided together with delay_unit. Cannot be used together with scheduled_send_at.
+        is_current_stage:
+          type: boolean
+          description: When true, sets this stage as the application's current stage in the hiring workflow. When false, creates a historical record without changing the application's current stage.
+        scheduled_send_at:
+          type: string
+          format: date-time
+          description: The exact future datetime to send the archivation email. Cannot be used together with delay_amount/delay_unit.
+        interview_plan_stage_id:
+          type: string
+          format: uuid
+          description: The ID of the interview plan stage to associate with the application
+        applicable_job_activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataApplicableJobActivitiesItems'
+          description: Optional array of job activities to trigger when associating the application with this stage. If not provided, all activities will be triggered. If an empty array is provided, no activities will be triggered.
+        candidate_archivation_reason_id:
+          type: string
+          format: uuid
+          description: Optional ID of the archivation reason if the candidate is being archived
+        candidate_archivation_email_template_id:
+          type: string
+          format: uuid
+          description: Optional ID of the rejection email template if the candidate is being archived
+      required:
+      - creator_id
+      - is_current_stage
+      - interview_plan_stage_id
+      title: AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaData
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmissionAnswersItemsQuestionType:
+      type: string
+      enum:
+      - FREETEXT
+      - PARAGRAPH
+      - SINGLESELECTION
+      - MULTISELECTION
+      - DOCUMENTUPLOAD
+      - PRESETDROPDOWN
+      - CUSTOMDROPDOWN
+      - NUMBER
+      - DATEPICKER
+      - ADDRESS
+      - PHONENUMBER
+      - EMAIL
+      description: Type of the question (uppercase)
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmissionAnswersItemsQuestionType
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsStageHistoryItemsInterviewPlanStage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Interview plan stage identifier
+        name:
+          type: string
+          description: Customer-defined stage name
+        position_number:
+          type: integer
+          description: Position of the stage in the interview plan
+        default_type_slug:
+          type:
+          - string
+          - 'null'
+          description: System stage type (e.g. new_lead, application_review, offer, hired, archived); null for custom stages
+        category_type_slug:
+          type: string
+          description: 'Stage category: lead, active or completed'
+      required:
+      - id
+      - name
+      - position_number
+      - default_type_slug
+      - category_type_slug
+      description: The interview plan stage this history record refers to
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsStageHistoryItemsInterviewPlanStage
+    ats-applications_createAtsApplication-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AtsApplicationsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      description: Created application response
+      title: ats-applications_createAtsApplication-v2026-01-01_Response_201
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataNotesItems:
+      type: object
+      properties:
+        richtext_content:
+          type: string
+          description: The richtext content of the note
+      required:
+      - richtext_content
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataNotesItems
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the offer
+        email:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsEmail'
+          - type: 'null'
+          description: Email message associated with the offer
+        job_title:
+          type: string
+          description: Job title for the offer
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the offer was created
+        start_date:
+          type: string
+          format: date-time
+          description: Start date for the position
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the offer was last updated
+        country_code:
+          type: string
+          description: Country code (ISO 3166-1 alpha-2)
+        attachment_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier for the offer attachment
+        approval_rule_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier for the approval rule
+        worker_type_enum:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsWorkerTypeEnum'
+          description: Type of worker for the offer
+        offer_status_enum:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsOfferStatusEnum'
+          description: Status of the offer
+        approval_request_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier for the approval request
+        compensation_amount:
+          type: number
+          format: double
+          description: Compensation amount
+        rejection_reason_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier for the rejection reason (if rejected)
+        compensation_currency:
+          type: string
+          description: Currency code for compensation (ISO 4217)
+        compensation_period_slug:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsCompensationPeriodSlug'
+          - type: 'null'
+          description: Compensation period
+        application_interview_plan_stage_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the application interview plan stage
+      required:
+      - id
+      - job_title
+      - created_at
+      - start_date
+      - updated_at
+      - country_code
+      - attachment_id
+      - approval_rule_id
+      - worker_type_enum
+      - offer_status_enum
+      - approval_request_id
+      - compensation_amount
+      - rejection_reason_id
+      - compensation_currency
+      - compensation_period_slug
+      - application_interview_plan_stage_id
+      description: Offer details
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItems
+    AtsApplicationsApplicationIdNotesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        author_id:
+          type: string
+          format: uuid
+          description: The UUID of the HRIS organization user creating the note
+        richtext_content:
+          type: string
+          description: The content of the note in rich text HTML format
+      required:
+      - author_id
+      - richtext_content
+      title: AtsApplicationsApplicationIdNotesPostRequestBodyContentApplicationJsonSchemaData
+    AtsApplicationsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Application unique identifier
+        job_id:
+          type: string
+          format: uuid
+          description: Job unique identifier
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        numeric_id:
+          type: integer
+          description: Application numeric identifier
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        source_slug:
+          type:
+          - string
+          - 'null'
+          description: The application source slug in uppercase
+        candidate_id:
+          type: string
+          format: uuid
+          description: Candidate unique identifier
+        job_posting_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Job posting unique identifier
+        job_employment_type_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Job employment type identifier
+        moved_to_current_stage_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When application moved to current stage
+        current_application_interview_plan_stage_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Current interview plan stage identifier
+      required:
+      - id
+      - job_id
+      - created_at
+      - numeric_id
+      - updated_at
+      - candidate_id
+      - job_posting_id
+      - job_employment_type_id
+      - moved_to_current_stage_at
+      - current_application_interview_plan_stage_id
+      title: AtsApplicationsPostResponsesContentApplicationJsonSchemaData
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataArchivationReason:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Archivation reason identifier
+        label:
+          type: string
+          description: Archivation reason label
+      required:
+      - id
+      - label
+      description: Archivation reason details; null unless archived
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataArchivationReason
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems0:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf0Type'
+          description: Question type this answer belongs to.
+        answer:
+          type: string
+          description: Text answer
+        question_id:
+          type: string
+          description: Question identifier
+      required:
+      - type
+      - answer
+      - question_id
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems0
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataNotesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the note
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the note was created
+        created_by:
+          type: string
+          format: uuid
+          description: Unique identifier for the user who created the note
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the note was last updated
+        richtext_content:
+          type: string
+          description: Rich text content of the note
+      required:
+      - id
+      - created_at
+      - created_by
+      - updated_at
+      - richtext_content
+      description: Note associated with the application
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataNotesItems
+    AtsApplicationsGetParametersJobCriteriasMatchingsSchemaItemsIsMatched:
+      type: string
+      enum:
+      - MATCHED
+      - NOT_MATCHED
+      - UNDECIDED
+      title: AtsApplicationsGetParametersJobCriteriasMatchingsSchemaItemsIsMatched
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems6:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf6Type'
+          description: Question type this answer belongs to.
+        question_id:
+          type: string
+          description: Question identifier
+        selected_option_ids:
+          type: array
+          items:
+            type: string
+          description: Selected option IDs
+      required:
+      - type
+      - question_id
+      - selected_option_ids
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems6
+    AtsApplicationsApplicationIdInterviewPlanStagesPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsApplicationsApplicationIdInterviewPlanStagesPostResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveAListOfAtsApplications-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsApplications-v2026-01-01RequestInternalServerError
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the application interview plan stage
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItems'
+          description: Array of offers associated with this stage
+        exited_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the application left this stage; null while the application is still in it
+        entered_at:
+          type: string
+          format: date-time
+          description: Timestamp when the application entered this stage
+        is_current:
+          type: boolean
+          description: Whether this is the stage the application is currently in
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the stage was last updated
+        interview_plan_stage:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsInterviewPlanStage'
+          - type: 'null'
+        moved_by_hris_organization_user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: HRIS organization user who moved the application into this stage; null for automated moves
+      required:
+      - id
+      - offers
+      - exited_at
+      - entered_at
+      - is_current
+      - updated_at
+      - interview_plan_stage
+      - moved_by_hris_organization_user_id
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItems
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf9Type:
+      type: string
+      enum:
+      - ADDRESS
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf9Type
+    AssociateApplicationWithAnInterviewPlanStage-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdInterviewPlanStagesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: AssociateApplicationWithAnInterviewPlanStage-v2026-01-01RequestForbiddenError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ? AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsOfferStatusEnum
+    : type: string
+      enum:
+      - CREATED
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - NOT_APPROVED
+      - SENT
+      - EXPIRED
+      - ACCEPTED
+      - REJECTED
+      description: Status of the offer
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsOfferStatusEnum
+    CreateApplication-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateApplication-v2026-01-01RequestForbiddenError
+    ? AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsWorkerTypeEnum
+    : type: string
+      enum:
+      - CONTRACTOR
+      - DIRECT_EMPLOYEE
+      - EOR_EMPLOYEE
+      - GLOBAL_PAYROLL_EMPLOYEE
+      - PEO_EMPLOYEE
+      - UNKNOWN
+      description: Type of worker for the offer
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsOffersItemsWorkerTypeEnum
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCurrentApplicationInterviewPlanStageInterviewPlanStage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Interview plan stage unique identifier
+        name:
+          type: string
+          description: Interview plan stage name
+        position_number:
+          type:
+          - integer
+          - 'null'
+          description: 'Ordinal position of the stage in its job pipeline. Ranges are stable across organizations: below 2000 for lead stages, 2000 for application review, 2001-2998 for the customer-defined interview rounds, 2999 for offer, 3000 and above for hired and archived.'
+        default_type_slug:
+          type:
+          - string
+          - 'null'
+          description: Interview plan stage default type slug
+        category_type_slug:
+          type: string
+          description: Interview plan stage category type
+      required:
+      - id
+      - name
+      - position_number
+      - default_type_slug
+      - category_type_slug
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCurrentApplicationInterviewPlanStageInterviewPlanStage
+    AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataApplicableJobActivitiesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the job activity to trigger
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataApplicableJobActivitiesItemsParticipantsItems'
+          description: Optional array of custom participants for this activity. If not provided, the default participants from the job activity template will be used.
+        candidate_self_scheduling_email_template_id:
+          type: string
+          format: uuid
+          description: Optional custom email template ID for candidate self-scheduling (only applicable for interview scheduling activities)
+      required:
+      - id
+      title: AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataApplicableJobActivitiesItems
+    ? AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataApplicableJobActivitiesItemsParticipantsItems
+    : type: object
+      properties:
+        role_slug:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataApplicableJobActivitiesItemsParticipantsItemsRoleSlug'
+          description: The role of the participant in the activity
+        participant_hris_organization_user_id:
+          type: string
+          format: uuid
+          description: The HRIS organization user ID of the participant
+      required:
+      - role_slug
+      - participant_hris_organization_user_id
+      title: AtsApplicationsApplicationIdInterviewPlanStagesPostRequestBodyContentApplicationJsonSchemaDataApplicableJobActivitiesItemsParticipantsItems
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems5:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf5Type'
+          description: Question type this answer belongs to.
+        preset:
+          type: string
+          description: Preset name
+        question_id:
+          type: string
+          description: Question identifier
+        selected_options:
+          type: array
+          items:
+            type: string
+          description: Selected options
+      required:
+      - type
+      - preset
+      - question_id
+      - selected_options
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems5
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf6Type:
+      type: string
+      enum:
+      - CUSTOMDROPDOWN
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf6Type
+    AtsApplicationsGetParametersIncludeSchemaItems:
+      type: string
+      enum:
+      - STAGE_HISTORY
+      title: AtsApplicationsGetParametersIncludeSchemaItems
+    AddNoteToAnApplication-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdNotesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: AddNoteToAnApplication-v2026-01-01RequestForbiddenError
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf11Type:
+      type: string
+      enum:
+      - EMAIL
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf11Type
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmission:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Identifier of the application form submission
+        answers:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmissionAnswersItems'
+          description: Array of parsed form submission answers
+      required:
+      - id
+      - answers
+      description: Application form submission data with parsed answers
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmission
+    ats-applications_addNoteToAnApplication-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdNotesPostResponsesContentApplicationJsonSchemaData'
+          description: The created application note
+      required:
+      - data
+      title: ats-applications_addNoteToAnApplication-v2026-01-01_Response_201
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the automation rule execution
+        action_type_enum:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItemsActionTypeEnum'
+          description: Type of action to execute
+        evaluation_result:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItemsEvaluationResultItems'
+          description: Array of evaluation results
+        application_automation_rule_id:
+          type: string
+          format: uuid
+          description: Automation rule identifier
+      required:
+      - id
+      - action_type_enum
+      - evaluation_result
+      - application_automation_rule_id
+      description: Application automation rule execution
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationAutomationRuleExecutionsItems
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems10:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf10Type'
+          description: Question type this answer belongs to.
+        question_id:
+          type: string
+          description: Question identifier
+        phone_number:
+          type: string
+          description: Phone number
+      required:
+      - type
+      - question_id
+      - phone_number
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems10
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job
+        title:
+          type: string
+          description: Title of the job
+      required:
+      - id
+      - title
+      description: Job details
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJob
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems8:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf8Type'
+          description: Question type this answer belongs to.
+        end_date:
+          type: string
+          description: End date (for ranges)
+        start_date:
+          type: string
+          description: Start date
+        question_id:
+          type: string
+          description: Question identifier
+      required:
+      - type
+      - question_id
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems8
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf8Type:
+      type: string
+      enum:
+      - DATEPICKER
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf8Type
+    AtsApplicationsGetParametersSortOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      title: AtsApplicationsGetParametersSortOrder
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidateCandidateTagsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the candidate tag
+        tag:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidateCandidateTagsItemsTag'
+          description: Tag details
+      required:
+      - id
+      - tag
+      description: Candidate tag
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataCandidateCandidateTagsItems
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf0Type:
+      type: string
+      enum:
+      - FREETEXT
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf0Type
+    AtsApplicationsGetParametersCandidateTagIdsOperator:
+      type: string
+      enum:
+      - ANY
+      - ALL
+      title: AtsApplicationsGetParametersCandidateTagIdsOperator
+    ? AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsInterviewPlanStage
+    : type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Interview plan stage unique identifier
+        name:
+          type: string
+          description: Interview plan stage name
+        position_number:
+          type: integer
+          description: Position of the stage in the interview plan
+        default_type_slug:
+          type:
+          - string
+          - 'null'
+          description: Default type slug
+        category_type_slug:
+          type: string
+          description: Category type slug
+      required:
+      - id
+      - name
+      - position_number
+      - default_type_slug
+      - category_type_slug
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataAllApplicationInterviewPlanStagesItemsInterviewPlanStage
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmissionAnswersItems:
+      type: object
+      properties:
+        answer:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmissionAnswersItemsAnswer'
+          description: The answer value
+        question_text:
+          type: string
+          description: Text of the question
+        question_type:
+          $ref: '#/components/schemas/AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmissionAnswersItemsQuestionType'
+          description: Type of the question (uppercase)
+        data_binding_id:
+          type: string
+          description: Data binding identifier for the question
+      required:
+      - answer
+      - question_text
+      - question_type
+      - data_binding_id
+      description: Form submission answer
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationFormSubmissionAnswersItems
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf4Type:
+      type: string
+      enum:
+      - DOCUMENTUPLOAD
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf4Type
+    RetrieveAListOfAtsApplications-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsApplications-v2026-01-01RequestForbiddenError
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationJobCriteriasMatchingsItemsIsMatched:
+      type: string
+      enum:
+      - MATCHED
+      - NOT_MATCHED
+      - UNDECIDED
+      description: Match status
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataApplicationJobCriteriasMatchingsItemsIsMatched
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Application unique identifier
+        job:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJob'
+          description: Job information for the application
+        hired_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the application reached the hired stage; null otherwise
+        candidate:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCandidate'
+          description: Candidate information associated with the application
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the application was created
+        numeric_id:
+          type: integer
+          description: Application numeric identifier
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the application was last updated
+        job_posting:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJobPosting'
+          - type: 'null'
+          description: Job posting information (if application came through a posting)
+        source_slug:
+          type:
+          - string
+          - 'null'
+          description: Source of the application
+        stage_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsStageHistoryItems'
+          description: Chronological stage timeline of the application. Present only when include=STAGE_HISTORY is requested.
+        job_employment_type:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentType'
+          description: Employment type information for the job
+        submitter_ip_address:
+          type:
+          - string
+          - 'null'
+          description: IP address of the applicant who submitted the application
+        submitter_user_agent:
+          type:
+          - string
+          - 'null'
+          description: User agent of the applicant who submitted the application
+        archivation_reason_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Reason the application was archived; null unless archived
+        moved_to_current_stage_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the application moved to current stage
+        application_form_submission:
+          oneOf:
+          - $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmission'
+          - type: 'null'
+          description: Application form submission data with parsed answers
+        application_job_criterias_matchings:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationJobCriteriasMatchingsItems'
+          description: AI-generated job criteria matching results for the application
+        created_by_hris_organization_user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: User who created the application
+        current_application_interview_plan_stage:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsCurrentApplicationInterviewPlanStage'
+          description: Current interview plan stage information for the application
+        current_application_interview_plan_stage_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Current interview plan stage unique identifier
+        application_form_form_builder_form_submission_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Application form submission unique identifier
+      required:
+      - id
+      - created_at
+      - numeric_id
+      - moved_to_current_stage_at
+      description: Application object
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItems
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job unique identifier
+        title:
+          type: string
+          description: Job title
+      required:
+      - id
+      - title
+      description: Job information for the application
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsJob
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems1:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf1Type'
+          description: Question type this answer belongs to.
+        answer:
+          type: string
+          description: Paragraph answer
+        question_id:
+          type: string
+          description: Question identifier
+      required:
+      - type
+      - answer
+      - question_id
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItems1
+    AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf1Type:
+      type: string
+      enum:
+      - PARAGRAPH
+      description: Question type this answer belongs to.
+      title: AtsApplicationsPostRequestBodyContentApplicationJsonSchemaDataApplicationFormSubmissionDataItemsOneOf1Type
+    ats-applications_retrieveAListOfAtsApplications-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of applications
+        has_more:
+          type: boolean
+          description: Whether more pages are available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to fetch the next page; null when there are no more pages
+        total_count:
+          type: integer
+          description: Total number of applications
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      description: Paginated list of applications
+      title: ats-applications_retrieveAListOfAtsApplications-v2026-01-01_Response_200
+    AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmissionAnswersItems:
+      type: object
+      properties:
+        answer:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmissionAnswersItemsAnswer'
+        question_text:
+          type: string
+          description: Text of the question
+        question_type:
+          $ref: '#/components/schemas/AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmissionAnswersItemsQuestionType'
+          description: Type of the question (uppercase)
+        data_binding_id:
+          type: string
+          format: uuid
+          description: Data binding identifier for the question
+      required:
+      - answer
+      - question_text
+      - question_type
+      - data_binding_id
+      description: Parsed form submission answer
+      title: AtsApplicationsGetResponsesContentApplicationJsonSchemaDataItemsApplicationFormSubmissionAnswersItems
+    AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPosting:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job posting
+        title:
+          type: string
+          description: Title of the job posting
+      required:
+      - id
+      - title
+      description: Job posting details
+      title: AtsApplicationsApplicationIdGetResponsesContentApplicationJsonSchemaDataJobPosting
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

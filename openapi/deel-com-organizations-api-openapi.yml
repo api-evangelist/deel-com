@@ -1,156 +1,1645 @@
 openapi: 3.2.0
 info:
-  title: Deel Core Organizations API
-  description: 'Core organizational, contract, and people APIs for Deel. Covers organizations,
-
-    legal entities, departments, groups, managers, cost centers, contracts (IC, EOR,
-
-    Global Payroll), invoice adjustments, lookups, magic links, tasks, and custom fields.
-
-
-    Authentication uses bearer Organization or Personal API tokens generated from the
-
-    Deel Developer Center. Production base URL is https://api.letsdeel.com/rest/v2 and
-
-    the sandbox is https://api-sandbox.demo.deel.com/rest/v2.'
-  version: '2026-05-25'
-  contact:
-    name: Deel Developer Support
-    url: https://developer.deel.com/
-  termsOfService: https://www.deel.com/legal/terms-of-service/
-  license:
-    name: Deel Developer Terms
-    url: https://www.deel.com/legal/
+  title: Endpoints Organizations API
+  version: 1.0.0
 servers:
-- url: https://api.letsdeel.com/rest/v2
+- url: https://api.letsdeel.com/rest
   description: Production
-- url: https://api-sandbox.demo.deel.com/rest/v2
-  description: Sandbox
-security:
-- BearerAuth: []
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
 tags:
 - name: Organizations
-  description: Organization profile, child organizations, structure, departments, groups
 paths:
+  /organizations/children/admins:
+    post:
+      operationId: organizations_addChildOrganizationAdmins-v2026-10-12
+      summary: Add admins to child organizations
+      description: 'Add multiple admins to child organizations in one call (e.g., when a new team member joins). Provide the admins and target child organizations: people who are not members yet are invited by email, and existing members are made admins. People who are already admins are left unchanged and get no new invitation. The response shows results for each admin-organization pair.
+
+
+        **Token scopes**: `organizations:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-12.'
+      tags:
+      - Organizations
+      parameters:
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrganizationsChildrenAdminsPostParametersXBeta'
+      responses:
+        '200':
+          description: The outcome for every admin and child organization pair.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizations_addChildOrganizationAdmins-v2026-10-12_Response_200'
+        '400':
+          description: 'Bad request. Nothing is written. Codes: VALIDATION_ERROR (the request body failed validation, for example a malformed email, an email or child organization id listed twice, or an empty list; the error item also carries a details object naming the offending key), GENERIC_ERROR (the number of admins multiplied by the number of child organizations is above 100). The API gateway rejects a schema-invalid request body before it reaches Deel; each error item of that response carries a path field and no code.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddChildOrganizationAdmins-v2026-10-12RequestBadRequestError'
+        '401':
+          description: Unauthorized. The request token is missing or invalid. The API gateway rejects an unauthenticated call before it reaches Deel; a call that reaches Deel without a valid session is rejected by the access middleware, whose error item carries a message and no code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddChildOrganizationAdmins-v2026-10-12RequestUnauthorizedError'
+        '403':
+          description: Forbidden. The caller lacks the permission to manage child organizations, or at least one submitted id is not a direct child organization of the authenticated organization. The message lists every rejected id. Nothing is written.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddChildOrganizationAdmins-v2026-10-12RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '429':
+          description: Too many requests. Each partner organization can call this endpoint at most 20 times per hour, with up to 100 admin and child organization pairs per call. Nothing is written; retry once the hour has passed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddChildOrganizationAdmins-v2026-10-12RequestTooManyRequestsError'
+        '500':
+          description: An unexpected error occurred before any admin and child organization pair was processed. Nothing is written, and the same request can be retried.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddChildOrganizationAdmins-v2026-10-12RequestInternalServerError'
+      requestBody:
+        description: The people to add as admins and the child organizations to add them to.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/OrganizationsChildrenAdminsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: The request payload.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /organizations/deal-registrations:
+    post:
+      operationId: organizations_createDealRegistration-v2026-09-30
+      summary: Create a deal registration
+      description: 'Registers a prospective end client against the authenticated partner organization. An approved registration protects the partner claim on that client for a fixed period. It stops Deel and other partners from pursuing the same account.
+
+
+        **Token scopes**: `organizations:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-30.'
+      tags:
+      - Organizations
+      parameters:
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrganizationsDealRegistrationsPostParametersXBeta'
+      responses:
+        '200':
+          description: The deal registration outcome.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizations_createDealRegistration-v2026-09-30_Response_200'
+        '400':
+          description: 'Bad request. Codes: VALIDATION_ERROR (the request body failed validation; the error item also carries a details object naming the offending key), GENERIC_ERROR (the submitted domain could not be normalised, or the authenticated organization is not set up for deal registration). The API gateway rejects a schema-invalid request body before it reaches Deel; each error item of that response carries a path field and no code, and the body also carries a request object that describes the failed call.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDealRegistration-v2026-09-30RequestBadRequestError'
+        '401':
+          description: Unauthorized. The request token is missing or invalid. The API gateway rejects an unauthenticated call before it reaches Deel; a call that reaches Deel without a valid session is rejected by the access middleware, whose error item carries a message and no code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDealRegistration-v2026-09-30RequestUnauthorizedError'
+        '403':
+          description: Deal registration is not enabled for the authenticated organization, or the caller lacks the required permission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDealRegistration-v2026-09-30RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '429':
+          description: The caller exceeded the deal registration rate limit for its organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDealRegistration-v2026-09-30RequestTooManyRequestsError'
+        '500':
+          description: An unexpected error occurred. The outcome is not confirmed. Retry the same payload — retries are idempotent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDealRegistration-v2026-09-30RequestInternalServerError'
+      requestBody:
+        description: The end client the partner wants to register.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/OrganizationsDealRegistrationsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: The request payload.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /organizations/children/{child_organization_id}/session:
+    post:
+      operationId: organizations_createChildOrgSessionToken-v2026-07-14
+      summary: Create a session token for a child organization
+      description: 'Issues a short-lived session token (valid 6 hours) for a child organisation. If an active session token with more than one hour of remaining validity already exists, that token is returned. Otherwise the prior session token is invalidated and a new 6-hour token is issued. Session tokens do not affect the child organisation’s original permanent token.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - Organizations
+      parameters:
+      - name: child_organization_id
+        in: path
+        description: The public UUID of the child organisation for which to issue a session token.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: Session token issued successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizations_createChildOrgSessionToken-v2026-07-14_Response_201'
+        '400':
+          description: Bad Request. The request was malformed or failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildOrgSessionToken-v2026-07-14RequestBadRequestError'
+        '401':
+          description: Unauthorized. Authentication credentials were missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildOrgSessionToken-v2026-07-14RequestUnauthorizedError'
+        '403':
+          description: Forbidden. The caller does not have the required scope or permission to access this resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildOrgSessionToken-v2026-07-14RequestForbiddenError'
+        '404':
+          description: Not Found. The child organisation does not exist or is missing a service account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildOrgSessionToken-v2026-07-14RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /organizations/children:
+    post:
+      operationId: organizations_createOrganizationChild
+      summary: Create child organization
+      description: 'Creates a child organization under the authenticated parent organization. Use it to provision child organizations from your own systems instead of the Partner Portal create form. The `token` field in the response holds the child organization''s API token. It is returned only once and cannot be retrieved later, so store it on receipt.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - Organizations
+      responses:
+        '201':
+          description: Operation successful. The child organization was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organizations_createOrganizationChild_Response_201'
+        '400':
+          description: Bad request. The request body failed validation, admin_email or a parent_admin_emails entry is not an admin of the parent organization, parent_admin_emails or child_admins is sent while multiple admins are not enabled for the parent organization, or the parent organization cannot create child organizations. When the API gateway rejects the request body before it reaches Deel, each error item carries a path field instead of code, and the body also carries a request object that describes the failed call.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildOrganization-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '409':
+          description: Conflict - an organization with this name is currently being created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildOrganization-v2026-01-01RequestConflictError'
+        '429':
+          description: Too Many Requests - retry limit exceeded for creating this organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildOrganization-v2026-01-01RequestTooManyRequestsError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildOrganization-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaData'
+                  description: The request payload.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /roles:
+    post:
+      operationId: organizations_CreateOrganizationRole-v2026-01-01
+      summary: Create organization custom role
+      description: 'Creates a new custom role within the current organization.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - Organizations
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizations_CreateOrganizationRole-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/RolesPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+    get:
+      operationId: organizations_getTheRolesOfTheCurrentOrganization-v2026-01-01
+      summary: Get the roles of the current organization
+      description: 'Retrieves all roles defined within the current organization.
+
+
+        **Token scopes**: `organizations:read`'
+      tags:
+      - Organizations
+      responses:
+        '200':
+          description: Successful retrieval of the organization roles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizations_getTheRolesOfTheCurrentOrganization-v2026-01-01_Response_200'
+        '400':
+          description: Bad request. The request was malformed or missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTheRolesOfTheCurrentOrganization-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized. The request is missing authentication credentials or the credentials provided are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTheRolesOfTheCurrentOrganization-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error. An error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTheRolesOfTheCurrentOrganization-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
   /organizations:
     get:
-      operationId: getOrganizations
-      summary: Retrieve Organization
-      description: Returns the current organization profile and child organizations the API token can access.
+      operationId: organizations_getOrganizations
+      summary: Get Current Organization
+      description: 'Returns details of the organization associated with the authentication token; the organization is resolved automatically from the token and requires no additional identifier.
+
+
+        **Token scopes**: `organizations:read`'
       tags:
       - Organizations
       responses:
         '200':
-          description: Organization details
+          description: Successful retrieval of the organization details.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrganizationListResponse'
+                $ref: '#/components/schemas/organizations_getOrganizations_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
         '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-  /organizations/structure:
+          description: Unauthorized. The request is missing authentication credentials or the credentials provided are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOrganizations-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Organization not found. The current organization associated with the authentication token could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOrganizations-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal server error. An error occurred on the server while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOrganizations-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /teams:
     get:
-      operationId: getOrganizationStructure
-      summary: Retrieve Organization Structure
-      description: Returns the organization tree of departments, groups, and reporting relationships.
+      operationId: organizations_getTeams-v2026-01-01
+      summary: Get Teams
+      description: 'Returns the list of teams within the authenticated user''s organization, with each entry including the team''s ID and name.
+
+
+        **Token scopes**: `organizations:read`'
       tags:
       - Organizations
       responses:
         '200':
-          description: Organization structure
+          description: Successful retrieval of the teams in the organization.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrganizationStructure'
+                $ref: '#/components/schemas/Organizations_getTeams-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Unauthorized. The request is missing authentication credentials or the credentials provided are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTeams-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: No teams found. There are no teams associated with the current organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTeams-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal server error. An error occurred on the server while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTeams-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /departments:
+    get:
+      operationId: organizations_GetDepartments-v2026-01-01
+      summary: Retrieve Departments
+      description: 'Returns the list of departments within the authenticated user''s organization, including each department''s identifier, name, and parent department where applicable.
+
+
+        **Token scopes**: `organizations:read`'
+      tags:
+      - Organizations
+      responses:
+        '200':
+          description: Successful retrieval of the list of departments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizations_GetDepartments-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Unauthorized. The request is missing authentication credentials or the credentials provided are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDepartments-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: No departments found. There are no departments associated with the current organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDepartments-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal server error. An error occurred on the server while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDepartments-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /working-locations:
+    get:
+      operationId: organizations_retrieveWorkingLocations-v2026-01-01
+      summary: Retrieve working locations
+      description: 'Returns the list of available work location labels for the organization. Populate options when creating or editing people or contract records.
+
+
+        **Token scopes**: `organizations:read`'
+      tags:
+      - Organizations
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizations_retrieveWorkingLocations-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /roles/{roleId}:
+    patch:
+      operationId: organizations_UpdateOrganizationRole-v2026-01-01
+      summary: Update organization custom role
+      description: 'Applies a partial update to the custom role, modifying only the fields supplied in the request body.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - Organizations
+      parameters:
+      - name: roleId
+        in: path
+        description: ID of the role
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizations_UpdateOrganizationRole-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/RolesRoleIdPatchRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
 components:
   schemas:
-    OrganizationStructure:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            departments:
-              type: array
-              items:
-                $ref: '#/components/schemas/Department'
-            groups:
-              type: array
-              items:
-                $ref: '#/components/schemas/Group'
-    Group:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        type:
-          type: string
-    Error:
+    AddChildOrganizationAdmins-v2026-10-12RequestInternalServerError:
       type: object
       properties:
         errors:
           type: array
           items:
-            type: object
-            properties:
-              code:
-                type: string
-              message:
-                type: string
-              field:
-                type: string
-    Organization:
+            $ref: '#/components/schemas/OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AddChildOrganizationAdmins-v2026-10-12RequestInternalServerError
+    OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaErrorsItems
+    OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaDataItemsItems:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: The email of the admin, as submitted.
+        status:
+          $ref: '#/components/schemas/OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaDataItemsItemsStatus'
+          description: 'The outcome for the pair. ADDED means the person is now an admin of the child organization: a person who was not a member is added with the admin role and receives the invitation email, and a member with another role is made an admin. ALREADY_ADMIN means the person already was, and nothing changed or was sent. FAILED means the pair could not be processed; the other pairs are unaffected and the same request can be retried.'
+        child_org_id:
+          type: string
+          format: uuid
+          description: The public id of the child organization.
+      required:
+      - email
+      - status
+      - child_org_id
+      title: OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaDataItemsItems
+    GetTeams-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error message indicating that the authentication failed.
+      title: GetTeams-v2026-01-01RequestUnauthorizedError
+    OrganizationsChildrenPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
         id:
           type: string
-        name:
+          description: The unique identifier of the created child organization.
+        token:
           type: string
-        country:
-          type: string
-        currency:
-          type: string
+          description: The API token generated for the created child organization
         created_at:
           type: string
           format: date-time
-        external_id:
+          description: When the created child organization was created (ISO 8601 format)
+        updated_at:
           type: string
-    OrganizationListResponse:
+          format: date-time
+          description: When the created child organization was updated for the last time (ISO 8601 format)
+      required:
+      - id
+      - token
+      - created_at
+      - updated_at
+      title: OrganizationsChildrenPostResponsesContentApplicationJsonSchemaData
+    OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaDataItemsItemsStatus:
+      type: string
+      enum:
+      - ADDED
+      - ALREADY_ADMIN
+      - FAILED
+      description: 'The outcome for the pair. ADDED means the person is now an admin of the child organization: a person who was not a member is added with the admin role and receives the invitation email, and a member with another role is made an admin. ALREADY_ADMIN means the person already was, and nothing changed or was sent. FAILED means the pair could not be processed; the other pairs are unaffected and the same request can be retried.'
+      title: OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaDataItemsItemsStatus
+    Organizations_retrieveWorkingLocations-v2026-01-01_Response_200:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Organization'
-    Department:
+            $ref: '#/components/schemas/WorkingLocationsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: Organizations_retrieveWorkingLocations-v2026-01-01_Response_200
+    Organizations_UpdateOrganizationRole-v2026-01-01_Response_200:
+      type: object
+      properties:
+        id:
+          type: number
+          format: double
+          description: ID of the role
+        name:
+          type: string
+          description: Name of the role
+        scope:
+          type: string
+          description: Scope of the role
+        description:
+          type: string
+          description: Description of the role
+        permissionSets:
+          type: array
+          items:
+            type: string
+      title: Organizations_UpdateOrganizationRole-v2026-01-01_Response_200
+    OrganizationsChildrenAdminsPostRequestBodyContentApplicationJsonSchemaDataAdminsItems:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: The email of the person. Each email may appear once per request, ignoring case.
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: The last name of the person. Used only when the email has no Deel account yet.
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: The first name of the person. Used only when the email has no Deel account yet.
+      required:
+      - email
+      - last_name
+      - first_name
+      title: OrganizationsChildrenAdminsPostRequestBodyContentApplicationJsonSchemaDataAdminsItems
+    Organizations_createChildOrgSessionToken-v2026-07-14_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OrganizationsChildrenChildOrganizationIdSessionPostResponsesContentApplicationJsonSchemaData'
+          description: The issued session token.
+      required:
+      - data
+      title: Organizations_createChildOrgSessionToken-v2026-07-14_Response_201
+    RolesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: number
+          format: double
+          description: The unique identifier for the role.
+        name:
+          type: string
+          description: The name of the role.
+        scope:
+          type: string
+          description: The scope of the role, which can define the level of access. For example, 'ORGANIZATION' represents a global role within the organization.
+        hrisOrgStructureId:
+          type:
+          - string
+          - 'null'
+          description: The HRIS (Human Resource Information System) organization structure ID associated with the role, if applicable.
+      required:
+      - id
+      - name
+      - scope
+      title: RolesGetResponsesContentApplicationJsonSchemaDataItems
+    OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaDataItemsItems'
+          description: One item per admin and child organization pair of the request.
+      required:
+      - items
+      description: The outcome of the request.
+      title: OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaData
+    OrganizationsGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
         id:
           type: string
+          format: uuid
+          description: The unique identifier of the organization.
         name:
           type: string
-        parent_id:
+          minLength: 1
+          description: The name of the organization.
+      required:
+      - id
+      - name
+      title: OrganizationsGetResponsesContentApplicationJsonSchemaDataItems
+    OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
           type: string
-  responses:
-    Unauthorized:
-      description: Missing or invalid bearer token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    RateLimited:
-      description: Rate limit exceeded (5 requests/second per organization)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaErrorsItems
+    CreateChildOrganization-v2026-01-01RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateChildOrganization-v2026-01-01RequestConflictError
+    OrganizationsDealRegistrationsPostRequestBodyContentApplicationJsonSchemaDataRegion:
+      type: string
+      enum:
+      - NAM
+      - EMEA
+      - APAC
+      - LATAM
+      description: The sales region the deal belongs to.
+      title: OrganizationsDealRegistrationsPostRequestBodyContentApplicationJsonSchemaDataRegion
+    GetTeams-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A general error message indicating that the server encountered an unexpected issue.
+      title: GetTeams-v2026-01-01RequestInternalServerError
+    GetTheRolesOfTheCurrentOrganization-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: GetTheRolesOfTheCurrentOrganization-v2026-01-01RequestInternalServerError
+    Organizations_getTheRolesOfTheCurrentOrganization-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RolesGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: Organizations_getTheRolesOfTheCurrentOrganization-v2026-01-01_Response_200
+    CreateChildOrganization-v2026-01-01RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateChildOrganization-v2026-01-01RequestTooManyRequestsError
+    Organizations_GetDepartments-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepartmentsGetResponsesContentApplicationJsonSchemaDataItems'
+      title: Organizations_GetDepartments-v2026-01-01_Response_200
+    OrganizationsDealRegistrationsPostRequestBodyContentApplicationJsonSchemaDataProductsItems:
+      type: string
+      enum:
+      - EOR
+      - IC
+      - COR
+      - GP
+      - Contractor Management
+      - US Payroll
+      - PEO
+      - Immigration
+      - Deel HR
+      - Deel IT
+      title: OrganizationsDealRegistrationsPostRequestBodyContentApplicationJsonSchemaDataProductsItems
+    WorkingLocationsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: number
+          format: double
+          description: Unique identifier of this resource.
+        name:
+          type: string
+      required:
+      - id
+      - name
+      title: WorkingLocationsGetResponsesContentApplicationJsonSchemaDataItems
+    GetTheRolesOfTheCurrentOrganization-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: GetTheRolesOfTheCurrentOrganization-v2026-01-01RequestBadRequestError
+    organizations_getOrganizations_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsGetResponsesContentApplicationJsonSchemaDataItems'
+      title: organizations_getOrganizations_Response_200
+    OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaDataParentOrganization:
+      type: object
+      properties:
+        admin_email:
+          type: string
+          format: email
+          description: The email of one of the managers of the parent organization. It must belong to an existing admin/manager of the parent organization, otherwise creation fails. This manager is the user that creates the child organization.
+      required:
+      - admin_email
+      description: The object that contains the information related to the parent_organization.
+      title: OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaDataParentOrganization
+    GetTeams-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error message indicating that no teams were found.
+      title: GetTeams-v2026-01-01RequestNotFoundError
+    GetTheRolesOfTheCurrentOrganization-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: GetTheRolesOfTheCurrentOrganization-v2026-01-01RequestUnauthorizedError
+    Organizations_addChildOrganizationAdmins-v2026-10-12_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaData'
+          description: The outcome of the request.
+      required:
+      - data
+      title: Organizations_addChildOrganizationAdmins-v2026-10-12_Response_200
+    Organizations_CreateOrganizationRole-v2026-01-01_Response_200:
+      type: object
+      properties:
+        id:
+          type: number
+          format: double
+          description: Organization role id
+        name:
+          type: string
+          description: Organization role name
+        scope:
+          type: string
+          description: Organization role scope
+        description:
+          type: string
+          description: Organization role description
+        permissionSets:
+          type: array
+          items:
+            type: string
+        hrisOrgStructureId:
+          type: string
+          description: HRIS organization structure id
+      title: Organizations_CreateOrganizationRole-v2026-01-01_Response_200
+    OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        child_admins:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaDataChildAdminsItems'
+          description: People from the child organization to add as its admins. Each person receives an invite to the child organization.
+        child_organization:
+          $ref: '#/components/schemas/OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaDataChildOrganization'
+          description: The object that contains all the information related to the child organization that will be created.
+        parent_admin_emails:
+          type: array
+          items:
+            type: string
+            format: email
+            maxLength: 255
+          description: More admins of the parent organization to add as admins of the child organization, as the Partner Portal create form does. Every email must belong to an existing admin of the parent organization, otherwise creation fails and no child organization is created. Each admin receives an invite to the child organization.
+        parent_organization:
+          $ref: '#/components/schemas/OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaDataParentOrganization'
+          description: The object that contains the information related to the parent_organization.
+      required:
+      - child_organization
+      - parent_organization
+      description: The request payload.
+      title: OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaData
+    CreateDealRegistration-v2026-09-30RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateDealRegistration-v2026-09-30RequestForbiddenError
+    CreateDealRegistration-v2026-09-30RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateDealRegistration-v2026-09-30RequestTooManyRequestsError
+    GetOrganizations-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error message indicating that the authentication failed.
+      title: GetOrganizations-v2026-01-01RequestUnauthorizedError
+    OrganizationsChildrenAdminsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        admins:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenAdminsPostRequestBodyContentApplicationJsonSchemaDataAdminsItems'
+          description: The people to add as admins of every submitted child organization.
+        child_org_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Public ids of the target child organizations, as returned in the id field of the create child organization response. Every id must be a direct child organization of the authenticated organization. The number of admins multiplied by the number of child organizations must not exceed 100.
+      required:
+      - admins
+      - child_org_ids
+      description: The request payload.
+      title: OrganizationsChildrenAdminsPostRequestBodyContentApplicationJsonSchemaData
+    RolesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Organization role name
+        scope:
+          type: string
+          description: Organization role scope
+        description:
+          type: string
+          description: Organization role description
+        permissionSets:
+          type: array
+          items:
+            type: string
+        hrisOrgStructureId:
+          type: string
+          description: HRIS organization structure id
+      required:
+      - name
+      - scope
+      - description
+      - permissionSets
+      title: RolesPostRequestBodyContentApplicationJsonSchemaData
+    Organizations_getTeams-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: Organizations_getTeams-v2026-01-01_Response_200
+    GetOrganizations-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A general error message indicating that the server encountered an unexpected issue.
+      title: GetOrganizations-v2026-01-01RequestInternalServerError
+    GetDepartments-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error message indicating that the authentication failed.
+      title: GetDepartments-v2026-01-01RequestUnauthorizedError
+    AddChildOrganizationAdmins-v2026-10-12RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AddChildOrganizationAdmins-v2026-10-12RequestTooManyRequestsError
+    OrganizationsChildrenChildOrganizationIdSessionPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        token:
+          type: string
+          description: The short-lived session token for the child organisation.
+        expires_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the session token expires (6 hours from issuance).
+      required:
+      - token
+      - expires_at
+      description: The issued session token.
+      title: OrganizationsChildrenChildOrganizationIdSessionPostResponsesContentApplicationJsonSchemaData
+    CreateDealRegistration-v2026-09-30RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateDealRegistration-v2026-09-30RequestBadRequestError
+    organizations_createOrganizationChild_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OrganizationsChildrenPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: organizations_createOrganizationChild_Response_201
+    CreateChildOrgSessionToken-v2026-07-14RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenChildOrganizationIdSessionPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateChildOrgSessionToken-v2026-07-14RequestNotFoundError
+    AddChildOrganizationAdmins-v2026-10-12RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AddChildOrganizationAdmins-v2026-10-12RequestUnauthorizedError
+    OrganizationsChildrenChildOrganizationIdSessionPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable description of the error.
+      required:
+      - message
+      title: OrganizationsChildrenChildOrganizationIdSessionPostResponsesContentApplicationJsonSchemaErrorsItems
+    OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - APPROVED
+      - REJECTED
+      description: The eligibility outcome. APPROVED means the protection window is now active. REJECTED means the deal is not eligible.
+      title: OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaDataStatus
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    OrganizationsDealRegistrationsPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: OrganizationsDealRegistrationsPostParametersXBeta
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaDataChildOrganization:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          description: The organization's name.
+        department:
+          type: string
+          maxLength: 255
+          default: Founder
+          description: The department's name where the manager will be added. Defaults to "Founder" when omitted.
+        is_api_enabled:
+          type: boolean
+          default: false
+          description: The flag that enables the public API for the child organization. Defaults to false when omitted.
+        workforce_size:
+          type: integer
+          minimum: 1
+          maximum: 1000000
+          description: The workforce size of the child organization.
+        headquarters_country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: The organization's headquarters country as an ISO 3166-1 alpha-2 code. Validated against Deel's country whitelist; unknown codes are rejected.
+      required:
+      - name
+      description: The object that contains all the information related to the child organization that will be created.
+      title: OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaDataChildOrganization
+    CreateDealRegistration-v2026-09-30RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateDealRegistration-v2026-09-30RequestUnauthorizedError
+    DepartmentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the department.
+        name:
+          type: string
+          minLength: 1
+          description: The name of the department.
+        parent:
+          type:
+          - string
+          - 'null'
+          description: The ID of the parent department, if applicable.
+      required:
+      - id
+      - name
+      title: DepartmentsGetResponsesContentApplicationJsonSchemaDataItems
+    OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        region:
+          type: string
+          description: The region stored on the registration. Absent when the status is REJECTED.
+        status:
+          $ref: '#/components/schemas/OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: The eligibility outcome. APPROVED means the protection window is now active. REJECTED means the deal is not eligible.
+        message:
+          type: string
+          description: A generic ineligibility message. Present only when the status is REJECTED. It is deliberately identical for every rejection reason.
+        products:
+          type: array
+          items:
+            type: string
+          description: The products stored on the registration. Absent when the status is REJECTED.
+        countries:
+          type: array
+          items:
+            type: string
+          description: The countries stored on the registration, or an empty array when none are stored. Absent when the status is REJECTED.
+        expires_at:
+          type: string
+          format: date
+          description: The date the 90-day protection window ends. Present only when the status is APPROVED.
+        approved_at:
+          type: string
+          format: date
+          description: The date the registration was approved. Present only when the status is APPROVED.
+        company_name:
+          type: string
+          description: The company name stored on the registration. Absent when the status is REJECTED.
+        company_domain:
+          type: string
+          description: The normalised root domain stored on the registration. Absent when the status is REJECTED.
+        expected_deal_size:
+          type: number
+          format: double
+          description: The expected deal size stored on the registration. Absent when the status is REJECTED.
+      required:
+      - status
+      title: OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaData
+    GetDepartments-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error message indicating that no departments were found.
+      title: GetDepartments-v2026-01-01RequestNotFoundError
+    CreateChildOrgSessionToken-v2026-07-14RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenChildOrganizationIdSessionPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateChildOrgSessionToken-v2026-07-14RequestUnauthorizedError
+    CreateChildOrgSessionToken-v2026-07-14RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenChildOrganizationIdSessionPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateChildOrgSessionToken-v2026-07-14RequestForbiddenError
+    Organizations_createDealRegistration-v2026-09-30_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Organizations_createDealRegistration-v2026-09-30_Response_200
+    CreateChildOrgSessionToken-v2026-07-14RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenChildOrganizationIdSessionPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: The list of errors that caused the request to fail.
+      required:
+      - errors
+      title: CreateChildOrgSessionToken-v2026-07-14RequestBadRequestError
+    AddChildOrganizationAdmins-v2026-10-12RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AddChildOrganizationAdmins-v2026-10-12RequestBadRequestError
+    OrganizationsDealRegistrationsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        region:
+          $ref: '#/components/schemas/OrganizationsDealRegistrationsPostRequestBodyContentApplicationJsonSchemaDataRegion'
+          description: The sales region the deal belongs to.
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsDealRegistrationsPostRequestBodyContentApplicationJsonSchemaDataProductsItems'
+          description: The Deel products the partner expects to sell.
+        countries:
+          type: array
+          items:
+            type: string
+            minLength: 2
+            maxLength: 2
+          description: Optional ISO 3166-1 alpha-2 codes for the countries the deal covers.
+        company_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: The end client's legal company name.
+        company_domain:
+          type: string
+          minLength: 4
+          maxLength: 255
+          description: The end client's company domain. A scheme, a "www." prefix and a path are accepted and stripped before matching.
+        expected_deal_size:
+          type: number
+          format: double
+          minimum: 1
+          maximum: 1000000000
+          description: The expected annual contract value of the deal.
+      required:
+      - region
+      - products
+      - company_name
+      - company_domain
+      - expected_deal_size
+      description: The request payload.
+      title: OrganizationsDealRegistrationsPostRequestBodyContentApplicationJsonSchemaData
+    OrganizationsChildrenAdminsPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: OrganizationsChildrenAdminsPostParametersXBeta
+    AddChildOrganizationAdmins-v2026-10-12RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenAdminsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AddChildOrganizationAdmins-v2026-10-12RequestForbiddenError
+    OrganizationsChildrenPostResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: OrganizationsChildrenPostResponsesContentApplicationJsonSchemaRequest
+    TeamsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the team within the organization.
+        name:
+          type: string
+          minLength: 1
+          description: The name of the team.
+      required:
+      - id
+      - name
+      title: TeamsGetResponsesContentApplicationJsonSchemaDataItems
+    OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaDataChildAdminsItems:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: The email of the person from the child organization.
+        last_name:
+          type: string
+          maxLength: 100
+          description: The last name of the person from the child organization.
+        first_name:
+          type: string
+          maxLength: 100
+          description: The first name of the person from the child organization.
+      required:
+      - email
+      - last_name
+      - first_name
+      description: A person from the child organization who becomes one of its admins.
+      title: OrganizationsChildrenPostRequestBodyContentApplicationJsonSchemaDataChildAdminsItems
+    CreateChildOrganization-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateChildOrganization-v2026-01-01RequestInternalServerError
+    GetOrganizations-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error message indicating that no organization was found for the authenticated user.
+      title: GetOrganizations-v2026-01-01RequestNotFoundError
+    CreateChildOrganization-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsChildrenPostResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/OrganizationsChildrenPostResponsesContentApplicationJsonSchemaRequest'
+      title: CreateChildOrganization-v2026-01-01RequestBadRequestError
+    OrganizationsChildrenPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: OrganizationsChildrenPostResponsesContentApplicationJsonSchemaErrorsItems
+    GetDepartments-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A general error message indicating that the server encountered an unexpected issue.
+      title: GetDepartments-v2026-01-01RequestInternalServerError
+    CreateDealRegistration-v2026-09-30RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationsDealRegistrationsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateDealRegistration-v2026-09-30RequestInternalServerError
+    RolesRoleIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the role
+        description:
+          type: string
+          description: Description of the role
+        permissionSets:
+          type: array
+          items:
+            type: string
+      title: RolesRoleIdPatchRequestBodyContentApplicationJsonSchemaData
   securitySchemes:
-    BearerAuth:
+    deelToken:
       type: http
       scheme: bearer
-      bearerFormat: opaque
-      description: Deel Organization or Personal API token issued from the Developer Center.
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

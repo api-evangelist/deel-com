@@ -1,0 +1,851 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Payments API
+  version: 1.0.0
+  description: API endpoints related to Payments.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: Payments
+  description: API endpoints related to Payments.
+paths:
+  /payments/statements:
+    post:
+      operationId: payments_createPaymentStatement-v2026-07-23
+      summary: Create and pay a payment statement
+      description: 'Creates a payment statement for the requested invoices and pays it by bank transfer in a single call, instead of creating and paying in two separate steps. Use it when all invoices belong in one statement, grouped by statement type and legal entity. Every invoice must also be pending and not already locked in another payment. Submit invoices that span more than one statement in separate calls.
+
+
+        **Token scopes**: `payment-statements:write`'
+      tags:
+      - Payments
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        description: Unique key that makes the request idempotent. Replaying the same key returns the original response without creating a duplicate statement. Reusing a key with a different body returns 409 idempotency_conflict.
+        required: true
+        schema:
+          type: string
+          maxLength: 64
+      responses:
+        '201':
+          description: Successfully created and initiated payment of the statement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payments_createPaymentStatement-v2026-07-23_Response_201'
+        '400':
+          description: 'Bad request. Codes: too_many_invoices (invoice_ids exceeds the maximum of 100), currency_not_supported (the requested country does not support the requested currency for bank transfer), invalid_parameter (request validation failed), INVALID_IDEMPOTENCY_KEY (the Idempotency-Key header is missing, empty, or longer than 64 characters).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePaymentStatement-v2026-07-23RequestBadRequestError'
+        '401':
+          description: The authentication is missing or is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePaymentStatement-v2026-07-23RequestUnauthorizedError'
+        '403':
+          description: The organization is not permitted to use this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePaymentStatement-v2026-07-23RequestForbiddenError'
+        '404':
+          description: One or more referenced resources could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePaymentStatement-v2026-07-23RequestNotFoundError'
+        '409':
+          description: 'Conflict. Codes: invoices_not_payable (some invoices are already in a statement or not pending), invoices_locked (invoices are in an active payment process), no_payable_invoices (none of the invoices are payable), cor_preparation_failed (shielded/contract-of-record preparation failed), idempotency_conflict (the Idempotency-Key was reused with a different request body), multiple_statements (the invoices resolve to more than one statement — submit each group separately), payment_failed (the statement was created but the synchronous payment could not be completed).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePaymentStatement-v2026-07-23RequestConflictError'
+        '429':
+          description: Too many requests. Another request with the same Idempotency-Key is currently in progress.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePaymentStatement-v2026-07-23RequestTooManyRequestsError'
+        '500':
+          description: An unexpected error occurred while creating and paying the payment statement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePaymentStatement-v2026-07-23RequestInternalServerError'
+      requestBody:
+        description: Invoices and settlement options for the payment statement.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/PaymentsStatementsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /payments/statements/{payment_statement_id}:
+    get:
+      operationId: payments_getPaymentStatement-v2026-07-23
+      summary: Retrieve a payment statement
+      description: 'Retrieves a payment statement''s status and settlement details. Use it to check whether a statement has been paid, to see which invoices it covers, including any invoices Deel added automatically, and, for bank transfers, to get the exact beneficiary account to send funds to.
+
+
+        **Token scopes**: `payment-statements:read`'
+      tags:
+      - Payments
+      parameters:
+      - name: payment_statement_id
+        in: path
+        description: Unique identifier of the payment statement to retrieve.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved the payment statement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payments_getPaymentStatement-v2026-07-23_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: The authentication is missing or is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPaymentStatement-v2026-07-23RequestUnauthorizedError'
+        '403':
+          description: The organization is not permitted to use this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPaymentStatement-v2026-07-23RequestForbiddenError'
+        '404':
+          description: The payment statement does not exist or is not accessible to the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPaymentStatement-v2026-07-23RequestNotFoundError'
+        '500':
+          description: An unexpected error occurred while retrieving the payment statement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPaymentStatement-v2026-07-23RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    CreatePaymentStatement-v2026-07-23RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreatePaymentStatement-v2026-07-23RequestBadRequestError
+    CreatePaymentStatement-v2026-07-23RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreatePaymentStatement-v2026-07-23RequestForbiddenError
+    CreatePaymentStatement-v2026-07-23RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreatePaymentStatement-v2026-07-23RequestInternalServerError
+    PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the payment statement.
+        amount:
+          type:
+          - string
+          - 'null'
+          description: Total amount of the payment statement before any balance is applied. Null until the amount is set.
+        status:
+          $ref: '#/components/schemas/PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Normalized status of the payment statement. 'PROCESSING' covers any in-flight state (pending, preprocessing, awaiting payment); 'paid', 'cancelled' and 'failed' are terminal.
+        paid_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Date and time when the client paid, in ISO-8601 format. For bank transfers this can be set while the status is still processing. Null until payment is captured.
+        invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataInvoicesItems'
+          description: Authoritative superset of invoices settled by this payment statement. It always contains the requested invoices and may include additional overdue or required fee invoices that Deel attaches automatically.
+        reference:
+          type:
+          - string
+          - 'null'
+          description: Reference to use when reconciling this payment statement against incoming wires.
+        amount_due:
+          type:
+          - string
+          - 'null'
+          description: Amount still due after any applied balance and fee credits. Null until the amount is set.
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the payment statement was created, in ISO-8601 format.
+        payment_method:
+          type:
+          - string
+          - 'null'
+          description: Method used to settle the payment statement. Null until a payment method is attached.
+        balance_applied:
+          type: string
+          description: Amount of client balance applied to the payment statement.
+        payment_currency:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Three-letter currency code of the payment statement, following ISO 4217. Null until a payment method is attached.
+        beneficiary_details:
+          oneOf:
+          - $ref: '#/components/schemas/PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataBeneficiaryDetails'
+          - type: 'null'
+          description: Beneficiary bank details the payment is settled to. Null when not yet resolved.
+        fee_credits_applied:
+          type: string
+          description: Amount of fee credits applied to the payment statement.
+      required:
+      - id
+      - amount
+      - status
+      - invoices
+      - amount_due
+      - payment_currency
+      title: PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaData
+    GetPaymentStatement-v2026-07-23RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetPaymentStatement-v2026-07-23RequestNotFoundError
+    PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataBeneficiaryDetailsIntermediaryBank:
+      type: object
+      properties:
+        swift:
+          type:
+          - string
+          - 'null'
+          description: SWIFT/BIC code of the intermediary bank.
+        bank_name:
+          type:
+          - string
+          - 'null'
+          description: Name of the intermediary bank.
+      description: Intermediary bank to route the transfer through. Null when the rail has none.
+      title: PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataBeneficiaryDetailsIntermediaryBank
+    PaymentsStatementsPostRequestBodyContentApplicationJsonSchemaDataPayment:
+      type: object
+      properties:
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Two-letter country code for the bank transfer method, following ISO 3166-1 alpha-2.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Three-letter currency code of the payment statement, following ISO 4217. Must match the currency of the created statement.
+      required:
+      - country
+      - currency
+      description: Settlement details for the payment.
+      title: PaymentsStatementsPostRequestBodyContentApplicationJsonSchemaDataPayment
+    Payments_createPaymentStatement-v2026-07-23_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Payments_createPaymentStatement-v2026-07-23_Response_201
+    PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataBeneficiaryDetailsIntermediaryBank:
+      type: object
+      properties:
+        swift:
+          type:
+          - string
+          - 'null'
+          description: SWIFT/BIC code of the intermediary bank.
+        bank_name:
+          type:
+          - string
+          - 'null'
+          description: Name of the intermediary bank.
+      description: Intermediary bank to route the transfer through. Null when the rail has none.
+      title: PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataBeneficiaryDetailsIntermediaryBank
+    GetPaymentStatement-v2026-07-23RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetPaymentStatement-v2026-07-23RequestUnauthorizedError
+    PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    CreatePaymentStatement-v2026-07-23RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreatePaymentStatement-v2026-07-23RequestUnauthorizedError
+    PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataBeneficiaryDetails:
+      type: object
+      properties:
+        iban:
+          type:
+          - string
+          - 'null'
+          description: IBAN of the beneficiary account. Null on non-IBAN rails.
+        swift:
+          type:
+          - string
+          - 'null'
+          description: SWIFT/BIC code of the beneficiary bank. Null when not applicable.
+        address:
+          type:
+          - string
+          - 'null'
+          description: Address to include on the transfer for this rail. Null when not applicable.
+        country:
+          type:
+          - string
+          - 'null'
+          description: Two-letter country code of the beneficiary. Best-effort; null when not modeled.
+        bsb_code:
+          type:
+          - string
+          - 'null'
+          description: BSB code of the beneficiary bank, used for AUD transfers. Null when not applicable.
+        currency:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Three-letter currency code of the beneficiary account, following ISO 4217. Null when not modeled on the rail.
+        bank_code:
+          type:
+          - string
+          - 'null'
+          description: Local bank code or institution number of the beneficiary bank. Null when not applicable.
+        bank_name:
+          type:
+          - string
+          - 'null'
+          description: Name of the beneficiary bank.
+        ifsc_code:
+          type:
+          - string
+          - 'null'
+          description: IFSC code of the beneficiary bank, used for INR transfers. Null when not applicable.
+        sort_code:
+          type:
+          - string
+          - 'null'
+          description: Sort code of the beneficiary bank. Best-effort; null on most rails.
+        branch_code:
+          type:
+          - string
+          - 'null'
+          description: Branch code or transit number of the beneficiary bank. Null when not applicable.
+        account_type:
+          type:
+          - string
+          - 'null'
+          description: Type of the beneficiary account. Null when not applicable.
+        bank_address:
+          type:
+          - string
+          - 'null'
+          description: Address of the beneficiary bank. Null when not applicable.
+        account_holder:
+          type:
+          - string
+          - 'null'
+          description: Name of the beneficiary account holder. Null when not modeled on the rail.
+        account_number:
+          type:
+          - string
+          - 'null'
+          description: Beneficiary account number. Null on IBAN-only rails.
+        routing_number:
+          type:
+          - string
+          - 'null'
+          description: Routing number of the beneficiary bank when the rail uses one number for both ACH and wire. Null when not applicable.
+        intermediary_bank:
+          oneOf:
+          - $ref: '#/components/schemas/PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataBeneficiaryDetailsIntermediaryBank'
+          - type: 'null'
+          description: Intermediary bank to route the transfer through. Null when the rail has none.
+        ach_routing_number:
+          type:
+          - string
+          - 'null'
+          description: Routing number to use for ACH transfers. Null when not applicable.
+        wire_routing_number:
+          type:
+          - string
+          - 'null'
+          description: Routing number to use for wire transfers. Null when not applicable.
+      description: Beneficiary bank details the payment is settled to. Null when not yet resolved.
+      title: PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataBeneficiaryDetails
+    PaymentsStatementsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: Human-readable explanation of the error.
+      required:
+      - code
+      - message
+      title: PaymentsStatementsPostResponsesContentApplicationJsonSchemaErrorsItems
+    CreatePaymentStatement-v2026-07-23RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreatePaymentStatement-v2026-07-23RequestNotFoundError
+    PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - PROCESSING
+      - PAID
+      - CANCELLED
+      - FAILED
+      description: Normalized status of the payment statement. 'PROCESSING' covers any in-flight state (pending, preprocessing, awaiting payment); 'paid', 'cancelled' and 'failed' are terminal.
+      title: PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataStatus
+    CreatePaymentStatement-v2026-07-23RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreatePaymentStatement-v2026-07-23RequestConflictError
+    PaymentsStatementsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        payment:
+          $ref: '#/components/schemas/PaymentsStatementsPostRequestBodyContentApplicationJsonSchemaDataPayment'
+          description: Settlement details for the payment.
+        invoice_ids:
+          type: array
+          items:
+            type: string
+          description: Identifiers of the invoices to include in the payment statement. A maximum of 100 invoices can be paid in one request.
+      required:
+      - payment
+      - invoice_ids
+      title: PaymentsStatementsPostRequestBodyContentApplicationJsonSchemaData
+    PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataInvoicesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the invoice.
+        label:
+          type:
+          - string
+          - 'null'
+          description: Descriptive label for the invoice.
+        amount:
+          type: string
+          description: Amount of the invoice.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Three-letter currency code of the invoice, following ISO 4217.
+        is_auto_added:
+          type: boolean
+          description: True when Deel automatically attached this invoice (e.g. an overdue or required fee invoice) beyond the requested set.
+      required:
+      - id
+      - amount
+      - currency
+      title: PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataInvoicesItems
+    PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataBeneficiaryDetails:
+      type: object
+      properties:
+        iban:
+          type:
+          - string
+          - 'null'
+          description: IBAN of the beneficiary account. Null on non-IBAN rails.
+        swift:
+          type:
+          - string
+          - 'null'
+          description: SWIFT/BIC code of the beneficiary bank. Null when not applicable.
+        address:
+          type:
+          - string
+          - 'null'
+          description: Address to include on the transfer for this rail. Null when not applicable.
+        country:
+          type:
+          - string
+          - 'null'
+          description: Two-letter country code of the beneficiary. Best-effort; null when not modeled.
+        bsb_code:
+          type:
+          - string
+          - 'null'
+          description: BSB code of the beneficiary bank, used for AUD transfers. Null when not applicable.
+        currency:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Three-letter currency code of the beneficiary account, following ISO 4217. Null when not modeled on the rail.
+        bank_code:
+          type:
+          - string
+          - 'null'
+          description: Local bank code or institution number of the beneficiary bank. Null when not applicable.
+        bank_name:
+          type:
+          - string
+          - 'null'
+          description: Name of the beneficiary bank.
+        ifsc_code:
+          type:
+          - string
+          - 'null'
+          description: IFSC code of the beneficiary bank, used for INR transfers. Null when not applicable.
+        sort_code:
+          type:
+          - string
+          - 'null'
+          description: Sort code of the beneficiary bank. Best-effort; null on most rails.
+        branch_code:
+          type:
+          - string
+          - 'null'
+          description: Branch code or transit number of the beneficiary bank. Null when not applicable.
+        account_type:
+          type:
+          - string
+          - 'null'
+          description: Type of the beneficiary account. Null when not applicable.
+        bank_address:
+          type:
+          - string
+          - 'null'
+          description: Address of the beneficiary bank. Null when not applicable.
+        account_holder:
+          type:
+          - string
+          - 'null'
+          description: Name of the beneficiary account holder. Null when not modeled on the rail.
+        account_number:
+          type:
+          - string
+          - 'null'
+          description: Beneficiary account number. Null on IBAN-only rails.
+        routing_number:
+          type:
+          - string
+          - 'null'
+          description: Routing number of the beneficiary bank when the rail uses one number for both ACH and wire. Null when not applicable.
+        intermediary_bank:
+          oneOf:
+          - $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataBeneficiaryDetailsIntermediaryBank'
+          - type: 'null'
+          description: Intermediary bank to route the transfer through. Null when the rail has none.
+        ach_routing_number:
+          type:
+          - string
+          - 'null'
+          description: Routing number to use for ACH transfers. Null when not applicable.
+        wire_routing_number:
+          type:
+          - string
+          - 'null'
+          description: Routing number to use for wire transfers. Null when not applicable.
+      description: Beneficiary bank details the payment is settled to. Null when not yet resolved.
+      title: PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataBeneficiaryDetails
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataInvoicesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the invoice.
+        label:
+          type:
+          - string
+          - 'null'
+          description: Descriptive label for the invoice.
+        amount:
+          type: string
+          description: Amount of the invoice.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Three-letter currency code of the invoice, following ISO 4217.
+        is_auto_added:
+          type: boolean
+          description: True when Deel automatically attached this invoice (e.g. an overdue or required fee invoice) beyond the requested set.
+      required:
+      - id
+      - amount
+      - currency
+      title: PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaDataInvoicesItems
+    PaymentsStatementsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the payment statement.
+        amount:
+          type:
+          - string
+          - 'null'
+          description: Total amount of the payment statement before any balance is applied. Null until the amount is set.
+        status:
+          $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Normalized status of the payment statement. 'PROCESSING' covers any in-flight state (pending, preprocessing, awaiting payment); 'paid', 'cancelled' and 'failed' are terminal.
+        paid_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Date and time when the client paid, in ISO-8601 format. For bank transfers this can be set while the status is still processing. Null until payment is captured.
+        invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataInvoicesItems'
+          description: Authoritative superset of invoices settled by this payment statement. It always contains the requested invoices and may include additional overdue or required fee invoices that Deel attaches automatically.
+        reference:
+          type:
+          - string
+          - 'null'
+          description: Reference to use when reconciling this payment statement against incoming wires.
+        amount_due:
+          type:
+          - string
+          - 'null'
+          description: Amount still due after any applied balance and fee credits. Null until the amount is set.
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the payment statement was created, in ISO-8601 format.
+        payment_method:
+          type:
+          - string
+          - 'null'
+          description: Method used to settle the payment statement. Null until a payment method is attached.
+        balance_applied:
+          type: string
+          description: Amount of client balance applied to the payment statement.
+        payment_currency:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Three-letter currency code of the payment statement, following ISO 4217. Null until a payment method is attached.
+        beneficiary_details:
+          oneOf:
+          - $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataBeneficiaryDetails'
+          - type: 'null'
+          description: Beneficiary bank details the payment is settled to. Null when not yet resolved.
+        fee_credits_applied:
+          type: string
+          description: Amount of fee credits applied to the payment statement.
+      required:
+      - id
+      - amount
+      - status
+      - invoices
+      - amount_due
+      - payment_currency
+      title: PaymentsStatementsPostResponsesContentApplicationJsonSchemaData
+    GetPaymentStatement-v2026-07-23RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetPaymentStatement-v2026-07-23RequestInternalServerError
+    CreatePaymentStatement-v2026-07-23RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreatePaymentStatement-v2026-07-23RequestTooManyRequestsError
+    Payments_getPaymentStatement-v2026-07-23_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Payments_getPaymentStatement-v2026-07-23_Response_200
+    GetPaymentStatement-v2026-07-23RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentsStatementsPaymentStatementIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetPaymentStatement-v2026-07-23RequestForbiddenError
+    PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - PROCESSING
+      - PAID
+      - CANCELLED
+      - FAILED
+      description: Normalized status of the payment statement. 'PROCESSING' covers any in-flight state (pending, preprocessing, awaiting payment); 'paid', 'cancelled' and 'failed' are terminal.
+      title: PaymentsStatementsPostResponsesContentApplicationJsonSchemaDataStatus
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

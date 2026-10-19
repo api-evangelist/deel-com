@@ -1,0 +1,384 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Hrx Documents API
+  version: 1.0.0
+  description: API endpoints related to HRX Documents.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: hrxDocuments
+  description: API endpoints related to HRX Documents.
+paths:
+  /eor/contracts/{contract_id}/hrx-documents/{document_id}:
+    get:
+      operationId: hrxDocuments_downloadHrxDocuments-v2026-01-01
+      summary: Download HRX documents
+      description: 'Generates a pre-signed URL for downloading a specific HRX document as a PDF associated with an EOR contract. The URL expires 15 minutes after generation.
+
+
+        **Token scopes**: `contracts:read`, `worker:read`'
+      tags:
+      - hrxDocuments
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: document_id
+        in: path
+        description: The unique identifier of the document to download.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successfully generated pre-signed URL for HRX document download
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HRX_Documents_downloadHrxDocuments-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadHrxDocuments-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadHrxDocuments-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /eor/contracts/{contract_id}/hrx-documents:
+    get:
+      operationId: hrxDocuments_retrieveHrxDocuments-v2026-01-01
+      summary: Retrieve HRX documents
+      description: 'Returns a paginated list of HRX documents shared with an employee under a specific EOR contract.
+
+
+        **Token scopes**: `worker:read`, `contracts:read`'
+      tags:
+      - hrxDocuments
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      - name: cursor
+        in: query
+        description: Cursor for pagination. Use the cursor from the previous response to get the next page of results.
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Number of items to return per page. Maximum is 100, default is 20.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: HRX documents successfully retrieved for EOR contract
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HRX_Documents_retrieveHrxDocuments-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveHrxDocuments-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveHrxDocuments-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveHrxDocuments-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    HRX_Documents_retrieveHrxDocuments-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of employee documents
+        has_more:
+          type: boolean
+          description: Indicates if there are more pages available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to use for the next page. Null if there are no more pages.
+        total_count:
+          type: integer
+          description: Total number of documents available across all pages
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: HRX Documents_retrieveHrxDocuments-v2026-01-01_Response_200
+    EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Pre-signed URL to download the HRX document PDF. Valid for 15 minutes.
+        created_at:
+          type: string
+          format: date-time
+          description: When the document was created
+        updated_at:
+          type: string
+          format: date-time
+          description: When the document was last updated
+      required:
+      - url
+      - created_at
+      - updated_at
+      description: Download information for the HRX document
+      title: EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaData
+    RetrieveHrxDocuments-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveHrxDocuments-v2026-01-01RequestInternalServerError
+    RetrieveHrxDocuments-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveHrxDocuments-v2026-01-01RequestUnauthorizedError
+    EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItemsCategoryType:
+      type: string
+      enum:
+      - EMPLOYMENT_AGREEMENT
+      - ONBOARDING_REGISTRATION
+      - OFFBOARDING_TERMINATION
+      - TAX_FISCAL
+      - STATUS_BENEFITS
+      - VISA_TRAVEL_SUPPORT
+      - OTHER
+      description: Type of the document category
+      title: EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItemsCategoryType
+    EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where authentication failed
+        message:
+          type: string
+          description: Description of the returned error
+      title: EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveHrxDocuments-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveHrxDocuments-v2026-01-01RequestBadRequestError
+    DownloadHrxDocuments-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DownloadHrxDocuments-v2026-01-01RequestUnauthorizedError
+    EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the employee document
+        name:
+          type: string
+          description: Name of the employee document
+        category:
+          type: string
+          description: Type of the document category
+        created_at:
+          type: string
+          format: date-time
+          description: When the document was created
+        updated_at:
+          type: string
+          format: date-time
+          description: When the document was last updated
+        category_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the document category
+        category_type:
+          $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItemsCategoryType'
+          description: Type of the document category
+        category_description:
+          type: string
+          description: Description of the document category
+      required:
+      - id
+      - name
+      - category
+      - created_at
+      - updated_at
+      - category_id
+      - category_type
+      - category_description
+      title: EorContractsContractIdHrxDocumentsGetResponsesContentApplicationJsonSchemaDataItems
+    DownloadHrxDocuments-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DownloadHrxDocuments-v2026-01-01RequestBadRequestError
+    HRX_Documents_downloadHrxDocuments-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaData'
+          description: Download information for the HRX document
+      required:
+      - data
+      title: HRX Documents_downloadHrxDocuments-v2026-01-01_Response_200
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type: string
+          description: The field name where authentication failed
+        message:
+          type: string
+          description: Description of the returned error
+      title: EorContractsContractIdHrxDocumentsDocumentIdGetResponsesContentApplicationJsonSchemaErrorsItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

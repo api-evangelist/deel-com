@@ -1,0 +1,198 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Refund Statements API
+  version: 1.0.0
+  description: API endpoints related to Refund Statements.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: refundStatements
+  description: API endpoints related to Refund Statements.
+paths:
+  /refund-statements/{refund_statement_id}/breakdown:
+    get:
+      operationId: refundStatements_retrieveRefundStatementCreditNoteBreakdown-v2026-05-11
+      summary: Retrieve refund statement credit-note breakdown
+      description: 'Use this endpoint to retrieve a detailed breakdown of credit notes associated with a specific refund statement. It provides comprehensive details for financial tracking and reconciliation.
+
+
+        **Token scopes**: `accounting:read`'
+      tags:
+      - refundStatements
+      parameters:
+      - name: refund_statement_id
+        in: path
+        description: Public id (`invoice_id`) of the refund statement root invoice.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Breakdown succeeded. `data` contains zero or more rows (empty array when there are no child credit notes).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund_Statements_retrieveRefundStatementCreditNoteBreakdown-v2026-05-11_Response_200'
+        '400':
+          description: 'Bad request: missing organization context, or request validation failed (e.g. invalid path id format, invalid query types).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestBadRequestError'
+        '401':
+          description: 'Unauthorized: caller is not authenticated (e.g. missing or invalid session or bearer token).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestUnauthorizedError'
+        '403':
+          description: Forbidden (role or feature flag).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestForbiddenError'
+        '404':
+          description: Statement not found or not accessible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestNotFoundError'
+        '500':
+          description: Unexpected server failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefundStatementsRefundStatementIdBreakdownGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestForbiddenError
+    Refund_Statements_retrieveRefundStatementCreditNoteBreakdown-v2026-05-11_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefundStatementsRefundStatementIdBreakdownGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Credit note / credit statement lines linked to this refund statement.
+        hasMore:
+          type: boolean
+          description: Reserved for pagination; currently always false (full breakdown returned in `data`).
+        nextCursor:
+          type:
+          - string
+          - 'null'
+          description: Reserved for cursor pagination; currently always null for this endpoint.
+      required:
+      - data
+      - hasMore
+      - nextCursor
+      title: Refund Statements_retrieveRefundStatementCreditNoteBreakdown-v2026-05-11_Response_200
+    RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefundStatementsRefundStatementIdBreakdownGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestUnauthorizedError
+    RefundStatementsRefundStatementIdBreakdownGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable code when present.
+        message:
+          type: string
+          description: Human-readable message when present.
+      title: RefundStatementsRefundStatementIdBreakdownGetResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefundStatementsRefundStatementIdBreakdownGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestNotFoundError
+    RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefundStatementsRefundStatementIdBreakdownGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestBadRequestError
+    RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefundStatementsRefundStatementIdBreakdownGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Structured errors when the runtime could serialize them; may be absent or empty.
+      description: No guaranteed error shape for unhandled failures; body may omit structured errors or differ by gateway.
+      title: RetrieveRefundStatementCreditNoteBreakdown-v2026-05-11RequestInternalServerError
+    RefundStatementsRefundStatementIdBreakdownGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Public id of the credit note (or credit statement line) invoice.
+        label:
+          type: string
+          description: Display label (sequencing label or description fallback).
+        amount:
+          type: string
+          description: Credit amount; typically negative for credits.
+        currency:
+          type: string
+          description: ISO 4217 currency code.
+        contract_id:
+          type:
+          - string
+          - 'null'
+          description: Contract `oid` when the credit note is tied to a contract; otherwise null.
+        original_invoice_id:
+          type:
+          - string
+          - 'null'
+          description: Public id of the invoice being credited when applicable; `null` when not linked.
+      required:
+      - id
+      - label
+      - amount
+      - currency
+      title: RefundStatementsRefundStatementIdBreakdownGetResponsesContentApplicationJsonSchemaDataItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

@@ -1,0 +1,7301 @@
+openapi: 3.2.0
+info:
+  title: Endpoints It Orders API
+  version: 1.0.0
+  description: API endpoints related to IT orders.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: itOrders
+  description: API endpoints related to IT orders.
+paths:
+  /it/orders/{order_id}/approve:
+    post:
+      operationId: itOrders_approveItOrder-v2026-09-30
+      summary: Approve an IT order
+      description: 'Approves an order that is currently awaiting approval, moving it to approved status, creating assignments for its approved items, and starting fulfilment. Use this once an order has been submitted and is pending manager approval, before fulfilment can begin.
+
+
+        **Token scopes**: `it-orders:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-30.'
+      tags:
+      - itOrders
+      parameters:
+      - name: order_id
+        in: path
+        description: Unique identifier of the IT order
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_orders_approveItOrder-v2026-09-30_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproveItOrder-v2026-09-30RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproveItOrder-v2026-09-30RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproveItOrder-v2026-09-30RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproveItOrder-v2026-09-30RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproveItOrder-v2026-09-30RequestConflictError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproveItOrder-v2026-09-30RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/orders/{order_id}/cancel:
+    post:
+      operationId: itOrders_cancelItOrder-v2026-09-15
+      summary: Cancel an IT order
+      description: 'Cancels an order that is still pre-shipment with a reason. On success the order plus its related sales order are cancelled. Cancellation is rejected if the order is paid, in payment, or already shipped.
+
+
+        **Token scopes**: `it-orders:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-15.'
+      tags:
+      - itOrders
+      parameters:
+      - name: order_id
+        in: path
+        description: Unique identifier of the IT order
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_orders_cancelItOrder-v2026-09-15_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelItOrder-v2026-09-15RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelItOrder-v2026-09-15RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelItOrder-v2026-09-15RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelItOrder-v2026-09-15RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelItOrder-v2026-09-15RequestConflictError'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelItOrder-v2026-09-15RequestUnprocessableEntityError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelItOrder-v2026-09-15RequestInternalServerError'
+      requestBody:
+        description: Cancellation details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ItOrdersOrderIdCancelPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /it/orders:
+    post:
+      operationId: itOrders_createItOrder-v2026-09-17
+      summary: Create an IT order
+      description: 'Creates a pre-approved IT equipment order for a worker so it can be raised directly from an onboarding or procurement workflow instead of a separate approval step.
+
+
+        **Token scopes**: `it-orders:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-17.'
+      tags:
+      - itOrders
+      parameters:
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItOrdersPostParametersXBeta'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_orders_createItOrder-v2026-09-17_Response_201'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateItOrder-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateItOrder-v2026-09-17RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateItOrder-v2026-09-17RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateItOrder-v2026-09-17RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateItOrder-v2026-09-17RequestConflictError'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateItOrder-v2026-09-17RequestUnprocessableEntityError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateItOrder-v2026-09-17RequestInternalServerError'
+      requestBody:
+        description: Order to create
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: itOrders_listItOrders-v2026-01-01
+      summary: List IT orders
+      description: 'Lists your organization''s IT equipment orders with their current fulfilment status. Use it to surface order progress — pending, approved, shipped, delivered — inside your own service desk or onboarding workflow, so a worker can be told where their device is without logging into Deel.
+
+
+        **Token scopes**: `it-orders:read`'
+      tags:
+      - itOrders
+      parameters:
+      - name: cursor
+        in: query
+        description: Indicates where the next page of results starts, as returned in a paginated list response
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_orders_listItOrders-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItOrders-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItOrders-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/orders/{order_id}/decline:
+    post:
+      operationId: itOrders_declineItOrder-v2026-09-30
+      summary: Reject an IT order
+      description: 'Declines an order that is awaiting approval, moving it to a final DECLINED status and leaving every item unapproved with no fulfilment started. Use this when a service desk needs to reject an order before approval instead of going through the Deel IT UI. This decision cannot be reversed.
+
+
+        **Token scopes**: `it-orders:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-30.'
+      tags:
+      - itOrders
+      parameters:
+      - name: order_id
+        in: path
+        description: Unique identifier of the IT order
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_orders_declineItOrder-v2026-09-30_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeclineItOrder-v2026-09-30RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeclineItOrder-v2026-09-30RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeclineItOrder-v2026-09-30RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeclineItOrder-v2026-09-30RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeclineItOrder-v2026-09-30RequestConflictError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeclineItOrder-v2026-09-30RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/orders/{order_id}:
+    get:
+      operationId: itOrders_retrieveAnItOrder-v2026-01-01
+      summary: Retrieve an IT order
+      description: 'Retrieves one order with its fulfilment status, shipping details, and the product ordered. Call this to answer "where is my device?" for a specific worker, or to poll a single order through to delivery.
+
+
+        **Token scopes**: `it-orders:read`'
+      tags:
+      - itOrders
+      parameters:
+      - name: order_id
+        in: path
+        description: Unique identifier of the IT order
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_orders_retrieveAnItOrder-v2026-01-01_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItOrder-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItOrder-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItOrder-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    DeclineItOrder-v2026-09-30RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DeclineItOrder-v2026-09-30RequestConflictError
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetails:
+      type: object
+      properties:
+        asset_price:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsAssetPrice'
+          - type: 'null'
+          description: Price of the order item
+        storefront_fee:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsStorefrontFee'
+          - type: 'null'
+          description: Storefront fee associated with the order item
+        acquisition_type:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsAcquisitionType'
+          description: Acquisition type of the order item
+      required:
+      - asset_price
+      - storefront_fee
+      - acquisition_type
+      description: Order item pricing details
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetails
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestinationAssignTo:
+      type: string
+      enum:
+      - USER
+      description: Who the ordered items are assigned to
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestinationAssignTo
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType:
+      type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      description: Acquisition type of the order item
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus:
+      type: string
+      enum:
+      - AWAITING_PAYMENT
+      - CANCELLED
+      - COMPLETED
+      - PLACED
+      - PROCESSING
+      - READY_TO_SHIP
+      - SHIPPED
+      description: Status of the order item
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataUser:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - last_name
+      - first_name
+      - hris_profile_id
+      description: Details of the user the order is for
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataUser
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUserAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUserAddressCountry
+    CancelItOrder-v2026-09-15RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelItOrder-v2026-09-15RequestBadRequestError
+    ItOrdersOrderIdApprovePostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItOrdersOrderIdApprovePostParametersXBeta
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails:
+      type: object
+      properties:
+        asset_price:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice'
+          - type: 'null'
+          description: Price of the order item
+        storefront_fee:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee'
+          - type: 'null'
+          description: Storefront fee associated with the order item
+        acquisition_type:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType'
+          description: Acquisition type of the order item
+      required:
+      - asset_price
+      - storefront_fee
+      - acquisition_type
+      description: Order item pricing details
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency
+    IT_orders_retrieveAnItOrder-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: IT orders_retrieveAnItOrder-v2026-01-01_Response_200
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsAssetPriceCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsAssetPriceCurrency
+    CancelItOrder-v2026-09-15RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelItOrder-v2026-09-15RequestForbiddenError
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Price of the order item
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaErrorsItems
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataDeliveryAddressType:
+      type: string
+      enum:
+      - BILLING
+      - COLLECTION
+      - DELIVERY
+      - ENTITY
+      - PARTIAL
+      - PII
+      - SUPPLIER
+      description: Type of the address
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataDeliveryAddressType
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order
+        user:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataUser'
+          - type: 'null'
+          description: Details of the user the order is for
+        status:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Order status
+        public_id:
+          type: string
+          description: Public identifier of the order
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp of the order
+        order_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItems'
+          description: Order's items details
+        delivery_address:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataDeliveryAddress'
+          description: Delivery address of the order
+      required:
+      - id
+      - user
+      - status
+      - public_id
+      - created_at
+      - updated_at
+      - order_items
+      - delivery_address
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaData
+    ItOrdersOrderIdCancelPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        cancelled_reason:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostRequestBodyContentApplicationJsonSchemaDataCancelledReason'
+          description: Reason the order was cancelled
+        cancelled_reason_description:
+          type: string
+          maxLength: 500
+          description: Free-text description explaining the cancellation. Required when cancelled_reason is OTHER; max 500 characters.
+      required:
+      - cancelled_reason
+      title: ItOrdersOrderIdCancelPostRequestBodyContentApplicationJsonSchemaData
+    ItOrdersGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUserAddressType:
+      type: string
+      enum:
+      - BILLING
+      - COLLECTION
+      - DELIVERY
+      - ENTITY
+      - PARTIAL
+      - PII
+      - SUPPLIER
+      description: Type of the address
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUserAddressType
+    CancelItOrder-v2026-09-15RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelItOrder-v2026-09-15RequestConflictError
+    DeclineItOrder-v2026-09-30RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DeclineItOrder-v2026-09-30RequestUnauthorizedError
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: Product details
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingAddonsItemsPaymentSchema:
+      type: string
+      enum:
+      - MONTHLY
+      - UPFRONT
+      description: How the addon is billed. Omit to accept the default schema for the bundle.
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingAddonsItemsPaymentSchema
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: Product details
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsStorefrontFee:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsStorefrontFeeCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Storefront fee associated with the order item
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsStorefrontFee
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails:
+      type: object
+      properties:
+        asset_price:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice'
+          - type: 'null'
+          description: Price of the order item
+        storefront_fee:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee'
+          - type: 'null'
+          description: Storefront fee associated with the order item
+        acquisition_type:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType'
+          description: Acquisition type of the order item
+      required:
+      - asset_price
+      - storefront_fee
+      - acquisition_type
+      description: Order item pricing details
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order
+        user:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataUser'
+          - type: 'null'
+          description: Details of the user the order is for
+        status:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Order status
+        public_id:
+          type: string
+          description: Public identifier of the order
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp of the order
+        order_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItems'
+          description: Order's items details
+        delivery_address:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataDeliveryAddress'
+          description: Delivery address of the order
+      required:
+      - id
+      - user
+      - status
+      - public_id
+      - created_at
+      - updated_at
+      - order_items
+      - delivery_address
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaData
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItems'
+          description: One entry per item to order
+        destination:
+          $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestination'
+          description: Where the order goes
+        is_express_delivery_requested:
+          type: boolean
+          description: Whether express delivery was requested for this order
+      required:
+      - variants
+      - destination
+      - is_express_delivery_requested
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaData
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Price of the order item
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice
+    RetrieveAnItOrder-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItOrder-v2026-01-01RequestInternalServerError
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order item
+        status:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsStatus'
+          description: Status of the order item
+        product:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsProduct'
+          description: Product details
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order item
+        is_approved:
+          type: boolean
+          description: Is the order item approved
+        pricing_details:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetails'
+          description: Order item pricing details
+        is_express_delivery_requested:
+          type: boolean
+          description: Is express delivery requested for the order item
+      required:
+      - id
+      - status
+      - product
+      - created_at
+      - is_approved
+      - pricing_details
+      - is_express_delivery_requested
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItems
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency
+    CreateItOrder-v2026-09-17RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateItOrder-v2026-09-17RequestNotFoundError
+    DeclineItOrder-v2026-09-30RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DeclineItOrder-v2026-09-30RequestInternalServerError
+    IT_orders_cancelItOrder-v2026-09-15_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: IT orders_cancelItOrder-v2026-09-15_Response_200
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingPaymentSchema:
+      type: string
+      enum:
+      - MONTHLY
+      - UPFRONT
+      description: How the equipment is billed. Required for rentals, ignored for purchases (always upfront).
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingPaymentSchema
+    DeclineItOrder-v2026-09-30RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DeclineItOrder-v2026-09-30RequestBadRequestError
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus:
+      type: string
+      enum:
+      - AWAITING_PAYMENT
+      - CANCELLED
+      - COMPLETED
+      - PLACED
+      - PROCESSING
+      - READY_TO_SHIP
+      - SHIPPED
+      description: Status of the order item
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSetting:
+      type: object
+      properties:
+        addons:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingAddonsItems'
+          description: Addon bundles attached to this contract. At most two entries — one service + one warranty. Server derives the type from each `addon_id`.
+        rental_term:
+          $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingRentalTerm'
+          description: Rental term length. Required for rentals, ignored otherwise.
+        payment_schema:
+          $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingPaymentSchema'
+          description: How the equipment is billed. Required for rentals, ignored for purchases (always upfront).
+        acquisition_type:
+          $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingAcquisitionType'
+          description: How the equipment is acquired
+      required:
+      - addons
+      - acquisition_type
+      description: Contract terms — acquisition type, rental term, payment schema, and addons
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSetting
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsAssetPrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsAssetPriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Price of the order item
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsAssetPrice
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus:
+      type: string
+      enum:
+      - AWAITING_PAYMENT
+      - CANCELLED
+      - COMPLETED
+      - PLACED
+      - PROCESSING
+      - READY_TO_SHIP
+      - SHIPPED
+      description: Status of the order item
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus
+    ApproveItOrder-v2026-09-30RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ApproveItOrder-v2026-09-30RequestUnauthorizedError
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency
+    RetrieveAnItOrder-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItOrder-v2026-01-01RequestBadRequestError
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order item
+        status:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus'
+          description: Status of the order item
+        product:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct'
+          description: Product details
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order item
+        is_approved:
+          type: boolean
+          description: Is the order item approved
+        pricing_details:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails'
+          description: Order item pricing details
+        is_express_delivery_requested:
+          type: boolean
+          description: Is express delivery requested for the order item
+      required:
+      - id
+      - status
+      - product
+      - created_at
+      - is_approved
+      - pricing_details
+      - is_express_delivery_requested
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItems
+    ItOrdersPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order
+        user:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataUser'
+          - type: 'null'
+          description: Details of the user the order is for
+        status:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Order status
+        public_id:
+          type: string
+          description: Public identifier of the order
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp of the order
+        order_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItems'
+          description: Order's items details
+        delivery_address:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataDeliveryAddress'
+          description: Delivery address of the order
+      required:
+      - id
+      - user
+      - status
+      - public_id
+      - created_at
+      - updated_at
+      - order_items
+      - delivery_address
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaData
+    DeclineItOrder-v2026-09-30RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DeclineItOrder-v2026-09-30RequestForbiddenError
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataDeliveryAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataDeliveryAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      required:
+      - id
+      - city
+      - type
+      - line1
+      - line2
+      - state
+      - country
+      - is_valid
+      - post_code
+      - phone_number
+      - date_of_birth
+      - tax_id_number
+      - passport_number
+      - delivery_instructions
+      description: Delivery address of the order
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataDeliveryAddress
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingAcquisitionType:
+      type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      description: How the equipment is acquired
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingAcquisitionType
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestinationDeliveryAddress:
+      type: object
+      properties:
+        city:
+          type: string
+          description: City name
+        line1:
+          type: string
+          description: Address line 1
+        line2:
+          type: string
+          description: Address line 2
+        state:
+          type: string
+          description: State or region name
+        country:
+          $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestinationDeliveryAddressCountry'
+          description: Country code (ISO 3166 alpha-2)
+        post_code:
+          type: string
+          description: Post code
+        phone_number:
+          type: string
+          description: Phone number in E.164 format
+        date_of_birth:
+          type: string
+          format: date
+          description: Date of birth
+        tax_id_number:
+          type: string
+          description: Tax ID number
+        passport_number:
+          type: string
+          description: Passport number
+        delivery_instructions:
+          type: string
+          description: Delivery instructions for the courier
+      required:
+      - country
+      description: Delivery address for the order
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestinationDeliveryAddress
+    IT_orders_listItOrders-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItems'
+        has_more:
+          type: boolean
+          description: Whether there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to the next page
+        total_count:
+          type: integer
+          format: int64
+          description: Total number of records
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: IT orders_listItOrders-v2026-01-01_Response_200
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataDeliveryAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataDeliveryAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      required:
+      - id
+      - city
+      - type
+      - line1
+      - line2
+      - state
+      - country
+      - is_valid
+      - post_code
+      - phone_number
+      - date_of_birth
+      - tax_id_number
+      - passport_number
+      - delivery_instructions
+      description: Delivery address of the order
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataDeliveryAddress
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType:
+      type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      description: Acquisition type of the order item
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUserAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUserAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUserAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      required:
+      - id
+      - city
+      - type
+      - line1
+      - line2
+      - state
+      - country
+      - is_valid
+      - post_code
+      - phone_number
+      - date_of_birth
+      - tax_id_number
+      - passport_number
+      - delivery_instructions
+      description: User address details
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUserAddress
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingAddonsItems:
+      type: object
+      properties:
+        addon_id:
+          type: string
+          format: uuid
+          description: 'Unique identifier of the addon bundle. Callers pick these from
+
+            `available_addons[]` on `GET /products/{id}`.'
+        payment_schema:
+          $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingAddonsItemsPaymentSchema'
+          description: How the addon is billed. Omit to accept the default schema for the bundle.
+        duration_months:
+          type: integer
+          format: int64
+          description: Bundle duration in months. Service bundles only; nil for warranties and one-off addons.
+      required:
+      - addon_id
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingAddonsItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataDeliveryAddressType:
+      type: string
+      enum:
+      - BILLING
+      - COLLECTION
+      - DELIVERY
+      - ENTITY
+      - PARTIAL
+      - PII
+      - SUPPLIER
+      description: Type of the address
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataDeliveryAddressType
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order item
+        status:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus'
+          description: Status of the order item
+        product:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct'
+          description: Product details
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order item
+        is_approved:
+          type: boolean
+          description: Is the order item approved
+        pricing_details:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails'
+          description: Order item pricing details
+        is_express_delivery_requested:
+          type: boolean
+          description: Is express delivery requested for the order item
+      required:
+      - id
+      - status
+      - product
+      - created_at
+      - is_approved
+      - pricing_details
+      - is_express_delivery_requested
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItems
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry
+    ItOrdersPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItOrdersPostParametersXBeta
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: Product details
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct
+    ApproveItOrder-v2026-09-30RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ApproveItOrder-v2026-09-30RequestInternalServerError
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order item
+        status:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus'
+          description: Status of the order item
+        product:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct'
+          description: Product details
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order item
+        is_approved:
+          type: boolean
+          description: Is the order item approved
+        pricing_details:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails'
+          description: Order item pricing details
+        is_express_delivery_requested:
+          type: boolean
+          description: Is express delivery requested for the order item
+      required:
+      - id
+      - status
+      - product
+      - created_at
+      - is_approved
+      - pricing_details
+      - is_express_delivery_requested
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItems
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUserAddressType:
+      type: string
+      enum:
+      - BILLING
+      - COLLECTION
+      - DELIVERY
+      - ENTITY
+      - PARTIAL
+      - PII
+      - SUPPLIER
+      description: Type of the address
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUserAddressType
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType:
+      type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      description: Acquisition type of the order item
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItems:
+      type: object
+      properties:
+        variant_id:
+          type: string
+          format: uuid
+          description: Variant of the product to order
+        contract_setting:
+          $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSetting'
+          description: Contract terms — acquisition type, rental term, payment schema, and addons
+        is_preconfig_requested:
+          type: boolean
+          description: Whether preconfiguration was requested for the delivered device
+      required:
+      - variant_id
+      - contract_setting
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItems
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataDeliveryAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataDeliveryAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      required:
+      - id
+      - city
+      - type
+      - line1
+      - line2
+      - state
+      - country
+      - is_valid
+      - post_code
+      - phone_number
+      - date_of_birth
+      - tax_id_number
+      - passport_number
+      - delivery_instructions
+      description: Order delivery address details
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataDeliveryAddress
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsStatus:
+      type: string
+      enum:
+      - AWAITING_PAYMENT
+      - CANCELLED
+      - COMPLETED
+      - PLACED
+      - PROCESSING
+      - READY_TO_SHIP
+      - SHIPPED
+      description: Status of the order item
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsStatus
+    RetrieveAnItOrder-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItOrder-v2026-01-01RequestNotFoundError
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: Product details
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails:
+      type: object
+      properties:
+        asset_price:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice'
+          - type: 'null'
+          description: Price of the order item
+        storefront_fee:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee'
+          - type: 'null'
+          description: Storefront fee associated with the order item
+        acquisition_type:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType'
+          description: Acquisition type of the order item
+      required:
+      - asset_price
+      - storefront_fee
+      - acquisition_type
+      description: Order item pricing details
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataUser:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - last_name
+      - first_name
+      - hris_profile_id
+      description: Details of the user the order is for
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataUser
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsAcquisitionType:
+      type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      description: Acquisition type of the order item
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsAcquisitionType
+    IT_orders_createItOrder-v2026-09-17_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: IT orders_createItOrder-v2026-09-17_Response_201
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestinationDeliveryAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code (ISO 3166 alpha-2)
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestinationDeliveryAddressCountry
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - APPROVED
+      - CANCELLED
+      - DECLINED
+      - REQUESTED
+      description: Order status
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataStatus
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingRentalTerm:
+      type: string
+      enum:
+      - MONTH_12
+      - MONTH_24
+      description: Rental term length. Required for rentals, ignored otherwise.
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataVariantsItemsContractSettingRentalTerm
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails:
+      type: object
+      properties:
+        asset_price:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice'
+          - type: 'null'
+          description: Price of the order item
+        storefront_fee:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee'
+          - type: 'null'
+          description: Storefront fee associated with the order item
+        acquisition_type:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType'
+          description: Acquisition type of the order item
+      required:
+      - asset_price
+      - storefront_fee
+      - acquisition_type
+      description: Order item pricing details
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: Product details
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataDeliveryAddressType:
+      type: string
+      enum:
+      - BILLING
+      - COLLECTION
+      - DELIVERY
+      - ENTITY
+      - PARTIAL
+      - PII
+      - SUPPLIER
+      description: Type of the address
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataDeliveryAddressType
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType:
+      type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      description: Acquisition type of the order item
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - APPROVED
+      - CANCELLED
+      - DECLINED
+      - REQUESTED
+      description: Order status
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataStatus
+    CreateItOrder-v2026-09-17RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateItOrder-v2026-09-17RequestForbiddenError
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Storefront fee associated with the order item
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataDeliveryAddressType:
+      type: string
+      enum:
+      - BILLING
+      - COLLECTION
+      - DELIVERY
+      - ENTITY
+      - PARTIAL
+      - PII
+      - SUPPLIER
+      description: Type of the address
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataDeliveryAddressType
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails:
+      type: object
+      properties:
+        asset_price:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice'
+          - type: 'null'
+          description: Price of the order item
+        storefront_fee:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee'
+          - type: 'null'
+          description: Storefront fee associated with the order item
+        acquisition_type:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType'
+          description: Acquisition type of the order item
+      required:
+      - asset_price
+      - storefront_fee
+      - acquisition_type
+      description: Order item pricing details
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - APPROVED
+      - CANCELLED
+      - DECLINED
+      - REQUESTED
+      description: Order status
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataStatus
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - APPROVED
+      - CANCELLED
+      - DECLINED
+      - REQUESTED
+      description: Order status
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataStatus
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUser:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        address:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUserAddress'
+          description: User address details
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - address
+      - last_name
+      - first_name
+      - hris_profile_id
+      description: Details of the user with asset possession
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUser
+    ListItOrders-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItOrders-v2026-01-01RequestBadRequestError
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order item
+        status:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus'
+          description: Status of the order item
+        product:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct'
+          description: Product details
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order item
+        is_approved:
+          type: boolean
+          description: Is the order item approved
+        pricing_details:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails'
+          description: Order item pricing details
+        is_express_delivery_requested:
+          type: boolean
+          description: Is express delivery requested for the order item
+      required:
+      - id
+      - status
+      - product
+      - created_at
+      - is_approved
+      - pricing_details
+      - is_express_delivery_requested
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItems
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType:
+      type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      description: Acquisition type of the order item
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAcquisitionType
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory
+    CreateItOrder-v2026-09-17RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateItOrder-v2026-09-17RequestConflictError
+    ItOrdersOrderIdCancelPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItOrdersOrderIdCancelPostParametersXBeta
+    CancelItOrder-v2026-09-15RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelItOrder-v2026-09-15RequestNotFoundError
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order item
+        status:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus'
+          description: Status of the order item
+        product:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsProduct'
+          description: Product details
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order item
+        is_approved:
+          type: boolean
+          description: Is the order item approved
+        pricing_details:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetails'
+          description: Order item pricing details
+        is_express_delivery_requested:
+          type: boolean
+          description: Is express delivery requested for the order item
+      required:
+      - id
+      - status
+      - product
+      - created_at
+      - is_approved
+      - pricing_details
+      - is_express_delivery_requested
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItems
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaErrorsItems
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataDeliveryAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataDeliveryAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      required:
+      - id
+      - city
+      - type
+      - line1
+      - line2
+      - state
+      - country
+      - is_valid
+      - post_code
+      - phone_number
+      - date_of_birth
+      - tax_id_number
+      - passport_number
+      - delivery_instructions
+      description: Delivery address of the order
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataDeliveryAddress
+    ItOrdersOrderIdCancelPostRequestBodyContentApplicationJsonSchemaDataCancelledReason:
+      type: string
+      enum:
+      - ADDRESS_ISSUE
+      - DELAY_WANTED
+      - DUPLICATE
+      - ITEM_CHANGE
+      - NOT_NEEDED
+      - OTHER
+      - PRICE
+      - WRONG_WORKER
+      description: Reason the order was cancelled
+      title: ItOrdersOrderIdCancelPostRequestBodyContentApplicationJsonSchemaDataCancelledReason
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency
+    CreateItOrder-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateItOrder-v2026-09-17RequestBadRequestError
+    CreateItOrder-v2026-09-17RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateItOrder-v2026-09-17RequestInternalServerError
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order
+        user:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataUser'
+          - type: 'null'
+          description: Details of the user the order is for
+        status:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Order status
+        public_id:
+          type: string
+          description: Public identifier of the order
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp of the order
+        order_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItems'
+          description: Order's items details
+        delivery_address:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataDeliveryAddress'
+          description: Delivery address of the order
+      required:
+      - id
+      - user
+      - status
+      - public_id
+      - created_at
+      - updated_at
+      - order_items
+      - delivery_address
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaData
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory
+    DeclineItOrder-v2026-09-30RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DeclineItOrder-v2026-09-30RequestNotFoundError
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUser:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        address:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUserAddress'
+          description: User address details
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - address
+      - last_name
+      - first_name
+      - hris_profile_id
+      description: Details of the user with asset possession
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUser
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Storefront fee associated with the order item
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee
+    ItOrdersOrderIdDeclinePostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItOrdersOrderIdDeclinePostParametersXBeta
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus:
+      type: string
+      enum:
+      - AWAITING_PAYMENT
+      - CANCELLED
+      - COMPLETED
+      - PLACED
+      - PROCESSING
+      - READY_TO_SHIP
+      - SHIPPED
+      description: Status of the order item
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: Product details
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsProduct
+    ApproveItOrder-v2026-09-30RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ApproveItOrder-v2026-09-30RequestConflictError
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - APPROVED
+      - CANCELLED
+      - DECLINED
+      - REQUESTED
+      description: Order status
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataStatus
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Storefront fee associated with the order item
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUserAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUserAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUserAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      required:
+      - id
+      - city
+      - type
+      - line1
+      - line2
+      - state
+      - country
+      - is_valid
+      - post_code
+      - phone_number
+      - date_of_birth
+      - tax_id_number
+      - passport_number
+      - delivery_instructions
+      description: User address details
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUserAddress
+    ItOrdersPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaErrorsItems
+    IT_orders_approveItOrder-v2026-09-30_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: IT orders_approveItOrder-v2026-09-30_Response_200
+    ApproveItOrder-v2026-09-30RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ApproveItOrder-v2026-09-30RequestForbiddenError
+    CancelItOrder-v2026-09-15RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelItOrder-v2026-09-15RequestUnauthorizedError
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order
+        user:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUser'
+          - type: 'null'
+          description: Details of the user with asset possession
+        status:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Order status
+        public_id:
+          type: string
+          description: Public identifier of the order
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp of the order
+        order_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItems'
+          description: Order's items details
+        delivery_address:
+          $ref: '#/components/schemas/ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataDeliveryAddress'
+          description: Order delivery address details
+      required:
+      - id
+      - user
+      - status
+      - public_id
+      - created_at
+      - updated_at
+      - order_items
+      - delivery_address
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaData
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUserAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataUserAddressCountry
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Storefront fee associated with the order item
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Price of the order item
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice
+    ListItOrders-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItOrders-v2026-01-01RequestInternalServerError
+    CreateItOrder-v2026-09-17RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateItOrder-v2026-09-17RequestUnprocessableEntityError
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataDeliveryAddressType:
+      type: string
+      enum:
+      - BILLING
+      - COLLECTION
+      - DELIVERY
+      - ENTITY
+      - PARTIAL
+      - PII
+      - SUPPLIER
+      description: Type of the address
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataDeliveryAddressType
+    IT_orders_declineItOrder-v2026-09-30_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: IT orders_declineItOrder-v2026-09-30_Response_200
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus:
+      type: string
+      enum:
+      - AWAITING_PAYMENT
+      - CANCELLED
+      - COMPLETED
+      - PLACED
+      - PROCESSING
+      - READY_TO_SHIP
+      - SHIPPED
+      description: Status of the order item
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsStatus
+    ApproveItOrder-v2026-09-30RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ApproveItOrder-v2026-09-30RequestNotFoundError
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the order
+        user:
+          oneOf:
+          - $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsUser'
+          - type: 'null'
+          description: Details of the user with asset possession
+        status:
+          $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Order status
+        public_id:
+          type: string
+          description: Public identifier of the order
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the order
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp of the order
+        order_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItems'
+          description: Order's items details
+      required:
+      - id
+      - user
+      - status
+      - public_id
+      - created_at
+      - updated_at
+      - order_items
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItems
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Storefront fee associated with the order item
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFee
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - APPROVED
+      - CANCELLED
+      - DECLINED
+      - REQUESTED
+      description: Order status
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Price of the order item
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Price of the order item
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsAssetPrice
+    CreateItOrder-v2026-09-17RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateItOrder-v2026-09-17RequestUnauthorizedError
+    ApproveItOrder-v2026-09-30RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ApproveItOrder-v2026-09-30RequestBadRequestError
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsPricingDetailsStorefrontFeeCurrency
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataUser:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - last_name
+      - first_name
+      - hris_profile_id
+      description: Details of the user the order is for
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataUser
+    CancelItOrder-v2026-09-15RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelItOrder-v2026-09-15RequestInternalServerError
+    ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsProductCategory
+    ItOrdersPostResponsesContentApplicationJsonSchemaDataUser:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - last_name
+      - first_name
+      - hris_profile_id
+      description: Details of the user the order is for
+      title: ItOrdersPostResponsesContentApplicationJsonSchemaDataUser
+    ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataDeliveryAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataDeliveryAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      required:
+      - id
+      - city
+      - type
+      - line1
+      - line2
+      - state
+      - country
+      - is_valid
+      - post_code
+      - phone_number
+      - date_of_birth
+      - tax_id_number
+      - passport_number
+      - delivery_instructions
+      description: Delivery address of the order
+      title: ItOrdersOrderIdApprovePostResponsesContentApplicationJsonSchemaDataDeliveryAddress
+    CancelItOrder-v2026-09-15RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItOrdersOrderIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelItOrder-v2026-09-15RequestUnprocessableEntityError
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataDeliveryAddressCountry
+    ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItOrdersOrderIdDeclinePostResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory
+    ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestination:
+      type: object
+      properties:
+        assign_to:
+          $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestinationAssignTo'
+          description: Who the ordered items are assigned to
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: HRIS profile that will receive the order
+        delivery_address:
+          $ref: '#/components/schemas/ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestinationDeliveryAddress'
+          description: Delivery address for the order
+      required:
+      - assign_to
+      - hris_profile_id
+      - delivery_address
+      description: Where the order goes
+      title: ItOrdersPostRequestBodyContentApplicationJsonSchemaDataDestination
+    ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsStorefrontFeeCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItOrdersGetResponsesContentApplicationJsonSchemaDataItemsOrderItemsItemsPricingDetailsStorefrontFeeCurrency
+    ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItOrdersOrderIdGetResponsesContentApplicationJsonSchemaDataOrderItemsItemsProductCategory
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

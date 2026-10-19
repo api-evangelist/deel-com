@@ -1,0 +1,3680 @@
+openapi: 3.2.0
+info:
+  title: Endpoints It Agreements API
+  version: 1.0.0
+  description: API endpoints related to IT agreements.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: itAgreements
+  description: API endpoints related to IT agreements.
+paths:
+  /it/agreements/{agreement_id}/reassign:
+    post:
+      operationId: itAgreements_reassignItAgreement-v2026-09-17
+      summary: Assign agreement to a new worker
+      description: 'Use this when a worker leaves and their rented device should pass to a new joiner rather than return to Deel. Reassigns a rental agreement to a new HRIS profile via store-and-reuse. The caller picks a `variant_id` from `actions.reuse.details.reusable_variants` on `GET /rest/it/agreements/{agreement_id}` and supplies the new holder''s delivery address. Transitions `store_and_reuse.status` from `READY` to `IN_PROGRESS` and returns the updated agreement.
+
+
+        **Token scopes**: `it-service-requests:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-17.'
+      tags:
+      - itAgreements
+      parameters:
+      - name: agreement_id
+        in: path
+        description: Unique identifier of the agreement
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_agreements_reassignItAgreement-v2026-09-17_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReassignItAgreement-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReassignItAgreement-v2026-09-17RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReassignItAgreement-v2026-09-17RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReassignItAgreement-v2026-09-17RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReassignItAgreement-v2026-09-17RequestConflictError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReassignItAgreement-v2026-09-17RequestInternalServerError'
+      requestBody:
+        description: Reassignment details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Reassignment payload.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /it/agreements:
+    get:
+      operationId: itAgreements_listItAgreements-v2026-09-15
+      summary: List agreements
+      description: 'Lists the rental agreements your organization holds with Deel, each with its current store-and-reuse state. Call this to find agreements whose device is free to hand to a different worker — an agreement in `store_and_reuse.status = READY` can be reassigned via `POST /rest/it/agreements/{agreement_id}/reassign`.
+
+
+        **Token scopes**: `it-agreements:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-15.'
+      tags:
+      - itAgreements
+      parameters:
+      - name: cursor
+        in: query
+        description: Indicates where the next page of results starts, as returned in a paginated list response
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: status
+        in: query
+        description: Filter agreements by status. Repeat the key to filter on multiple values.
+        required: false
+        schema:
+          $ref: '#/components/schemas/ItAgreementsGetParametersStatus'
+      - name: type
+        in: query
+        description: Filter agreements by type. Repeat the key to filter on multiple values.
+        required: false
+        schema:
+          $ref: '#/components/schemas/ItAgreementsGetParametersType'
+      - name: store_and_reuse_status
+        in: query
+        description: Filter rentals by store-and-reuse status. Repeat the key to filter on multiple values.
+        required: false
+        schema:
+          $ref: '#/components/schemas/ItAgreementsGetParametersStoreAndReuseStatus'
+      - name: hris_profile_id
+        in: query
+        description: Filter by the HRIS profile id currently holding the agreement.
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItAgreementsGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_agreements_listItAgreements-v2026-09-15_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItAgreements-v2026-09-15RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItAgreements-v2026-09-15RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/agreements/{agreement_id}:
+    get:
+      operationId: itAgreements_retrieveAnItAgreement-v2026-09-15
+      summary: Retrieve an agreement
+      description: 'Retrieves one rental agreement, including the reuse context needed to reassign it: `actions.reuse.details.reusable_variants` lists the device variants the next holder can receive. Call this before `POST /rest/it/agreements/{agreement_id}/reassign` to pick a `variant_id`.
+
+
+        **Token scopes**: `it-agreements:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-15.'
+      tags:
+      - itAgreements
+      parameters:
+      - name: agreement_id
+        in: path
+        description: Unique identifier of the agreement
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_agreements_retrieveAnItAgreement-v2026-09-15_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItAgreement-v2026-09-15RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItAgreement-v2026-09-15RequestNotFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItAgreement-v2026-09-15RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataStoreAndReuse:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataStoreAndReuseStatus'
+          description: Current state of the store-and-reuse lifecycle for this rental contract.
+      required:
+      - status
+      description: 'Store-and-reuse block. Present only when the agreement is a rental with store-and-reuse
+
+        enabled.'
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataStoreAndReuse
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsKeyboardLayout:
+      type: string
+      enum:
+      - BELGIAN_AZERTY
+      - CANADIAN_MULTILINGUAL_STANDARD_QWERTY
+      - CZECH_QWERTY
+      - DANISH_QWERTY
+      - DUTCH_QWERTY
+      - EGYPTIAN_LOCAL
+      - ENGLISH_RUSSIAN_QWERTY
+      - EU_STANDARD_QWERTY
+      - FRENCH_AZERTY
+      - GERMAN_QWERTZ
+      - INDIAN_QWERTY
+      - INTERNATIONAL_ENGLISH_QWERTY
+      - ITALIAN_QWERTY
+      - JAPANESE_QWERTY
+      - KOREAN_QWERTY
+      - LATAM_QWERTY
+      - NORWEGIAN_QWERTY
+      - PORTUGUESE_QWERTY
+      - SPANISH_QWERTY
+      - SWEDISH_QWERTY
+      - SWISS_FRENCH_QWERTZ
+      - SWISS_GERMAN_QWERTZ
+      - TURKISH_QWERTY
+      - UK_ENGLISH_QWERTY
+      - UNKNOWN
+      - US_ENGLISH_QWERTY
+      description: Physical keyboard layout (laptops only)
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsKeyboardLayout
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsAssignedHrisProfile:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - last_name
+      - first_name
+      - hris_profile_id
+      description: 'Current holder of the agreement, if any. `null` while the agreement is between users
+
+        (e.g. after POST /assets/{id}/store).'
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsAssignedHrisProfile
+    ItAgreementsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItAgreementsGetParametersStoreAndReuseStatus:
+      type: string
+      enum:
+      - COMPLETED
+      - IN_PROGRESS
+      - READY
+      title: ItAgreementsGetParametersStoreAndReuseStatus
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDisabledReason:
+      type: string
+      enum:
+      - CONTRACT_HAS_ACTIVE_ASSIGNMENT
+      - CONTRACT_IS_NOT_ACTIVE
+      - CONTRACT_IS_NOT_RENTAL
+      - CONTRACT_IS_NOT_REUSE_ENABLED
+      - CONTRACT_TYPE_NOT_ALLOWED
+      - ORGANIZATION_NOT_ACTIVE
+      description: 'Populated when `is_enabled = false`; the single reason code the storefront gave for the
+
+        disabled state. Not a list — matches V2 action-slot semantics.'
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDisabledReason
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataStoreAndReuse:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataStoreAndReuseStatus'
+          description: Current state of the store-and-reuse lifecycle for this rental contract.
+      required:
+      - status
+      description: 'Store-and-reuse block. Present only when the agreement is a rental with store-and-reuse
+
+        enabled.'
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataStoreAndReuse
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaErrorsItems
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataStoreAndReuseStatus:
+      type: string
+      enum:
+      - COMPLETED
+      - IN_PROGRESS
+      - READY
+      description: Current state of the store-and-reuse lifecycle for this rental contract.
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataStoreAndReuseStatus
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsStoreAndReuseStatus:
+      type: string
+      enum:
+      - COMPLETED
+      - IN_PROGRESS
+      - READY
+      description: Current state of the store-and-reuse lifecycle for this rental contract.
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsStoreAndReuseStatus
+    ItAgreementsAgreementIdReassignPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItAgreementsAgreementIdReassignPostParametersXBeta
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuse:
+      type: object
+      properties:
+        details:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetails'
+          - type: 'null'
+          description: 'Populated when `enabled = true` and the action has caller-relevant context to surface
+
+            (see per-slot documentation). Null otherwise.'
+        is_enabled:
+          type: boolean
+          description: Whether the action is currently callable on this agreement.
+        disabled_reason:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDisabledReason'
+          - type: 'null'
+          description: 'Populated when `is_enabled = false`; the single reason code the storefront gave for the
+
+            disabled state. Not a list — matches V2 action-slot semantics.'
+      required:
+      - details
+      - is_enabled
+      - disabled_reason
+      description: Backs POST /agreements/{agreement_id}/reassign.
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuse
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataAssignedHrisProfile:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - last_name
+      - first_name
+      - hris_profile_id
+      description: 'Current holder of the agreement, if any. `null` while the agreement is between users
+
+        (e.g. after POST /assets/{id}/store).'
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataAssignedHrisProfile
+    ? ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAvailableCountriesItems
+    : type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAvailableCountriesItems
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the agreement.
+        type:
+          $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsType'
+          description: Agreement type.
+        status:
+          $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Normalised agreement status.
+        actions:
+          $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActions'
+          description: Snapshot of which agreement-level actions are currently callable on this agreement.
+        product:
+          $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsProduct'
+          description: The product this agreement is for.
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Agreement end date. `null` while the agreement is open.
+        public_id:
+          type: string
+          description: Public identifier of the agreement.
+        created_at:
+          type: string
+          format: date-time
+          description: When the agreement was created.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Agreement start date.
+        updated_at:
+          type: string
+          format: date-time
+          description: When the agreement was last updated.
+        variant_id:
+          type: string
+          format: uuid
+          description: The currently-assigned product variant.
+        store_and_reuse:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsStoreAndReuse'
+          - type: 'null'
+          description: 'Store-and-reuse block. Present only when the agreement is a rental with store-and-reuse
+
+            enabled.'
+        billing_entity_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: 'ID of the billing entity that pays for this agreement. `null` when the billing entity is
+
+            no longer active.'
+        assigned_hris_profile:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsAssignedHrisProfile'
+          - type: 'null'
+          description: 'Current holder of the agreement, if any. `null` while the agreement is between users
+
+            (e.g. after POST /assets/{id}/store).'
+      required:
+      - id
+      - type
+      - status
+      - actions
+      - product
+      - end_date
+      - public_id
+      - created_at
+      - start_date
+      - updated_at
+      - variant_id
+      - store_and_reuse
+      - billing_entity_id
+      - assigned_hris_profile
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItems
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsOperatingSystem:
+      type: string
+      enum:
+      - ANDROID_PHONE
+      - ANDROID_TABLET
+      - CHROME_OS
+      - IOS_PHONE
+      - IOS_TABLET
+      - LINUX
+      - MACOS
+      - WINDOWS
+      description: Operating system installed on this variant (devices only)
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsOperatingSystem
+    ? ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedRentalTermsItems
+    : type: string
+      enum:
+      - MONTH_12
+      - MONTH_24
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedRentalTermsItems
+    ? ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedRentalTermsItems
+    : type: string
+      enum:
+      - MONTH_12
+      - MONTH_24
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedRentalTermsItems
+    ItAgreementsGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItAgreementsGetParametersXBeta
+    ItAgreementsAgreementIdReassignPostRequestBodyContentApplicationJsonSchemaDataDeliveryAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code (ISO 3166 alpha-2).
+      title: ItAgreementsAgreementIdReassignPostRequestBodyContentApplicationJsonSchemaDataDeliveryAddressCountry
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsStoreAndReuse:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsStoreAndReuseStatus'
+          description: Current state of the store-and-reuse lifecycle for this rental contract.
+      required:
+      - status
+      description: 'Store-and-reuse block. Present only when the agreement is a rental with store-and-reuse
+
+        enabled.'
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsStoreAndReuse
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDisabledReason:
+      type: string
+      enum:
+      - CONTRACT_HAS_ACTIVE_ASSIGNMENT
+      - CONTRACT_IS_NOT_ACTIVE
+      - CONTRACT_IS_NOT_RENTAL
+      - CONTRACT_IS_NOT_REUSE_ENABLED
+      - CONTRACT_TYPE_NOT_ALLOWED
+      - ORGANIZATION_NOT_ACTIVE
+      description: 'Populated when `is_enabled = false`; the single reason code the storefront gave for the
+
+        disabled state. Not a list — matches V2 action-slot semantics.'
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDisabledReason
+    ReassignItAgreement-v2026-09-17RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ReassignItAgreement-v2026-09-17RequestForbiddenError
+    ReassignItAgreement-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ReassignItAgreement-v2026-09-17RequestBadRequestError
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsImage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the image
+        url:
+          type: string
+          description: Public URL of the image
+      required:
+      - id
+      - url
+      description: Image of this variant, null when the variant has no image
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsImage
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActions:
+      type: object
+      properties:
+        reuse:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuse'
+          description: Backs POST /agreements/{agreement_id}/reassign.
+      required:
+      - reuse
+      description: Snapshot of which agreement-level actions are currently callable on this agreement.
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActions
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReassignableInItems:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReassignableInItems
+    IT_agreements_reassignItAgreement-v2026-09-17_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: IT agreements_reassignItAgreement-v2026-09-17_Response_200
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsKeyboardLayout:
+      type: string
+      enum:
+      - BELGIAN_AZERTY
+      - CANADIAN_MULTILINGUAL_STANDARD_QWERTY
+      - CZECH_QWERTY
+      - DANISH_QWERTY
+      - DUTCH_QWERTY
+      - EGYPTIAN_LOCAL
+      - ENGLISH_RUSSIAN_QWERTY
+      - EU_STANDARD_QWERTY
+      - FRENCH_AZERTY
+      - GERMAN_QWERTZ
+      - INDIAN_QWERTY
+      - INTERNATIONAL_ENGLISH_QWERTY
+      - ITALIAN_QWERTY
+      - JAPANESE_QWERTY
+      - KOREAN_QWERTY
+      - LATAM_QWERTY
+      - NORWEGIAN_QWERTY
+      - PORTUGUESE_QWERTY
+      - SPANISH_QWERTY
+      - SWEDISH_QWERTY
+      - SWISS_FRENCH_QWERTZ
+      - SWISS_GERMAN_QWERTZ
+      - TURKISH_QWERTY
+      - UK_ENGLISH_QWERTY
+      - UNKNOWN
+      - US_ENGLISH_QWERTY
+      description: Physical keyboard layout (laptops only)
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsKeyboardLayout
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataAssignedHrisProfile:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - last_name
+      - first_name
+      - hris_profile_id
+      description: 'Current holder of the agreement, if any. `null` while the agreement is between users
+
+        (e.g. after POST /assets/{id}/store).'
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataAssignedHrisProfile
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsOperatingSystem:
+      type: string
+      enum:
+      - ANDROID_PHONE
+      - ANDROID_TABLET
+      - CHROME_OS
+      - IOS_PHONE
+      - IOS_TABLET
+      - LINUX
+      - MACOS
+      - WINDOWS
+      description: Operating system installed on this variant (devices only)
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsOperatingSystem
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the variant
+        sku:
+          type:
+          - string
+          - 'null'
+          description: SKU of the variant
+        size:
+          type:
+          - string
+          - 'null'
+          description: Physical size or dimension label — style + size together uniquely identify a variant within a product
+        image:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsImage'
+          - type: 'null'
+          description: Image of this variant, null when the variant has no image
+        style:
+          type:
+          - string
+          - 'null'
+          description: Marketing style (colour, tier, etc.) — style + size together uniquely identify a variant within a product
+        public_id:
+          type: string
+          description: Public identifier of the variant
+        keyboard_layout:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsKeyboardLayout'
+          - type: 'null'
+          description: Physical keyboard layout (laptops only)
+        operating_system:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsOperatingSystem'
+          - type: 'null'
+          description: Operating system installed on this variant (devices only)
+        available_countries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsAvailableCountriesItems'
+          description: ISO 3166 alpha-2 country codes where this variant can be ordered
+        allowed_rental_terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsAllowedRentalTermsItems'
+          description: Rental terms permitted for this variant. Empty for non-rental variants.
+        allowed_acquisition_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsAllowedAcquisitionTypesItems'
+          description: Acquisition types allowed for this variant
+      required:
+      - id
+      - sku
+      - size
+      - image
+      - style
+      - public_id
+      - keyboard_layout
+      - operating_system
+      - available_countries
+      - allowed_rental_terms
+      - allowed_acquisition_types
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItems
+    ? ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsAvailableCountriesItems
+    : type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsAvailableCountriesItems
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - MANAGEMENT
+      - PURCHASE
+      - RENTAL
+      description: Agreement type.
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataType
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - CANCELED
+      - ENDED
+      - PENDING
+      description: Normalised agreement status.
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the variant
+        sku:
+          type:
+          - string
+          - 'null'
+          description: SKU of the variant
+        size:
+          type:
+          - string
+          - 'null'
+          description: Physical size or dimension label — style + size together uniquely identify a variant within a product
+        image:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsImage'
+          - type: 'null'
+          description: Image of this variant, null when the variant has no image
+        style:
+          type:
+          - string
+          - 'null'
+          description: Marketing style (colour, tier, etc.) — style + size together uniquely identify a variant within a product
+        public_id:
+          type: string
+          description: Public identifier of the variant
+        keyboard_layout:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsKeyboardLayout'
+          - type: 'null'
+          description: Physical keyboard layout (laptops only)
+        operating_system:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsOperatingSystem'
+          - type: 'null'
+          description: Operating system installed on this variant (devices only)
+        available_countries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAvailableCountriesItems'
+          description: ISO 3166 alpha-2 country codes where this variant can be ordered
+        allowed_rental_terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedRentalTermsItems'
+          description: Rental terms permitted for this variant. Empty for non-rental variants.
+        allowed_acquisition_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedAcquisitionTypesItems'
+          description: Acquisition types allowed for this variant
+      required:
+      - id
+      - sku
+      - size
+      - image
+      - style
+      - public_id
+      - keyboard_layout
+      - operating_system
+      - available_countries
+      - allowed_rental_terms
+      - allowed_acquisition_types
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItems
+    IT_agreements_listItAgreements-v2026-09-15_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItems'
+        has_more:
+          type: boolean
+          description: Whether there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to the next page
+        total_count:
+          type: integer
+          format: int64
+          description: Total number of records
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: IT agreements_listItAgreements-v2026-09-15_Response_200
+    ListItAgreements-v2026-09-15RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItAgreements-v2026-09-15RequestBadRequestError
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataProductCategory
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataStoreAndReuseStatus:
+      type: string
+      enum:
+      - COMPLETED
+      - IN_PROGRESS
+      - READY
+      description: Current state of the store-and-reuse lifecycle for this rental contract.
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataStoreAndReuseStatus
+    ? ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedAcquisitionTypesItems
+    : type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedAcquisitionTypesItems
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsType:
+      type: string
+      enum:
+      - MANAGEMENT
+      - PURCHASE
+      - RENTAL
+      description: Agreement type.
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsType
+    ReassignItAgreement-v2026-09-17RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ReassignItAgreement-v2026-09-17RequestConflictError
+    ItAgreementsAgreementIdReassignPostRequestBodyContentApplicationJsonSchemaDataDeliveryAddress:
+      type: object
+      properties:
+        city:
+          type: string
+          description: City name.
+        line1:
+          type: string
+          description: Address line 1.
+        line2:
+          type: string
+          description: Address line 2.
+        state:
+          type: string
+          description: State or region name.
+        country:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostRequestBodyContentApplicationJsonSchemaDataDeliveryAddressCountry'
+          description: Country code (ISO 3166 alpha-2).
+        post_code:
+          type: string
+          description: Post code.
+        phone_number:
+          type: string
+          description: Phone number in E.164 format.
+        date_of_birth:
+          type: string
+          format: date
+          description: Date of birth.
+        tax_id_number:
+          type: string
+          description: Tax ID number.
+        passport_number:
+          type: string
+          description: Passport number.
+        delivery_instructions:
+          type: string
+          description: Delivery instructions for the courier.
+      required:
+      - country
+      description: Delivery address for the new holder. Country must appear in `actions.reuse.details.reassignable_in`.
+      title: ItAgreementsAgreementIdReassignPostRequestBodyContentApplicationJsonSchemaDataDeliveryAddress
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - CANCELED
+      - ENDED
+      - PENDING
+      description: Normalised agreement status.
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataStatus
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReassignableInItems:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReassignableInItems
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetails:
+      type: object
+      properties:
+        reassignable_in:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReassignableInItems'
+          description: Countries the contract can currently be reassigned to (customs / entity constraints).
+        reusable_variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItems'
+          description: 'The subset of the parent product''s variants that can be reassigned via store-and-reuse.
+
+            The original contract variant is appended as a fallback when the store-and-reuse filter
+
+            returns none.'
+      required:
+      - reassignable_in
+      - reusable_variants
+      description: 'Populated when `enabled = true` and the action has caller-relevant context to surface
+
+        (see per-slot documentation). Null otherwise.'
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetails
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetails:
+      type: object
+      properties:
+        reassignable_in:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReassignableInItems'
+          description: Countries the contract can currently be reassigned to (customs / entity constraints).
+        reusable_variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItems'
+          description: 'The subset of the parent product''s variants that can be reassigned via store-and-reuse.
+
+            The original contract variant is appended as a fallback when the store-and-reuse filter
+
+            returns none.'
+      required:
+      - reassignable_in
+      - reusable_variants
+      description: 'Populated when `enabled = true` and the action has caller-relevant context to surface
+
+        (see per-slot documentation). Null otherwise.'
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetails
+    ? ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsAllowedRentalTermsItems
+    : type: string
+      enum:
+      - MONTH_12
+      - MONTH_24
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsAllowedRentalTermsItems
+    ReassignItAgreement-v2026-09-17RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ReassignItAgreement-v2026-09-17RequestUnauthorizedError
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReassignableInItems:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReassignableInItems
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsProductCategory
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: The product this agreement is for.
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataProduct
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    RetrieveAnItAgreement-v2026-09-15RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItAgreement-v2026-09-15RequestInternalServerError
+    RetrieveAnItAgreement-v2026-09-15RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItAgreement-v2026-09-15RequestBadRequestError
+    ReassignItAgreement-v2026-09-17RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ReassignItAgreement-v2026-09-17RequestNotFoundError
+    ? ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAvailableCountriesItems
+    : type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAvailableCountriesItems
+    ? ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsAllowedAcquisitionTypesItems
+    : type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsAllowedAcquisitionTypesItems
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDisabledReason:
+      type: string
+      enum:
+      - CONTRACT_HAS_ACTIVE_ASSIGNMENT
+      - CONTRACT_IS_NOT_ACTIVE
+      - CONTRACT_IS_NOT_RENTAL
+      - CONTRACT_IS_NOT_REUSE_ENABLED
+      - CONTRACT_TYPE_NOT_ALLOWED
+      - ORGANIZATION_NOT_ACTIVE
+      description: 'Populated when `is_enabled = false`; the single reason code the storefront gave for the
+
+        disabled state. Not a list — matches V2 action-slot semantics.'
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDisabledReason
+    ItAgreementsGetParametersStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - CANCELED
+      - ENDED
+      - PENDING
+      title: ItAgreementsGetParametersStatus
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActions:
+      type: object
+      properties:
+        reuse:
+          $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuse'
+          description: Backs POST /agreements/{agreement_id}/reassign.
+      required:
+      - reuse
+      description: Snapshot of which agreement-level actions are currently callable on this agreement.
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActions
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - MANAGEMENT
+      - PURCHASE
+      - RENTAL
+      description: Agreement type.
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataType
+    ReassignItAgreement-v2026-09-17RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ReassignItAgreement-v2026-09-17RequestInternalServerError
+    RetrieveAnItAgreement-v2026-09-15RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItAgreement-v2026-09-15RequestNotFoundError
+    ListItAgreements-v2026-09-15RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItAgreements-v2026-09-15RequestInternalServerError
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the variant
+        sku:
+          type:
+          - string
+          - 'null'
+          description: SKU of the variant
+        size:
+          type:
+          - string
+          - 'null'
+          description: Physical size or dimension label — style + size together uniquely identify a variant within a product
+        image:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsImage'
+          - type: 'null'
+          description: Image of this variant, null when the variant has no image
+        style:
+          type:
+          - string
+          - 'null'
+          description: Marketing style (colour, tier, etc.) — style + size together uniquely identify a variant within a product
+        public_id:
+          type: string
+          description: Public identifier of the variant
+        keyboard_layout:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsKeyboardLayout'
+          - type: 'null'
+          description: Physical keyboard layout (laptops only)
+        operating_system:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsOperatingSystem'
+          - type: 'null'
+          description: Operating system installed on this variant (devices only)
+        available_countries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAvailableCountriesItems'
+          description: ISO 3166 alpha-2 country codes where this variant can be ordered
+        allowed_rental_terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedRentalTermsItems'
+          description: Rental terms permitted for this variant. Empty for non-rental variants.
+        allowed_acquisition_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedAcquisitionTypesItems'
+          description: Acquisition types allowed for this variant
+      required:
+      - id
+      - sku
+      - size
+      - image
+      - style
+      - public_id
+      - keyboard_layout
+      - operating_system
+      - available_countries
+      - allowed_rental_terms
+      - allowed_acquisition_types
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItems
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuse:
+      type: object
+      properties:
+        details:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetails'
+          - type: 'null'
+          description: 'Populated when `enabled = true` and the action has caller-relevant context to surface
+
+            (see per-slot documentation). Null otherwise.'
+        is_enabled:
+          type: boolean
+          description: Whether the action is currently callable on this agreement.
+        disabled_reason:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDisabledReason'
+          - type: 'null'
+          description: 'Populated when `is_enabled = false`; the single reason code the storefront gave for the
+
+            disabled state. Not a list — matches V2 action-slot semantics.'
+      required:
+      - details
+      - is_enabled
+      - disabled_reason
+      description: Backs POST /agreements/{agreement_id}/reassign.
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuse
+    ItAgreementsAgreementIdGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItAgreementsAgreementIdGetParametersXBeta
+    ItAgreementsGetParametersType:
+      type: string
+      enum:
+      - MANAGEMENT
+      - PURCHASE
+      - RENTAL
+      title: ItAgreementsGetParametersType
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsImage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the image
+        url:
+          type: string
+          description: Public URL of the image
+      required:
+      - id
+      - url
+      description: Image of this variant, null when the variant has no image
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsActionsReuseDetailsReusableVariantsItemsImage
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsImage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the image
+        url:
+          type: string
+          description: Public URL of the image
+      required:
+      - id
+      - url
+      description: Image of this variant, null when the variant has no image
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsImage
+    IT_agreements_retrieveAnItAgreement-v2026-09-15_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: IT agreements_retrieveAnItAgreement-v2026-09-15_Response_200
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - CANCELED
+      - ENDED
+      - PENDING
+      description: Normalised agreement status.
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataStatus
+    ? ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsKeyboardLayout
+    : type: string
+      enum:
+      - BELGIAN_AZERTY
+      - CANADIAN_MULTILINGUAL_STANDARD_QWERTY
+      - CZECH_QWERTY
+      - DANISH_QWERTY
+      - DUTCH_QWERTY
+      - EGYPTIAN_LOCAL
+      - ENGLISH_RUSSIAN_QWERTY
+      - EU_STANDARD_QWERTY
+      - FRENCH_AZERTY
+      - GERMAN_QWERTZ
+      - INDIAN_QWERTY
+      - INTERNATIONAL_ENGLISH_QWERTY
+      - ITALIAN_QWERTY
+      - JAPANESE_QWERTY
+      - KOREAN_QWERTY
+      - LATAM_QWERTY
+      - NORWEGIAN_QWERTY
+      - PORTUGUESE_QWERTY
+      - SPANISH_QWERTY
+      - SWEDISH_QWERTY
+      - SWISS_FRENCH_QWERTZ
+      - SWISS_GERMAN_QWERTZ
+      - TURKISH_QWERTY
+      - UK_ENGLISH_QWERTY
+      - UNKNOWN
+      - US_ENGLISH_QWERTY
+      description: Physical keyboard layout (laptops only)
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsKeyboardLayout
+    ? ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedAcquisitionTypesItems
+    : type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsAllowedAcquisitionTypesItems
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItAgreementsAgreementIdReassignPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        variant_id:
+          type: string
+          format: uuid
+          description: Product variant to reassign the agreement to. Must be one of the variants returned in `actions.reuse.details.reusable_variants` on `GET /agreements/{agreement_id}`.
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: HRIS profile identifier of the new holder.
+        delivery_address:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostRequestBodyContentApplicationJsonSchemaDataDeliveryAddress'
+          description: Delivery address for the new holder. Country must appear in `actions.reuse.details.reassignable_in`.
+        is_express_delivery_requested:
+          type: boolean
+          description: Charges the express-delivery fee when the destination country supports it. Defaults to `false`.
+      required:
+      - variant_id
+      - hris_profile_id
+      - delivery_address
+      description: Reassignment payload.
+      title: ItAgreementsAgreementIdReassignPostRequestBodyContentApplicationJsonSchemaData
+    ? ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsOperatingSystem
+    : type: string
+      enum:
+      - ANDROID_PHONE
+      - ANDROID_TABLET
+      - CHROME_OS
+      - IOS_PHONE
+      - IOS_TABLET
+      - LINUX
+      - MACOS
+      - WINDOWS
+      description: Operating system installed on this variant (devices only)
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItemsOperatingSystem
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataProductCategory
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuse:
+      type: object
+      properties:
+        details:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetails'
+          - type: 'null'
+          description: 'Populated when `enabled = true` and the action has caller-relevant context to surface
+
+            (see per-slot documentation). Null otherwise.'
+        is_enabled:
+          type: boolean
+          description: Whether the action is currently callable on this agreement.
+        disabled_reason:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDisabledReason'
+          - type: 'null'
+          description: 'Populated when `is_enabled = false`; the single reason code the storefront gave for the
+
+            disabled state. Not a list — matches V2 action-slot semantics.'
+      required:
+      - details
+      - is_enabled
+      - disabled_reason
+      description: Backs POST /agreements/{agreement_id}/reassign.
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuse
+    ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: The product this agreement is for.
+      title: ItAgreementsGetResponsesContentApplicationJsonSchemaDataItemsProduct
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the agreement.
+        type:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataType'
+          description: Agreement type.
+        status:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Normalised agreement status.
+        actions:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActions'
+          description: Snapshot of which agreement-level actions are currently callable on this agreement.
+        product:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataProduct'
+          description: The product this agreement is for.
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Agreement end date. `null` while the agreement is open.
+        public_id:
+          type: string
+          description: Public identifier of the agreement.
+        created_at:
+          type: string
+          format: date-time
+          description: When the agreement was created.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Agreement start date.
+        updated_at:
+          type: string
+          format: date-time
+          description: When the agreement was last updated.
+        variant_id:
+          type: string
+          format: uuid
+          description: The currently-assigned product variant.
+        store_and_reuse:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataStoreAndReuse'
+          - type: 'null'
+          description: 'Store-and-reuse block. Present only when the agreement is a rental with store-and-reuse
+
+            enabled.'
+        billing_entity_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: 'ID of the billing entity that pays for this agreement. `null` when the billing entity is
+
+            no longer active.'
+        assigned_hris_profile:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataAssignedHrisProfile'
+          - type: 'null'
+          description: 'Current holder of the agreement, if any. `null` while the agreement is between users
+
+            (e.g. after POST /assets/{id}/store).'
+      required:
+      - id
+      - type
+      - status
+      - actions
+      - product
+      - end_date
+      - public_id
+      - created_at
+      - start_date
+      - updated_at
+      - variant_id
+      - store_and_reuse
+      - billing_entity_id
+      - assigned_hris_profile
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaData
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActions:
+      type: object
+      properties:
+        reuse:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActionsReuse'
+          description: Backs POST /agreements/{agreement_id}/reassign.
+      required:
+      - reuse
+      description: Snapshot of which agreement-level actions are currently callable on this agreement.
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActions
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: The product this agreement is for.
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataProduct
+    ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetails:
+      type: object
+      properties:
+        reassignable_in:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReassignableInItems'
+          description: Countries the contract can currently be reassigned to (customs / entity constraints).
+        reusable_variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetailsReusableVariantsItems'
+          description: 'The subset of the parent product''s variants that can be reassigned via store-and-reuse.
+
+            The original contract variant is appended as a fallback when the store-and-reuse filter
+
+            returns none.'
+      required:
+      - reassignable_in
+      - reusable_variants
+      description: 'Populated when `enabled = true` and the action has caller-relevant context to surface
+
+        (see per-slot documentation). Null otherwise.'
+      title: ItAgreementsAgreementIdReassignPostResponsesContentApplicationJsonSchemaDataActionsReuseDetails
+    ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the agreement.
+        type:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataType'
+          description: Agreement type.
+        status:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Normalised agreement status.
+        actions:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataActions'
+          description: Snapshot of which agreement-level actions are currently callable on this agreement.
+        product:
+          $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataProduct'
+          description: The product this agreement is for.
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Agreement end date. `null` while the agreement is open.
+        public_id:
+          type: string
+          description: Public identifier of the agreement.
+        created_at:
+          type: string
+          format: date-time
+          description: When the agreement was created.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Agreement start date.
+        updated_at:
+          type: string
+          format: date-time
+          description: When the agreement was last updated.
+        variant_id:
+          type: string
+          format: uuid
+          description: The currently-assigned product variant.
+        store_and_reuse:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataStoreAndReuse'
+          - type: 'null'
+          description: 'Store-and-reuse block. Present only when the agreement is a rental with store-and-reuse
+
+            enabled.'
+        billing_entity_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: 'ID of the billing entity that pays for this agreement. `null` when the billing entity is
+
+            no longer active.'
+        assigned_hris_profile:
+          oneOf:
+          - $ref: '#/components/schemas/ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaDataAssignedHrisProfile'
+          - type: 'null'
+          description: 'Current holder of the agreement, if any. `null` while the agreement is between users
+
+            (e.g. after POST /assets/{id}/store).'
+      required:
+      - id
+      - type
+      - status
+      - actions
+      - product
+      - end_date
+      - public_id
+      - created_at
+      - start_date
+      - updated_at
+      - variant_id
+      - store_and_reuse
+      - billing_entity_id
+      - assigned_hris_profile
+      title: ItAgreementsAgreementIdGetResponsesContentApplicationJsonSchemaData
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

@@ -1,0 +1,1224 @@
+openapi: 3.2.0
+info:
+  title: Endpoints It Products API
+  version: 1.0.0
+  description: API endpoints related to IT products.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: itProducts
+  description: API endpoints related to IT products.
+paths:
+  /it/products:
+    get:
+      operationId: itProducts_listItProducts-v2026-09-17
+      summary: List products in the catalog
+      description: 'Browse the Deel IT catalog to see which devices are available for purchase or rent before creating an order, filtered by country and other criteria. Returns product metadata only — no pricing, taxes, fees, or contract settings.
+
+
+        **Token scopes**: `it-products:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-17.'
+      tags:
+      - itProducts
+      parameters:
+      - name: cursor
+        in: query
+        description: Indicates where the next page of results starts, as returned in a paginated list response
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: country
+        in: query
+        description: ISO 3166 alpha-2 country code. Restricts results to products whose variants ship to this country.
+        required: false
+        schema:
+          type: string
+      - name: stock_condition
+        in: query
+        description: Filter by stock condition. Omit to include products of any stock condition.
+        required: false
+        schema:
+          $ref: '#/components/schemas/ItProductsGetParametersStockCondition'
+      - name: acquisition_types
+        in: query
+        description: Restrict results to products offering at least one of these acquisition types (RENTAL, PURCHASE, REUSE). REUSE represents BYOD (customer-owned) stock. Omit to include all acquisition types the organization is entitled to.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsGetParametersAcquisitionTypesSchemaItems'
+      - name: search
+        in: query
+        description: Return products whose name or brand contains this text. Case-insensitive, and partial words match, so 'book' finds 'MacBook Pro'. Only the name and brand are searched — not the description or hardware specification. Use brands for an exact manufacturer match.
+        required: false
+        schema:
+          type: string
+      - name: category
+        in: query
+        description: Filter by product category
+        required: false
+        schema:
+          $ref: '#/components/schemas/ItProductsGetParametersCategory'
+      - name: operating_systems
+        in: query
+        description: Filter by operating system — repeat for OR semantics
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsGetParametersOperatingSystemsSchemaItems'
+      - name: keyboard_layouts
+        in: query
+        description: Filter by keyboard layout — repeat for OR semantics
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsGetParametersKeyboardLayoutsSchemaItems'
+      - name: brands
+        in: query
+        description: Filter by manufacturer — exact and case-insensitive, repeat for OR semantics. Unlike search it does not substring-match.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: it_policy_ids
+        in: query
+        description: Restrict results to products approved by any of these IT policies, to see what workers on those policies can order. Repeat for OR semantics. A policy id your organization does not own matches nothing.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: is_marketplace
+        in: query
+        description: Filter by marketplace sourcing. Organizations without marketplace access never see marketplace products, and the filter is ignored for them rather than emptying the catalog.
+        required: false
+        schema:
+          type: boolean
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItProductsGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_products_listItProducts-v2026-09-17_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItProducts-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItProducts-v2026-09-17RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/products/{product_id}:
+    get:
+      operationId: itProducts_retrieveAnItProduct-v2026-09-17
+      summary: Retrieve a product's catalog details
+      description: 'Returns catalog data for a single product — variants, images, hardware spec, and available addons. Variants are filtered to those the organization''s allowed acquisition types cover, and (when country is supplied) to those shipping to that country. No pricing, taxes, fees, contract-setting-derived values, or stock counts are returned. Use this after listing products to pull a specific product''s variant and addon options before creating an order.
+
+
+        **Token scopes**: `it-products:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-17.'
+      tags:
+      - itProducts
+      parameters:
+      - name: product_id
+        in: path
+        description: Unique identifier of the product
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: country
+        in: query
+        description: ISO 3166 alpha-2 country code. When set, restricts returned variants to those shipping to this country.
+        required: false
+        schema:
+          type: string
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItProductsProductIdGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_products_retrieveAnItProduct-v2026-09-17_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItProduct-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItProduct-v2026-09-17RequestNotFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItProduct-v2026-09-17RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsAllowedAcquisitionTypesItems:
+      type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsAllowedAcquisitionTypesItems
+    IT_products_listItProducts-v2026-09-17_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsGetResponsesContentApplicationJsonSchemaDataItems'
+        has_more:
+          type: boolean
+          description: Whether there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to the next page
+        total_count:
+          type: integer
+          format: int64
+          description: Total number of records
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: IT products_listItProducts-v2026-09-17_Response_200
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataImagesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the image
+        url:
+          type: string
+          description: Public URL of the image
+      required:
+      - id
+      - url
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataImagesItems
+    RetrieveAnItProduct-v2026-09-17RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItProduct-v2026-09-17RequestInternalServerError
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsKeyboardLayout:
+      type: string
+      enum:
+      - BELGIAN_AZERTY
+      - CANADIAN_MULTILINGUAL_STANDARD_QWERTY
+      - CZECH_QWERTY
+      - DANISH_QWERTY
+      - DUTCH_QWERTY
+      - EGYPTIAN_LOCAL
+      - ENGLISH_RUSSIAN_QWERTY
+      - EU_STANDARD_QWERTY
+      - FRENCH_AZERTY
+      - GERMAN_QWERTZ
+      - INDIAN_QWERTY
+      - INTERNATIONAL_ENGLISH_QWERTY
+      - ITALIAN_QWERTY
+      - JAPANESE_QWERTY
+      - KOREAN_QWERTY
+      - LATAM_QWERTY
+      - NORWEGIAN_QWERTY
+      - PORTUGUESE_QWERTY
+      - SPANISH_QWERTY
+      - SWEDISH_QWERTY
+      - SWISS_FRENCH_QWERTZ
+      - SWISS_GERMAN_QWERTZ
+      - TURKISH_QWERTY
+      - UK_ENGLISH_QWERTY
+      - UNKNOWN
+      - US_ENGLISH_QWERTY
+      description: Physical keyboard layout (laptops only)
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsKeyboardLayout
+    ItProductsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Company that produced the product
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsGetResponsesContentApplicationJsonSchemaDataItemsImagesItems'
+          description: Ordered list of product images. The first element is the cover image.
+        category:
+          $ref: '#/components/schemas/ItProductsGetResponsesContentApplicationJsonSchemaDataItemsCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - images
+      - category
+      title: ItProductsGetResponsesContentApplicationJsonSchemaDataItems
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataCategory
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataProductHardwareSpecProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Category of the product this hardware spec belongs to
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataProductHardwareSpecProductCategory
+    ItProductsGetResponsesContentApplicationJsonSchemaDataItemsCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItProductsGetResponsesContentApplicationJsonSchemaDataItemsCategory
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Company that produced the product
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataImagesItems'
+          description: Ordered list of product images. The first element is the cover image.
+        category:
+          $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataCategory'
+          description: Product category
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItems'
+          description: Catalog variants for this product — one per SKU
+        public_id:
+          type: string
+          description: Public identifier of the product
+        description:
+          type: string
+          description: Free-text product description
+        available_addons:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataAvailableAddonsItems'
+          description: Menu of addons the organization has available to attach on POST /orders. Callers submit an addon by `id` on the order's contract_setting.addons[]. Pricing is not returned in Bundle 2 — the invoice reveals amounts once the order lands.
+        product_hardware_spec:
+          oneOf:
+          - $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataProductHardwareSpec'
+          - type: 'null'
+          description: Structured hardware detail — nullable when no hardware spec is recorded (accessories, consumables)
+      required:
+      - id
+      - name
+      - brand
+      - images
+      - category
+      - variants
+      - public_id
+      - description
+      - available_addons
+      - product_hardware_spec
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaData
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItProductsGetParametersCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      title: ItProductsGetParametersCategory
+    ItProductsGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItProductsGetParametersXBeta
+    ItProductsGetParametersStockCondition:
+      type: string
+      enum:
+      - NEW
+      - REFURBISHED
+      title: ItProductsGetParametersStockCondition
+    ItProductsProductIdGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItProductsProductIdGetParametersXBeta
+    RetrieveAnItProduct-v2026-09-17RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItProduct-v2026-09-17RequestNotFoundError
+    ItProductsGetParametersKeyboardLayoutsSchemaItems:
+      type: string
+      enum:
+      - BELGIAN_AZERTY
+      - CANADIAN_MULTILINGUAL_STANDARD_QWERTY
+      - CZECH_QWERTY
+      - DANISH_QWERTY
+      - DUTCH_QWERTY
+      - EGYPTIAN_LOCAL
+      - ENGLISH_RUSSIAN_QWERTY
+      - EU_STANDARD_QWERTY
+      - FRENCH_AZERTY
+      - GERMAN_QWERTZ
+      - INDIAN_QWERTY
+      - INTERNATIONAL_ENGLISH_QWERTY
+      - ITALIAN_QWERTY
+      - JAPANESE_QWERTY
+      - KOREAN_QWERTY
+      - LATAM_QWERTY
+      - NORWEGIAN_QWERTY
+      - PORTUGUESE_QWERTY
+      - SPANISH_QWERTY
+      - SWEDISH_QWERTY
+      - SWISS_FRENCH_QWERTZ
+      - SWISS_GERMAN_QWERTZ
+      - TURKISH_QWERTY
+      - UK_ENGLISH_QWERTY
+      - UNKNOWN
+      - US_ENGLISH_QWERTY
+      title: ItProductsGetParametersKeyboardLayoutsSchemaItems
+    ListItProducts-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItProducts-v2026-09-17RequestBadRequestError
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsAllowedRentalTermsItems:
+      type: string
+      enum:
+      - MONTH_12
+      - MONTH_24
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsAllowedRentalTermsItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsImage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the image
+        url:
+          type: string
+          description: Public URL of the image
+      required:
+      - id
+      - url
+      description: Image of this variant, null when the variant has no image
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsImage
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataAvailableAddonsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the addon. Submit this on POST /orders under contract_setting.addons[].id.
+        name:
+          type: string
+          description: Public name of the addon
+        type:
+          $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataAvailableAddonsItemsType'
+          description: Kind of addon — SERVICE bundles cover service/support, WARRANTY bundles cover extended cover.
+        is_premium:
+          type: boolean
+          description: Whether the addon is a premium (paid) offering. Free/default addons are false.
+      required:
+      - id
+      - name
+      - type
+      - is_premium
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataAvailableAddonsItems
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the variant
+        sku:
+          type:
+          - string
+          - 'null'
+          description: SKU of the variant
+        size:
+          type:
+          - string
+          - 'null'
+          description: Physical size or dimension label — style + size together uniquely identify a variant within a product
+        image:
+          oneOf:
+          - $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsImage'
+          - type: 'null'
+          description: Image of this variant, null when the variant has no image
+        style:
+          type:
+          - string
+          - 'null'
+          description: Marketing style (colour, tier, etc.) — style + size together uniquely identify a variant within a product
+        public_id:
+          type: string
+          description: Public identifier of the variant
+        keyboard_layout:
+          oneOf:
+          - $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsKeyboardLayout'
+          - type: 'null'
+          description: Physical keyboard layout (laptops only)
+        operating_system:
+          oneOf:
+          - $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsOperatingSystem'
+          - type: 'null'
+          description: Operating system installed on this variant (devices only)
+        available_countries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsAvailableCountriesItems'
+          description: ISO 3166 alpha-2 country codes where this variant can be ordered
+        allowed_rental_terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsAllowedRentalTermsItems'
+          description: Rental terms permitted for this variant. Empty for non-rental variants.
+        allowed_acquisition_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsAllowedAcquisitionTypesItems'
+          description: Acquisition types allowed for this variant
+      required:
+      - id
+      - sku
+      - size
+      - image
+      - style
+      - public_id
+      - keyboard_layout
+      - operating_system
+      - available_countries
+      - allowed_rental_terms
+      - allowed_acquisition_types
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItems
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsAvailableCountriesItems:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsAvailableCountriesItems
+    ItProductsGetResponsesContentApplicationJsonSchemaDataItemsImagesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the image
+        url:
+          type: string
+          description: Public URL of the image
+      required:
+      - id
+      - url
+      title: ItProductsGetResponsesContentApplicationJsonSchemaDataItemsImagesItems
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataProductHardwareSpec:
+      type: object
+      properties:
+        memory_gb:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Memory (RAM) capacity in gigabytes (laptops, mobile devices, tablets)
+        processor:
+          type:
+          - string
+          - 'null'
+          description: Processor model (laptops only)
+        storage_gb:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Storage capacity in gigabytes (laptops, mobile devices, tablets)
+        display_size:
+          type:
+          - string
+          - 'null'
+          description: Diagonal display size in inches (devices with a screen only)
+        storage_type:
+          oneOf:
+          - $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataProductHardwareSpecStorageType'
+          - type: 'null'
+          description: Storage medium type (laptops only)
+        has_hdmi_port:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the device has an HDMI port (laptops, monitors)
+        has_display_port:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the device has a DisplayPort connection (laptops, monitors)
+        product_category:
+          $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataProductHardwareSpecProductCategory'
+          description: Category of the product this hardware spec belongs to
+        usb_c_connections:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Number of USB-C connections (laptops, monitors)
+        has_usb_c_video_input:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the monitor supports USB-C video input (monitors only)
+      required:
+      - memory_gb
+      - processor
+      - storage_gb
+      - display_size
+      - storage_type
+      - has_hdmi_port
+      - has_display_port
+      - product_category
+      - usb_c_connections
+      - has_usb_c_video_input
+      description: Structured hardware detail — nullable when no hardware spec is recorded (accessories, consumables)
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataProductHardwareSpec
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataProductHardwareSpecStorageType:
+      type: string
+      enum:
+      - HDD
+      - SSD
+      description: Storage medium type (laptops only)
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataProductHardwareSpecStorageType
+    ItProductsGetParametersAcquisitionTypesSchemaItems:
+      type: string
+      enum:
+      - PURCHASE
+      - RENTAL
+      - REUSE
+      title: ItProductsGetParametersAcquisitionTypesSchemaItems
+    IT_products_retrieveAnItProduct-v2026-09-17_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: IT products_retrieveAnItProduct-v2026-09-17_Response_200
+    RetrieveAnItProduct-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsProductIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItProduct-v2026-09-17RequestBadRequestError
+    ListItProducts-v2026-09-17RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItProductsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItProducts-v2026-09-17RequestInternalServerError
+    ItProductsGetParametersOperatingSystemsSchemaItems:
+      type: string
+      enum:
+      - ANDROID_PHONE
+      - ANDROID_TABLET
+      - CHROME_OS
+      - IOS_PHONE
+      - IOS_TABLET
+      - LINUX
+      - MACOS
+      - WINDOWS
+      title: ItProductsGetParametersOperatingSystemsSchemaItems
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataAvailableAddonsItemsType:
+      type: string
+      enum:
+      - SERVICE
+      - WARRANTY
+      description: Kind of addon — SERVICE bundles cover service/support, WARRANTY bundles cover extended cover.
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataAvailableAddonsItemsType
+    ItProductsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItProductsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsOperatingSystem:
+      type: string
+      enum:
+      - ANDROID_PHONE
+      - ANDROID_TABLET
+      - CHROME_OS
+      - IOS_PHONE
+      - IOS_TABLET
+      - LINUX
+      - MACOS
+      - WINDOWS
+      description: Operating system installed on this variant (devices only)
+      title: ItProductsProductIdGetResponsesContentApplicationJsonSchemaDataVariantsItemsOperatingSystem
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

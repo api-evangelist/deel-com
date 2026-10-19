@@ -1,0 +1,295 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Locations API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsLocations
+paths:
+  /ats/locations:
+    get:
+      operationId: atsLocations_retrieveAListOfAtsLocations-v2026-01-01
+      summary: Retrieve a list of ATS locations
+      description: 'Returns a paginated list of all work locations associated with the organization, suitable for use when constructing job postings or filtering by location.
+
+
+        **Token scopes**: `ats:read`, `worker:read`
+
+
+        **Deprecated**: a newer version of this endpoint is available. This version is scheduled for removal on 2027-09-01.
+
+
+        **Beta version available**: version `2026-09-01` of this endpoint is in beta. Send `X-Beta: true` to call it.'
+      tags:
+      - atsLocations
+      parameters:
+      - name: cursor
+        in: query
+        description: The cursor for pagination
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Maximum number of records returned in one response
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: include_archived
+        in: query
+        description: If true, archived locations are included in the response; they are excluded by default
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response with locations data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-locations_retrieveAListOfAtsLocations-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsLocations-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsLocations-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsLocations-v2026-01-01RequestInternalServerError'
+      deprecated: true
+      security:
+      - deelToken: []
+components:
+  schemas:
+    AtsLocationsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the location
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        name:
+          type: string
+          description: Name of the location/country
+        is_remote:
+          type: boolean
+          description: Indicates if this is a remote location
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the location was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the location was last updated
+        archived_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the location was archived; null while the location is active and selectable
+        country_code:
+          type:
+          - string
+          - 'null'
+          description: ISO country code
+        location_group:
+          oneOf:
+          - $ref: '#/components/schemas/AtsLocationsGetResponsesContentApplicationJsonSchemaDataItemsLocationGroup'
+          - type: 'null'
+          description: Location group information
+        province_or_region_text:
+          type:
+          - string
+          - 'null'
+          description: Province or region text
+      required:
+      - id
+      - name
+      - created_at
+      - updated_at
+      title: AtsLocationsGetResponsesContentApplicationJsonSchemaDataItems
+    RetrieveAListOfAtsLocations-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsLocationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsLocations-v2026-01-01RequestBadRequestError
+    AtsLocationsGetResponsesContentApplicationJsonSchemaDataItemsLocationGroup:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the location group
+        name:
+          type: string
+          description: Name of the location group
+      required:
+      - id
+      - name
+      description: Location group information
+      title: AtsLocationsGetResponsesContentApplicationJsonSchemaDataItemsLocationGroup
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ats-locations_retrieveAListOfAtsLocations-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsLocationsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of locations.
+        has_more:
+          type: boolean
+          description: Indicates if there are more locations available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for pagination to get the next set of results
+        total_count:
+          type: integer
+          minimum: 0
+          description: Total number of locations available
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: ats-locations_retrieveAListOfAtsLocations-v2026-01-01_Response_200
+    RetrieveAListOfAtsLocations-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsLocationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsLocations-v2026-01-01RequestForbiddenError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    RetrieveAListOfAtsLocations-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsLocationsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsLocations-v2026-01-01RequestInternalServerError
+    AtsLocationsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsLocationsGetResponsesContentApplicationJsonSchemaErrorsItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

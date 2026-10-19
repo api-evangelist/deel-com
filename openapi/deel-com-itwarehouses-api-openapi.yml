@@ -1,0 +1,1216 @@
+openapi: 3.2.0
+info:
+  title: Endpoints It Warehouses API
+  version: 1.0.0
+  description: API endpoints related to IT warehouses.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: itWarehouses
+  description: API endpoints related to IT warehouses.
+paths:
+  /it/warehouses:
+    get:
+      operationId: itWarehouses_listItWarehouses-v2026-09-15
+      summary: List warehouses
+      description: 'Lists your organization''s storage locations — your own offices and any Deel-managed warehouses. Use it to resolve a `warehouse_id` before routing a collection or an asset location update, and to enumerate sites alongside `GET /rest/it/assets`.
+
+
+        **Token scopes**: `it-assets:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-15.'
+      tags:
+      - itWarehouses
+      parameters:
+      - name: cursor
+        in: query
+        description: Indicates where the next page of results starts, as returned in a paginated list response
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        description: Free-text search on warehouse name
+        required: false
+        schema:
+          type: string
+      - name: country
+        in: query
+        description: Filter by warehouse country (ISO 3166 alpha-2). Repeat the key to filter on multiple values.
+        required: false
+        schema:
+          type: string
+      - name: type
+        in: query
+        description: Filter by organization warehouse type. Repeat the key to filter on multiple values.
+        required: false
+        schema:
+          $ref: '#/components/schemas/ItWarehousesGetParametersType'
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItWarehousesGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_warehouses_listItWarehouses-v2026-09-15_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItWarehouses-v2026-09-15RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItWarehouses-v2026-09-15RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/warehouses/{warehouse_id}:
+    get:
+      operationId: itWarehouses_retrieveAnItWarehouse-v2026-09-15
+      summary: Retrieve a warehouse
+      description: 'Retrieves one storage location with its address and type. Call this to confirm a warehouse''s delivery address before routing a collection or an asset location update to it.
+
+
+        **Token scopes**: `it-assets:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-15.'
+      tags:
+      - itWarehouses
+      parameters:
+      - name: warehouse_id
+        in: path
+        description: Unique identifier of the warehouse
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItWarehousesWarehouseIdGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_warehouses_retrieveAnItWarehouse-v2026-09-15_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItWarehouse-v2026-09-15RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItWarehouse-v2026-09-15RequestNotFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnItWarehouse-v2026-09-15RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      required:
+      - id
+      - city
+      - type
+      - line1
+      - line2
+      - state
+      - country
+      - is_valid
+      - post_code
+      - phone_number
+      - date_of_birth
+      - tax_id_number
+      - passport_number
+      - delivery_instructions
+      description: Warehouse address
+      title: ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsAddress
+    ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataAddressCountry
+    IT_warehouses_retrieveAnItWarehouse-v2026-09-15_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: IT warehouses_retrieveAnItWarehouse-v2026-09-15_Response_200
+    ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsOwnership:
+      type: string
+      enum:
+      - DEEL
+      - ORGANIZATION
+      description: Warehouse ownership. Always ORGANIZATION for this endpoint.
+      title: ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsOwnership
+    ItWarehousesGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItWarehousesGetParametersXBeta
+    ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsType:
+      type: string
+      enum:
+      - OFFICE
+      - RESIDENCE
+      - WAREHOUSE
+      description: Organization warehouse type
+      title: ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsType
+    ItWarehousesGetParametersType:
+      type: string
+      enum:
+      - OFFICE
+      - RESIDENCE
+      - WAREHOUSE
+      title: ItWarehousesGetParametersType
+    ListItWarehouses-v2026-09-15RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItWarehousesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItWarehouses-v2026-09-15RequestInternalServerError
+    ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataOwnership:
+      type: string
+      enum:
+      - DEEL
+      - ORGANIZATION
+      description: Warehouse ownership. Always ORGANIZATION for this endpoint.
+      title: ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataOwnership
+    ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    IT_warehouses_listItWarehouses-v2026-09-15_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItWarehousesGetResponsesContentApplicationJsonSchemaDataItems'
+        has_more:
+          type: boolean
+          description: Whether there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to the next page
+        total_count:
+          type: integer
+          format: int64
+          description: Total number of records
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: IT warehouses_listItWarehouses-v2026-09-15_Response_200
+    ItWarehousesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the warehouse
+        name:
+          type: string
+          description: Warehouse or storage location name
+        type:
+          $ref: '#/components/schemas/ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsType'
+          description: Organization warehouse type
+        address:
+          oneOf:
+          - $ref: '#/components/schemas/ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsAddress'
+          - type: 'null'
+          description: Warehouse address
+        ownership:
+          $ref: '#/components/schemas/ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsOwnership'
+          description: Warehouse ownership. Always ORGANIZATION for this endpoint.
+        public_id:
+          type: string
+          description: Public identifier of the warehouse
+        created_at:
+          type: string
+          format: date-time
+          description: When the warehouse was created
+        updated_at:
+          type: string
+          format: date-time
+          description: When the warehouse was last updated
+        warehouse_type:
+          $ref: '#/components/schemas/ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsWarehouseType'
+          description: Warehouse type. Always ORGANIZATION for this endpoint.
+      required:
+      - id
+      - name
+      - type
+      - address
+      - ownership
+      - public_id
+      - created_at
+      - updated_at
+      - warehouse_type
+      title: ItWarehousesGetResponsesContentApplicationJsonSchemaDataItems
+    ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsAddressCountry:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AN
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AX
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BL
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BV
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CC
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CX
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - EH
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GS
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HM
+      - HN
+      - HR
+      - HT
+      - HU
+      - IC
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MF
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PN
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SJ
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TF
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - US
+      - UY
+      - UZ
+      - VA
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      description: Country code
+      title: ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsAddressCountry
+    ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the warehouse
+        name:
+          type: string
+          description: Warehouse or storage location name
+        type:
+          $ref: '#/components/schemas/ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataType'
+          description: Organization warehouse type
+        address:
+          oneOf:
+          - $ref: '#/components/schemas/ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataAddress'
+          - type: 'null'
+          description: Warehouse address
+        ownership:
+          $ref: '#/components/schemas/ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataOwnership'
+          description: Warehouse ownership. Always ORGANIZATION for this endpoint.
+        public_id:
+          type: string
+          description: Public identifier of the warehouse
+        created_at:
+          type: string
+          format: date-time
+          description: When the warehouse was created
+        updated_at:
+          type: string
+          format: date-time
+          description: When the warehouse was last updated
+        warehouse_type:
+          $ref: '#/components/schemas/ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataWarehouseType'
+          description: Warehouse type. Always ORGANIZATION for this endpoint.
+      required:
+      - id
+      - name
+      - type
+      - address
+      - ownership
+      - public_id
+      - created_at
+      - updated_at
+      - warehouse_type
+      title: ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaData
+    ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataType:
+      type: string
+      enum:
+      - OFFICE
+      - RESIDENCE
+      - WAREHOUSE
+      description: Organization warehouse type
+      title: ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataType
+    ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataWarehouseType:
+      type: string
+      enum:
+      - CLEARANCE
+      - DEEL
+      - ORGANIZATION
+      description: Warehouse type. Always ORGANIZATION for this endpoint.
+      title: ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataWarehouseType
+    ItWarehousesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItWarehousesGetResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveAnItWarehouse-v2026-09-15RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItWarehouse-v2026-09-15RequestBadRequestError
+    ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the address
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name
+        type:
+          $ref: '#/components/schemas/ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataAddressType'
+          description: Type of the address
+        line1:
+          type:
+          - string
+          - 'null'
+          description: Address line 1
+        line2:
+          type:
+          - string
+          - 'null'
+          description: Address line 2
+        state:
+          type:
+          - string
+          - 'null'
+          description: State code or name
+        country:
+          $ref: '#/components/schemas/ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataAddressCountry'
+          description: Country code
+        is_valid:
+          type: boolean
+          description: Whether the address passes validation
+        post_code:
+          type:
+          - string
+          - 'null'
+          description: Post code
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number
+        date_of_birth:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date of birth (applicable for some address types)
+        tax_id_number:
+          type:
+          - string
+          - 'null'
+          description: Tax ID number (applicable for some address types)
+        passport_number:
+          type:
+          - string
+          - 'null'
+          description: Passport number (applicable for some address types)
+        delivery_instructions:
+          type:
+          - string
+          - 'null'
+          description: Special instructions for deliveries
+      required:
+      - id
+      - city
+      - type
+      - line1
+      - line2
+      - state
+      - country
+      - is_valid
+      - post_code
+      - phone_number
+      - date_of_birth
+      - tax_id_number
+      - passport_number
+      - delivery_instructions
+      description: Warehouse address
+      title: ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataAddress
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    RetrieveAnItWarehouse-v2026-09-15RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItWarehouse-v2026-09-15RequestInternalServerError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsWarehouseType:
+      type: string
+      enum:
+      - CLEARANCE
+      - DEEL
+      - ORGANIZATION
+      description: Warehouse type. Always ORGANIZATION for this endpoint.
+      title: ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsWarehouseType
+    ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataAddressType:
+      type: string
+      enum:
+      - BILLING
+      - COLLECTION
+      - DELIVERY
+      - ENTITY
+      - PARTIAL
+      - PII
+      - SUPPLIER
+      description: Type of the address
+      title: ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaDataAddressType
+    RetrieveAnItWarehouse-v2026-09-15RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItWarehousesWarehouseIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAnItWarehouse-v2026-09-15RequestNotFoundError
+    ListItWarehouses-v2026-09-15RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItWarehousesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItWarehouses-v2026-09-15RequestBadRequestError
+    ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsAddressType:
+      type: string
+      enum:
+      - BILLING
+      - COLLECTION
+      - DELIVERY
+      - ENTITY
+      - PARTIAL
+      - PII
+      - SUPPLIER
+      description: Type of the address
+      title: ItWarehousesGetResponsesContentApplicationJsonSchemaDataItemsAddressType
+    ItWarehousesWarehouseIdGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItWarehousesWarehouseIdGetParametersXBeta
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

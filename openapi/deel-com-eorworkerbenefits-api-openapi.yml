@@ -1,0 +1,589 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Eor Worker Benefits API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: eorWorkerBenefits
+paths:
+  /eor/worker/benefits:
+    get:
+      operationId: eorWorkerBenefits_getEORWorkerBenefits
+      summary: Retrieve Benefits for Employee
+      description: 'Returns the benefits for the authenticated employee. The employee identity is inferred from the auth token, so this endpoint must be called with an employee-scoped token rather than a client token.
+
+
+        **Token scopes**: `benefits:read`'
+      tags:
+      - eorWorkerBenefits
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eor-worker-benefits_getEORWorkerBenefits_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveBenefitsForEmployee-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The relative URL of the failed request
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaRequest
+    eor-worker-benefits_getEORWorkerBenefits_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of contracts with their associated benefits. An employee may have benefits across multiple contracts if they have more than one active engagement.
+      required:
+      - data
+      title: eor-worker-benefits_getEORWorkerBenefits_Response_200
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedPlan:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this benefit plan. Use when referencing the plan in enrollment or amendment API calls.
+        name:
+          type: string
+          description: Display name of the plan tier (e.g. 'Gold', 'Silver', 'Bronze'). Shown to employees during enrollment selection and in benefits summaries.
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedPlanAttachmentsItems'
+          description: Downloadable documents associated with this plan (e.g. Summary of Benefits and Coverage, Certificate of Coverage, plan brochure). Render each item as a labeled download link.
+      required:
+      - id
+      - name
+      - attachments
+      description: The specific benefit plan the employee is enrolled in (e.g. 'Gold', 'Silver', 'Bronze'). Contains the plan's ID, display name, and downloadable plan documents.
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedPlan
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedProvider:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this provider.
+        name:
+          type: string
+          description: Display name of the insurance carrier or benefit provider (e.g. 'ManuLife', 'Aetna'). Use for labeling in UI.
+        is_unisure:
+          type: boolean
+          description: True if this benefit is administered through Unisure, a global group insurance platform Deel uses to deliver international EOR benefits. Relevant for understanding the benefit's administration model and claims process.
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedProviderAttachmentsItems'
+          description: Provider-level documents such as general coverage guides, network directories, or enrollment guides. Render each as a labeled download link.
+        home_page_url:
+          type: string
+          description: URL to the employee-facing provider portal where the employee can view claims, access ID cards, find in-network providers, and manage coverage details.
+      required:
+      - id
+      - name
+      - attachments
+      - home_page_url
+      description: The insurance carrier or benefit administrator managing the employee's currently enrolled plan. Includes portal access URL and provider-level documents.
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedProvider
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployeeContribution:
+      type: object
+      properties:
+        type:
+          type:
+          - string
+          - 'null'
+          description: How the employee contribution is derived. FIXED_AMOUNT = flat currency per `frequency`. PERCENTAGE = percent of an earnings or cost basis defined by the plan. Additional values (for example employer match shapes on retirement benefits) can appear for specialized products.
+        value:
+          oneOf:
+          - oneOf:
+            - $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployeeContributionValue'
+            - type: 'null'
+          - type: 'null'
+          description: Raw contribution input from configuration or upstream systems; may be a number or string (for example `"1.23"`). Use `amount` for display and arithmetic — it is the normalized numeric value in `currency` per `frequency`.
+        amount:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Resolved employee contribution in `currency` for each `frequency` period (for example `100` with `USD` and `MONTHLY` means one hundred US dollars per month).
+        currency:
+          type: string
+          description: ISO 4217 currency code for `amount` (for example USD, CAD, GBP). Matches the parent contract's `currency` for this benefits payload.
+        frequency:
+          type:
+          - string
+          - 'null'
+          description: Payroll or billing cadence for this contribution. Typical values include MONTHLY, SEMI_MONTHLY (twice per month), BIWEEKLY, WEEKLY, and ANNUALLY; exact strings follow Deel payroll configuration.
+      required:
+      - type
+      - value
+      - amount
+      - currency
+      - frequency
+      description: Recurring portion of plan cost collected from the employee's pay for this benefit. Expressed with calculation metadata (`type`, `value`), resolved `amount`, `currency`, and `frequency`. For a given period, `employee_contribution.amount` plus `employer_contribution.amount` reflects the split of premium or plan cost represented here; use `enrollment_details` cycle fields when you need billed totals for the current cycle.
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployeeContribution
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployerContributionValue:
+      oneOf:
+      - type: number
+        format: double
+      - type: string
+      description: Raw employer contribution input; may be number or string depending on source. Prefer `amount` for calculations and UI.
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployerContributionValue
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedProvider:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the organization's selected provider.
+        name:
+          type: string
+          description: Display name of the provider the organization has selected (e.g. 'ManuLife', 'Aetna').
+        is_unisure:
+          type: boolean
+          description: True if this provider is Unisure, a global group insurance platform used by Deel for international EOR benefits.
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedProviderAttachmentsItems'
+          description: Provider-level documents associated with the organization's selected provider.
+        home_page_url:
+          type: string
+          description: URL to the employee-facing portal for the organization's selected provider.
+      required:
+      - id
+      - name
+      - attachments
+      - home_page_url
+      description: The insurance carrier or benefit provider the organization has contracted with to administer this benefit.
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedProvider
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier (UUID) for this benefit instance. Use this when referencing the benefit in subsequent API calls.
+        name:
+          type: string
+          description: Human-readable display name of the benefit (e.g. 'Healthcare', 'Dental', '401(k)'). Suitable for display in UI.
+        type:
+          type:
+          - string
+          - 'null'
+          description: High-level category of the benefit (e.g. HEALTHCARE, DENTAL, VISION). May be null if uncategorized. Use benefit_type_code for a more specific, jurisdiction-aware value.
+        status:
+          type: string
+          description: Enrollment lifecycle state for this benefit. Populated with the same value as `enrollment_status` (both fields are returned for backward compatibility). ENROLLED = active, claimable coverage. OPTED_OUT = employee stopped or waived the coverage. TERMINATED = cancelled mid-contract. EXPIRED = coverage period ended. PENDING, AWAITING_ENROLLMENT, AWAITING_CARRIER_CONFIRMATION, and AWAITING_CONTRACT_ACTIVATION indicate transitional or pre-active states; see `enrollment_status` for the same enumeration and definitions.
+        end_date:
+          type:
+          - string
+          - 'null'
+          description: Date on which this benefit's coverage ends (ISO 8601, `YYYY-MM-DD`). Benefit record's effective end, termination, or offer end where applicable. Null or absent when no definitive end date is set on this record (coverage may still change if the contract or offering is updated).
+        plan_url:
+          type:
+          - string
+          - 'null'
+          description: URL to this specific plan's portal or documentation — for example, a plan summary PDF, carrier-hosted plan detail page, or plan materials. Distinct from `provider_website_url` (the provider organization as a whole) and `home_page_url` (employee portal for claims and ID cards).
+        description:
+          type: string
+          description: Plain-text explanation of what this benefit covers and why it matters to the employee. Suitable for display in a benefits overview UI or summary card.
+        contract_type:
+          type: string
+          description: Workforce product for the contract this benefit belongs to. EOR — Employer of Record; Deel is the legal employer. GP — Global Payroll; the client is the legal employer and Deel runs payroll. PEO — Professional Employer Organization (US co-employment). EMBEDDED — payroll or HR through an embedded partner integration.
+        provider_name:
+          type: string
+          description: Display name of the insurance carrier or benefit provider administering this plan (for example Allianz, Cigna, ManuLife).
+        coverage_group:
+          type: string
+          description: Who is covered under this benefit, derived from enrolled dependents on the contract benefit. EMPLOYEE = employee only. EMPLOYEE_AND_SPOUSE = employee plus legal spouse. EMPLOYEE_AND_DOMESTIC_PARTNER = employee plus registered domestic partner where applicable. EMPLOYEE_AND_CHILD = employee plus dependent child coverage structured as a single-child tier. EMPLOYEE_AND_CHILDREN = employee plus all enrolled children. EMPLOYEE_AND_FAMILY = employee plus spouse or partner and children (full family tier) per plan rules.
+        effective_date:
+          type: string
+          description: Date from which this benefit offering is in effect for this employee in this response (ISO 8601, `YYYY-MM-DD`). The benefit offering's offered-at date when present — not the same as contract coverage start or plan-specific coverage start dates inside enrollment.
+        benefit_type_code:
+          type: string
+          description: 'Jurisdiction-aware classification code for this benefit. Use this (not only `type`) when product logic must differ by country — for example retirement: `401_K` in the US versus `OCCUPATIONAL_PENSION` in the UK and Ireland. Other common values include HEALTHCARE, DENTAL, VISION, LIFE_INSURANCE, ACCIDENT_INSURANCE, and CRITICAL_ILLNESS; the full set may expand as new benefit types are added.'
+        enrollment_status:
+          type: string
+          description: Enrollment lifecycle state for this benefit. Always matches `status` in this API version; both are returned so integrations can use the explicit `enrollment_status` name. PENDING = benefit exists but no enrollment action yet. AWAITING_ENROLLMENT = employee must complete enrollment while an enrollment window applies. AWAITING_CARRIER_CONFIRMATION = submission received; awaiting carrier or administrator confirmation. AWAITING_CONTRACT_ACTIVATION = enrollment cannot complete until the underlying employment contract is active. ENROLLED = active coverage. OPTED_OUT = employee stopped or waived the coverage. TERMINATED = stopped before natural expiry. EXPIRED = coverage window has ended.
+        enrollment_window:
+          $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentWindow'
+          description: Calendar window during which the employee may enroll in, change, or opt out of this benefit. Omitted when no window is returned (enrollment changes are then not accepted until a new window opens, for example open enrollment, a qualifying life event, or a new-hire cycle per employer configuration).
+        enrollment_details:
+          $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetails'
+          description: Details about the specific plan and provider the employee is currently enrolled in, along with the cost breakdown for the current billing cycle. Reflects the employee's actual enrollment, which may differ from organization_selection if the employee made their own plan choice.
+        provider_website_url:
+          type: string
+          description: Public marketing or corporate website for the carrier or administrator. For the employee-facing portal (claims, ID cards, provider search), use `home_page_url` when enrolled.
+        employee_contribution:
+          $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployeeContribution'
+          description: Recurring portion of plan cost collected from the employee's pay for this benefit. Expressed with calculation metadata (`type`, `value`), resolved `amount`, `currency`, and `frequency`. For a given period, `employee_contribution.amount` plus `employer_contribution.amount` reflects the split of premium or plan cost represented here; use `enrollment_details` cycle fields when you need billed totals for the current cycle.
+        employer_contribution:
+          $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployerContribution'
+          description: Recurring employer-paid portion for this benefit, same shape as `employee_contribution`. Together with `employee_contribution.amount`, describes how premium or plan cost is split for the modeled period; billed totals for the active cycle may also appear under `enrollment_details`.
+        organization_selection:
+          $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelection'
+          description: The plan and provider the client organization has configured as the default offering for this benefit type. This reflects the employer's choice, which may differ from enrollment_details if the employee hasn't enrolled yet or selected a different option during open enrollment.
+      required:
+      - name
+      - type
+      - status
+      - description
+      - enrollment_details
+      - organization_selection
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItems
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetails:
+      type: object
+      properties:
+        selected_plan:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedPlan'
+          - type: 'null'
+          description: The specific benefit plan the employee is enrolled in (e.g. 'Gold', 'Silver', 'Bronze'). Contains the plan's ID, display name, and downloadable plan documents.
+        selected_provider:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedProvider'
+          - type: 'null'
+          description: The insurance carrier or benefit administrator managing the employee's currently enrolled plan. Includes portal access URL and provider-level documents.
+        current_cycle_plan_cost:
+          type: number
+          format: double
+          description: Total cost of the selected plan for the current billing cycle, in the contract's currency. This is the gross plan cost before employer contributions are applied. Subtract current_cycle_employer_contribution to get the employee's net out-of-pocket cost.
+        current_cycle_employer_contribution:
+          type: number
+          format: double
+          description: Amount the employer contributes toward the plan cost for the current billing cycle, in the contract's currency. This is the portion the company pays on the employee's behalf. The employee's actual cost is current_cycle_plan_cost minus this value.
+      required:
+      - selected_plan
+      - selected_provider
+      - current_cycle_plan_cost
+      - current_cycle_employer_contribution
+      description: Details about the specific plan and provider the employee is currently enrolled in, along with the cost breakdown for the current billing cycle. Reflects the employee's actual enrollment, which may differ from organization_selection if the employee made their own plan choice.
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetails
+    ? EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedProviderAttachmentsItems
+    : type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this attachment document.
+        url:
+          type: string
+          description: Direct URL to download or view the attachment. Use as the href for a download link.
+        label:
+          type: string
+          description: Human-readable filename or label for the attachment. Use as the visible text for download links.
+      required:
+      - id
+      - url
+      - label
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedProviderAttachmentsItems
+    ? EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedPlanAttachmentsItems
+    : type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this attachment document.
+        url:
+          type: string
+          description: Direct URL to download or view the attachment.
+        label:
+          type: string
+          description: Human-readable filename or label for the attachment.
+      required:
+      - id
+      - url
+      - label
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedPlanAttachmentsItems
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedPlan:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the organization's selected plan.
+        name:
+          type: string
+          description: Display name of the plan tier the organization has selected (e.g. 'Gold', 'Silver'). Shown to employees as the employer-offered default.
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedPlanAttachmentsItems'
+          description: Downloadable plan documents for the organization's selected plan.
+      required:
+      - id
+      - name
+      - attachments
+      description: The plan tier the organization has chosen to offer employees by default for this benefit.
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedPlan
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ? EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedPlanAttachmentsItems
+    : type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this attachment document.
+        url:
+          type: string
+          description: Direct URL to download or view the attachment. Typically a PDF. Use as the href for a download link.
+        label:
+          type: string
+          description: Human-readable filename or label for the attachment (e.g. 'Canada_Benefits.pdf'). Use as the visible text for download links.
+      required:
+      - id
+      - url
+      - label
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentDetailsSelectedPlanAttachmentsItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The JSON path where input validation failed
+        message:
+          type: string
+          description: A description of the returned error
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaErrorsItems
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployerContribution:
+      type: object
+      properties:
+        type:
+          type:
+          - string
+          - 'null'
+          description: How the employer contribution is derived. FIXED_AMOUNT = flat currency per `frequency`. PERCENTAGE = percent of an earnings or cost basis. Additional values may appear for specialized products.
+        value:
+          oneOf:
+          - oneOf:
+            - $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployerContributionValue'
+            - type: 'null'
+          - type: 'null'
+          description: Raw employer contribution input; may be number or string depending on source. Prefer `amount` for calculations and UI.
+        amount:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Resolved employer contribution in `currency` per `frequency` period.
+        currency:
+          type: string
+          description: ISO 4217 currency code for `amount`. Matches the parent contract's `currency`.
+        frequency:
+          type:
+          - string
+          - 'null'
+          description: Cadence at which the employer contribution is applied. Same vocabulary as `employee_contribution.frequency`.
+      required:
+      - type
+      - value
+      - amount
+      - currency
+      - frequency
+      description: Recurring employer-paid portion for this benefit, same shape as `employee_contribution`. Together with `employee_contribution.amount`, describes how premium or plan cost is split for the modeled period; billed totals for the active cycle may also appear under `enrollment_details`.
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployerContribution
+    RetrieveBenefitsForEmployee-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaErrorsItems'
+        request:
+          $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaRequest'
+      title: RetrieveBenefitsForEmployee-v2026-01-01RequestBadRequestError
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployeeContributionValue:
+      oneOf:
+      - type: number
+        format: double
+      - type: string
+      description: Raw contribution input from configuration or upstream systems; may be a number or string (for example `"1.23"`). Use `amount` for display and arithmetic — it is the normalized numeric value in `currency` per `frequency`.
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEmployeeContributionValue
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentWindow:
+      type: object
+      properties:
+        ends_at:
+          type: string
+          description: Last date the enrollment window is open (ISO 8601, `YYYY-MM-DD`). After this date, enrollment is locked until a new window is triggered.
+        trigger:
+          type:
+          - string
+          - 'null'
+          description: Business reason this window was opened. new_hire = initial enrollment after onboarding completes. open_enrollment = scheduled annual election period. qualifying_life_event = permitted mid-year change after a life event (for example marriage, birth, divorce) per plan rules. termination = window tied to offboarding, often for continuation or COBRA-style elections in applicable jurisdictions.
+        starts_at:
+          type: string
+          description: First date the enrollment window is open (ISO 8601, `YYYY-MM-DD`). Enrollment actions are accepted on or after this date only.
+      required:
+      - ends_at
+      - trigger
+      - starts_at
+      description: Calendar window during which the employee may enroll in, change, or opt out of this benefit. Omitted when no window is returned (enrollment changes are then not accepted until a new window opens, for example open enrollment, a qualifying life event, or a new-hire cycle per employer configuration).
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsEnrollmentWindow
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        benefits:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItems'
+          description: All benefits associated with this contract, regardless of enrollment status. Includes benefits the employee is enrolled in, has opted out of, or is pending enrollment for.
+        currency:
+          type: string
+          description: ISO 4217 currency code for all monetary amounts within this contract's benefits (e.g. 'USD', 'CAD', 'GBP'). Applies to all cost and contribution fields in this contract grouping.
+        contract_id:
+          type: string
+          description: Unique identifier for the employment contract these benefits are associated with. Use to correlate benefits with a specific contract when the employee has multiple active engagements.
+      required:
+      - benefits
+      - currency
+      - contract_id
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItems
+    ? EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedProviderAttachmentsItems
+    : type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this attachment document.
+        url:
+          type: string
+          description: Direct URL to download or view the attachment.
+        label:
+          type: string
+          description: Human-readable filename or label for the attachment.
+      required:
+      - id
+      - url
+      - label
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedProviderAttachmentsItems
+    EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelection:
+      type: object
+      properties:
+        selected_plan:
+          oneOf:
+          - $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedPlan'
+          - type: 'null'
+          description: The plan tier the organization has chosen to offer employees by default for this benefit.
+        selected_provider:
+          $ref: '#/components/schemas/EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelectionSelectedProvider'
+          description: The insurance carrier or benefit provider the organization has contracted with to administer this benefit.
+      required:
+      - selected_plan
+      - selected_provider
+      description: The plan and provider the client organization has configured as the default offering for this benefit type. This reflects the employer's choice, which may differ from enrollment_details if the employee hasn't enrolled yet or selected a different option during open enrollment.
+      title: EorWorkerBenefitsGetResponsesContentApplicationJsonSchemaDataItemsBenefitsItemsOrganizationSelection
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

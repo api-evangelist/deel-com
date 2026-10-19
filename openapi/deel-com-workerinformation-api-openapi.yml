@@ -1,0 +1,1421 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Worker Information API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: workerInformation
+paths:
+  /gp/workers/{worker_id}/banks:
+    post:
+      operationId: workerInformation_createGPWorkerBank
+      summary: Add bank account
+      description: 'Adds a bank account for the GP worker; country-specific field requirements must be retrieved from `GET /gp/workers/{worker_id}/banks/guide` before submitting.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - workerInformation
+      parameters:
+      - name: worker_id
+        in: path
+        description: Unique identifier for a worker in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-information_createGPWorkerBank_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Request body containing the details of the bank account to be added.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpWorkersWorkerIdBanksPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: workerInformation_getGPWorkerBanks
+      summary: Retrieve bank accounts
+      description: 'Returns all bank accounts associated with the employee.
+
+
+        **Token scopes**: `people:read`'
+      tags:
+      - workerInformation
+      parameters:
+      - name: worker_id
+        in: path
+        description: Unique identifier for a worker.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-information_getGPWorkerBanks_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /gp/workers/contracts/{contract_id}/additional-information:
+    post:
+      operationId: workerInformation_createGPWorkerAdditionalInformation
+      summary: Add GP Workers Additional Information
+      description: 'Adds supplementary fields to the contract, with the extra data supplied under the `data` object in the request body.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - workerInformation
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique public identifier of the contract.
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Operation successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-information_createGPWorkerAdditionalInformation_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddGpWorkersAdditionalInformation-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddGpWorkersAdditionalInformation-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    patch:
+      operationId: workerInformation_getGPWorkerAdditionalInformation
+      summary: Update GP worker additional information
+      description: 'Use this endpoint to correct or change country-specific additional information already held on a Global Payroll worker contract, for example after the worker reports a new marital status or a tax identifier changes. Only the fields sent under `data` are modified; everything else is left untouched. Field keys must belong to the additional-information fields defined for the contract country (see `GET /rest/forms/gp/worker-additional-fields/{country_code}`). For fields the organization has configured as effective-dated, a date must be supplied in `effective_dates` (`YYYY-MM-DD`) whenever the value changes: today or a past date applies the change immediately, a future date schedules it and the current value stays in effect until then. Unchanged values and clears need no date. Changes are recorded in the contract history and may update the worker onboarding checklist. By default returns 204. Pass `?include_completion_status=true` to receive a 200 response with `is_additional_data_done` (true when all required fields for EDM onboarding are provided) and `missing_keys` (required fields still absent). Requires the `people:write` scope.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - workerInformation
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique public identifier of the contract.
+        required: true
+        schema:
+          type: string
+      - name: include_completion_status
+        in: query
+        description: Pass `true` to receive a 200 response with `is_additional_data_done` and `missing_keys` instead of the default 204 No Content.
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Returned only when `?include_completion_status=true` is passed. Contains completion status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-information_getGPWorkerAdditionalInformation_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateGpWorkersAdditionalInformation-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized — missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateGpWorkersAdditionalInformation-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden — caller lacks the people:write permission or cannot access this contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateGpWorkersAdditionalInformation-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not found — the contract does not exist or is not accessible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateGpWorkersAdditionalInformation-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateGpWorkersAdditionalInformation-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPatchRequestBodyContentApplicationJsonSchemaData'
+                effective_dates:
+                  type: object
+                  additionalProperties:
+                    type: string
+                    format: date
+                    pattern: ^\d{4}-\d{2}-\d{2}$
+                  description: Per-field effective date (YYYY-MM-DD), keyed like `data`. Only allowed for effective-dated fields, and required whenever such a field is set to a new value (unchanged values and clears need no date). Past dates apply immediately as corrections, future dates are scheduled.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /gp/workers/{worker_id}/banks/{bank_id}:
+    patch:
+      operationId: workerInformation_updateGPWorkerBank
+      summary: Modify bank account
+      description: 'Partially updates the bank account for the worker; only fields provided in the request body are modified.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - workerInformation
+      parameters:
+      - name: worker_id
+        in: path
+        description: Unique identifier for a worker in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: bank_id
+        in: path
+        description: Unique identifier for the bank account in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-information_updateGPWorkerBank_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Request body to modify an existing bank account for an employee.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                city:
+                  type: string
+                  description: The city of the user's address.
+                iban:
+                  type: string
+                  description: The International Bank Account Number (IBAN).
+                email:
+                  type: string
+                  description: The user's email address.
+                phone:
+                  type: string
+                  description: The user's phone number.
+                postal:
+                  type: string
+                  description: The user's postal or ZIP code.
+                tax_id:
+                  type: string
+                  description: The user's tax identification number.
+                bank_code:
+                  type: string
+                  description: The bank code.
+                bank_name:
+                  type: string
+                  description: Name of the user's bank.
+                full_name:
+                  type: string
+                  description: Full name of the user.
+                swift_bic:
+                  type: string
+                  description: SWIFT/BIC code for the bank.
+                rib_number:
+                  type: string
+                  description: The RIB (Relevé d'Identité Bancaire).
+                branch_code:
+                  type: string
+                  description: The branch code of the user's bank.
+                account_type:
+                  type: string
+                  description: Bank account type.
+                country_code:
+                  type: string
+                  description: The country code of the user's address.
+                address_line1:
+                  type: string
+                  description: The primary address line.
+                address_line2:
+                  type: string
+                  description: The secondary address line.
+                currency_code:
+                  type: string
+                  description: The currency code for transactions.
+                original_name:
+                  type: string
+                  description: The original name of the user.
+                account_number:
+                  type: string
+                  description: The user's bank account number.
+                province_state:
+                  type: string
+                  description: The state or province of the user's address.
+                bank_branch_name:
+                  type: string
+                  description: The name of the user's bank branch.
+                bank_country_code:
+                  type: string
+                  description: The country code where the bank is located.
+                ach_routing_number:
+                  type: string
+                  description: The ACH (Automated Clearing House) Routing Number.
+      security:
+      - deelToken: []
+  /gp/workers/{worker_id}/banks/guide:
+    get:
+      operationId: workerInformation_getGPWorkerBankGuide
+      summary: Retrieve bank guide
+      description: 'Returns the country-specific field requirements for a worker''s bank account form, which determines the fields required when adding a bank account.
+
+
+        **Token scopes**: `people:read`'
+      tags:
+      - workerInformation
+      parameters:
+      - name: worker_id
+        in: path
+        description: Unique identifier for a worker in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-information_getGPWorkerBankGuide_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /gp/workers/{worker_id}/address:
+    patch:
+      operationId: workerInformation_updateGPWorkerAddress
+      summary: Update address
+      description: 'Partially updates the address on record for the GP employee.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - workerInformation
+      parameters:
+      - name: worker_id
+        in: path
+        description: Unique identifier for a worker in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-information_updateGPWorkerAddress_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: The desired address of the Global Payroll employee
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpWorkersWorkerIdAddressPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /gp/workers/{worker_id}/compensation:
+    patch:
+      operationId: workerInformation_updateGPWorkerCompensation
+      summary: Update compensation
+      description: 'Updates the compensation for the GP employee and returns the complete compensation history including the applied change.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - workerInformation
+      parameters:
+      - name: worker_id
+        in: path
+        description: Unique identifier for a worker in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-information_updateGPWorkerCompensation_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Request body containing the data to update the compensation of the employee.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpWorkersWorkerIdCompensationPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /gp/workers/{worker_id}/employee-information:
+    patch:
+      operationId: workerInformation_updateGPWorkerEmployeeInformation
+      summary: Update employee information
+      description: 'Partially updates personal details, tax information, and employment-related fields for the GP worker.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - workerInformation
+      parameters:
+      - name: worker_id
+        in: path
+        description: Unique identifier for a worker in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '202':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpWorkersWorkerIdEmployeeInformationPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /gp/workers/{worker_id}/pto-policy:
+    patch:
+      operationId: workerInformation_updateGPWorkerPTOPolicy
+      summary: Update PTO policy
+      description: 'Applies a partial update to the PTO policy assigned to a Global Payroll worker. Only fields included in the request body are modified; omitted fields retain their current values.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - workerInformation
+      parameters:
+      - name: worker_id
+        in: path
+        description: Unique identifier for a worker in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-information_updateGPWorkerPTOPolicy_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Contract object that needs to be amended.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/GpWorkersWorkerIdPtoPolicyPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+components:
+  schemas:
+    worker-information_updateGPWorkerCompensation_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersWorkerIdCompensationPatchResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: worker-information_updateGPWorkerCompensation_Response_200
+    UpdateGpWorkersAdditionalInformation-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateGpWorkersAdditionalInformation-v2026-01-01RequestForbiddenError
+    GpWorkersWorkerIdPtoPolicyPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        updated:
+          type: boolean
+          description: Indicates if the PTO policy was successfully updated.
+      required:
+      - updated
+      title: GpWorkersWorkerIdPtoPolicyPatchResponsesContentApplicationJsonSchemaData
+    GpWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: GpWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems
+    GpWorkersContractsContractIdAdditionalInformationPatchRequestBodyContentApplicationJsonSchemaData:
+      oneOf:
+      - type: string
+        maxLength: 1000
+      - type: number
+        format: double
+      - type: boolean
+      title: GpWorkersContractsContractIdAdditionalInformationPatchRequestBodyContentApplicationJsonSchemaData
+    GpWorkersWorkerIdBanksBankIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the modified bank account.
+        status:
+          type: string
+          description: The status of the modified bank account.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the bank account was created, in ISO-8601 format.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp of the last update to the bank account, in ISO-8601 format.
+      required:
+      - id
+      - status
+      - created_at
+      - updated_at
+      title: GpWorkersWorkerIdBanksBankIdPatchResponsesContentApplicationJsonSchemaData
+    GpWorkersWorkerIdCompensationPatchResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        scale:
+          $ref: '#/components/schemas/GpWorkersWorkerIdCompensationPatchResponsesContentApplicationJsonSchemaDataItemsScale'
+          description: The scale to which a given salary applies.
+        salary:
+          type: string
+          description: Compensation salary.
+        status:
+          $ref: '#/components/schemas/GpWorkersWorkerIdCompensationPatchResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: The status of a salary amendment.
+        effective_date:
+          type: string
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+      title: GpWorkersWorkerIdCompensationPatchResponsesContentApplicationJsonSchemaDataItems
+    worker-information_updateGPWorkerPTOPolicy_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpWorkersWorkerIdPtoPolicyPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: worker-information_updateGPWorkerPTOPolicy_Response_200
+    GpWorkersWorkerIdPtoPolicyPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        yearly_allowance:
+          type: string
+          description: 'Enter the number of holidays. Example: ''15'' for 15 days.'
+        accrual_start_date:
+          type: string
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: ''2022-12-31''.'
+      required:
+      - yearly_allowance
+      - accrual_start_date
+      title: GpWorkersWorkerIdPtoPolicyPatchRequestBodyContentApplicationJsonSchemaData
+    GpWorkersWorkerIdEmployeeInformationPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        employee_number:
+          type: string
+          description: Employee's unique number.
+      title: GpWorkersWorkerIdEmployeeInformationPatchRequestBodyContentApplicationJsonSchemaData
+    GpWorkersContractsContractIdAdditionalInformationPostRequestBodyContentApplicationJsonSchemaData:
+      oneOf:
+      - type: string
+        maxLength: 1000
+      - type: number
+        format: double
+      - type: boolean
+      title: GpWorkersContractsContractIdAdditionalInformationPostRequestBodyContentApplicationJsonSchemaData
+    GpWorkersWorkerIdAddressPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        zip:
+          type: string
+          description: Zip code.
+        city:
+          type: string
+          description: City name.
+        street:
+          type: string
+          description: Street name.
+      title: GpWorkersWorkerIdAddressPatchRequestBodyContentApplicationJsonSchemaData
+    UpdateGpWorkersAdditionalInformation-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateGpWorkersAdditionalInformation-v2026-01-01RequestBadRequestError
+    worker-information_getGPWorkerAdditionalInformation_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: worker-information_getGPWorkerAdditionalInformation_Response_200
+    worker-information_getGPWorkerBanks_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersWorkerIdBanksGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: worker-information_getGPWorkerBanks_Response_200
+    GpWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        is_updated:
+          type: boolean
+          description: Indicates if the contract was updated.
+        missing_keys:
+          type: array
+          items:
+            type: string
+          description: Public API keys of required fields still missing. Empty when is_additional_data_done is true.
+        is_additional_data_done:
+          type: boolean
+          description: True when all required additional information fields for EDM onboarding have been provided.
+      required:
+      - is_updated
+      - missing_keys
+      - is_additional_data_done
+      title: GpWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaData
+    GpWorkersWorkerIdCompensationPatchResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - UPCOMING
+      - OUTDATED
+      description: The status of a salary amendment.
+      title: GpWorkersWorkerIdCompensationPatchResponsesContentApplicationJsonSchemaDataItemsStatus
+    GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The unique key representing the field.
+        type:
+          type: string
+          description: The type of the field, such as 'Text' or 'Dropdown'.
+        label:
+          type: string
+          description: The label or display name for this field.
+        required:
+          type: boolean
+          description: Indicates whether the field is required.
+        validations:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItems'
+          description: An array of validation rules applied to the field.
+        values_allowed:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValuesAllowedItems'
+          description: An array of allowed values for the field (e.g., for dropdown fields).
+      required:
+      - key
+      - required
+      title: GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItems
+    GpWorkersWorkerIdBanksPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        city:
+          type: string
+          description: The city of the user's address.
+        iban:
+          type: string
+          description: The International Bank Account Number (IBAN).
+        email:
+          type: string
+          description: The user's email address.
+        phone:
+          type: string
+          description: The user's phone number.
+        postal:
+          type: string
+          description: The user's postal or ZIP code.
+        tax_id:
+          type: string
+          description: The user's tax identification number.
+        bank_code:
+          type: string
+          description: The bank code.
+        bank_name:
+          type: string
+          description: Name of the user's bank.
+        full_name:
+          type: string
+          description: Full name of the user.
+        swift_bic:
+          type: string
+          description: SWIFT/BIC code for the bank.
+        rib_number:
+          type: string
+          description: The RIB (Relevé d'Identité Bancaire).
+        branch_code:
+          type: string
+          description: The branch code of the user's bank.
+        account_type:
+          type: string
+          description: Bank account type.
+        country_code:
+          type: string
+          description: The country code of the user's address.
+        address_line1:
+          type: string
+          description: The primary address line.
+        address_line2:
+          type: string
+          description: The secondary address line.
+        currency_code:
+          type: string
+          description: The currency code for transactions.
+        original_name:
+          type: string
+          description: The original name of the user.
+        account_number:
+          type: string
+          description: The user's bank account number.
+        province_state:
+          type: string
+          description: The state or province of the user's address.
+        bank_branch_name:
+          type: string
+          description: The name of the user's bank branch.
+        bank_country_code:
+          type: string
+          description: The country code where the bank is located.
+        ach_routing_number:
+          type: string
+          description: The ACH (Automated Clearing House) Routing Number.
+      title: GpWorkersWorkerIdBanksPostRequestBodyContentApplicationJsonSchemaData
+    GpWorkersWorkerIdCompensationPatchRequestBodyContentApplicationJsonSchemaDataScale:
+      type: string
+      enum:
+      - YEAR
+      - MONTH
+      - HOUR
+      description: The scale to which a given salary applies.
+      title: GpWorkersWorkerIdCompensationPatchRequestBodyContentApplicationJsonSchemaDataScale
+    AddGpWorkersAdditionalInformation-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: AddGpWorkersAdditionalInformation-v2026-01-01RequestBadRequestError
+    GpWorkersWorkerIdCompensationPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        scale:
+          $ref: '#/components/schemas/GpWorkersWorkerIdCompensationPatchRequestBodyContentApplicationJsonSchemaDataScale'
+          description: The scale to which a given salary applies.
+        salary:
+          type: number
+          format: double
+          description: Compensation salary.
+        effective_date:
+          type: string
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+      required:
+      - scale
+      - salary
+      - effective_date
+      title: GpWorkersWorkerIdCompensationPatchRequestBodyContentApplicationJsonSchemaData
+    GpWorkersWorkerIdBanksPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the newly added bank account.
+        status:
+          type: string
+          description: The status of the newly added bank account.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the bank account was created, in ISO-8601 format.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp of the last update to the bank account, in ISO-8601 format.
+      required:
+      - id
+      - status
+      - created_at
+      - updated_at
+      title: GpWorkersWorkerIdBanksPostResponsesContentApplicationJsonSchemaData
+    GpWorkersWorkerIdCompensationPatchResponsesContentApplicationJsonSchemaDataItemsScale:
+      type: string
+      enum:
+      - YEAR
+      - MONTH
+      - HOUR
+      description: The scale to which a given salary applies.
+      title: GpWorkersWorkerIdCompensationPatchResponsesContentApplicationJsonSchemaDataItemsScale
+    GpWorkersWorkerIdBanksGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        city:
+          type: string
+          description: The city of the user's address.
+        iban:
+          type: string
+          description: The International Bank Account Number (IBAN).
+        email:
+          type: string
+          description: The user's email address.
+        phone:
+          type: string
+          description: The user's phone number.
+        postal:
+          type: string
+          description: The user's postal or ZIP code.
+        tax_id:
+          type: string
+          description: The user's tax identification number.
+        bank_code:
+          type: string
+          description: The bank code.
+        bank_name:
+          type: string
+          description: Name of the user's bank.
+        full_name:
+          type: string
+          description: Full name of the user.
+        sort_code:
+          type: string
+          description: UK sort code.
+        swift_bic:
+          type: string
+          description: SWIFT/BIC code for the bank.
+        rib_number:
+          type: string
+          description: The RIB(Relevé d'Identité Bancaire).
+        branch_code:
+          type: string
+          description: The branch code of the user's bank.
+        account_type:
+          type: string
+          description: Bank account type.
+        country_code:
+          type: string
+          description: The country code of the user.
+        address_line1:
+          type: string
+          description: The primary address line.
+        address_line2:
+          type: string
+          description: The secondary address line.
+        currency_code:
+          type: string
+          description: The currency code for transactions.
+        original_name:
+          type: string
+          description: The original name of the user.
+        account_number:
+          type: string
+          description: The user's bank account number.
+        province_state:
+          type: string
+          description: The state or province of the user's address.
+        bank_branch_name:
+          type: string
+          description: The name of the user's bank branch.
+        bank_country_code:
+          type: string
+          description: The country code where the bank is located.
+        ach_routing_number:
+          type: string
+          description: The ACH (Automated Clearing House) Routing Number.
+        id:
+          type: string
+          description: Unique identifier of this resource.
+        status:
+          type: string
+          description: Current status of bank account.
+        created_at:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601.
+        updated_at:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601.
+      required:
+      - id
+      - created_at
+      - updated_at
+      title: GpWorkersWorkerIdBanksGetResponsesContentApplicationJsonSchemaDataItems
+    GpWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created_at:
+          type: string
+          description: Datetime of submission of the additional information
+      title: GpWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaData
+    worker-information_getGPWorkerBankGuide_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: worker-information_getGPWorkerBankGuide_Response_200
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    worker-information_createGPWorkerBank_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpWorkersWorkerIdBanksPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: worker-information_createGPWorkerBank_Response_201
+    GpWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: GpWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems
+    GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValuesAllowedItems:
+      type: object
+      properties:
+        label:
+          type: string
+          description: The display name of the allowed value.
+        value:
+          type: string
+          description: The value associated with the allowed option.
+      title: GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValuesAllowedItems
+    GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsType:
+      type: string
+      enum:
+      - MIN_LENGTH
+      - MAX_LENGTH
+      - REGEX
+      description: The type of validation applied to the field.
+      title: GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsType
+    UpdateGpWorkersAdditionalInformation-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateGpWorkersAdditionalInformation-v2026-01-01RequestUnauthorizedError
+    AddGpWorkersAdditionalInformation-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: AddGpWorkersAdditionalInformation-v2026-01-01RequestInternalServerError
+    UpdateGpWorkersAdditionalInformation-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateGpWorkersAdditionalInformation-v2026-01-01RequestNotFoundError
+    worker-information_createGPWorkerAdditionalInformation_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPostResponsesContentApplicationJsonSchemaData'
+      title: worker-information_createGPWorkerAdditionalInformation_Response_201
+    GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItems:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsType'
+          description: The type of validation applied to the field.
+        value:
+          $ref: '#/components/schemas/GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsValue'
+      title: GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItems
+    worker-information_updateGPWorkerBank_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpWorkersWorkerIdBanksBankIdPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: worker-information_updateGPWorkerBank_Response_200
+    GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      title: GpWorkersWorkerIdBanksGuideGetResponsesContentApplicationJsonSchemaDataItemsValidationsItemsValue
+    GpWorkersWorkerIdAddressPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        zip:
+          type:
+          - string
+          - 'null'
+          description: Zip code.
+        city:
+          type:
+          - string
+          - 'null'
+          description: City name.
+        state:
+          type:
+          - string
+          - 'null'
+          description: State name.
+        street:
+          type:
+          - string
+          - 'null'
+          description: Street name.
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country code.
+        updated_at:
+          type: string
+          format: date-time
+          description: Long date-time format following ISO-8601
+      title: GpWorkersWorkerIdAddressPatchResponsesContentApplicationJsonSchemaData
+    UpdateGpWorkersAdditionalInformation-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GpWorkersContractsContractIdAdditionalInformationPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateGpWorkersAdditionalInformation-v2026-01-01RequestInternalServerError
+    worker-information_updateGPWorkerAddress_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GpWorkersWorkerIdAddressPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: worker-information_updateGPWorkerAddress_Response_201
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

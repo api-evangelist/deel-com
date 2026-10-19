@@ -1,166 +1,601 @@
 openapi: 3.2.0
 info:
-  title: Deel Core Lookups API
-  description: 'Core organizational, contract, and people APIs for Deel. Covers organizations,
-
-    legal entities, departments, groups, managers, cost centers, contracts (IC, EOR,
-
-    Global Payroll), invoice adjustments, lookups, magic links, tasks, and custom fields.
-
-
-    Authentication uses bearer Organization or Personal API tokens generated from the
-
-    Deel Developer Center. Production base URL is https://api.letsdeel.com/rest/v2 and
-
-    the sandbox is https://api-sandbox.demo.deel.com/rest/v2.'
-  version: '2026-05-25'
-  contact:
-    name: Deel Developer Support
-    url: https://developer.deel.com/
-  termsOfService: https://www.deel.com/legal/terms-of-service/
-  license:
-    name: Deel Developer Terms
-    url: https://www.deel.com/legal/
+  title: Endpoints Lookups API
+  version: 1.0.0
 servers:
-- url: https://api.letsdeel.com/rest/v2
+- url: https://api.letsdeel.com/rest
   description: Production
-- url: https://api-sandbox.demo.deel.com/rest/v2
-  description: Sandbox
-security:
-- BearerAuth: []
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
 tags:
 - name: Lookups
-  description: Countries, currencies, job titles, seniority levels, time-off types
 paths:
-  /lookups/countries:
-    get:
-      operationId: getCountries
-      summary: Retrieve Country List
-      description: Returns all countries with visa support, EOR availability, and sub-territories.
-      tags:
-      - Lookups
-      responses:
-        '200':
-          description: Country list
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CountryListResponse'
-  /lookups/currencies:
-    get:
-      operationId: getCurrencies
-      summary: Retrieve Supported Currency List
-      tags:
-      - Lookups
-      responses:
-        '200':
-          description: Currency list
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CurrencyListResponse'
   /lookups/job-titles:
     get:
-      operationId: getJobTitles
-      summary: Job Titles List
+      operationId: lookups_getJobTitles
+      summary: Job titles list
+      description: Returns the platform's catalogue of predefined job titles. Results are paginated using cursor-based navigation via `after_cursor`.
       tags:
       - Lookups
+      parameters:
+      - name: after_cursor
+        in: query
+        description: Cursor for pagination. Use this to retrieve the next page of results.
+        required: false
+        schema:
+          type: string
       responses:
         '200':
-          description: Job titles
+          description: Successful operation.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JobTitleListResponse'
-  /lookups/seniority-levels:
+                $ref: '#/components/schemas/lookups_getJobTitles_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /lookups/countries:
     get:
-      operationId: getSeniorityLevels
-      summary: Retrieve Seniority Levels
+      operationId: lookups_getCountries
+      summary: Retrieve Country List
+      description: Returns all countries supported by the platform, including each country's visa support status, Employer of Record availability, sub-territories, and classification.
       tags:
       - Lookups
       responses:
         '200':
-          description: Seniority levels
+          description: Successful operation.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/SeniorityLevel'
+                $ref: '#/components/schemas/lookups_getCountries_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /lookups:
+    get:
+      operationId: lookups_getLookups-v2026-01-01
+      summary: Retrieve lookup information for currencies, countries, entity types, etc
+      description: 'Returns reference data of the type specified by the `documents` query parameter; supported values are `currencies`, `countries`, `entity_types`, and `sic`.
+
+
+        **Token scopes**: `legal-entity:read`'
+      tags:
+      - Lookups
+      parameters:
+      - name: documents
+        in: query
+        description: The type of lookup data to retrieve. Options are `currencies`, `countries`, `entity_types`, and `sic_numbers`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/LookupsGetParametersDocuments'
+      responses:
+        '200':
+          description: A list of lookup information based on the requested type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lookups_getLookups-v2026-01-01_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLookups-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /lookups/seniorities:
+    get:
+      operationId: lookups_getSeniorityLevels
+      summary: Retrieve Seniority Levels
+      description: Returns predefined seniority levels including their names, hierarchical positions, and identifiers. When `is_eor_contract` is `true`, C-level seniorities are excluded from the response.
+      tags:
+      - Lookups
+      parameters:
+      - name: is_eor_contract
+        in: query
+        description: when `true`, exclude C-level seniorities for EOR contracts. Set to `false` to return all seniorities
+        required: false
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lookups_getSeniorityLevels_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /lookups/currencies:
+    get:
+      operationId: lookups_getCurrencies
+      summary: Retrieve Supported Currency List
+      description: Returns all currencies supported by the platform, including their ISO codes and names.
+      tags:
+      - Lookups
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lookups_getCurrencies_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /lookups/time-off-types:
+    get:
+      operationId: lookups_getTimeOffTypes
+      summary: Retrieve Time-Off Types
+      description: Returns the predefined time-off types available for registration on the platform.
+      tags:
+      - Lookups
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lookups_getTimeOffTypes_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Resource not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTimeOffTypes-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
 components:
   schemas:
-    JobTitleListResponse:
+    lookups_getCurrencies_Response_200:
       type: object
       properties:
         data:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: string
-              name:
-                type: string
-              category:
-                type: string
-    SeniorityLevel:
+            $ref: '#/components/schemas/LookupsCurrenciesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of currencies supported by Deel.
+      title: lookups_getCurrencies_Response_200
+    lookups_getSeniorityLevels_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupsSenioritiesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of predefined seniority levels supported by the Deel platform.
+      title: lookups_getSeniorityLevels_Response_200
+    LookupsSenioritiesGetResponsesContentApplicationJsonSchemaDataItems:
       type: object
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
+          description: A unique identifier for the seniority level.
         name:
           type: string
-        order:
+          minLength: 1
+          description: The name of the seniority level, e.g., 'Mid (Individual Contributor Level 2)'.
+        level:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The hierarchical level of seniority, where higher numbers indicate greater seniority.
+      required:
+      - id
+      - name
+      title: LookupsSenioritiesGetResponsesContentApplicationJsonSchemaDataItems
+    LookupsJobTitlesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
           type: integer
-    CountryListResponse:
+          format: int64
+          description: identifier of the job title
+        name:
+          type: string
+          description: Job title.
+      required:
+      - id
+      - name
+      title: LookupsJobTitlesGetResponsesContentApplicationJsonSchemaDataItems
+    LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: The ISO 3166-1 alpha-2 country code.
+        name:
+          type: string
+          minLength: 1
+          description: The official name of the country.
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItemsStatesItems'
+          description: List of sub-territories within the country. These may be called states, provinces, prefectures, regions, or may not exist.
+        state_type:
+          type:
+          - string
+          - 'null'
+          description: The designation for sub-territories within the country, such as 'state', 'province', 'prefecture', or 'region'. If none, this field will be null.
+        eor_support:
+          type: boolean
+          description: Indicates whether Deel provides Employer of Record (EoR) support in this country.
+        visa_support:
+          type: boolean
+          description: Indicates whether Deel provides visa support for employees being hired in this country.
+        default_currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Indicates the default currency 3-letter ISO code
+      required:
+      - code
+      - name
+      - states
+      - state_type
+      - eor_support
+      - visa_support
+      - default_currency
+      title: LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItems
+    LookupsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        label:
+          type: string
+          description: The label for the lookup item (e.g., country name, entity type).
+        value:
+          type: string
+          description: The value associated with the lookup item (e.g., ISO code, type identifier).
+      title: LookupsGetResponsesContentApplicationJsonSchemaDataItems
+    LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItemsStatesItems:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          description: The code representing the sub-territory (e.g., state or region).
+        name:
+          type: string
+          minLength: 1
+          description: The name of the sub-territory (e.g., state or region).
+      required:
+      - code
+      - name
+      title: LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItemsStatesItems
+    LookupsJobTitlesGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type: string
+          description: Use for pagination to get next set of records after the given cursor.
+      required:
+      - cursor
+      title: LookupsJobTitlesGetResponsesContentApplicationJsonSchemaPage
+    LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message describing what went wrong.
+      required:
+      - message
+      title: LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaErrorsItems
+    LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: string
+      enum:
+      - VACATION
+      - SICK_LEAVE
+      - OTHER
+      - UNPAID_LEAVE
+      description: Predefined time-off types. Possible values include 'VACATION', 'SICK_LEAVE', 'UNPAID_LEAVE'  and 'OTHER'.
+      title: LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaDataItems
+    lookups_getTimeOffTypes_Response_200:
       type: object
       properties:
         data:
           type: array
           items:
-            type: object
-            properties:
-              code:
-                type: string
-              name:
-                type: string
-              eor_available:
-                type: boolean
-              visa_support:
-                type: boolean
-              sub_territories:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    code:
-                      type: string
-                    name:
-                      type: string
-              classification:
-                type: string
-    CurrencyListResponse:
+            $ref: '#/components/schemas/LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of predefined time-off types supported by the Deel platform.
+      title: lookups_getTimeOffTypes_Response_200
+    lookups_getCountries_Response_200:
       type: object
       properties:
         data:
           type: array
           items:
-            type: object
-            properties:
-              code:
-                type: string
-              name:
-                type: string
-              symbol:
-                type: string
-              crypto:
-                type: boolean
+            $ref: '#/components/schemas/LookupsCountriesGetResponsesContentApplicationJsonSchemaDataItems'
+      title: lookups_getCountries_Response_200
+    RetrieveTimeOffTypes-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupsTimeOffTypesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Array of error objects containing error messages.
+      required:
+      - errors
+      title: RetrieveTimeOffTypes-v2026-01-01RequestNotFoundError
+    Lookups_getLookups-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupsGetResponsesContentApplicationJsonSchemaDataItems'
+      title: Lookups_getLookups-v2026-01-01_Response_200
+    GetLookups-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message explaining what went wrong.
+      title: GetLookups-v2026-01-01RequestBadRequestError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    LookupsGetParametersDocuments:
+      type: string
+      enum:
+      - sicNumbers
+      - entityTypes
+      - countries
+      title: LookupsGetParametersDocuments
+    LookupsCurrenciesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: The ISO 4217 three-letter currency code.
+        name:
+          type:
+          - string
+          - 'null'
+          description: The name of the currency. This may be null if a name is not available.
+      required:
+      - code
+      title: LookupsCurrenciesGetResponsesContentApplicationJsonSchemaDataItems
+    lookups_getJobTitles_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LookupsJobTitlesGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/LookupsJobTitlesGetResponsesContentApplicationJsonSchemaPage'
+      title: lookups_getJobTitles_Response_200
   securitySchemes:
-    BearerAuth:
+    deelToken:
       type: http
       scheme: bearer
-      bearerFormat: opaque
-      description: Deel Organization or Personal API token issued from the Developer Center.
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

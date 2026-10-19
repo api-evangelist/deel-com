@@ -1,0 +1,249 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Departments API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsDepartments
+paths:
+  /ats/departments:
+    get:
+      operationId: atsDepartments_retrieveAListOfAtsDepartments
+      summary: Retrieve a list of ATS departments
+      description: 'Returns a paginated list of all departments configured in the organization''s ATS. Use it to resolve the department IDs accepted by the `department_ids` filter when listing jobs and by job creation, and page through results with the `cursor` and `limit` query parameters.
+
+
+        **Token scopes**: `ats:read`, `worker:read`'
+      tags:
+      - atsDepartments
+      parameters:
+      - name: cursor
+        in: query
+        description: Cursor for pagination to get the next set of results
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Maximum number of records returned in one response
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: include_archived
+        in: query
+        description: If true, archived departments are included in the response; they are excluded by default
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response with departments data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-departments_retrieveAListOfAtsDepartments_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsDepartments-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsDepartments-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsDepartments-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    AtsDepartmentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the department
+        name:
+          type: string
+          description: Name of the department
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the department was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the department was last updated
+        archived_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the department was archived; null while the department is active and selectable
+      required:
+      - id
+      - name
+      - created_at
+      - updated_at
+      title: AtsDepartmentsGetResponsesContentApplicationJsonSchemaDataItems
+    AtsDepartmentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsDepartmentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    RetrieveAListOfAtsDepartments-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsDepartmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsDepartments-v2026-01-01RequestInternalServerError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    RetrieveAListOfAtsDepartments-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsDepartmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsDepartments-v2026-01-01RequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ats-departments_retrieveAListOfAtsDepartments_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsDepartmentsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of departments.
+        has_more:
+          type: boolean
+          description: Indicates if there are more departments available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for pagination to get the next set of results; null when there are no more pages
+        total_count:
+          type: integer
+          description: Total number of departments available
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: ats-departments_retrieveAListOfAtsDepartments_Response_200
+    RetrieveAListOfAtsDepartments-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsDepartmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsDepartments-v2026-01-01RequestForbiddenError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

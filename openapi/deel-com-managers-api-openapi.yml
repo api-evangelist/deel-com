@@ -1,112 +1,496 @@
 openapi: 3.2.0
 info:
-  title: Deel Core Managers API
-  description: 'Core organizational, contract, and people APIs for Deel. Covers organizations,
-
-    legal entities, departments, groups, managers, cost centers, contracts (IC, EOR,
-
-    Global Payroll), invoice adjustments, lookups, magic links, tasks, and custom fields.
-
-
-    Authentication uses bearer Organization or Personal API tokens generated from the
-
-    Deel Developer Center. Production base URL is https://api.letsdeel.com/rest/v2 and
-
-    the sandbox is https://api-sandbox.demo.deel.com/rest/v2.'
-  version: '2026-05-25'
-  contact:
-    name: Deel Developer Support
-    url: https://developer.deel.com/
-  termsOfService: https://www.deel.com/legal/terms-of-service/
-  license:
-    name: Deel Developer Terms
-    url: https://www.deel.com/legal/
+  title: Endpoints Managers API
+  version: 1.0.0
+  description: API endpoints related to Managers.
 servers:
-- url: https://api.letsdeel.com/rest/v2
+- url: https://api.letsdeel.com/rest
   description: Production
-- url: https://api-sandbox.demo.deel.com/rest/v2
-  description: Sandbox
-security:
-- BearerAuth: []
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
 tags:
 - name: Managers
-  description: Manager directory for the organization
+  description: API endpoints related to Managers.
 paths:
   /managers:
-    get:
-      operationId: getManagers
-      summary: Retrieve List Of Managers
+    post:
+      operationId: managers_createManager
+      summary: Create a Manager
+      description: 'Creates a new manager in the organization and returns the created manager''s identity fields, including the assigned `id`.
+
+
+        **Token scopes**: `organizations:write`'
       tags:
       - Managers
       responses:
-        '200':
-          description: Manager list
+        '201':
+          description: Manager created successfully.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Manager'
-    post:
-      operationId: createManager
-      summary: Create A Manager
-      tags:
-      - Managers
+                $ref: '#/components/schemas/managers_createManager_Response_201'
+        '400':
+          description: Invalid request. The input data did not meet the required validation rules.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateManager-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '409':
+          description: Conflict. A manager with the provided email already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateManager-v2026-01-01RequestConflictError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
       requestBody:
-        required: true
+        description: Details of the new manager to be created.
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ManagerCreate'
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ManagersPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: managers_getManagers
+      summary: Retrieve List of Managers
+      description: 'Returns a paginated list of all managers in the organization.
+
+
+        **Token scopes**: `organizations:read`'
+      tags:
+      - Managers
+      parameters:
+      - name: limit
+        in: query
+        description: The number of records to return in the response.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+      - name: offset
+        in: query
+        description: The offset or starting point for pagination.
+        required: false
+        schema:
+          type: integer
+          minimum: 0
       responses:
-        '201':
-          description: Manager created
+        '200':
+          description: Successful operation.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Manager'
+                $ref: '#/components/schemas/managers_getManagers_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Unauthorized. The request is missing authentication credentials or the credentials provided are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetManagers-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: No managers found. There are no managers associated with the current organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetManagers-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal server error. An error occurred on the server while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetManagers-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /managers/magic-links:
+    post:
+      operationId: managers_generateMagicLinkForManagerLogin-v2026-01-01
+      summary: Generate magic link for manager login
+      description: 'Generates a single-use magic link that authenticates a manager into the platform without credentials. The target manager must belong to the requesting organization and cannot be an organization admin; this operation is restricted to White Label–enabled organizations, Partners, and Child organizations. The link expires 5 minutes after creation.
+
+
+        **Token scopes**: `auth:write`'
+      tags:
+      - Managers
+      responses:
+        '201':
+          description: Magic link generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Managers_generateMagicLinkForManagerLogin-v2026-01-01_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateMagicLinkForManagerLogin-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Forbidden - Not allowed to generate magic link for this manager
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateMagicLinkForManagerLogin-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found - Manager does not exist or is not in organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateMagicLinkForManagerLogin-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateMagicLinkForManagerLogin-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Details for magic link for managers generation.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ManagersMagicLinksPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
 components:
   schemas:
-    ManagerCreate:
+    GenerateMagicLinkForManagerLogin-v2026-01-01RequestForbiddenError:
       type: object
-      required:
-      - email
-      - first_name
-      - last_name
       properties:
-        email:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GenerateMagicLinkForManagerLogin-v2026-01-01RequestForbiddenError
+    managers_createManager_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ManagersPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: managers_createManager_Response_201
+    ManagersMagicLinksPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        manager_id:
           type: string
-          format: email
-        first_name:
+          format: uuid
+          maxLength: 100
+          description: Manager id.
+        redirect_path:
           type: string
-        last_name:
+          maxLength: 1000
+          description: Optional path to redirect the manager to after login. Must start with /.
+      required:
+      - manager_id
+      title: ManagersMagicLinksPostRequestBodyContentApplicationJsonSchemaData
+    ManagersMagicLinksPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created_at:
           type: string
-        role:
+          format: date-time
+          description: When the magic link was created (ISO 8601 format)
+        expires_at:
           type: string
-          enum:
-          - admin
-          - manager
-          - viewer
-    Manager:
+          format: date-time
+          description: When the magic link expires (ISO 8601 format)
+        magic_link:
+          type: string
+          description: The magic link URL that managers can click to log in to Deel automatically
+      required:
+      - created_at
+      - expires_at
+      - magic_link
+      title: ManagersMagicLinksPostResponsesContentApplicationJsonSchemaData
+    GetManagers-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A general error message indicating that the server encountered an unexpected issue.
+      title: GetManagers-v2026-01-01RequestInternalServerError
+    GetManagers-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error message indicating that the authentication failed.
+      title: GetManagers-v2026-01-01RequestUnauthorizedError
+    ManagersPostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
         id:
           type: string
+          format: uuid
+          description: The unique identifier of the created manager.
         email:
           type: string
           format: email
-        first_name:
-          type: string
+          description: The email address of the created manager.
         last_name:
           type: string
-        role:
+          description: The last name of the created manager.
+        first_name:
           type: string
+          description: The first name of the created manager.
+      required:
+      - id
+      - email
+      - last_name
+      - first_name
+      title: ManagersPostResponsesContentApplicationJsonSchemaData
+    CreateManager-v2026-01-01RequestConflictError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Explanation of the conflict error.
+      title: CreateManager-v2026-01-01RequestConflictError
+    ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems
+    GenerateMagicLinkForManagerLogin-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GenerateMagicLinkForManagerLogin-v2026-01-01RequestInternalServerError
+    GetManagers-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: An error message indicating that no managers were found.
+      title: GetManagers-v2026-01-01RequestNotFoundError
+    GenerateMagicLinkForManagerLogin-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GenerateMagicLinkForManagerLogin-v2026-01-01RequestNotFoundError
+    CreateManager-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the validation error.
+      title: CreateManager-v2026-01-01RequestBadRequestError
+    ManagersGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        offset:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: The offset/index of the current page.
+        total_rows:
+          type: number
+          format: double
+          description: Total number of rows available for this resource.
+        items_per_page:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of items returned per page.
+      required:
+      - total_rows
+      description: Pagination details for the response.
+      title: ManagersGetResponsesContentApplicationJsonSchemaPage
+    managers_getManagers_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagersGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of managers in the organization.
+        page:
+          $ref: '#/components/schemas/ManagersGetResponsesContentApplicationJsonSchemaPage'
+          description: Pagination details for the response.
+      required:
+      - data
+      - page
+      title: managers_getManagers_Response_200
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ManagersGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the manager.
+        email:
+          type: string
+          format: email
+          description: The email address of the manager.
+        last_name:
+          type: string
+          description: The last name of the manager.
+        first_name:
+          type: string
+          description: The first name of the manager.
+      required:
+      - id
+      title: ManagersGetResponsesContentApplicationJsonSchemaDataItems
+    GenerateMagicLinkForManagerLogin-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagersMagicLinksPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GenerateMagicLinkForManagerLogin-v2026-01-01RequestUnauthorizedError
+    Managers_generateMagicLinkForManagerLogin-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ManagersMagicLinksPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Managers_generateMagicLinkForManagerLogin-v2026-01-01_Response_201
+    ManagersPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: The email address of the manager.
+        last_name:
+          type: string
+          minLength: 1
+          description: The last name of the manager.
+        first_name:
+          type: string
+          minLength: 1
+          description: The first name of the manager.
+      required:
+      - email
+      - last_name
+      - first_name
+      title: ManagersPostRequestBodyContentApplicationJsonSchemaData
   securitySchemes:
-    BearerAuth:
+    deelToken:
       type: http
       scheme: bearer
-      bearerFormat: opaque
-      description: Deel Organization or Personal API token issued from the Developer Center.
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

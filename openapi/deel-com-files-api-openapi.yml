@@ -1,0 +1,416 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Files API
+  version: 1.0.0
+  description: API endpoints related to Files.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: Files
+  description: API endpoints related to Files.
+paths:
+  /files/{fileid}/status:
+    get:
+      operationId: files_getFileUploadStatus-v2026-08-05
+      summary: Check file upload status
+      description: 'Poll the status of a file registered via the upload endpoint. Call this after uploading to check whether the file has cleared virus scanning: pending means the scan is still running, ready means it can be claimed, and failed means the upload was rejected.
+
+
+        **Token scopes**: `files:read`, `worker:read`'
+      tags:
+      - Files
+      parameters:
+      - name: fileid
+        in: path
+        description: File UUID from the register response.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: x-one-time-secret
+        in: header
+        description: One-time secret from the register response.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Current upload status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Files_getFileUploadStatus-v2026-08-05_Response_200'
+        '400':
+          description: Missing x-one-time-secret header
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: File not found or invalid one-time secret
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /files/{fileid}/complete:
+    post:
+      operationId: files_completeFileUpload-v2026-08-05
+      summary: Complete a multipart upload
+      description: 'Finalize an S3 multipart upload started via POST /rest/files, after all parts have been uploaded.
+
+
+        **Token scopes**: `files:write`, `worker:write`'
+      tags:
+      - Files
+      parameters:
+      - name: fileid
+        in: path
+        description: File UUID from the register response.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: x-one-time-secret
+        in: header
+        description: One-time secret from the register response.
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Multipart upload completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Missing x-one-time-secret header or invalid body
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: File not found or invalid one-time secret
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '422':
+          description: File is not in PENDING state or missing upload location
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/FilesFileidCompletePostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /files:
+    post:
+      operationId: files_registerFileUpload-v2026-08-05
+      summary: Create a file upload
+      description: 'Register an upload and receive presigned S3 upload target(s) plus a file handle (file_id and one_time_secret). Use the returned upload target(s) to send the file directly, then pass the file handle to domain endpoints to claim ownership once the upload completes.
+
+
+        **Token scopes**: `files:write`, `worker:write`'
+      tags:
+      - Files
+      parameters:
+      - name: x-upload-method
+        in: header
+        description: Declares the client is multipart-capable. The server returns a multipart response only when the declared size exceeds the configured multipart threshold (`MULTIPART_THRESHOLD`); otherwise the standard POST form.
+        required: false
+        schema:
+          $ref: '#/components/schemas/FilesPostParametersXUploadMethod'
+      responses:
+        '201':
+          description: Upload registered successfully with presigned S3 upload target(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Files_registerFileUpload-v2026-08-05_Response_201'
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Upload registration parameters
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/FilesPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+components:
+  schemas:
+    FilesPostParametersXUploadMethod:
+      type: string
+      enum:
+      - multipart
+      title: FilesPostParametersXUploadMethod
+    FilesPostResponsesContentApplicationJsonSchemaDataUploadPartsItems:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Presigned upload URL for this part.
+        size:
+          type: number
+          format: double
+          description: Maximum bytes for this part.
+        fields:
+          $ref: '#/components/schemas/FilesPostResponsesContentApplicationJsonSchemaDataUploadPartsItemsFields'
+          description: Form fields to submit with the presigned POST form. Present for the single-part POST upload; absent for multipart PUT parts.
+        number:
+          type: number
+          format: double
+          description: Part number (1-indexed).
+      title: FilesPostResponsesContentApplicationJsonSchemaDataUploadPartsItems
+    Files_registerFileUpload-v2026-08-05_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/FilesPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Files_registerFileUpload-v2026-08-05_Response_201
+    FilesFileidCompletePostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilesFileidCompletePostRequestBodyContentApplicationJsonSchemaDataPartsItems'
+          description: Uploaded parts, in any order.
+        upload_id:
+          type: string
+          description: S3 multipart upload ID from the register response.
+      required:
+      - parts
+      - upload_id
+      title: FilesFileidCompletePostRequestBodyContentApplicationJsonSchemaData
+    FilesFileidCompletePostRequestBodyContentApplicationJsonSchemaDataPartsItems:
+      type: object
+      properties:
+        etag:
+          type: string
+          description: ETag returned by S3 in the response header after uploading the part.
+        number:
+          type: number
+          format: double
+          description: Part number (1-indexed) matching the register response.
+      required:
+      - etag
+      - number
+      title: FilesFileidCompletePostRequestBodyContentApplicationJsonSchemaDataPartsItems
+    Files_getFileUploadStatus-v2026-08-05_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/FilesFileidStatusGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Files_getFileUploadStatus-v2026-08-05_Response_200
+    FilesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        file_id:
+          type: string
+          format: uuid
+          description: Unique file identifier.
+        upload_id:
+          type: string
+          description: S3 multipart upload ID. Present only when the server selected multipart — pass to POST /rest/files/{fileid}/complete.
+        upload_parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilesPostResponsesContentApplicationJsonSchemaDataUploadPartsItems'
+          description: 'Presigned upload targets (always present). Single-part: one presigned POST form with fields. Multipart: multiple presigned PUT URLs without fields.'
+        one_time_secret:
+          type: string
+          description: One-time secret for claiming ownership. Pass to domain endpoints when ready to claim the file.
+      required:
+      - file_id
+      - upload_parts
+      - one_time_secret
+      title: FilesPostResponsesContentApplicationJsonSchemaData
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    FilesFileidStatusGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        status:
+          type: string
+          description: 'Upload status: pending (virus scan in progress), ready (claimable), or failed (virus scan failed).'
+        file_id:
+          type: string
+          format: uuid
+          description: Unique file identifier.
+      required:
+      - status
+      - file_id
+      title: FilesFileidStatusGetResponsesContentApplicationJsonSchemaData
+    FilesPostResponsesContentApplicationJsonSchemaDataUploadPartsItemsFields:
+      type: object
+      properties: {}
+      description: Form fields to submit with the presigned POST form. Present for the single-part POST upload; absent for multipart PUT parts.
+      title: FilesPostResponsesContentApplicationJsonSchemaDataUploadPartsItemsFields
+    FilesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        size:
+          type: number
+          format: double
+          description: 'Actual file size in bytes (max 1GB). Drives the server-side multipart decision when x-upload-method: multipart is set.'
+        expiry:
+          type: number
+          format: double
+          description: Presigned URL expiry in seconds.
+        filename:
+          type: string
+          description: Original filename with extension; used to detect the content type.
+        is_attachment:
+          type: boolean
+          description: Whether the file should be served as an attachment (download) rather than inline.
+      required:
+      - filename
+      title: FilesPostRequestBodyContentApplicationJsonSchemaData
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

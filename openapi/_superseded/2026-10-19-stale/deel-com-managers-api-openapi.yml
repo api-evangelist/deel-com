@@ -1,0 +1,112 @@
+openapi: 3.2.0
+info:
+  title: Deel Core Managers API
+  description: 'Core organizational, contract, and people APIs for Deel. Covers organizations,
+
+    legal entities, departments, groups, managers, cost centers, contracts (IC, EOR,
+
+    Global Payroll), invoice adjustments, lookups, magic links, tasks, and custom fields.
+
+
+    Authentication uses bearer Organization or Personal API tokens generated from the
+
+    Deel Developer Center. Production base URL is https://api.letsdeel.com/rest/v2 and
+
+    the sandbox is https://api-sandbox.demo.deel.com/rest/v2.'
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/
+  termsOfService: https://www.deel.com/legal/terms-of-service/
+  license:
+    name: Deel Developer Terms
+    url: https://www.deel.com/legal/
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Managers
+  description: Manager directory for the organization
+paths:
+  /managers:
+    get:
+      operationId: getManagers
+      summary: Retrieve List Of Managers
+      tags:
+      - Managers
+      responses:
+        '200':
+          description: Manager list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Manager'
+    post:
+      operationId: createManager
+      summary: Create A Manager
+      tags:
+      - Managers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManagerCreate'
+      responses:
+        '201':
+          description: Manager created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+components:
+  schemas:
+    ManagerCreate:
+      type: object
+      required:
+      - email
+      - first_name
+      - last_name
+      properties:
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        role:
+          type: string
+          enum:
+          - admin
+          - manager
+          - viewer
+    Manager:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        role:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: Deel Organization or Personal API token issued from the Developer Center.

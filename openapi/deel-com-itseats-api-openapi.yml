@@ -1,0 +1,1093 @@
+openapi: 3.2.0
+info:
+  title: Endpoints It Seats API
+  version: 1.0.0
+  description: API endpoints related to IT seats.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: itSeats
+  description: API endpoints related to IT seats.
+paths:
+  /it/seats/assign:
+    post:
+      operationId: itSeats_assignWorkersToItSeats-v2026-09-24
+      summary: Assign workers to IT seats
+      description: 'Use this from onboarding or HRIS automations to give workers an IT seat on your organization''s IT-seat subscription. Assigns a seat to each listed worker, identified by their Deel HRIS profile id. Accepts between 1 and 100 ids per call. The call is all-or-nothing: if any id is not found in your organization, or the seats cannot be assigned, the whole request fails and nothing changes. Workers already holding a seat are left unchanged and workers whose seat is pending approval have it approved. If the subscription has fewer free seats than the workers need, the request fails with a conflict unless is_accepting_new_seat_subscription is true, in which case the missing seats are added to the subscription at its monthly seat price and billed to your organization; check the available seats and the monthly seat price via `GET /rest/it/seats/status` before accepting. Only organizations on a per-seat plan with an active IT-seat subscription can use this endpoint.
+
+
+        **Token scopes**: `it-seats:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-24.'
+      tags:
+      - itSeats
+      parameters:
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItSeatsAssignPostParametersXBeta'
+      responses:
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItSeats-v2026-09-24RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItSeats-v2026-09-24RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItSeats-v2026-09-24RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItSeats-v2026-09-24RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItSeats-v2026-09-24RequestConflictError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignWorkersToItSeats-v2026-09-24RequestInternalServerError'
+      requestBody:
+        description: Workers to give an IT seat
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ItSeatsAssignPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Workers to give an IT seat.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /it/seats:
+    get:
+      operationId: itSeats_listItSeats-v2026-09-25
+      summary: List IT seats
+      description: 'Use this endpoint to let HRIS and finance automations audit which worker holds each IT seat and reconcile seat usage, instead of checking the seat list manually in the Deel IT UI. Only available to organizations on a per-seat plan.
+
+
+        **Token scopes**: `it-seats:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-25.'
+      tags:
+      - itSeats
+      parameters:
+      - name: cursor
+        in: query
+        description: Indicates where the next page of results starts, as returned in a paginated list response
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: status
+        in: query
+        description: Filter seats by their status — repeat the key for OR semantics. Omit to include seats of any status.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsGetParametersStatusSchemaItems'
+      - name: hris_profile_id
+        in: query
+        description: Filter seats by the HRIS profile holding them — repeat the key for OR semantics. Ids not found in your organization match nothing. Omit to include seats of any worker.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItSeatsGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_seats_listItSeats-v2026-09-25_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItSeats-v2026-09-25RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItSeats-v2026-09-25RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItSeats-v2026-09-25RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItSeats-v2026-09-25RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItSeats-v2026-09-25RequestConflictError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItSeats-v2026-09-25RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/seats/status:
+    get:
+      operationId: itSeats_retrieveTheItSeatContract-v2026-09-25
+      summary: Retrieve the IT seat subscription
+      description: 'Reports your organization''s IT-seat subscription so HRIS and finance automations can see how many seats are paid for, how many are already taken, how many are free and what one more seat costs per month — before assigning workers via `POST /rest/it/seats/assign`. Returns the subscription in force today; if your organization is between subscriptions, the most recent one is returned with its status, so an expired subscription is still visible. Only organizations on a per-seat plan can use this endpoint.
+
+
+        **Token scopes**: `it-seats:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-25.'
+      tags:
+      - itSeats
+      parameters:
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItSeatsStatusGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IT_seats_retrieveTheItSeatContract-v2026-09-25_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTheItSeatContract-v2026-09-25RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTheItSeatContract-v2026-09-25RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTheItSeatContract-v2026-09-25RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTheItSeatContract-v2026-09-25RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTheItSeatContract-v2026-09-25RequestConflictError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTheItSeatContract-v2026-09-25RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/seats/unassign:
+    post:
+      operationId: itSeats_unassignWorkersFromItSeats-v2026-09-25
+      summary: Unassign workers from IT seats
+      description: 'Use this from offboarding or HRIS automations to release the IT seats of workers who no longer need one. Releases the seat of each listed worker, identified by their Deel HRIS profile id, on your organization''s IT-seat subscription: released seats become available to assign to another worker, and the number of paid seats is unchanged. The call is all-or-nothing: if any id is not found in your organization the whole request fails and no seat is released. Workers without a seat are left unchanged. A seat whose paid feature is already in use cannot be released; the whole request then fails with a conflict and no seat is released. The worker''s IT policy is not changed. Only organizations on a per-seat plan with an active IT-seat subscription can use this endpoint.
+
+
+        **Token scopes**: `it-seats:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-25.'
+      tags:
+      - itSeats
+      parameters:
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItSeatsUnassignPostParametersXBeta'
+      responses:
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnassignWorkersFromItSeats-v2026-09-25RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnassignWorkersFromItSeats-v2026-09-25RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnassignWorkersFromItSeats-v2026-09-25RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnassignWorkersFromItSeats-v2026-09-25RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnassignWorkersFromItSeats-v2026-09-25RequestConflictError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnassignWorkersFromItSeats-v2026-09-25RequestInternalServerError'
+      requestBody:
+        description: Workers whose IT seat to release
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ItSeatsUnassignPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Workers whose IT seat to release.
+              required:
+              - data
+      security:
+      - deelToken: []
+components:
+  schemas:
+    RetrieveTheItSeatContract-v2026-09-25RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveTheItSeatContract-v2026-09-25RequestNotFoundError
+    ListItSeats-v2026-09-25RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItSeats-v2026-09-25RequestUnauthorizedError
+    ItSeatsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the seat.
+        status:
+          $ref: '#/components/schemas/ItSeatsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Current status of the seat.
+        active_on:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Day the seat's paid features started being used. `null` while the seat is not in use.
+        created_at:
+          type: string
+          format: date-time
+          description: When the seat was created.
+        assigned_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the seat was given to its worker. `null` when the seat has never been assigned.
+        declined_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the worker declined the seat. `null` unless the worker declined it.
+        deactivated_on:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Day the seat was released. `null` while the seat is still held.
+        assigned_hris_profile:
+          oneOf:
+          - $ref: '#/components/schemas/ItSeatsGetResponsesContentApplicationJsonSchemaDataItemsAssignedHrisProfile'
+          - type: 'null'
+          description: Worker holding the seat. `null` when the seat is free or its worker has no Deel HRIS profile.
+      required:
+      - id
+      - status
+      - active_on
+      - created_at
+      - assigned_at
+      - declined_at
+      - deactivated_on
+      - assigned_hris_profile
+      title: ItSeatsGetResponsesContentApplicationJsonSchemaDataItems
+    AssignWorkersToItSeats-v2026-09-24RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItSeats-v2026-09-24RequestNotFoundError
+    UnassignWorkersFromItSeats-v2026-09-25RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsUnassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UnassignWorkersFromItSeats-v2026-09-25RequestBadRequestError
+    ItSeatsUnassignPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItSeatsUnassignPostResponsesContentApplicationJsonSchemaErrorsItems
+    UnassignWorkersFromItSeats-v2026-09-25RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsUnassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UnassignWorkersFromItSeats-v2026-09-25RequestNotFoundError
+    ItSeatsUnassignPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        hris_profile_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: HRIS profile identifiers of the workers whose IT seat to release. Between 1 and 100 unique ids per request; the whole request is rejected when any id is not found in your organization.
+      required:
+      - hris_profile_ids
+      description: Workers whose IT seat to release.
+      title: ItSeatsUnassignPostRequestBodyContentApplicationJsonSchemaData
+    ListItSeats-v2026-09-25RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItSeats-v2026-09-25RequestInternalServerError
+    ItSeatsGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItSeatsGetParametersXBeta
+    ItSeatsAssignPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        hris_profile_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: HRIS profile identifiers of the workers to give an IT seat. Between 1 and 100 unique ids per request; the whole request is rejected when any id is not found in your organization.
+        is_accepting_new_seat_subscription:
+          type: boolean
+          description: Whether missing seats may be purchased. When true and the subscription has fewer free seats than the workers need, the missing seats are added to your organization's IT-seat subscription at its monthly seat price and billed immediately, bypassing the seat purchase approval your organization would go through in the Deel IT UI. When false (the default) the request fails with a conflict instead and nothing is changed.
+      required:
+      - hris_profile_ids
+      - is_accepting_new_seat_subscription
+      description: Workers to give an IT seat.
+      title: ItSeatsAssignPostRequestBodyContentApplicationJsonSchemaData
+    IT_seats_retrieveTheItSeatContract-v2026-09-25_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: IT seats_retrieveTheItSeatContract-v2026-09-25_Response_200
+    ListItSeats-v2026-09-25RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItSeats-v2026-09-25RequestNotFoundError
+    UnassignWorkersFromItSeats-v2026-09-25RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsUnassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UnassignWorkersFromItSeats-v2026-09-25RequestUnauthorizedError
+    ItSeatsStatusGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the IT seat subscription.
+        term:
+          $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataTerm'
+          description: Committed length of the subscription.
+        status:
+          $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current status of the subscription.
+        end_date:
+          type: string
+          format: date
+          description: Last day the subscription is in force.
+        created_at:
+          type: string
+          format: date-time
+          description: When the subscription was created.
+        paid_seats:
+          type: integer
+          format: int64
+          description: Number of seats the organization pays for.
+        start_date:
+          type: string
+          format: date
+          description: First day the subscription is in force.
+        assigned_seats:
+          type: integer
+          format: int64
+          description: Number of seats held by a worker, whether or not the seat's paid features are in use yet.
+        available_seats:
+          type: integer
+          format: int64
+          description: Number of paid seats free to assign right now.
+        monthly_seat_price:
+          $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataMonthlySeatPrice'
+          description: Price of each seat per month.
+        pending_approval_seats:
+          type: integer
+          format: int64
+          description: Number of seats pending purchase approval. These do not consume a paid seat until approved.
+      required:
+      - id
+      - term
+      - status
+      - end_date
+      - created_at
+      - paid_seats
+      - start_date
+      - assigned_seats
+      - available_seats
+      - monthly_seat_price
+      - pending_approval_seats
+      title: ItSeatsStatusGetResponsesContentApplicationJsonSchemaData
+    ItSeatsGetResponsesContentApplicationJsonSchemaDataItemsAssignedHrisProfile:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Array of user email addresses
+        last_name:
+          type: string
+          description: Last name of the user
+        first_name:
+          type: string
+          description: First name of the user
+        hris_profile_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the HRIS profile of the assigned user
+      required:
+      - emails
+      - last_name
+      - first_name
+      - hris_profile_id
+      description: Worker holding the seat. `null` when the seat is free or its worker has no Deel HRIS profile.
+      title: ItSeatsGetResponsesContentApplicationJsonSchemaDataItemsAssignedHrisProfile
+    AssignWorkersToItSeats-v2026-09-24RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItSeats-v2026-09-24RequestInternalServerError
+    IT_seats_listItSeats-v2026-09-25_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsGetResponsesContentApplicationJsonSchemaDataItems'
+        has_more:
+          type: boolean
+          description: Whether there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to the next page
+        total_count:
+          type: integer
+          format: int64
+          description: Total number of records
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: IT seats_listItSeats-v2026-09-25_Response_200
+    ItSeatsAssignPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItSeatsAssignPostResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveTheItSeatContract-v2026-09-25RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveTheItSeatContract-v2026-09-25RequestForbiddenError
+    ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataMonthlySeatPrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataMonthlySeatPriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Price of each seat per month.
+      title: ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataMonthlySeatPrice
+    AssignWorkersToItSeats-v2026-09-24RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItSeats-v2026-09-24RequestBadRequestError
+    UnassignWorkersFromItSeats-v2026-09-25RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsUnassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UnassignWorkersFromItSeats-v2026-09-25RequestForbiddenError
+    RetrieveTheItSeatContract-v2026-09-25RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveTheItSeatContract-v2026-09-25RequestInternalServerError
+    UnassignWorkersFromItSeats-v2026-09-25RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsUnassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UnassignWorkersFromItSeats-v2026-09-25RequestInternalServerError
+    ItSeatsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItSeatsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItSeatsAssignPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItSeatsAssignPostParametersXBeta
+    ListItSeats-v2026-09-25RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItSeats-v2026-09-25RequestForbiddenError
+    ListItSeats-v2026-09-25RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItSeats-v2026-09-25RequestBadRequestError
+    ItSeatsGetParametersStatusSchemaItems:
+      type: string
+      enum:
+      - ACTIVE
+      - ASSIGNED
+      - INACTIVE
+      - PENDING_APPROVAL
+      title: ItSeatsGetParametersStatusSchemaItems
+    AssignWorkersToItSeats-v2026-09-24RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItSeats-v2026-09-24RequestConflictError
+    ItSeatsStatusGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItSeatsStatusGetParametersXBeta
+    AssignWorkersToItSeats-v2026-09-24RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItSeats-v2026-09-24RequestForbiddenError
+    ItSeatsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - ASSIGNED
+      - INACTIVE
+      - PENDING_APPROVAL
+      description: Current status of the seat.
+      title: ItSeatsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    AssignWorkersToItSeats-v2026-09-24RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsAssignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: AssignWorkersToItSeats-v2026-09-24RequestUnauthorizedError
+    RetrieveTheItSeatContract-v2026-09-25RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveTheItSeatContract-v2026-09-25RequestUnauthorizedError
+    ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - EXPIRED
+      - TRIAL
+      description: Current status of the subscription.
+      title: ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataStatus
+    ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataMonthlySeatPriceCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataMonthlySeatPriceCurrency
+    ItSeatsStatusGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItSeatsStatusGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataTerm:
+      type: string
+      enum:
+      - 12_MONTHS
+      - 24_MONTHS
+      - 36_MONTHS
+      - CUSTOM
+      description: Committed length of the subscription.
+      title: ItSeatsStatusGetResponsesContentApplicationJsonSchemaDataTerm
+    RetrieveTheItSeatContract-v2026-09-25RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveTheItSeatContract-v2026-09-25RequestBadRequestError
+    RetrieveTheItSeatContract-v2026-09-25RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsStatusGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveTheItSeatContract-v2026-09-25RequestConflictError
+    UnassignWorkersFromItSeats-v2026-09-25RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsUnassignPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: UnassignWorkersFromItSeats-v2026-09-25RequestConflictError
+    ItSeatsUnassignPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItSeatsUnassignPostParametersXBeta
+    ListItSeats-v2026-09-25RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItSeatsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListItSeats-v2026-09-25RequestConflictError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

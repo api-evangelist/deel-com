@@ -1,0 +1,166 @@
+openapi: 3.2.0
+info:
+  title: Deel Core Lookups API
+  description: 'Core organizational, contract, and people APIs for Deel. Covers organizations,
+
+    legal entities, departments, groups, managers, cost centers, contracts (IC, EOR,
+
+    Global Payroll), invoice adjustments, lookups, magic links, tasks, and custom fields.
+
+
+    Authentication uses bearer Organization or Personal API tokens generated from the
+
+    Deel Developer Center. Production base URL is https://api.letsdeel.com/rest/v2 and
+
+    the sandbox is https://api-sandbox.demo.deel.com/rest/v2.'
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/
+  termsOfService: https://www.deel.com/legal/terms-of-service/
+  license:
+    name: Deel Developer Terms
+    url: https://www.deel.com/legal/
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Lookups
+  description: Countries, currencies, job titles, seniority levels, time-off types
+paths:
+  /lookups/countries:
+    get:
+      operationId: getCountries
+      summary: Retrieve Country List
+      description: Returns all countries with visa support, EOR availability, and sub-territories.
+      tags:
+      - Lookups
+      responses:
+        '200':
+          description: Country list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryListResponse'
+  /lookups/currencies:
+    get:
+      operationId: getCurrencies
+      summary: Retrieve Supported Currency List
+      tags:
+      - Lookups
+      responses:
+        '200':
+          description: Currency list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyListResponse'
+  /lookups/job-titles:
+    get:
+      operationId: getJobTitles
+      summary: Job Titles List
+      tags:
+      - Lookups
+      responses:
+        '200':
+          description: Job titles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobTitleListResponse'
+  /lookups/seniority-levels:
+    get:
+      operationId: getSeniorityLevels
+      summary: Retrieve Seniority Levels
+      tags:
+      - Lookups
+      responses:
+        '200':
+          description: Seniority levels
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SeniorityLevel'
+components:
+  schemas:
+    JobTitleListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              category:
+                type: string
+    SeniorityLevel:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        order:
+          type: integer
+    CountryListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              name:
+                type: string
+              eor_available:
+                type: boolean
+              visa_support:
+                type: boolean
+              sub_territories:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                    name:
+                      type: string
+              classification:
+                type: string
+    CurrencyListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              name:
+                type: string
+              symbol:
+                type: string
+              crypto:
+                type: boolean
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: Deel Organization or Personal API token issued from the Developer Center.

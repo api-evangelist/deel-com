@@ -1,0 +1,762 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Talent API
+  version: 1.0.0
+  description: API endpoints related to Talent.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: talent
+  description: API endpoints related to Talent.
+paths:
+  /vms/requisitions:
+    get:
+      operationId: talent_listRequisitions-v2026-09-10
+      summary: List job requests
+      description: 'Returns a cursor-paginated list of Deel Talent job requests for the organization. Use filters to find requests by hiring criteria or approval status, then use the results to populate a dashboard, synchronize an external system, or identify requests needing follow-up. Pass the cursor from each response to retrieve the next page.
+
+
+        **Token scopes**: `talents:read`'
+      tags:
+      - talent
+      parameters:
+      - name: search
+        in: query
+        description: Free-text search over the job request title.
+        required: false
+        schema:
+          type: string
+          maxLength: 150
+      - name: vendor_ids
+        in: query
+        description: Filter by talent partner identifiers. The reserved value `external_provider` matches job requests whose candidates were sourced from an external provider rather than a Deel talent partner.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: contract_type
+        in: query
+        description: Filter by contract type.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VmsRequisitionsGetParametersContractTypeSchemaItems'
+      - name: rate_scale
+        in: query
+        description: Filter by the rate scale of the job request.
+        required: false
+        schema:
+          $ref: '#/components/schemas/VmsRequisitionsGetParametersRateScale'
+      - name: locations
+        in: query
+        description: Filter by ISO 3166-1 alpha-2 country codes.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            maxLength: 2
+      - name: work_mode
+        in: query
+        description: Filter by work mode.
+        required: false
+        schema:
+          $ref: '#/components/schemas/VmsRequisitionsGetParametersWorkMode'
+      - name: status
+        in: query
+        description: Filter by job request status.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VmsRequisitionsGetParametersStatusSchemaItems'
+      - name: approval_status
+        in: query
+        description: Filter by approval status.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VmsRequisitionsGetParametersApprovalStatusSchemaItems'
+      - name: start_date_from
+        in: query
+        description: Only return job requests whose start date is on or after this date.
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: start_date_to
+        in: query
+        description: Only return job requests whose start date is on or before this date. Must not be earlier than `start_date_from`.
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: end_date_from
+        in: query
+        description: Only return job requests whose end date is on or after this date.
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: end_date_to
+        in: query
+        description: Only return job requests whose end date is on or before this date. Must not be earlier than `end_date_from`.
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: created_at_from
+        in: query
+        description: Only return job requests created on or after this date.
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: created_at_to
+        in: query
+        description: Only return job requests created on or before this date. Must not be earlier than `created_at_from`.
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: request_type
+        in: query
+        description: Use `PENDING_TASKS` to return only the job requests awaiting an action from the token owner.
+        required: false
+        schema:
+          $ref: '#/components/schemas/VmsRequisitionsGetParametersRequestType'
+          default: GENERAL
+      - name: sort_by
+        in: query
+        description: Field to sort by.
+        required: false
+        schema:
+          $ref: '#/components/schemas/VmsRequisitionsGetParametersSortBy'
+          default: created_at
+      - name: sort_order
+        in: query
+        description: Sort direction.
+        required: false
+        schema:
+          $ref: '#/components/schemas/VmsRequisitionsGetParametersSortOrder'
+          default: ASC
+      - name: cursor
+        in: query
+        description: Opaque cursor returned by the previous page. Omit to retrieve the first page.
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Maximum number of records to return.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Talent_listRequisitions-v2026-09-10_Response_200'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRequisitions-v2026-09-10RequestBadRequestError'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRequisitions-v2026-09-10RequestUnauthorizedError'
+        '403':
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRequisitions-v2026-09-10RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRequisitions-v2026-09-10RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    VmsRequisitionsGetParametersWorkMode:
+      type: string
+      enum:
+      - REMOTE
+      - OFFICE
+      - HYBRID
+      title: VmsRequisitionsGetParametersWorkMode
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsApprovalStatus:
+      type: string
+      enum:
+      - NOT_REQUESTED
+      - REQUESTED
+      - APPROVED
+      - REJECTED
+      - CANCELLED
+      description: Approval status of the job request.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsApprovalStatus
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsContractType:
+      type: string
+      enum:
+      - EMPLOYEE
+      - CONTRACTOR
+      description: Contract type of the job request.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsContractType
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItemsStatus:
+      type: string
+      enum:
+      - APPROVED
+      - REJECTED
+      - PENDING_APPROVAL
+      - HIDDEN_BY_HIRER
+      - WITHDRAWN_BY_HIRER
+      - WITHDRAWN_BY_VENDOR
+      description: Status of the talent partner on this job request.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItemsStatus
+    VmsRequisitionsGetParametersSortBy:
+      type: string
+      enum:
+      - n_candidates
+      - n_positions
+      - rate_min
+      - rate_max
+      - created_at
+      - start_date
+      - end_date
+      - status
+      default: created_at
+      title: VmsRequisitionsGetParametersSortBy
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsRateScale:
+      type: string
+      enum:
+      - HOURLY
+      - MILESTONE
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - ANNUAL
+      description: Scale the rate range is expressed in.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsRateScale
+    VmsRequisitionsGetParametersSortOrder:
+      type: string
+      enum:
+      - ASC
+      - DESC
+      default: ASC
+      title: VmsRequisitionsGetParametersSortOrder
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItemsFeeType:
+      type: string
+      enum:
+      - ONE_TIME_FIXED
+      - ONE_TIME_PERCENTAGE
+      - RECURRING_FIXED
+      - RECURRING_PERCENTAGE
+      - DEPRECATED
+      description: Agreed fee type.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItemsFeeType
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsServiceStatus:
+      type: string
+      enum:
+      - PENDING
+      - SERVICEABLE
+      - NOT_SERVICEABLE
+      description: Whether Deel can service the job request.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsServiceStatus
+    ListRequisitions-v2026-09-10RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that describe why the request was not authenticated.
+      title: ListRequisitions-v2026-09-10RequestUnauthorizedError
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItems:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: Unique identifier of the talent partner.
+        name:
+          type: string
+          description: Name of the talent partner.
+        status:
+          $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItemsStatus'
+          description: Status of the talent partner on this job request.
+        fee_type:
+          $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItemsFeeType'
+          description: Agreed fee type.
+        logo_url:
+          type:
+          - string
+          - 'null'
+          description: Talent partner logo URL.
+        fee_value:
+          type: number
+          format: double
+          description: Agreed fee value.
+        created_at:
+          type: string
+          format: date-time
+          description: When the talent partner was attached.
+        updated_at:
+          type: string
+          format: date-time
+          description: When the attachment was last updated.
+        rejected_reason:
+          type:
+          - string
+          - 'null'
+          description: Reason the talent partner rejected the job request.
+        status_updated_at:
+          type: string
+          format: date-time
+          description: When the status last changed.
+        work_order_status:
+          $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItemsWorkOrderStatus'
+          description: Status of the associated work order.
+        hirer_withdrawn_reason:
+          type:
+          - string
+          - 'null'
+          description: Reason the client withdrew the talent partner.
+        vendor_withdrawn_reason:
+          type:
+          - string
+          - 'null'
+          description: Reason the talent partner withdrew.
+        work_order_status_updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the work order status last changed.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItems
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsContractLengthType:
+      type: string
+      enum:
+      - FIXED
+      - INDEFINITE
+      description: Whether the engagement is fixed-term or indefinite.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsContractLengthType
+    ListRequisitions-v2026-09-10RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that describe why the request was not permitted.
+      title: ListRequisitions-v2026-09-10RequestForbiddenError
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItemsWorkOrderStatus:
+      type: string
+      enum:
+      - NOT_REQUIRED
+      - AWAITING_CREATION
+      - PENDING_VENDOR_SIGNATURE
+      - REJECTED_BY_VENDOR
+      - REJECTED_DUE_TO_INACTIVITY
+      - REJECTED_BY_HIRER
+      - SIGNED
+      description: Status of the associated work order.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItemsWorkOrderStatus
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsWorkMode:
+      type: string
+      enum:
+      - REMOTE
+      - OFFICE
+      - HYBRID
+      description: Work mode.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsWorkMode
+    VmsRequisitionsGetParametersRateScale:
+      type: string
+      enum:
+      - HOURLY
+      - MILESTONE
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - ANNUAL
+      title: VmsRequisitionsGetParametersRateScale
+    VmsRequisitionsGetParametersRequestType:
+      type: string
+      enum:
+      - GENERAL
+      - PENDING_TASKS
+      default: GENERAL
+      title: VmsRequisitionsGetParametersRequestType
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - PAUSED
+      - CLOSED
+      - NOT_SHARED
+      description: Job request status.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsEmploymentType:
+      type: string
+      enum:
+      - FULL_TIME
+      - PART_TIME
+      description: Employment type.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsEmploymentType
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ListRequisitions-v2026-09-10RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors that describe the unexpected server failure.
+      title: ListRequisitions-v2026-09-10RequestInternalServerError
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsOrganization:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: Unique identifier of the organization.
+        name:
+          type:
+          - string
+          - 'null'
+          description: Organization name.
+      description: Organization the job request belongs to.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsOrganization
+    VmsRequisitionsGetParametersApprovalStatusSchemaItems:
+      type: string
+      enum:
+      - NOT_REQUESTED
+      - REQUESTED
+      - APPROVED
+      - REJECTED
+      - CANCELLED
+      title: VmsRequisitionsGetParametersApprovalStatusSchemaItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    VmsRequisitionsGetParametersStatusSchemaItems:
+      type: string
+      enum:
+      - ACTIVE
+      - PAUSED
+      - CLOSED
+      - NOT_SHARED
+      title: VmsRequisitionsGetParametersStatusSchemaItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        cursor:
+          type: string
+          description: Cursor to pass to the next request. Empty when no records remain.
+        total_rows:
+          type: integer
+          description: Total number of job requests matching the filters.
+      required:
+      - cursor
+      - total_rows
+      description: Pagination metadata.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaPage
+    Talent_listRequisitions-v2026-09-10_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: The job requests on the requested page.
+        page:
+          $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaPage'
+          description: Pagination metadata.
+      required:
+      - data
+      - page
+      title: Talent_listRequisitions-v2026-09-10_Response_200
+    VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: Unique identifier of the job request.
+        title:
+          type: string
+          description: Job request title.
+        status:
+          $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Job request status.
+        vendors:
+          type: array
+          items:
+            $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsVendorsItems'
+          description: Talent partners attached to the job request.
+        yoe_min:
+          type:
+          - integer
+          - 'null'
+          description: Minimum years of experience required.
+        currency:
+          type:
+          - string
+          - 'null'
+          description: ISO 4217 currency code of the rate.
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Requested end date.
+        quantity:
+          type: integer
+          description: Number of open positions.
+        rate_max:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Upper bound of the rate range.
+        rate_min:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Lower bound of the rate range.
+        locations:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: ISO 3166-1 alpha-2 country codes the job request targets.
+        work_mode:
+          oneOf:
+          - $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsWorkMode'
+          - type: 'null'
+          description: Work mode.
+        close_note:
+          type:
+          - string
+          - 'null'
+          description: Free-text note recorded when closing the job request.
+        created_at:
+          type: string
+          format: date-time
+          description: When the job request was created.
+        job_family:
+          type:
+          - string
+          - 'null'
+          description: Job family.
+        rate_scale:
+          oneOf:
+          - $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsRateScale'
+          - type: 'null'
+          description: Scale the rate range is expressed in.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Requested start date.
+        updated_at:
+          type: string
+          format: date-time
+          description: When the job request was last updated.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Job request description.
+        close_reason:
+          type:
+          - string
+          - 'null'
+          description: Reason the job request was closed.
+        organization:
+          $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsOrganization'
+          description: Organization the job request belongs to.
+        contract_type:
+          oneOf:
+          - $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsContractType'
+          - type: 'null'
+          description: Contract type of the job request.
+        total_vendors:
+          type: integer
+          description: Number of talent partners attached to the job request.
+        service_status:
+          oneOf:
+          - $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsServiceStatus'
+          - type: 'null'
+          description: Whether Deel can service the job request.
+        approval_status:
+          $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsApprovalStatus'
+          description: Approval status of the job request.
+        candidate_count:
+          type: integer
+          description: Total number of candidates on the job request.
+        candidate_limit:
+          type:
+          - integer
+          - 'null'
+          description: Maximum number of candidates each talent partner may submit.
+        employment_type:
+          oneOf:
+          - $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsEmploymentType'
+          - type: 'null'
+          description: Employment type.
+        hours_per_month:
+          type:
+          - integer
+          - 'null'
+          description: Expected hours per month.
+        approval_policy_id:
+          type:
+          - string
+          - 'null'
+          description: Identifier of the approval policy applied to the job request.
+        contract_length_type:
+          oneOf:
+          - $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItemsContractLengthType'
+          - type: 'null'
+          description: Whether the engagement is fixed-term or indefinite.
+        marked_as_inactive_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the job request was flagged as inactive, if it was.
+        total_hired_candidates:
+          type: integer
+          description: Number of candidates hired on this job request.
+        total_vendors_per_status:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Count of attached talent partners per status.
+        has_non_vendor_candidates:
+          type: boolean
+          description: Whether the job request has candidates not sourced through a talent partner.
+        ready_to_hire_candidates_count:
+          type: integer
+          description: Candidates who accepted an offer and are ready to be hired. Returned as `0` when the token owner is only an approver on the job request.
+        ready_for_offer_candidates_count:
+          type: integer
+          description: Candidates ready to receive an offer. Returned as `0` when the token owner is only an approver on the job request.
+        pending_interview_candidates_count:
+          type: integer
+          description: Candidates awaiting an interview. Returned as `0` when the token owner is only an approver on the job request.
+        pending_initial_screening_candidates_count:
+          type: integer
+          description: Candidates awaiting initial screening. Returned as `0` when the token owner is only an approver on the job request.
+      title: VmsRequisitionsGetResponsesContentApplicationJsonSchemaDataItems
+    VmsRequisitionsGetParametersContractTypeSchemaItems:
+      type: string
+      enum:
+      - EMPLOYEE
+      - CONTRACTOR
+      title: VmsRequisitionsGetParametersContractTypeSchemaItems
+    ListRequisitions-v2026-09-10RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/VmsRequisitionsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation errors that describe why the request was rejected.
+      title: ListRequisitions-v2026-09-10RequestBadRequestError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

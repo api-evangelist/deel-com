@@ -1,0 +1,1005 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Eor API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: eor
+paths:
+  /eor/workers/contracts/{contract_id}/project-assignment/acknowledge:
+    post:
+      operationId: eor_acknowledgeAssignmentAgreement-v2026-01-01
+      summary: Acknowledge assignment agreement
+      description: 'Employee acknowledges their assignment agreement as part of project initiation. Ensure all terms in the agreement are reviewed before acknowledgment.
+
+
+        **Token scopes**: `worker:write`'
+      tags:
+      - eor
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the EOR contract.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Acknowledged successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Invalid input or HrisProfile not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcknowledgeAssignmentAgreement-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Contract not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcknowledgeAssignmentAgreement-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /eor/workers/contracts/{contract_id}/additional-information:
+    get:
+      operationId: eor_getAdditionalInformation-v2026-09-18
+      summary: Get additional information
+      description: 'Lets a worker review the additional information saved on their own EOR employee agreement — data that could previously only be written, not read back. Absent values are omitted from the response rather than returned as null.
+
+
+        **Token scopes**: `worker:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2027-01-05.'
+      tags:
+      - eor
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationGetParametersXBeta'
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EOR_getAdditionalInformation-v2026-09-18_Response_200'
+        '400':
+          description: Bad request. Contract not found or contract is not EOR.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAdditionalInformation-v2026-09-18RequestBadRequestError'
+        '401':
+          description: Authentication failed. Bearer token is missing, expired, or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAdditionalInformation-v2026-09-18RequestUnauthorizedError'
+        '403':
+          description: Forbidden. The token lacks worker:read scope or the worker cannot access this contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAdditionalInformation-v2026-09-18RequestForbiddenError'
+        '404':
+          description: Not found. The contract does not exist or does not belong to the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAdditionalInformation-v2026-09-18RequestNotFoundError'
+        '429':
+          description: Rate limit exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAdditionalInformation-v2026-09-18RequestTooManyRequestsError'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAdditionalInformation-v2026-09-18RequestInternalServerError'
+      security:
+      - deelToken: []
+  /eor/contracts/amendments/data-points/configuration:
+    get:
+      operationId: eor_getAmendmentDataPointsConfigurationByCountry-v2026-05-06
+      summary: Get amendment data points configuration by country
+      description: 'Returns amendment data points configuration per country. If no countries filter is provided, returns configuration for all available countries. If no configuration exists for a country, all data points are treated as enabled.
+
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - eor
+      parameters:
+      - name: countries
+        in: query
+        description: Optional list of ISO 3166-1 alpha-2 country codes to filter results. Returns all countries if omitted.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            minLength: 2
+            maxLength: 2
+      - name: enabled
+        in: query
+        description: When true, returns only enabled data points. A data point is enabled if at least one of its items is not DISABLED_AMENDMENTS.
+        required: false
+        schema:
+          type: boolean
+      - name: limit
+        in: query
+        description: Maximum number of results to return per page.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: cursor
+        in: query
+        description: Cursor from a previous response to fetch the next page of results.
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Data points configuration per country
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EOR_getAmendmentDataPointsConfigurationByCountry-v2026-05-06_Response_200'
+        '400':
+          description: Bad Request. The request could not be understood or was missing required parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAmendmentDataPointsConfigurationByCountry-v2026-05-06RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. The caller does not have permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAmendmentDataPointsConfigurationByCountry-v2026-05-06RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAmendmentDataPointsConfigurationByCountry-v2026-05-06RequestInternalServerError'
+      security:
+      - deelToken: []
+  /eor/contracts/{contract_id}/employee-agreement-draft-preview:
+    get:
+      operationId: eor_getEmployeeAgreementDraftPreview-v2026-01-01
+      summary: Get employee agreement draft preview
+      description: 'Initiates or polls for async generation of an employee agreement template PDF draft. On first call (no task_id), kicks off generation and returns a task_id with is_processing: true. Poll with ?task_id= until is_processing is false, at which point url contains a signed download link valid for 15 minutes.
+
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - eor
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the EOR contract.
+        required: true
+        schema:
+          type: string
+          pattern: ^(([a-z0-9]{6,})|([a-z0-9-_]{20,})|(-2[0-9]{2}))$
+      - name: task_id
+        in: query
+        description: Task ID from a previous response. Omit on first call. Provide on subsequent calls to poll for completion.
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Draft preview initiated or ready.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EOR_getEmployeeAgreementDraftPreview-v2026-01-01_Response_200'
+        '400':
+          description: Generation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEmployeeAgreementDraftPreview-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Contract or template not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEmployeeAgreementDraftPreview-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /eor/workers/banks/{bank_id}:
+    patch:
+      operationId: eor_modifyBankAccountForAnEorEmployee-v2026-08-19
+      summary: Modify bank account for an EOR employee
+      description: 'Modify bank account for an EOR employee by providing only those properties whose values you would like to adjust.
+
+
+        **Token scopes**: `worker:write`'
+      tags:
+      - eor
+      parameters:
+      - name: bank_id
+        in: path
+        description: Unique identifier for a bank in UUID format.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EOR_modifyBankAccountForAnEorEmployee-v2026-08-19_Response_201'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '403':
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '404':
+          description: Bank account not found.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                description: Any type
+      requestBody:
+        description: Bank account fields to be modified, provided as key-value pairs.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: An object where each property name represents a key of bank account property and its value is the field's value to set.
+              required:
+              - data
+      security:
+      - deelToken: []
+  /eor/contracts/{contract_id}/reject:
+    patch:
+      operationId: eor_rejectEorQuote-v2026-09-10
+      summary: Reject an EOR quote
+      description: 'Rejects the quote of an EOR contract. Rejection is only accepted while the contract is in one of `new`, `under_review`, `waiting_for_client_sign`, `waiting_for_eor_sign`, `waiting_for_employee_contract`, `waiting_for_employee_sign` or `awaiting_deposit_payment`. Rejection is terminal — there is no public endpoint to un-reject a contract, and a contract already in `rejected` cannot be rejected again. The token must hold the `contracts.edit` permission on the contract.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - eor
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the EOR contract.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The quote was rejected successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EOR_rejectEorQuote-v2026-09-10_Response_200'
+        '400':
+          description: The payload is invalid or the contract is not in a status that allows quote rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RejectEorQuote-v2026-09-10RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: The token does not have access to this contract, or the token is not a client token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RejectEorQuote-v2026-09-10RequestForbiddenError'
+        '404':
+          description: No EOR contract matches the provided identifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RejectEorQuote-v2026-09-10RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RejectEorQuote-v2026-09-10RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/EorContractsContractIdRejectPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+components:
+  schemas:
+    EorContractsContractIdRejectPatchRequestBodyContentApplicationJsonSchemaDataReason:
+      type: string
+      enum:
+      - TOO_EXPENSIVE
+      - DECIDED_AGAINST_EMPLOYING_EOR
+      - TEST_QUOTE
+      - NOT_SATISFIED_WITH_DEEL
+      - INACCURATE_INFO_JOB_TITLE
+      - INACCURATE_INFO_JOB_DESCRIPTION
+      - INACCURATE_INFO_JOB_DUTIES_SCOPE_OF_WORK
+      - COMPLIANCE_RESTRICTIONS
+      - OTHER
+      description: The reason for rejecting the quote.
+      title: EorContractsContractIdRejectPatchRequestBodyContentApplicationJsonSchemaDataReason
+    EorWorkersBanksBankIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the bank account.
+        status:
+          $ref: '#/components/schemas/EorWorkersBanksBankIdPatchResponsesContentApplicationJsonSchemaDataStatus'
+          description: Bank Account status
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when bank account was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Date and time when bank account was last updated
+      title: EorWorkersBanksBankIdPatchResponsesContentApplicationJsonSchemaData
+    ? EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsMetadataPossibleOptionsItems
+    : type: string
+      enum:
+      - START_DATE
+      - END_DATE
+      - BENEFITS
+      - PROBATION_PERIOD
+      - VARIABLE_COMPENSATIONS
+      - INCENTIVE_PLAN
+      - SALARY
+      - FIXED_ALLOWANCES
+      - JOB_TITLE
+      - SENIORITY_ID
+      - SENIORITY_DATE
+      - JOB_CODE
+      - JOB_CATEGORY
+      - JOB_SCOPE
+      - EMPLOYMENT_TYPE
+      - PERSONAL_DATA
+      - OTHER
+      title: EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsMetadataPossibleOptionsItems
+    EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+      required:
+      - message
+      title: EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaErrorsItems
+    GetAdditionalInformation-v2026-09-18RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetAdditionalInformation-v2026-09-18RequestBadRequestError
+    RejectEorQuote-v2026-09-10RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdRejectPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RejectEorQuote-v2026-09-10RequestNotFoundError
+    GetEmployeeAgreementDraftPreview-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: A description of the returned error
+      title: GetEmployeeAgreementDraftPreview-v2026-01-01RequestNotFoundError
+    RejectEorQuote-v2026-09-10RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdRejectPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RejectEorQuote-v2026-09-10RequestForbiddenError
+    GetAmendmentDataPointsConfigurationByCountry-v2026-05-06RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetAmendmentDataPointsConfigurationByCountry-v2026-05-06RequestInternalServerError
+    RejectEorQuote-v2026-09-10RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdRejectPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RejectEorQuote-v2026-09-10RequestBadRequestError
+    EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItems'
+          description: List of countries with their amendment data points configuration
+      required:
+      - settings
+      title: EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaData
+    EorWorkersContractsContractIdAdditionalInformationGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: EorWorkersContractsContractIdAdditionalInformationGetParametersXBeta
+    AcknowledgeAssignmentAgreement-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: A description of the returned error
+      title: AcknowledgeAssignmentAgreement-v2026-01-01RequestBadRequestError
+    AcknowledgeAssignmentAgreement-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: A description of the returned error
+      title: AcknowledgeAssignmentAgreement-v2026-01-01RequestNotFoundError
+    GetAdditionalInformation-v2026-09-18RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetAdditionalInformation-v2026-09-18RequestUnauthorizedError
+    EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaErrorsItems
+    GetAdditionalInformation-v2026-09-18RequestTooManyRequestsError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetAdditionalInformation-v2026-09-18RequestTooManyRequestsError
+    EOR_rejectEorQuote-v2026-09-10_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorContractsContractIdRejectPatchResponsesContentApplicationJsonSchemaData'
+      title: EOR_rejectEorQuote-v2026-09-10_Response_200
+    EOR_getAmendmentDataPointsConfigurationByCountry-v2026-05-06_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaData'
+        has_more:
+          type: boolean
+          description: Whether more pages are available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Opaque cursor to pass as the cursor query param to fetch the next page. null when on the last page.
+        total_count:
+          type: integer
+          description: Total number of countries with amendment settings in the database
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: EOR_getAmendmentDataPointsConfigurationByCountry-v2026-05-06_Response_200
+    ? EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsTypesItemsType
+    : type: string
+      enum:
+      - AUTOMATED
+      - INSTANT
+      - LEGAL
+      - NO_AUTOMATION
+      - DISABLED_AMENDMENTS
+      description: Processing type. AUTOMATED means no explicit configuration — processed automatically.
+      title: EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsTypesItemsType
+    EorContractsContractIdRejectPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: EorContractsContractIdRejectPatchResponsesContentApplicationJsonSchemaErrorsItems
+    EorContractsContractIdRejectPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          description: The unique identifier of the EOR contract whose quote was rejected.
+        status:
+          type:
+          - string
+          - 'null'
+          description: The status of the contract after the rejection.
+        rejection_reason:
+          type:
+          - string
+          - 'null'
+          description: The reason recorded for the latest quote rejection.
+      title: EorContractsContractIdRejectPatchResponsesContentApplicationJsonSchemaData
+    EOR_getEmployeeAgreementDraftPreview-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorContractsContractIdEmployeeAgreementDraftPreviewGetResponsesContentApplicationJsonSchemaData'
+      title: EOR_getEmployeeAgreementDraftPreview-v2026-01-01_Response_200
+    EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        dob:
+          type: string
+          description: Date of birth (ISO 8601 date)
+        city:
+          type: string
+          description: City
+        phone:
+          type: string
+          description: Worker phone
+        state:
+          type: string
+          description: State/province
+        street:
+          type: string
+          description: Street
+        zip_code:
+          type: string
+          description: Zipcode/Post code
+        tax_residence:
+          type: string
+          description: Worker tax residence
+        is_payslip_access_allowed:
+          type: boolean
+          description: Worker access to payslips
+        is_compliance_access_allowed:
+          type: boolean
+          description: Worker access to compliance documents
+      description: Only fields with a saved value are included. Keys not listed above are country/state-specific additional information fields, keyed the same way as the fields returned by GET /forms/eor/worker-additional-fields/{country_code} (public keys).
+      title: EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaData
+    GetAdditionalInformation-v2026-09-18RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetAdditionalInformation-v2026-09-18RequestForbiddenError
+    GetAdditionalInformation-v2026-09-18RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetAdditionalInformation-v2026-09-18RequestInternalServerError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    EorContractsContractIdEmployeeAgreementDraftPreviewGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Signed URL to download the draft PDF. Valid for 15 minutes. Present only when is_processing is false.
+        task_id:
+          type: string
+          description: Async task ID. Use this in subsequent requests to poll.
+        is_processing:
+          type: boolean
+          description: True while generation is in progress; false when the url is ready.
+      title: EorContractsContractIdEmployeeAgreementDraftPreviewGetResponsesContentApplicationJsonSchemaData
+    GetAdditionalInformation-v2026-09-18RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetAdditionalInformation-v2026-09-18RequestNotFoundError
+    EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsItem:
+      type: string
+      enum:
+      - SALARY
+      - START_DATE
+      - END_DATE
+      - HOLIDAYS
+      - SCOPE
+      - JOB_TITLE
+      - VARIABLE_COMPENSATIONS
+      - CUSTOM
+      - CURRENCY
+      - TIME_OFF_TYPE
+      - FIXED_ALLOWANCES
+      - PROBATION_PERIOD
+      - SENIORITY_ID
+      - WORK_HOURS_PER_WEEK
+      - EMPLOYMENT_STATE
+      - EMPLOYMENT_TYPE
+      - EMPLOYEE_NATIONALITY
+      - NOTICE_PERIOD_DURING_PROBATION
+      - NOTICE_PERIOD_AFTER_PROBATION
+      - NOTICE_PERIOD_TYPE
+      - WORK_SCHEDULE
+      - SENIORITY_DATE
+      - JOB_CATEGORY
+      - JOB_CODE
+      description: Data point identifier
+      title: EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsItem
+    EOR_getAdditionalInformation-v2026-09-18_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorWorkersContractsContractIdAdditionalInformationGetResponsesContentApplicationJsonSchemaData'
+          description: Only fields with a saved value are included. Keys not listed above are country/state-specific additional information fields, keyed the same way as the fields returned by GET /forms/eor/worker-additional-fields/{country_code} (public keys).
+      required:
+      - data
+      title: EOR_getAdditionalInformation-v2026-09-18_Response_200
+    EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItems:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Database record ID for this country's settings. null when no settings row exists and defaults are returned.
+        country:
+          type: string
+          description: ISO 3166-1 alpha-2 country code
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the country settings row was created. null when no DB row exists.
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the country settings row was last updated. null when no DB row exists.
+        data_points:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItems'
+          description: Amendment data points configured for this country
+      required:
+      - id
+      - country
+      - created_at
+      - updated_at
+      - data_points
+      title: EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItems
+    ? EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsMetadata
+    : type: object
+      properties:
+        possible_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsMetadataPossibleOptionsItems'
+          description: Allowed subject values for a custom amendment item
+      description: Additional configuration for the data point. Present only for CUSTOM.
+      title: EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsMetadata
+    GetAmendmentDataPointsConfigurationByCountry-v2026-05-06RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetAmendmentDataPointsConfigurationByCountry-v2026-05-06RequestForbiddenError
+    EorContractsContractIdRejectPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/EorContractsContractIdRejectPatchRequestBodyContentApplicationJsonSchemaDataReason'
+          description: The reason for rejecting the quote.
+        message:
+          type: string
+          maxLength: 2000
+          description: Optional free-text explanation accompanying the rejection.
+      required:
+      - reason
+      title: EorContractsContractIdRejectPatchRequestBodyContentApplicationJsonSchemaData
+    EorWorkersBanksBankIdPatchResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - NEW
+      - PENDING
+      - APPROVED
+      - FAILED
+      description: Bank Account status
+      title: EorWorkersBanksBankIdPatchResponsesContentApplicationJsonSchemaDataStatus
+    RejectEorQuote-v2026-09-10RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsContractIdRejectPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RejectEorQuote-v2026-09-10RequestInternalServerError
+    GetAmendmentDataPointsConfigurationByCountry-v2026-05-06RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: GetAmendmentDataPointsConfigurationByCountry-v2026-05-06RequestBadRequestError
+    ? EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsTypesItems
+    : type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsTypesItemsType'
+          description: Processing type. AUTOMATED means no explicit configuration — processed automatically.
+        amendment_item:
+          type: string
+          description: Amendment item identifier
+      required:
+      - type
+      - amendment_item
+      title: EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsTypesItems
+    EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItems:
+      type: object
+      properties:
+        item:
+          $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsItem'
+          description: Data point identifier
+        types:
+          type: array
+          items:
+            $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsTypesItems'
+          description: Processing type configuration per amendment item within this data point
+        metadata:
+          $ref: '#/components/schemas/EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItemsMetadata'
+          description: Additional configuration for the data point. Present only for CUSTOM.
+        is_enabled:
+          type: boolean
+          description: Whether at least one amendment item within this data point is enabled
+      required:
+      - item
+      - types
+      - is_enabled
+      title: EorContractsAmendmentsDataPointsConfigurationGetResponsesContentApplicationJsonSchemaDataSettingsItemsDataPointsItems
+    GetEmployeeAgreementDraftPreview-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: A description of the returned error
+      title: GetEmployeeAgreementDraftPreview-v2026-01-01RequestBadRequestError
+    EOR_modifyBankAccountForAnEorEmployee-v2026-08-19_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EorWorkersBanksBankIdPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: EOR_modifyBankAccountForAnEorEmployee-v2026-08-19_Response_201
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

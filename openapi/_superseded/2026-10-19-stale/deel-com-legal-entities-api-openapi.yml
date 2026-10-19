@@ -1,0 +1,113 @@
+openapi: 3.2.0
+info:
+  title: Deel Core Legal Entities API
+  description: 'Core organizational, contract, and people APIs for Deel. Covers organizations,
+
+    legal entities, departments, groups, managers, cost centers, contracts (IC, EOR,
+
+    Global Payroll), invoice adjustments, lookups, magic links, tasks, and custom fields.
+
+
+    Authentication uses bearer Organization or Personal API tokens generated from the
+
+    Deel Developer Center. Production base URL is https://api.letsdeel.com/rest/v2 and
+
+    the sandbox is https://api-sandbox.demo.deel.com/rest/v2.'
+  version: '2026-05-25'
+  contact:
+    name: Deel Developer Support
+    url: https://developer.deel.com/
+  termsOfService: https://www.deel.com/legal/terms-of-service/
+  license:
+    name: Deel Developer Terms
+    url: https://www.deel.com/legal/
+servers:
+- url: https://api.letsdeel.com/rest/v2
+  description: Production
+- url: https://api-sandbox.demo.deel.com/rest/v2
+  description: Sandbox
+security:
+- BearerAuth: []
+tags:
+- name: Legal Entities
+  description: Client legal entities, industries
+paths:
+  /legal-entities:
+    get:
+      operationId: getLegalEntities
+      summary: List Legal Entities
+      description: Returns the client legal entities registered under the organization.
+      tags:
+      - Legal Entities
+      responses:
+        '200':
+          description: Legal entity list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalEntityListResponse'
+    post:
+      operationId: createLegalEntity
+      summary: Create A New Legal Entity
+      tags:
+      - Legal Entities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LegalEntityCreate'
+      responses:
+        '201':
+          description: Legal entity created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalEntity'
+components:
+  schemas:
+    LegalEntity:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        country:
+          type: string
+        registration_number:
+          type: string
+        industry:
+          type: string
+        currency:
+          type: string
+    LegalEntityListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntity'
+    LegalEntityCreate:
+      type: object
+      required:
+      - name
+      - country
+      properties:
+        name:
+          type: string
+        country:
+          type: string
+          description: ISO 3166-1 alpha-2
+        registration_number:
+          type: string
+        industry:
+          type: string
+        currency:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: Deel Organization or Personal API token issued from the Developer Center.

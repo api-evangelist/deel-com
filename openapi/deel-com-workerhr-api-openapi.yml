@@ -1,0 +1,196 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Worker Hr API
+  version: 1.0.0
+  description: API endpoints related to Worker HR.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: workerHr
+  description: API endpoints related to Worker HR.
+paths:
+  /escalations/workers/me/hrx:
+    get:
+      operationId: workerHr_getHrxManagerForWorker-v2026-01-01
+      summary: Get HRX manager for worker
+      description: 'Retrieves the Human Resource Experience (HRX) Manager assigned to the authenticated worker, including contact details and a scheduling URL. Accessible only to workers with the appropriate permissions.
+
+
+        **Token scopes**: `worker:read`'
+      tags:
+      - workerHr
+      responses:
+        '200':
+          description: Successful operation. Returns HRX representative information for the worker based on their country.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Worker_HR_getHrxManagerForWorker-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - user is not authorized to access this resource. Only employees can access HRX information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHrxManagerForWorker-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found - There is no assignment of HRX Manager against this worker
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHrxManagerForWorker-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal server error - unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetHrxManagerForWorker-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    EscalationsWorkersMeHrxGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier (UUID) for the HRX representative
+        name:
+          type: string
+          description: Full name of the HRX representative
+        avatar:
+          type: string
+          description: URL to the HRX representative's avatar/profile picture
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the HRX record was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the HRX record was last updated
+        cal_com_url:
+          type: string
+          description: A link to schedule call with HRX Manager
+      required:
+      - id
+      - name
+      - avatar
+      - created_at
+      - updated_at
+      title: EscalationsWorkersMeHrxGetResponsesContentApplicationJsonSchemaData
+    GetHrxManagerForWorker-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EscalationsWorkersMeHrxGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetHrxManagerForWorker-v2026-01-01RequestNotFoundError
+    EscalationsWorkersMeHrxGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: EscalationsWorkersMeHrxGetResponsesContentApplicationJsonSchemaErrorsItems
+    Worker_HR_getHrxManagerForWorker-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EscalationsWorkersMeHrxGetResponsesContentApplicationJsonSchemaData'
+      title: Worker HR_getHrxManagerForWorker-v2026-01-01_Response_200
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    GetHrxManagerForWorker-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EscalationsWorkersMeHrxGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetHrxManagerForWorker-v2026-01-01RequestInternalServerError
+    GetHrxManagerForWorker-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EscalationsWorkersMeHrxGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetHrxManagerForWorker-v2026-01-01RequestForbiddenError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

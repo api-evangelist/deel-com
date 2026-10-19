@@ -1,0 +1,826 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Tasks API
+  version: 1.0.0
+  description: API endpoints related to Tasks.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: Tasks
+  description: API endpoints related to Tasks.
+paths:
+  /contracts/{contract_id}/tasks:
+    post:
+      operationId: tasks_createContractTask
+      summary: Create a new task
+      description: 'Creates a new task for the contractor associated with the specified contract. A task can include an amount, description, and submission date.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - Tasks
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique Deel contract ID associated with the task.
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: The task was successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasks_createContractTask_Response_201'
+        '400':
+          description: Bad request. Missing required fields or invalid data format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateANewTask-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized. Authentication credentials are missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateANewTask-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error. An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateANewTask-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+    get:
+      operationId: tasks_getContractTasks
+      summary: List of tasks
+      description: 'Retrieves all tasks associated with a specific contract, including each task''s ID, amount, submission date, status, and description.
+
+
+        **Token scopes**: `contracts:read`'
+      tags:
+      - Tasks
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier for the Deel contract.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation. A list of tasks associated with the specified contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasks_getContractTasks_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/tasks/{task_id}:
+    delete:
+      operationId: tasks_deleteContractTask
+      summary: Delete task
+      description: 'Deletes a specific task from a contract. An optional `reason` can be supplied for audit or documentation purposes.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - Tasks
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the Deel contract.
+        required: true
+        schema:
+          type: string
+      - name: task_id
+        in: path
+        description: The unique identifier of the task to be deleted.
+        required: true
+        schema:
+          type: string
+      - name: reason
+        in: query
+        description: The reason for deleting the task. This can be used for auditing purposes.
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The task was successfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasks_deleteContractTask_Response_200'
+        '400':
+          description: Invalid request. For example, missing required parameters or invalid format.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Permission denied. The user does not have the required access to delete the task.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '404':
+          description: The specified task or contract was not found.
+          content:
+            application/json:
+              schema:
+                description: Any type
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/tasks/{task_id}/reviews:
+    post:
+      operationId: tasks_createContractTaskReview
+      summary: Review a single task
+      description: 'Submits an approval or rejection review for a task associated with a contract. If the review status is declined, an optional reason may be included in the request body.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - Tasks
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique Deel contract ID associated with the task.
+        required: true
+        schema:
+          type: string
+      - name: task_id
+        in: path
+        description: The unique ID of the task to be reviewed.
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: The task review was successfully processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasks_createContractTaskReview_Response_201'
+        '400':
+          description: Bad request. Missing required fields or invalid data format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewASingleTask-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized. Authentication credentials are missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewASingleTask-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not found. The specified task or contract was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewASingleTask-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal server error. An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewASingleTask-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/tasks/many/reviews:
+    post:
+      operationId: tasks_reviewMultipleTasks-v2026-01-01
+      summary: Review multiple tasks
+      description: 'Approves or declines multiple submitted tasks associated with a contract in a single request. Each task review must include a status of approved or declined, with an optional reason required when declining.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - Tasks
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique Deel contract ID associated with the tasks.
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: The task reviews were successfully processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tasks_reviewMultipleTasks-v2026-01-01_Response_201'
+        '400':
+          description: Bad request. Missing required fields or invalid data format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewMultipleTasks-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Unauthorized. Authentication credentials are missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewMultipleTasks-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not found. One or more specified tasks or the contract was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewMultipleTasks-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal server error. An unexpected error occurred while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewMultipleTasks-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /tasks/{task_id}:
+    patch:
+      operationId: tasks_updateTaskById-v2026-01-01
+      summary: Update Task By ID
+      description: 'Applies a partial update to the specified task and returns whether the update was successful.
+
+
+        **Token scopes**: `tasks:write`'
+      tags:
+      - Tasks
+      parameters:
+      - name: task_id
+        in: path
+        description: The id of an existing task
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The task was successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tasks_updateTaskById-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateTaskById-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateTaskById-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Task update object containing fields to modify.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/TasksTaskIdPatchRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+components:
+  schemas:
+    ContractsContractIdTasksTaskIdReviewsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+          description: Indicating whether the task review was created
+      required:
+      - created
+      title: ContractsContractIdTasksTaskIdReviewsPostResponsesContentApplicationJsonSchemaData
+    CreateANewTask-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateANewTask-v2026-01-01RequestUnauthorizedError
+    ContractsContractIdTasksTaskIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Indicates whether the task was successfully deleted.
+      required:
+      - deleted
+      title: ContractsContractIdTasksTaskIdDeleteResponsesContentApplicationJsonSchemaData
+    ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      description: The review status of the tasks. Possible values are 'approved' or 'declined'.
+      title: ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus
+    TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        reason:
+          type:
+          - string
+          - 'null'
+          description: Optional reason for declining the task.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus'
+          description: The review status of the task. Possible values are 'approved' or 'declined'.
+      required:
+      - status
+      title: ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaData
+    ReviewMultipleTasks-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewMultipleTasks-v2026-01-01RequestInternalServerError
+    ReviewASingleTask-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewASingleTask-v2026-01-01RequestBadRequestError
+    ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: The current status of the task.
+      title: ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ReviewASingleTask-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewASingleTask-v2026-01-01RequestInternalServerError
+    tasks_getContractTasks_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: tasks_getContractTasks_Response_200
+    ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      description: The review status of the task. Possible values are 'approved' or 'declined'.
+      title: ContractsContractIdTasksTaskIdReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus
+    ReviewASingleTask-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewASingleTask-v2026-01-01RequestNotFoundError
+    ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          description: The unique identifier for the task.
+        amount:
+          type: string
+          description: The monetary amount associated with the task.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          - type: 'null'
+          description: The current status of the task.
+        attachment:
+          $ref: '#/components/schemas/ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsAttachment'
+        description:
+          type: string
+          description: (Required) A brief description of the task.
+        date_submitted:
+          type: string
+          description: (Required) The date when the task was submitted.
+      required:
+      - id
+      - amount
+      - status
+      - description
+      - date_submitted
+      title: ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItems
+    ReviewMultipleTasks-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewMultipleTasks-v2026-01-01RequestBadRequestError
+    ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: The amount to be associated with the task, in the appropriate currency.
+        description:
+          type:
+          - string
+          - 'null'
+          description: A description of the task.
+        date_submitted:
+          $ref: '#/components/schemas/ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaDataDateSubmitted'
+          description: The date the task was submitted, in ISO 8601 format. Also accepts date-time (YYYY-MM-DDTHH:MM:SSZ).
+        is_auto_approved:
+          type: boolean
+          description: If true, the task will be automatically approved as part of the request.
+      required:
+      - amount
+      - description
+      - date_submitted
+      title: ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaData
+    tasks_createContractTaskReview_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdTasksTaskIdReviewsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: tasks_createContractTaskReview_Response_201
+    ReviewMultipleTasks-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewMultipleTasks-v2026-01-01RequestNotFoundError
+    tasks_deleteContractTask_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdTasksTaskIdDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: tasks_deleteContractTask_Response_200
+    ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsAttachment:
+      type: object
+      properties:
+        key:
+          type:
+          - string
+          - 'null'
+          description: (Optional) The key for accessing the attachment.
+        filename:
+          type:
+          - string
+          - 'null'
+          description: (Optional) The name of the file attached to the task.
+      title: ContractsContractIdTasksGetResponsesContentApplicationJsonSchemaDataItemsAttachment
+    ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the created task.
+        status:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaDataStatus'
+          - type: 'null'
+          description: The current status of the task.
+        created:
+          type: boolean
+          description: Indicates whether the task creation operation was successful.
+      title: ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - approved
+      - declined
+      - not_payable
+      - paid
+      - pending
+      - processing
+      description: The current status of the task.
+      title: ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaDataStatus
+    ContractsContractIdTasksManyReviewsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created:
+          type: boolean
+          description: Indicating whether the task review was created
+      required:
+      - created
+      title: ContractsContractIdTasksManyReviewsPostResponsesContentApplicationJsonSchemaData
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    Tasks_reviewMultipleTasks-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdTasksManyReviewsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Tasks_reviewMultipleTasks-v2026-01-01_Response_201
+    CreateANewTask-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateANewTask-v2026-01-01RequestBadRequestError
+    tasks_createContractTask_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdTasksPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: tasks_createContractTask_Response_201
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: An array of task IDs to review. A maximum of 1000 task IDs is allowed per request.
+        reason:
+          type:
+          - string
+          - 'null'
+          description: Optional reason for declining the tasks.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaDataStatus'
+          description: The review status of the tasks. Possible values are 'approved' or 'declined'.
+      required:
+      - ids
+      - status
+      title: ContractsContractIdTasksManyReviewsPostRequestBodyContentApplicationJsonSchemaData
+    TasksTaskIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the task was last updated.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp indicating when the task was last updated.
+      required:
+      - created_at
+      - updated_at
+      title: TasksTaskIdPatchResponsesContentApplicationJsonSchemaData
+    ReviewMultipleTasks-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewMultipleTasks-v2026-01-01RequestUnauthorizedError
+    CreateANewTask-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: CreateANewTask-v2026-01-01RequestInternalServerError
+    Tasks_updateTaskById-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TasksTaskIdPatchResponsesContentApplicationJsonSchemaData'
+      title: Tasks_updateTaskById-v2026-01-01_Response_200
+    ReviewASingleTask-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        error:
+          type: string
+      title: ReviewASingleTask-v2026-01-01RequestUnauthorizedError
+    UpdateTaskById-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateTaskById-v2026-01-01RequestBadRequestError
+    UpdateTaskById-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TasksTaskIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateTaskById-v2026-01-01RequestInternalServerError
+    ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaDataDateSubmitted:
+      oneOf:
+      - type: string
+        format: date
+      - type: string
+        format: date-time
+      description: The date the task was submitted, in ISO 8601 format. Also accepts date-time (YYYY-MM-DDTHH:MM:SSZ).
+      title: ContractsContractIdTasksPostRequestBodyContentApplicationJsonSchemaDataDateSubmitted
+    TasksTaskIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        amount:
+          type:
+          - string
+          - 'null'
+          description: The amount to be associated with the task, in the appropriate currency.
+        description:
+          type:
+          - string
+          - 'null'
+          description: A description of the task.
+        hourly_report_preset_id:
+          type:
+          - string
+          - 'null'
+          description: Public ID of the hourly report preset, if applicable.
+      title: TasksTaskIdPatchRequestBodyContentApplicationJsonSchemaData
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

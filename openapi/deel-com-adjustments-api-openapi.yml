@@ -1,28 +1,430 @@
 openapi: 3.2.0
 info:
-  title: Deel Global Payroll Adjustments API
-  description: 'Global Payroll APIs for direct employees on the client''s own legal entities across
-
-    120+ countries. Covers payroll events/cycles, gross-to-net adjustments (bonuses,
-
-    deductions, one-time payments, expense reimbursements), time-tracking shifts,
-
-    payslips/paystubs, and Global Payroll hiring.'
-  version: '2026-05-25'
-  contact:
-    name: Deel Developer Support
-    url: https://developer.deel.com/api/global-payroll/introduction
+  title: Deel Com Adjustments API
+  version: '1.0'
+  description: 'Operations tagged Adjustments across 2 of this provider''s published API definitions: deel-com-openapi.yml, deel-global-payroll-api-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
 - url: https://api.letsdeel.com/rest/v2
   description: Production
 - url: https://api-sandbox.demo.deel.com/rest/v2
   description: Sandbox
-security:
-- BearerAuth: []
 tags:
 - name: Adjustments
-  description: Gross-to-net payroll adjustments — bonuses, deductions, one-time payments
+  description: API endpoints related to Adjustments.
 paths:
+  /adjustments:
+    post:
+      operationId: adjustments_createContractAdjustment
+      summary: Create a new adjustment
+      description: 'Create a payroll adjustment for a contract to add or correct a payment amount on an upcoming payment cycle. Use this endpoint when you need to programmatically apply one-off adjustments; each adjustment must reference a valid category from `GET /rest/adjustments/categories`, which determines its type and accounting treatment.
+
+
+        **Token scopes**: `adjustments:write`'
+      tags:
+      - Adjustments
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_createContractAdjustment_Response_201'
+        '400':
+          description: Bad Request – failed to create adjustments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateANewAdjustment-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Creation data for a new adjustment
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AdjustmentsPostRequestBodyContentApplicationJsonSchemaData'
+                  description: Details of adjustment to create
+              required:
+              - data
+      security:
+      - deelToken: []
+    servers:
+    - url: https://api.letsdeel.com/rest
+      description: Production
+    - url: https://api-staging.letsdeel.com/rest
+      description: Demo
+    - url: https://api.letsdeel.com/scim/v2
+      description: Production
+    - url: https://api-staging.letsdeel.com/scim/v2
+      description: Demo
+  /adjustments/{id}:
+    delete:
+      operationId: adjustments_deleteContractAdjustment
+      summary: Delete an adjustment
+      description: 'Permanently deletes an adjustment by its id.
+
+
+        **Token scopes**: `adjustments:write`'
+      tags:
+      - Adjustments
+      parameters:
+      - name: id
+        in: path
+        description: Deel adjustment id.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_deleteContractAdjustment_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    get:
+      operationId: adjustments_getContractAdjustment
+      summary: Retrieve an adjustment
+      description: 'Retrieves a single adjustment by its id. Use it to track an adjustment after creation: approval happens inside Deel rather than over the API, so polling `status` is how a caller learns the outcome. Requires the `adjustments:read` scope.
+
+
+        **Token scopes**: `adjustments:read`'
+      tags:
+      - Adjustments
+      parameters:
+      - name: id
+        in: path
+        description: Deel adjustment id.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_getContractAdjustment_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAnAdjustment-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    patch:
+      operationId: adjustments_updateContractAdjustment
+      summary: Update an adjustment
+      description: 'Updates an existing payroll or EOR adjustment identified by its id. Use it when an adjustment that has already been created needs correcting, such as a wrong amount, date, category or receipt, so the record keeps its id instead of being deleted with `DELETE /rest/adjustments/{id}` and recreated. Applies a partial update: only fields included in the request body are modified, and omitted fields keep their current values. Requires the `adjustments:write` scope.
+
+
+        **Token scopes**: `adjustments:write`'
+      tags:
+      - Adjustments
+      parameters:
+      - name: id
+        in: path
+        description: Deel adjustment id.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_updateContractAdjustment_Response_200'
+        '400':
+          description: Bad Request – failed to update adjustment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAdjustment-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        description: Adjustment object that needs to be updated
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaData'
+                  description: Details of adjustment to update
+              required:
+              - data
+      security:
+      - deelToken: []
+    servers:
+    - url: https://api.letsdeel.com/rest
+      description: Production
+    - url: https://api-staging.letsdeel.com/rest
+      description: Demo
+    - url: https://api.letsdeel.com/scim/v2
+      description: Production
+    - url: https://api-staging.letsdeel.com/scim/v2
+      description: Demo
+  /contracts/{contract_id}/adjustments:
+    get:
+      operationId: adjustments_getContractAdjustments
+      summary: Retrieve adjustments
+      description: 'Retrieves all adjustments associated with a specific contract, optionally scoped to a date range.
+
+
+        **Token scopes**: `adjustments:read`'
+      tags:
+      - Adjustments
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel adjustment id.
+        required: true
+        schema:
+          type: string
+      - name: from
+        in: query
+        description: Filter adjustments by start date.
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        description: Filter adjustments by end date.
+        required: false
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_getContractAdjustments_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAdjustments-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    servers:
+    - url: https://api.letsdeel.com/rest
+      description: Production
+    - url: https://api-staging.letsdeel.com/rest
+      description: Demo
+    - url: https://api.letsdeel.com/scim/v2
+      description: Production
+    - url: https://api-staging.letsdeel.com/scim/v2
+      description: Demo
+  /adjustments/categories:
+    get:
+      operationId: adjustments_getAdjustmentCategories
+      summary: Retrieve categories
+      description: 'Returns the available adjustment categories, optionally filtered by contract type. Category IDs returned here are required when creating adjustments and define the type and accounting treatment applied.
+
+
+        **Token scopes**: `adjustments:read`'
+      tags:
+      - Adjustments
+      parameters:
+      - name: contract_types
+        in: query
+        description: array of contract types to filter categories
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdjustmentsCategoriesGetParametersContractTypesSchemaItems'
+          default:
+          - eor
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjustments_getAdjustmentCategories_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    servers:
+    - url: https://api.letsdeel.com/rest
+      description: Production
+    - url: https://api-staging.letsdeel.com/rest
+      description: Demo
+    - url: https://api.letsdeel.com/scim/v2
+      description: Production
+    - url: https://api-staging.letsdeel.com/scim/v2
+      description: Demo
   /gp/adjustments:
     get:
       operationId: getAdjustments
@@ -50,6 +452,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/PayrollAdjustment'
+      security:
+      - BearerAuth: []
     post:
       operationId: createAdjustment
       summary: Create Payroll Adjustment
@@ -71,8 +475,641 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PayrollAdjustment'
+      security:
+      - BearerAuth: []
+    servers:
+    - url: https://api.letsdeel.com/rest/v2
+      description: Production
+    - url: https://api-sandbox.demo.deel.com/rest/v2
+      description: Sandbox
 components:
   schemas:
+    AdjustmentsCategoriesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of an adjustment category.
+        name:
+          type: string
+          description: The name of the adjustment category.
+        label:
+          type: string
+          description: The label of the adjustment category.
+        unit_type:
+          type: string
+          description: The unit type of the adjustment category.
+      title: AdjustmentsCategoriesGetResponsesContentApplicationJsonSchemaDataItems
+    adjustments_getAdjustmentCategories_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdjustmentsCategoriesGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: adjustments_getAdjustmentCategories_Response_200
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        fileType:
+          type: string
+          description: The type of the file
+      description: Adjustment attachment
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataFile
+    RetrieveAdjustments-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveAdjustments-v2026-01-01RequestBadRequestError
+    AdjustmentsPostRequestBodyContentApplicationJsonSchemaDataAmount:
+      oneOf:
+      - type: string
+        minLength: 1
+      - type: number
+        format: double
+        minimum: 1
+      description: Amount of adjustment.
+      title: AdjustmentsPostRequestBodyContentApplicationJsonSchemaDataAmount
+    adjustments_deleteContractAdjustment_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: adjustments_deleteContractAdjustment_Response_200
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the adjustment
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile'
+          - type: 'null'
+          description: Info for the attachment of adjustment
+        title:
+          type: string
+          description: The title of the adjustment
+        amount:
+          type: string
+          description: The amount of the adjustment
+        status:
+          $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Adjustment status
+        odp_only:
+          type: boolean
+          description: Whether the adjustment is restricted to on-demand payroll and never attached to a regular payroll cycle. Always false for contract types other than EOR
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was last updated
+        contract_id:
+          type: string
+          description: The identifier of the contract associated with the adjustment
+        description:
+          type: string
+          description: The description of the adjustment
+        cycle_reference:
+          type:
+          - string
+          - 'null'
+          description: The reference to the cycle associated with the adjustment
+        move_next_cycle:
+          type: boolean
+          description: If an adjustments can belong to another payroll cycle
+        date_of_adjustment:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date of the adjustment
+        actual_end_cycle_date:
+          type: string
+          description: The date of the actual end cycle date
+        adjustment_category_id:
+          type: string
+          description: The identifier of the adjustment category associated with the adjustment
+        actual_start_cycle_date:
+          type: string
+          description: The date of the actual start cycle date
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems
+    CreateANewAdjustment-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateANewAdjustment-v2026-01-01RequestBadRequestError
+    adjustments_createContractAdjustment_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: adjustments_createContractAdjustment_Response_201
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1:
+      type: string
+      enum:
+      - DRAFT
+      - PENDING
+      - ERRORS_FOUND
+      - APPROVED
+      - DENIED
+      - DISBURSE_SCHEDULED
+      - REIMBURSED
+      - UNDER_REVIEW
+      - PENDING_DEEL_REVIEW
+      description: Adjustment status (when contract type is EOR)
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1
+    AdjustmentsCategoriesGetParametersContractTypesSchemaItems:
+      type: string
+      enum:
+      - peo
+      - global_payroll
+      - hris_direct_employee
+      - eor
+      - employee
+      - independent_contractor
+      title: AdjustmentsCategoriesGetParametersContractTypesSchemaItems
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - open
+      - pending_approval
+      - overwritten
+      - failed
+      - success
+      - DRAFT
+      - PENDING
+      - APPROVED
+      - DENIED
+      - DISBURSE_SCHEDULED
+      - REIMBURSED
+      - UNDER_REVIEW
+      - ERRORS_FOUND
+      - PENDING_DEEL_REVIEW
+      - AI_CHECK_IN_PROGRESS
+      description: Adjustment status
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus
+    adjustments_getContractAdjustment_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AdjustmentsIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: adjustments_getContractAdjustment_Response_200
+    AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaData:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          minLength: 1
+          description: 'File of adjustment. Accepted file types: JPEG, PNG, HEIC, WebP, GIF, BMP, TIFF, HEIF images and PDF documents.'
+        title:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: Title of adjustment.
+        amount:
+          $ref: '#/components/schemas/AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount'
+          description: Amount of adjustment.
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country code.
+        odp_only:
+          type: boolean
+          description: 'EOR contracts only. Restrict the adjustment to on-demand payroll: when true it is never attached to a regular payroll cycle, and it is automatically denied if it is still not part of an on-demand payroll 30 days after creation. Sending it for any other contract type is rejected, because on-demand payroll does not exist there. Editable only through this API, and it forces move_next_cycle to false.'
+        description:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: Description of adjustment.
+        vendor_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Vendor name of adjustment.
+        date_of_adjustment:
+          type: string
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        adjustment_category_id:
+          type: string
+          minLength: 25
+          description: Adjustment category id.
+      description: Details of adjustment to update
+      title: AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaData
+    AdjustmentsIdPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message describing the validation or update failure
+      title: AdjustmentsIdPatchResponsesContentApplicationJsonSchemaErrorsItems
+    adjustments_getContractAdjustments_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItems'
+      required:
+      - data
+      title: adjustments_getContractAdjustments_Response_200
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus:
+      oneOf:
+      - $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0'
+      - $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus1'
+      description: The status of the adjustments
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - open
+      - pending_approval
+      - overwritten
+      - failed
+      - success
+      - DRAFT
+      - PENDING
+      - APPROVED
+      - DENIED
+      - DISBURSE_SCHEDULED
+      - REIMBURSED
+      - UNDER_REVIEW
+      - ERRORS_FOUND
+      - PENDING_DEEL_REVIEW
+      - AI_CHECK_IN_PROGRESS
+      description: Adjustment status
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0:
+      type: string
+      enum:
+      - OPEN
+      - PENDING_APPROVAL
+      - OVERWRITTEN
+      - FAILED
+      - SUCCESS
+      - AI_CHECK_IN_PROGRESS
+      description: Adjustment status (when contract type is GP)
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus0
+    RetrieveAnAdjustment-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveAnAdjustment-v2026-01-01RequestBadRequestError
+    AdjustmentsIdPatchResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        updated:
+          type: boolean
+          description: Confirms the update was successful.
+      required:
+      - updated
+      title: AdjustmentsIdPatchResponsesContentApplicationJsonSchemaData
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        fileType:
+          type: string
+          description: The type of the file
+      description: Info about the attachment of adjustment
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataFile
+    AdjustmentsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the adjustment
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataFile'
+          - type: 'null'
+          description: Adjustment attachment
+        title:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: The title of the adjustment
+        amount:
+          type: string
+          description: The amount of the adjustment
+        status:
+          $ref: '#/components/schemas/AdjustmentsPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: The status of the adjustments
+        odp_only:
+          type: boolean
+          description: Whether the adjustment is restricted to on-demand payroll and never attached to a regular payroll cycle. Always false for contract types other than EOR
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was last updated
+        contract_id:
+          type: string
+          description: The identifier of the contract associated with the adjustment
+        description:
+          type: string
+          description: The description of the adjustment
+        cycle_reference:
+          type:
+          - string
+          - 'null'
+          description: The reference to the cycle associated with the adjustment
+        move_next_cycle:
+          type: boolean
+          description: If an adjustments can belong to another payroll cycle
+        date_of_adjustment:
+          type: string
+          format: date-time
+          description: The date of the adjustment
+        actual_end_cycle_date:
+          type: string
+          description: The date of the actual end cycle date
+        adjustment_category_id:
+          type: string
+          description: The identifier of the adjustment category associated with the adjustment
+        actual_start_cycle_date:
+          type: string
+          description: The date of the actual start cycle date
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaData
+    AdjustmentsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: Title of adjustment.
+        amount:
+          $ref: '#/components/schemas/AdjustmentsPostRequestBodyContentApplicationJsonSchemaDataAmount'
+          description: Amount of adjustment.
+        vendor:
+          type: string
+          minLength: 3
+          description: 'Vendor of adjustment. Conditionally required: for adjustment categories configured to require a vendor, which is typically an expense category, and for Global Payroll contracts whenever the organization has the compliance check enabled, which applies to any category. Leave the field out entirely when it does not apply - sending it empty is rejected, because the length constraint still applies to a value that is present.'
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: 'Country the expense was incurred in, which is not necessarily the contract country. Conditionally required: for adjustment categories configured to require a country, which is typically an expense category, and for Global Payroll contracts whenever the organization has the compliance check enabled, which applies to any category. Leave the field out entirely when it does not apply - sending it empty is rejected, because the pattern still applies to a value that is present.'
+        odp_only:
+          type: boolean
+          description: 'EOR contracts only. Restrict the adjustment to on-demand payroll: when true it is never attached to a regular payroll cycle, and it is automatically denied if it is still not part of an on-demand payroll 30 days after creation. Sending it for any other contract type is rejected, because on-demand payroll does not exist there. Editable only through this API, and it forces move_next_cycle to false.'
+        contract_id:
+          type: string
+          minLength: 5
+          description: The identifier of the contract associated with the adjustment
+        description:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: Description of adjustment.
+        cycle_reference:
+          type: string
+          description: Cycle reference of adjustment.
+        move_next_cycle:
+          type:
+          - boolean
+          - 'null'
+          description: If an adjustments can belong to another payroll cycle.
+        date_of_adjustment:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        submitter_profile_id:
+          type:
+          - integer
+          - 'null'
+          minimum: 1
+          description: The identifier of the profile that submits the adjustment. Must be a profile authorized on the target contract. When omitted, the adjustment is attributed to the profile resolved from the API token.
+        adjustment_category_id:
+          type: string
+          minLength: 25
+          description: Adjustment category id.
+      required:
+      - title
+      - amount
+      - contract_id
+      - description
+      - adjustment_category_id
+      description: Details of adjustment to create
+      title: AdjustmentsPostRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+        name:
+          type: string
+          description: The name of the file
+        fileType:
+          type: string
+          description: The type of the file
+      description: Info for the attachment of adjustment
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaDataItemsFile
+    UpdateAdjustment-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdjustmentsIdPatchResponsesContentApplicationJsonSchemaErrorsItems'
+      title: UpdateAdjustment-v2026-01-01RequestBadRequestError
+    ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: You must have access to the contract sent
+      title: ContractsContractIdAdjustmentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+      title: AdjustmentsPostResponsesContentApplicationJsonSchemaErrorsItems
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        message:
+          type: string
+          description: You must have access to the contract sent
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms the deletion.
+      required:
+      - deleted
+      title: AdjustmentsIdDeleteResponsesContentApplicationJsonSchemaData
+    AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: Amount of adjustment.
+      title: AdjustmentsIdPatchRequestBodyContentMultipartFormDataSchemaDataAmount
+    AdjustmentsIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the adjustment
+        file:
+          oneOf:
+          - $ref: '#/components/schemas/AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataFile'
+          - type: 'null'
+          description: Info about the attachment of adjustment
+        title:
+          type: string
+          description: The title of the adjustment
+        amount:
+          type: string
+          description: The amount of the adjustment
+        status:
+          $ref: '#/components/schemas/AdjustmentsIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Adjustment status
+        odp_only:
+          type: boolean
+          description: Whether the adjustment is restricted to on-demand payroll and never attached to a regular payroll cycle. Always false for contract types other than EOR
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was created
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the adjustment was last updated
+        contract_id:
+          type: string
+          description: The identifier of the contract associated with the adjustment
+        description:
+          type: string
+          description: The description of the adjustment
+        cycle_reference:
+          type:
+          - string
+          - 'null'
+          description: The reference to the cycle associated with the adjustment
+        move_next_cycle:
+          type: boolean
+          description: If an adjustments can belong to another payroll cycle
+        date_of_adjustment:
+          type: string
+          format: date-time
+          description: The date of the adjustment
+        actual_end_cycle_date:
+          type: string
+          description: The date of the actual end cycle date
+        adjustment_category_id:
+          type: string
+          description: The identifier of the adjustment category associated with the adjustment
+        actual_start_cycle_date:
+          type: string
+          description: The date of the actual start cycle date
+      title: AdjustmentsIdGetResponsesContentApplicationJsonSchemaData
+    adjustments_updateContractAdjustment_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AdjustmentsIdPatchResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: adjustments_updateContractAdjustment_Response_200
     PayrollAdjustmentCreate:
       type: object
       required:
@@ -149,7 +1186,18 @@ components:
         type: string
         format: uuid
   securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: opaque
+x-refined-from:
+- deel-com-openapi.yml
+- deel-global-payroll-api-openapi.yml

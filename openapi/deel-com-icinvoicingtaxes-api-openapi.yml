@@ -1,0 +1,566 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ic Invoicing Taxes API
+  version: 1.0.0
+  description: API endpoints related to IC invoicing taxes.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: icInvoicingTaxes
+  description: API endpoints related to IC invoicing taxes.
+paths:
+  /contracts/{contract_id}/ic-invoicing-taxes:
+    post:
+      operationId: icInvoicingTaxes_createIcInvoicingTax-v2026-01-01
+      summary: Create IC invoicing tax
+      description: 'Creates an invoicing tax entry for an independent contractor contract.
+
+
+        **Token scopes**: `invoice-adjustments:write`'
+      tags:
+      - icInvoicingTaxes
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel Contract ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: IC tax successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IC_invoicing_taxes_createIcInvoicingTax-v2026-01-01_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIcInvoicingTax-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIcInvoicingTax-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+    get:
+      operationId: icInvoicingTaxes_getIcInvoicingTaxes-v2026-01-01
+      summary: Get IC invoicing taxes
+      description: 'Retrieves the VAT and withholding tax settings configured for an independent contractor contract.
+
+
+        **Token scopes**: `invoice-adjustments:read`'
+      tags:
+      - icInvoicingTaxes
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel Contract ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: IC invoicing taxes response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IC_invoicing_taxes_getIcInvoicingTaxes-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIcInvoicingTaxes-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIcInvoicingTaxes-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+    patch:
+      operationId: icInvoicingTaxes_updateIcInvoicingTax-v2026-01-01
+      summary: Update IC invoicing tax
+      description: 'Applies a partial update to the invoicing tax for an independent contractor contract; accepts `tax_type` (WITHHOLDING_TAX or VAT) and `percentage` to modify how taxes are calculated on future invoices.
+
+
+        **Token scopes**: `invoice-adjustments:write`'
+      tags:
+      - icInvoicingTaxes
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel Contract ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: IC tax successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad Request - The request payload failed validation or violated a business rule for the IC invoicing tax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateIcInvoicingTax-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found - The specified contract does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateIcInvoicingTax-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The IC invoicing tax could not be updated due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateIcInvoicingTax-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesPatchRequestBodyContentApplicationJsonSchemaData'
+                  description: IC invoicing tax fields to update on the contract.
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/ic-invoicing-taxes/{tax_type}:
+    delete:
+      operationId: icInvoicingTaxes_deleteIcInvoicingTax-v2026-01-01
+      summary: Delete IC invoicing tax
+      description: 'Permanently removes the specified `tax_type` from the contract''s invoicing tax configuration; this action is irreversible and takes effect on future invoices.
+
+
+        **Token scopes**: `invoice-adjustments:write`'
+      tags:
+      - icInvoicingTaxes
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel Contract ID
+        required: true
+        schema:
+          type: string
+      - name: tax_type
+        in: path
+        description: IC tax type
+        required: true
+        schema:
+          $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesTaxTypeDeleteParametersTaxType'
+      responses:
+        '204':
+          description: IC tax successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad Request - The request payload failed validation or violated a business rule for the IC invoicing tax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteIcInvoicingTax-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found - The specified contract does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteIcInvoicingTax-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The IC invoicing tax could not be deleted due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteIcInvoicingTax-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    CreateIcInvoicingTax-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateIcInvoicingTax-v2026-01-01RequestInternalServerError
+    ContractsContractIdIcInvoicingTaxesPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ContractsContractIdIcInvoicingTaxesPostResponsesContentApplicationJsonSchemaErrorsItems
+    IC_invoicing_taxes_createIcInvoicingTax-v2026-01-01_Response_201:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: IC invoicing taxes_createIcInvoicingTax-v2026-01-01_Response_201
+    ContractsContractIdIcInvoicingTaxesPatchResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: ContractsContractIdIcInvoicingTaxesPatchResponsesContentApplicationJsonSchemaErrorsItems
+    GetIcInvoicingTaxes-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetIcInvoicingTaxes-v2026-01-01RequestInternalServerError
+    UpdateIcInvoicingTax-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the IC invoicing tax cannot be updated.
+      required:
+      - errors
+      title: UpdateIcInvoicingTax-v2026-01-01RequestInternalServerError
+    DeleteIcInvoicingTax-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesTaxTypeDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation or business rule errors describing why the IC invoicing tax could not be deleted, such as an unsupported contract type, a missing active payment cycle, or the tax not currently existing on the contract.
+      required:
+      - errors
+      title: DeleteIcInvoicingTax-v2026-01-01RequestBadRequestError
+    ContractsContractIdIcInvoicingTaxesPatchRequestBodyContentApplicationJsonSchemaDataTaxType:
+      type: string
+      enum:
+      - WITHHOLDING_TAX
+      - VAT
+      description: Type of IC invoicing tax.
+      title: ContractsContractIdIcInvoicingTaxesPatchRequestBodyContentApplicationJsonSchemaDataTaxType
+    ContractsContractIdIcInvoicingTaxesPostRequestBodyContentApplicationJsonSchemaDataTaxType:
+      type: string
+      enum:
+      - WITHHOLDING_TAX
+      - VAT
+      description: Type of IC invoicing tax.
+      title: ContractsContractIdIcInvoicingTaxesPostRequestBodyContentApplicationJsonSchemaDataTaxType
+    DeleteIcInvoicingTax-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesTaxTypeDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the IC invoicing tax cannot be deleted.
+      required:
+      - errors
+      title: DeleteIcInvoicingTax-v2026-01-01RequestInternalServerError
+    UpdateIcInvoicingTax-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation or business rule errors describing why the IC invoicing tax could not be updated, such as an unsupported contract type, a missing active payment cycle, or the tax not currently existing on the contract.
+      required:
+      - errors
+      title: UpdateIcInvoicingTax-v2026-01-01RequestBadRequestError
+    ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaDataWithholdingTax:
+      type: object
+      properties:
+        percentage:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Withholding tax percentage
+      description: Withholding tax details (if applicable)
+      title: ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaDataWithholdingTax
+    ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsContractIdIcInvoicingTaxesPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        tax_type:
+          $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesPatchRequestBodyContentApplicationJsonSchemaDataTaxType'
+          description: Type of IC invoicing tax.
+        percentage:
+          type: number
+          format: double
+          description: Tax percentage amount.
+      required:
+      - tax_type
+      - percentage
+      description: IC invoicing tax fields to update on the contract.
+      title: ContractsContractIdIcInvoicingTaxesPatchRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdIcInvoicingTaxesTaxTypeDeleteParametersTaxType:
+      type: string
+      enum:
+      - WITHHOLDING_TAX
+      - VAT
+      title: ContractsContractIdIcInvoicingTaxesTaxTypeDeleteParametersTaxType
+    ContractsContractIdIcInvoicingTaxesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        tax_type:
+          $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesPostRequestBodyContentApplicationJsonSchemaDataTaxType'
+          description: Type of IC invoicing tax.
+        percentage:
+          type: number
+          format: double
+          description: Tax percentage amount.
+      required:
+      - tax_type
+      - percentage
+      title: ContractsContractIdIcInvoicingTaxesPostRequestBodyContentApplicationJsonSchemaData
+    CreateIcInvoicingTax-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateIcInvoicingTax-v2026-01-01RequestBadRequestError
+    ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaDataVat:
+      type: object
+      properties:
+        percentage:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: VAT percentage
+      description: VAT tax details (if applicable)
+      title: ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaDataVat
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdIcInvoicingTaxesTaxTypeDeleteResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: ContractsContractIdIcInvoicingTaxesTaxTypeDeleteResponsesContentApplicationJsonSchemaErrorsItems
+    UpdateIcInvoicingTax-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesPatchResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the contract could not be found.
+      required:
+      - errors
+      title: UpdateIcInvoicingTax-v2026-01-01RequestNotFoundError
+    IC_invoicing_taxes_getIcInvoicingTaxes-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaData'
+      title: IC invoicing taxes_getIcInvoicingTaxes-v2026-01-01_Response_200
+    GetIcInvoicingTaxes-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetIcInvoicingTaxes-v2026-01-01RequestBadRequestError
+    DeleteIcInvoicingTax-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesTaxTypeDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the contract could not be found.
+      required:
+      - errors
+      title: DeleteIcInvoicingTax-v2026-01-01RequestNotFoundError
+    ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Deel contract ID
+        vat:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaDataVat'
+          - type: 'null'
+          description: VAT tax details (if applicable)
+        withholding_tax:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaDataWithholdingTax'
+          - type: 'null'
+          description: Withholding tax details (if applicable)
+      required:
+      - id
+      title: ContractsContractIdIcInvoicingTaxesGetResponsesContentApplicationJsonSchemaData
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

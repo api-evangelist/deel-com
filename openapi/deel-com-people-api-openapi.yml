@@ -1,260 +1,2819 @@
 openapi: 3.2.0
 info:
-  title: Deel HRIS People API
-  description: 'Unified HR Information System API across all worker types (IC, EOR, employee).
-
-    Surfaces include people directory, working locations, time off (policies, requests,
-
-    entitlements, events, work schedules), positions, employment information, departments,
-
-    manager hierarchy, custom HR fields, and SCIM 2.0 user provisioning for Okta, Azure AD,
-
-    and other identity providers.'
-  version: '2026-05-25'
-  contact:
-    name: Deel Developer Support
-    url: https://developer.deel.com/api/hris/introduction
+  title: Endpoints People API
+  version: 1.0.0
+  description: API endpoints related to People.
 servers:
-- url: https://api.letsdeel.com/rest/v2
+- url: https://api.letsdeel.com/rest
   description: Production
-- url: https://api-sandbox.demo.deel.com/rest/v2
-  description: Sandbox
-security:
-- BearerAuth: []
-- ScimBearerAuth: []
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
 tags:
 - name: People
-  description: Unified directory across IC, EOR, and direct employees
+  description: API endpoints related to People.
 paths:
   /people:
-    get:
-      operationId: getPeople
-      summary: List Of People
-      description: Returns a paginated unified directory across all worker types.
-      tags:
-      - People
-      parameters:
-      - name: after_cursor
-        in: query
-        schema:
-          type: string
-      - name: limit
-        in: query
-        schema:
-          type: integer
-          default: 20
-          maximum: 100
-      - name: hiring_type
-        in: query
-        schema:
-          type: string
-          enum:
-          - contractor
-          - eor
-          - direct_employee
-          - global_payroll
-      - name: employment_status
-        in: query
-        schema:
-          type: string
-          enum:
-          - active
-          - terminated
-          - onboarding
-          - offboarded
-      - name: country
-        in: query
-        schema:
-          type: string
-      responses:
-        '200':
-          description: People list
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Person'
     post:
-      operationId: createPersonWithoutContract
-      summary: Create A Person Without A Contract
-      description: Create a person record (for example a future hire) before any contract exists.
+      operationId: people_createADirectEmployee-v2026-01-01
+      summary: Create a direct employee
+      description: 'Creates a direct employee record in Deel''s HRIS, hired under the organization''s own legal entity. Provisions both a person and an associated employment contract. Applicable when onboarding employees managed through your own payroll providers. It can support downstream integrations, such as IT equipment orders.
+
+
+        **Token scopes**: `people:write`'
       tags:
       - People
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PersonCreate'
       responses:
         '201':
-          description: Person created
+          description: Successful operation.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
-  /people/{person_id}:
-    get:
-      operationId: getPersonById
-      summary: Retrieve A Single Person
-      tags:
-      - People
-      parameters:
-      - name: person_id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Person
+                $ref: '#/components/schemas/People_createADirectEmployee-v2026-01-01_Response_201'
+        '400':
+          description: Operation failed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
-  /people/{person_id}/working-location:
-    patch:
-      operationId: updateWorkingLocation
-      summary: Update Working Location
-      tags:
-      - People
-      parameters:
-      - name: person_id
-        in: path
-        required: true
-        schema:
-          type: string
+                $ref: '#/components/schemas/CreateADirectEmployee-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateADirectEmployee-v2026-01-01RequestInternalServerError'
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WorkingLocationUpdate'
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: people_getPeople
+      summary: List of People
+      description: 'Returns a paginated list of people records in the organization. Supports filtering by search term, teams, custom fields, and other query parameters. Build people directories, sync HR data, or power search interfaces across your workforce records.
+
+
+        **Token scopes**: `people:read`
+
+
+        **Deprecated**: a newer version of this endpoint is available. This version is scheduled for removal on 2027-09-30.
+
+
+        **Beta version available**: version `2026-09-30` of this endpoint is in beta. Send `X-Beta: true` to call it.'
+      tags:
+      - People
+      parameters:
+      - name: offset
+        in: query
+        description: Return a page of results with given number of records.
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 999999999
+          default: 0
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      - name: search
+        in: query
+        description: Include a contract if by name or contractor name contains given search term.
+        required: false
+        schema:
+          type: string
+      - name: teams
+        in: query
+        description: Filter the results based on the team(group) the users contract is associated with
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: fields
+        in: query
+        description: Pick the fields you want to see in the response in order to avoid a bloated people list output. Supports dot notation (e.g., 'employments[0].contract_status') to access nested fields.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleGetParametersFieldsSchemaItems'
+      - name: sort_by
+        in: query
+        description: Sort people by given field name.
+        required: false
+        schema:
+          $ref: '#/components/schemas/PeopleGetParametersSortBy'
+      - name: sort_order
+        in: query
+        description: Order direction of results; ascending or descending.
+        required: false
+        schema:
+          $ref: '#/components/schemas/PeopleGetParametersSortOrder'
+      - name: hiring_statuses
+        in: query
+        description: Employee's current hiring status.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleGetParametersHiringStatusesSchemaItems'
+      - name: band_placements
+        in: query
+        description: Employee's current band placement.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleGetParametersBandPlacementsSchemaItems'
+      - name: comparative_ratios_from
+        in: query
+        description: Employee's minimum band placement
+        required: false
+        schema:
+          type: string
+          title: float
+      - name: comparative_ratios_to
+        in: query
+        description: Employee's maximum band placement
+        required: false
+        schema:
+          type: string
+          title: float
+      - name: hiring_types
+        in: query
+        description: Filter people by hiring types
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleGetParametersHiringTypesSchemaItems'
+      - name: person_statuses
+        in: query
+        description: Filter people by person (worker profile) lifecycle status.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleGetParametersPersonStatusesSchemaItems'
       responses:
         '200':
-          description: Location updated
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/people_getPeople_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfPeople-v2026-01-01RequestInternalServerError'
+      deprecated: true
+      security:
+      - deelToken: []
+  /pwac:
+    post:
+      operationId: people_createPersonWithoutContract
+      summary: Create a person without a contract
+      description: 'Adds a person record in Deel''s HRIS without an associated employment contract. It creates a people-only record, allowing you to track individuals in your organization''s directory before or without formalizing an employment or agreement. Suitable for pre-boarding, contingent workers, or other scenarios where a contract is not yet applicable.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - People
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/people_createPersonWithoutContract_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAPersonWithoutAContract-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAPersonWithoutAContract-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/PwacPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /people/me:
+    get:
+      operationId: people_getMyCurrentPersonalProfile-v2026-01-01
+      summary: Get my current personal profile
+      description: 'Returns the profile of the currently authenticated user, including identity, organizational membership, and integration identifiers for connected services such as Slack.
+
+
+        **Token scopes**: `worker:read`, `people:read`'
+      tags:
+      - People
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/People_getMyCurrentPersonalProfile-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Unauthorized. Missing or invalid authentication credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMyCurrentPersonalProfile-v2026-01-01RequestUnauthorizedError'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /people/{hris_profile_id}:
+    get:
+      operationId: people_getPersonById
+      summary: Retrieve a single person
+      description: 'Returns detailed information about a single person in the organization by their public ID. Returns personal details, employment information, organizational structure, person status, direct manager, custom fields, and related data.
+
+
+        **Token scopes**: `people:read`
+
+
+        **Deprecated**: a newer version of this endpoint is available. This version is scheduled for removal on 2027-10-12.
+
+
+        **Beta version available**: version `2026-10-12` of this endpoint is in beta. Send `X-Beta: true` to call it.'
+      tags:
+      - People
+      parameters:
+      - name: hris_profile_id
+        in: path
+        description: Unique identifier for the person.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: include_custom_fields
+        in: query
+        description: Include custom fields in the response.
+        required: false
+        schema:
+          type: boolean
+      - name: include_worker_relations
+        in: query
+        description: Include worker relations in the response.
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/people_getPersonById_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveASinglePerson-v2026-01-01RequestInternalServerError'
+      deprecated: true
+      security:
+      - deelToken: []
+  /people/{id}/working-location:
+    put:
+      operationId: people_updatePersonWorkingLocation
+      summary: Update working location
+      description: 'Sets the working location for a worker identified by their HRIS profile ID.
+
+
+        **Token scopes**: `people:write`'
+      tags:
+      - People
+      parameters:
+      - name: id
+        in: path
+        description: Hris profile ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/people_updatePersonWorkingLocation_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/PeopleIdWorkingLocationPutRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
 components:
   schemas:
-    WorkingLocationUpdate:
-      type: object
-      required:
-      - country
-      properties:
-        country:
-          type: string
-        state:
-          type: string
-        city:
-          type: string
-        address:
-          type: string
-        timezone:
-          type: string
-        effective_date:
-          type: string
-          format: date
-    WorkingLocation:
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsHrisDirectEmployeeInvitation:
       type: object
       properties:
-        country:
+        oid:
           type: string
-        state:
-          type: string
-        city:
-          type: string
-        address:
-          type: string
+          description: Unique identifier of this resource.
+        status:
+          type:
+          - string
+          - 'null'
+          description: The HRIS direct employee invitation status.
+        send_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The HRIS direct employee invitation send date.
         timezone:
-          type: string
-    Person:
+          type:
+          - string
+          - 'null'
+          description: The HRIS direct employee invitation timezone.
+      description: The HRIS direct employee invitation status.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsHrisDirectEmployeeInvitation
+    PeoplePostResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
         id:
           type: string
-        first_name:
+          format: uuid
+          description: The unique identifier of the created employee record
+        employee:
+          $ref: '#/components/schemas/PeoplePostResponsesContentApplicationJsonSchemaDataEmployee'
+          description: The person that is being hired
+        employment:
+          $ref: '#/components/schemas/PeoplePostResponsesContentApplicationJsonSchemaDataEmployment'
+          description: The employment details of the employee
+        compensation_details:
+          $ref: '#/components/schemas/PeoplePostResponsesContentApplicationJsonSchemaDataCompensationDetails'
+          description: The compensation details of the employee
+      required:
+      - id
+      - employee
+      - employment
+      - compensation_details
+      title: PeoplePostResponsesContentApplicationJsonSchemaData
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployment:
+      oneOf:
+      - $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployment0'
+      - $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployment1'
+      description: The employment details of the employee
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployment
+    CreateADirectEmployee-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/PeoplePostResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: CreateADirectEmployee-v2026-01-01RequestInternalServerError
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItems:
+      type: object
+      properties:
+        id:
           type: string
-        last_name:
+          description: Unique identifier for the employment.
+        name:
           type: string
-        preferred_name:
-          type: string
+          description: Name of the employee.
+        team:
+          $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsTeam'
+          description: The team to which the employee belongs.
         email:
           type: string
-          format: email
+          description: The work email of the employee.
+        state:
+          type:
+          - string
+          - 'null'
+          description: The state of employment.
+        country:
+          type:
+          - string
+          - 'null'
+          description: The country of employment.
+        payment:
+          $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsPayment'
+          description: Payment information for the employment, including rate, scale, currency, and associated contract name.
+        is_ended:
+          type: boolean
+          description: Whether the employment has ended.
+        timezone:
+          type:
+          - string
+          - 'null'
+          description: The timezone of the employment.
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title of the employment.
+        seniority:
+          type:
+          - string
+          - 'null'
+          description: The seniority level of the employment.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The start date of the employment.
         work_email:
-          type: string
-          format: email
+          type:
+          - string
+          - 'null'
+          description: The work email of the employment.
         hiring_type:
           type: string
-          enum:
-          - contractor
-          - eor
-          - direct_employee
-          - global_payroll
-        employment_status:
+          description: The type of hiring of the employment.
+        hiring_status:
           type: string
-          enum:
-          - active
-          - terminated
-          - onboarding
-          - offboarded
+          description: The current hiring status of the employment.
+        completion_date:
+          type:
+          - string
+          - 'null'
+          description: The completion date of the employment contract.
+        contract_status:
+          type: string
+          description: The status of the employment contract.
+        voluntarily_left:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the employee voluntarily left the employment.
+        contract_coverage:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsContractCoverage'
+          - type: 'null'
+          description: The coverage type of the employment contract. 'is_shielded' = Contractor of Record, 'is_premium' = Premium, null = Standard (no coverage).
+        new_hiring_status:
+          type: string
+          description: The new hiring status of the employment.
+        client_legal_entity:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsClientLegalEntity'
+          - type: 'null'
+          description: The client legal entity associated with this employment contract.
+        has_eor_termination:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the employment has an EOR termination.
+        contract_is_archived:
+          type: boolean
+          description: Whether the employment contract is archived.
+        termination_last_day:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The last day of work mentioned on the contract termination.
+        contract_has_contractor:
+          type: boolean
+          description: Whether the contract has a contractor.
+        is_user_contract_deleted:
+          type: boolean
+          description: Whether the user contract is deleted.
+        hris_direct_employee_invitation:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsHrisDirectEmployeeInvitation'
+          - type: 'null'
+          description: The HRIS direct employee invitation status.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItems
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsTeam:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Refers to Groups in the platform. Working groups that reflect the organization's structure.
+        name:
+          type: string
+          description: The team name.
+      description: The team to which the employee belongs.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsTeam
+    PeoplePostResponsesContentApplicationJsonSchemaDataEmployment:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/PeoplePostResponsesContentApplicationJsonSchemaDataEmploymentType'
+          description: The type of employment
         country:
           type: string
-        working_location:
-          $ref: '#/components/schemas/WorkingLocation'
-        department:
-          type: object
-          properties:
-            id:
-              type: string
-            name:
-              type: string
-        manager:
-          type: object
-          properties:
-            id:
-              type: string
-            name:
-              type: string
+          minLength: 2
+          maxLength: 2
+          description: The country of the employment
+        end_date:
+          type: string
+          format: date
+          description: The end date of the employment
         job_title:
           type: string
+          description: The job title of the employment
+        seniority:
+          type: string
+          description: The seniority of the employment
         start_date:
           type: string
           format: date
-        external_id:
+          description: The start date of the employment
+        contract_id:
           type: string
-    PersonCreate:
-      type: object
+          description: The unique identifier of the worker contract
+        part_time_percentage:
+          type: number
+          format: double
+          minimum: 1
+          maximum: 99
+          description: The percentage of PART_TIME employment
       required:
-      - first_name
-      - last_name
-      - email
+      - type
+      - country
+      - end_date
+      - job_title
+      - seniority
+      - start_date
+      - contract_id
+      description: The employment details of the employee
+      title: PeoplePostResponsesContentApplicationJsonSchemaDataEmployment
+    PeoplePostRequestBodyContentApplicationJsonSchemaData:
+      type: object
       properties:
-        first_name:
+        client:
+          $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataClient'
+          description: The entity that is hiring the employee
+        employee:
+          $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployee'
+          description: The person that is being hired
+        employment:
+          $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployment'
+          description: The employment details of the employee
+        compensation_details:
+          $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataCompensationDetails'
+          description: The compensation details of the employee
+      required:
+      - client
+      - employee
+      - employment
+      - compensation_details
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaData
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAdditionalDetailsItems:
+      type: object
+      properties:
+        type:
           type: string
-        last_name:
+          description: Field name (the JSONB key from hris_employment_eligibility.eligibility_data, e.g. socialSecurity, idNumber, taxIdentificationNumber).
+        value:
+          $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAdditionalDetailsItemsValue'
+          description: Raw value associated with the field. May be a string, number, boolean, or null.
+        country:
           type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: ISO-2 country code that scopes this entry.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAdditionalDetailsItems
+    PwacPostRequestBodyContentApplicationJsonSchemaDataInvitationAction:
+      type: string
+      enum:
+      - DISABLE
+      - IMMEDIATE
+      description: Controls whether to send an invitation email.
+      title: PwacPostRequestBodyContentApplicationJsonSchemaDataInvitationAction
+    PeopleMeGetResponsesContentApplicationJsonSchemaProfileType:
+      type: string
+      enum:
+      - client
+      - contractor
+      - icp
+      - direct_employee
+      - hris_direct_employee
+      - peo_employee
+      - service_account
+      description: Type of profile
+      title: PeopleMeGetResponsesContentApplicationJsonSchemaProfileType
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAdditionalDetailsItemsValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      - type: object
+        additionalProperties:
+          description: Any type
+      description: Raw value associated with the field. May be a string, number, boolean, or null.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAdditionalDetailsItemsValue
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataClientTeam:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The team that the employee is part of
+        direct_manager_id:
+          type: string
+          format: uuid
+          description: The direct manager of the employee
+      required:
+      - id
+      description: The team information for the employee
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataClientTeam
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsClientLegalEntity:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of this resource.
+        name:
+          type:
+          - string
+          - 'null'
+          description: The name of the client legal entity.
+      description: The primary client legal entity associated with the employee.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsClientLegalEntity
+    PeopleGetParametersHiringTypesSchemaItems:
+      type: string
+      enum:
+      - contractor
+      - eor
+      - peo
+      - hris_direct_employee
+      - hris_direct_contractor
+      - direct_employee
+      - contractor_outside_deel
+      - person_without_contract
+      title: PeopleGetParametersHiringTypesSchemaItems
+    People_createADirectEmployee-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PeoplePostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: People_createADirectEmployee-v2026-01-01_Response_201
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsPaymentRate:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      description: The payment rate. Value is a string if contract type is PEO.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsPaymentRate
+    PeoplePostResponsesContentApplicationJsonSchemaDataCompensationDetailsScale:
+      type: string
+      enum:
+      - ANNUAL
+      - MONTHLY
+      - SEMIMONTHLY
+      - BIWEEKLY
+      - WEEKLY
+      - DAILY
+      - HOURLY
+      default: ANNUAL
+      description: The scale at which the salary is paid
+      title: PeoplePostResponsesContentApplicationJsonSchemaDataCompensationDetailsScale
+    PwacPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The legal entity that the person is part of
+      required:
+      - id
+      title: PwacPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of the Organizational structure.
+        name:
+          type: string
+          description: Name of the Organizational structure.
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItemsTeamsItems'
+          description: List of teams in the organizational structure.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItems
+    PwacPostResponsesContentApplicationJsonSchemaDataPerson:
+      type: object
+      properties:
         email:
           type: string
           format: email
-        preferred_name:
+          description: The personal email of the person being hired
+        state:
           type: string
+          minLength: 1
+          maxLength: 50
+          description: The state of the person being hired
         country:
           type: string
+          minLength: 2
+          maxLength: 2
+          description: The country of the person being hired
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The end date of the person being hired
         job_title:
           type: string
+          description: The job title of the person being hired
+        last_name:
+          type: string
+          description: The last name of the person being hired
+        seniority:
+          type: string
+          description: The seniority of the person being hired
+        worker_id:
+          type: number
+          format: double
+          description: The worker ID of the person being hired
+        first_name:
+          type: string
+          description: The first name of the person being hired
+        start_date:
+          type: string
+          format: date
+          description: The start date of the person being hired
+        work_email:
+          type: string
+          format: email
+          description: The work email of the person being hired
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: An external identifier for the person being hired
+        nationality:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: The nationality of the person being hired
+      required:
+      - email
+      - last_name
+      - first_name
+      - start_date
+      description: The person that is being hired
+      title: PwacPostResponsesContentApplicationJsonSchemaDataPerson
+    people_getPeople_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItems'
+        page:
+          $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaPage'
+      required:
+      - data
+      title: people_getPeople_Response_200
+    People_getMyCurrentPersonalProfile-v2026-01-01_Response_200:
+      type: object
+      properties:
+        id:
+          type: number
+          format: double
+          description: 'Unique identifier for the user profile '
+        email:
+          type: string
+          description: Email address of the user
+        user_id:
+          type: number
+          format: double
+          description: Unique identifier for the user
+        username:
+          type: string
+          description: Username of the user
+        full_name:
+          type: string
+          description: Full name of the user
+        last_name:
+          type: string
+          description: Last name of the user
+        avatar_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the user's avatar
+        first_name:
+          type: string
+          description: First name of the user
+        middle_name:
+          type:
+          - string
+          - 'null'
+          description: Middle name of the user
+        hris_enabled:
+          type:
+          - boolean
+          - 'null'
+          description: HRIS feature enabled.
+        profile_type:
+          $ref: '#/components/schemas/PeopleMeGetResponsesContentApplicationJsonSchemaProfileType'
+          description: Type of profile
+        slack_team_id:
+          type:
+          - string
+          - 'null'
+          description: User's team slack id
+        slack_user_id:
+          type:
+          - string
+          - 'null'
+          description: User's slack id
+        client_country:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country code.
+        organization_id:
+          type: number
+          format: double
+          description: Unique identifier for the organization
+        organization_name:
+          type:
+          - string
+          - 'null'
+          description: Name of the organization
+        contractor_country:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country code.
+        hris_organization_user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: HRIS Organization User ID of the user. Used in products like Deel Engage.
+      description: People object representing a Deel
+      title: People_getMyCurrentPersonalProfile-v2026-01-01_Response_200
+    PwacPostRequestBodyContentApplicationJsonSchemaDataClientTeam:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The team that the person is part of
+        direct_manager_id:
+          type: string
+          format: uuid
+          description: The direct manager of the person
+        direct_reports_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: The direct reports of the person
+      required:
+      - id
+      title: PwacPostRequestBodyContentApplicationJsonSchemaDataClientTeam
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsHrisDirectEmployeeInvitation:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: Unique identifier of this resource.
+        status:
+          type:
+          - string
+          - 'null'
+          description: The HRIS direct employee invitation status.
+        send_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The HRIS direct employee invitation send date.
+        timezone:
+          type:
+          - string
+          - 'null'
+          description: The HRIS direct employee invitation timezone.
+      description: The HRIS direct employee invitation status.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsHrisDirectEmployeeInvitation
+    ListOfPeople-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: ListOfPeople-v2026-01-01RequestInternalServerError
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsContractCoverage:
+      type: string
+      enum:
+      - is_premium
+      - is_shielded
+      - no_coverage
+      description: The coverage of the employment contract.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsContractCoverage
+    PeopleGetParametersPersonStatusesSchemaItems:
+      type: string
+      enum:
+      - ACTIVE
+      - NOT_STARTED
+      - INACTIVE
+      title: PeopleGetParametersPersonStatusesSchemaItems
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsTeam:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Refers to Groups in the platform. Working groups that reflect the organization's structure.
+        name:
+          type: string
+          description: The team name.
+      description: The team to which the employee belongs.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsTeam
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataEmploymentOneOf1Type:
+      type: string
+      enum:
+      - FULL_TIME
+      description: The type of employment
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataEmploymentOneOf1Type
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the employment.
+        name:
+          type: string
+          description: Name of the employee.
+        team:
+          $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsTeam'
+          description: The team to which the employee belongs.
+        email:
+          type: string
+          description: The work email of the employee.
+        state:
+          type:
+          - string
+          - 'null'
+          description: The state of employment.
+        country:
+          type:
+          - string
+          - 'null'
+          description: The country of employment.
+        payment:
+          $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsPayment'
+          description: Payment information for the employment, including rate, scale, currency, and associated contract name.
+        is_ended:
+          type: boolean
+          description: Whether the employment has ended.
+        timezone:
+          type:
+          - string
+          - 'null'
+          description: The timezone of the employment.
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title of the employment.
+        seniority:
+          type:
+          - string
+          - 'null'
+          description: The seniority level of the employment.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The start date of the employment.
+        work_email:
+          type:
+          - string
+          - 'null'
+          description: The work email of the employment.
+        hiring_type:
+          type:
+          - string
+          - 'null'
+          description: The type of hiring of the employment.
+        hiring_status:
+          type: string
+          description: The current hiring status of the employment.
+        band_placement:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsBandPlacement'
+          - type: 'null'
+          description: Where the employee falls in their compensation band
+        completion_date:
+          type:
+          - string
+          - 'null'
+          description: The completion date of the employment contract.
+        contract_status:
+          type: string
+          description: The status of the employment contract.
+        voluntarily_left:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the employee voluntarily left the employment.
+        comparative_ratio:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number comparing an employee's compensation to the band midpoint
+        contract_coverage:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsContractCoverage'
+          - type: 'null'
+          description: The coverage of the employment contract.
+        new_hiring_status:
+          type:
+          - string
+          - 'null'
+          description: The new hiring status of the employment.
+        client_legal_entity:
+          $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsClientLegalEntity'
+          description: The client legal entity associated with this employment contract.
+        has_eor_termination:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the employment has an EOR termination.
+        compensation_band_id:
+          type:
+          - string
+          - 'null'
+          description: The employee's assigned compensation band
+        contract_is_archived:
+          type: boolean
+          description: Whether the employment contract is archived.
+        termination_last_day:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The last day of work mentioned on the contract termination.
+        contract_has_contractor:
+          type: boolean
+          description: Whether the contract has a contractor.
+        is_user_contract_deleted:
+          type: boolean
+          description: Whether the user contract is deleted.
+        hris_direct_employee_invitation:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsHrisDirectEmployeeInvitation'
+          - type: 'null'
+          description: The HRIS direct employee invitation status.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItems
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmailsItems:
+      type: object
+      properties:
+        type:
+          type:
+          - string
+          - 'null'
+          description: The type of email.
+        value:
+          type:
+          - string
+          - 'null'
+          description: The email address.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmailsItems
+    PeopleGetParametersFieldsSchemaItems:
+      type: string
+      enum:
+      - id
+      - created_at
+      - first_name
+      - last_name
+      - full_name
+      - preferred_first_name
+      - preferred_last_name
+      - worker_id
+      - external_id
+      - hris_organization_user_id
+      - termination_last_day
+      - worker_relations
+      - custom_field_values
+      - emails
+      - birth_date
+      - start_date
+      - nationalities
+      - client_legal_entity
+      - state
+      - seniority
+      - completion_date
+      - direct_manager
+      - direct_reports
+      - direct_reports_count
+      - employments
+      - employments[0].id
+      - employments[0].name
+      - employments[0].team
+      - employments[0].custom_field_values
+      - employments[0].email
+      - employments[0].state
+      - employments[0].country
+      - employments[0].payment
+      - employments[0].is_ended
+      - employments[0].termination_last_day
+      - employments[0].timezone
+      - employments[0].job_title
+      - employments[0].seniority
+      - employments[0].start_date
+      - employments[0].work_email
+      - employments[0].hiring_type
+      - employments[0].hiring_status
+      - employments[0].completion_date
+      - employments[0].contract_status
+      - employments[0].voluntarily_left
+      - employments[0].contract_coverage
+      - employments[0].new_hiring_status
+      - employments[0].client_legal_entity
+      - employments[0].has_eor_termination
+      - employments[0].contract_is_archived
+      - employments[0].contract_has_contractor
+      - employments[0].is_user_contract_deleted
+      - employments[0].hris_direct_employee_invitation
+      - employments[0].employee_number
+      - hiring_status
+      - new_hiring_status
+      - is_pwac
+      - hiring_type
+      - job_title
+      - country
+      - timezone
+      - department
+      - work_location
+      - updated_at
+      - addresses
+      - additional_details
+      - profile_organizational_structures
+      - worker_termination_last_date_of_work
+      - active_worker_termination_status
+      - last_day_of_work_local_date
+      - person_status
+      title: PeopleGetParametersFieldsSchemaItems
+    ? PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItemsTeamsItemsPositionsItemsRole
+    : type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of the role.
+        name:
+          type: string
+          description: Name of the role.
+      description: The role associated with this position, including role ID and name.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItemsTeamsItemsPositionsItemsRole
+    PeopleGetParametersSortBy:
+      type: string
+      enum:
+      - id
+      - first_name
+      - last_name
+      - full_name
+      - email
+      - country
+      - birth_date
+      - hiring_type
+      - start_date
+      - team
+      - job_title
+      - hiring_status
+      - completion_date
+      - direct_manager
+      - direct_reports_count
+      - band_placement
+      - comparative_ratio
+      title: PeopleGetParametersSortBy
+    PwacPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        client:
+          $ref: '#/components/schemas/PwacPostRequestBodyContentApplicationJsonSchemaDataClient'
+        person:
+          $ref: '#/components/schemas/PwacPostRequestBodyContentApplicationJsonSchemaDataPerson'
+          description: The person that is being hired
+        invitation:
+          $ref: '#/components/schemas/PwacPostRequestBodyContentApplicationJsonSchemaDataInvitation'
+          description: Optional invitation configuration for the new hire. Defaults to 'disable' if not provided.
+      required:
+      - client
+      - person
+      title: PwacPostRequestBodyContentApplicationJsonSchemaData
+    PeopleGetParametersBandPlacementsSchemaItems:
+      type: string
+      enum:
+      - ABOVE
+      - WITHIN
+      - BELOW
+      title: PeopleGetParametersBandPlacementsSchemaItems
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsPersonStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - NOT_STARTED
+      - INACTIVE
+      description: Lifecycle status of the person (worker profile). Omitted or null without people_person_status.view; excluded from the response when using `fields` if not requested.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsPersonStatus
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsClientLegalEntity:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of this resource.
+        name:
+          type:
+          - string
+          - 'null'
+          description: The name of the client legal entity.
+      description: The client legal entity associated with this employment contract.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsClientLegalEntity
+    ? PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItemsTeamsItemsPositionsItems
+    : type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of the position.
+        role:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItemsTeamsItemsPositionsItemsRole'
+          - type: 'null'
+          description: The role associated with this position, including role ID and name.
+        is_supportive:
+          type: boolean
+          description: Whether the position is supportive or not.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItemsTeamsItemsPositionsItems
+    PeopleGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the employee.
+        state:
+          type:
+          - string
+          - 'null'
+          description: The state of the employee.
+        emails:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmailsItems'
+          description: An array of the employee's email addresses.
+        country:
+          type:
+          - string
+          - 'null'
+          description: The country of the employee.
+        is_pwac:
+          type: boolean
+          description: Whether the worker is a Person Without a Contract (PWAC)
+        timezone:
+          type:
+          - string
+          - 'null'
+          description: The timezone of the employee.
+        addresses:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsAddressesItems'
+          description: An array of address objects containing the employee's physical addresses.
+        full_name:
+          type: string
+          description: The full name of the employee.
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title of the employee.
+        last_name:
+          type:
+          - string
+          - 'null'
+          description: The last name of the employee.
+        seniority:
+          type:
+          - string
+          - 'null'
+          description: The seniority level of the employee.
+        worker_id:
+          type: string
+          description: The worker ID of the employee.
+        birth_date:
+          type:
+          - string
+          - 'null'
+          description: The birth date of the employee.
+        created_at:
+          type: string
+          format: date-time
+          description: The creation timestamp of the employee record.
+        department:
+          $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsDepartment'
+          description: The department of the employee.
+        first_name:
+          type: string
+          description: The first name of the employee.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date the employee started working.
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+        employments:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItems'
+          description: An array of employment records associated with the employee, including contract details, team information, payment details, and employment status.
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: The external ID of the employee.
+        hiring_type:
+          type:
+          - string
+          - 'null'
+          description: The type of hiring of the employee.
+        middle_name:
+          type:
+          - string
+          - 'null'
+          description: The middle name of the employee.
+        hiring_status:
+          type: string
+          description: The current hiring status of the employee.
+        nationalities:
+          type: array
+          items:
+            type: string
+          description: The nationality of the employee.
+        person_status:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsPersonStatus'
+          - type: 'null'
+          description: Lifecycle status of the person (worker profile). Omitted or null without people_person_status.view; excluded from the response when using `fields` if not requested.
+        work_location:
+          type:
+          - string
+          - 'null'
+          description: The work location of the employee.
+        direct_manager:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsDirectManager'
+          - type: 'null'
+          description: The direct manager of the employee.
+        direct_reports:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsDirectReportsItems'
+          description: The direct reports to the employee.
+        completion_date:
+          type:
+          - string
+          - 'null'
+          description: The completion date of the task or project.
+        new_hiring_status:
+          type:
+          - string
+          - 'null'
+          description: The new hiring status of the employee.
+        additional_details:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsAdditionalDetailsItems'
+          description: Country-scoped additional employment data points (national IDs, tax IDs, etc.) sourced from hris_employment_eligibility.eligibility_data. Returned only when the caller's organization has the feature flag enable and the request is not redacting PII.
+        client_legal_entity:
+          $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsClientLegalEntity'
+          description: The primary client legal entity associated with the employee.
+        preferred_last_name:
+          type:
+          - string
+          - 'null'
+          description: The preferred last name of the employee.
+        direct_reports_count:
+          type: integer
+          description: The count of direct reports to the employee.
+        preferred_first_name:
+          type:
+          - string
+          - 'null'
+          description: The preferred first name of the employee.
+        hris_organization_user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: HRIS Organization User ID of the employee. Used in products like Deel Engage.
+        active_worker_termination_status:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsActiveWorkerTerminationStatus'
+          - type: 'null'
+          description: The status of the active worker termination.
+        direct_employee_termination_last_day:
+          type: string
+          format: date-time
+          description: The last day of work mentioned on the primary contract termination.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItems
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsDirectReportsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the direct report.
+        last_name:
+          type: string
+          description: The last name of the direct report.
+        first_name:
+          type: string
+          description: The first name of the direct report.
+        work_email:
+          type:
+          - string
+          - 'null'
+          description: The work email of the direct report.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsDirectReportsItems
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    PeopleGetResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error.
+        details:
+          type:
+          - string
+          - 'null'
+          description: Additional details about the error.
+        message:
+          type: string
+          description: Error message describing what went wrong.
+      required:
+      - code
+      - message
+      title: PeopleGetResponsesContentApplicationJsonSchemaError
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsScale:
+      type: string
+      enum:
+      - ANNUAL
+      - MONTHLY
+      - SEMIMONTHLY
+      - BIWEEKLY
+      - WEEKLY
+      - DAILY
+      - HOURLY
+      default: ANNUAL
+      description: The scale at which the salary is paid
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsScale
+    PeopleGetParametersSortOrder:
+      type: string
+      enum:
+      - asc
+      - desc
+      title: PeopleGetParametersSortOrder
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsContractCoverage:
+      type: string
+      enum:
+      - is_shielded
+      - is_premium
+      description: The coverage type of the employment contract. 'is_shielded' = Contractor of Record, 'is_premium' = Premium, null = Standard (no coverage).
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsContractCoverage
+    PwacPostRequestBodyContentApplicationJsonSchemaDataClientDepartment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The department that the person is part of
+      required:
+      - id
+      title: PwacPostRequestBodyContentApplicationJsonSchemaDataClientDepartment
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsDepartment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        name:
+          type: string
+          description: The name of the department.
+        parent:
+          type: string
+          description: The parent department name.
+      description: The department of the employee.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsDepartment
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsAdditionalDetailsItems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Field name (the JSONB key from hris_employment_eligibility.eligibility_data, e.g. socialSecurity, idNumber, taxIdentificationNumber).
+        value:
+          $ref: '#/components/schemas/PeopleGetResponsesContentApplicationJsonSchemaDataItemsAdditionalDetailsItemsValue'
+          description: Raw value associated with the field. May be a string, number, boolean, or null.
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: ISO-2 country code that scopes this entry.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsAdditionalDetailsItems
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsPayment:
+      type: object
+      properties:
+        rate:
+          type:
+          - string
+          - 'null'
+          title: float
+          description: The payment rate
+        scale:
+          type:
+          - string
+          - 'null'
+          description: The payment scale (e.g., hourly, weekly, monthly, etc.)
+        currency:
+          type: string
+          description: The currency code (ISO 4217) for the payment
+        contract_name:
+          type: string
+          description: The name of the contract associated with the payment
+      description: Payment information for the employment, including rate, scale, currency, and associated contract name.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsPayment
+    people_createPersonWithoutContract_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PwacPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: people_createPersonWithoutContract_Response_201
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsAddressesItems:
+      type: object
+      properties:
+        region:
+          type: string
+          description: Region code.
+        country:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country code.
+        lineTwo:
+          type: string
+          description: Second address line.
+        locality:
+          type: string
+          description: Locality name.
+        postalCode:
+          type: string
+          description: Postal code.
+        streetAddress:
+          type: string
+          description: Street and number.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsAddressesItems
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsDirectManager:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the manager.
+        last_name:
+          type: string
+          description: The last name of the manager.
+        worker_id:
+          type: number
+          format: double
+          description: The worker ID of the manager.
+        first_name:
+          type: string
+          description: The first name of the manager.
+        work_email:
+          type:
+          - string
+          - 'null'
+          description: The work email of the manager.
+      description: The direct manager of the employee.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsDirectManager
+    CreateADirectEmployee-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/PeoplePostResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: CreateADirectEmployee-v2026-01-01RequestBadRequestError
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAddressesItems:
+      type: object
+      properties:
+        region:
+          type: string
+          description: Region code.
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: Country code.
+        locality:
+          type: string
+          description: Locality name.
+        postalCode:
+          type: string
+          description: Postal code.
+        streetAddress:
+          type: string
+          description: Street and number.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAddressesItems
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataClient:
+      type: object
+      properties:
+        team:
+          $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataClientTeam'
+          description: The team information for the employee
+        department:
+          $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataClientDepartment'
+          description: The department information for the employee
+        legal_entity:
+          $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity'
+          description: The legal entity information for the employee
+      required:
+      - team
+      - legal_entity
+      description: The entity that is hiring the employee
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataClient
+    PwacPostRequestBodyContentApplicationJsonSchemaDataPersonAddress:
+      type: object
+      properties:
+        zip:
+          type: string
+          description: The postal code of the home address
+        city:
+          type: string
+          description: The city of the home address
+        state:
+          type:
+          - string
+          - 'null'
+          description: The state or province of the home address
+        street:
+          type: string
+          description: The street and number of the home address
+        country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: The country of the home address as an ISO 3166-1 alpha-2 code
+        line_two:
+          type:
+          - string
+          - 'null'
+          description: The second line of the home address
+      required:
+      - country
+      description: The home address of the person being hired
+      title: PwacPostRequestBodyContentApplicationJsonSchemaDataPersonAddress
+    PeopleIdWorkingLocationPutResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        updated:
+          type: boolean
+          description: Indicates if the resource was updated successfully.
+      required:
+      - updated
+      title: PeopleIdWorkingLocationPutResponsesContentApplicationJsonSchemaData
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsAdditionalDetailsItemsValue:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      - type: boolean
+      - type: object
+        additionalProperties:
+          description: Any type
+      description: Raw value associated with the field. May be a string, number, boolean, or null.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsAdditionalDetailsItemsValue
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsActiveWorkerTerminationStatus:
+      type: string
+      enum:
+      - PENDING
+      - CONTRACT_TERMINATION_DATA_COLLECTED
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILED
+      - CANCELED
+      description: The status of the active worker termination.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsActiveWorkerTerminationStatus
+    GetMyCurrentPersonalProfile-v2026-01-01RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleMeGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: GetMyCurrentPersonalProfile-v2026-01-01RequestUnauthorizedError
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataClientLegalEntity:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of this resource.
+        name:
+          type:
+          - string
+          - 'null'
+          description: The name of the client legal entity.
+      description: The primary client legal entity associated with the employee.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataClientLegalEntity
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataActiveWorkerTerminationStatus:
+      type: string
+      enum:
+      - PENDING
+      - CONTRACT_TERMINATION_DATA_COLLECTED
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILED
+      - CANCELED
+      description: The status of the active worker termination.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataActiveWorkerTerminationStatus
+    people_getPersonById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: people_getPersonById_Response_200
+    CreateAPersonWithoutAContract-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/PwacPostResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: CreateAPersonWithoutAContract-v2026-01-01RequestInternalServerError
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmailsItems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of email.
+        value:
+          type:
+          - string
+          - 'null'
+          description: The email address.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmailsItems
+    PeoplePostResponsesContentApplicationJsonSchemaDataEmployee:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 255
+          description: The personal email of the person being hired
+        last_name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: The last name of the person being hired
+        first_name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: The first name of the person being hired
+        work_email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 255
+          description: The work email of the person being hired
         external_id:
           type: string
+          description: An external identifier for the person being hired
+        nationality:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: The nationality of the person being hired
+      required:
+      - email
+      - last_name
+      - first_name
+      - nationality
+      description: The person that is being hired
+      title: PeoplePostResponsesContentApplicationJsonSchemaDataEmployee
+    PwacPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the person
+        person:
+          $ref: '#/components/schemas/PwacPostResponsesContentApplicationJsonSchemaDataPerson'
+          description: The person that is being hired
+      required:
+      - id
+      - person
+      title: PwacPostResponsesContentApplicationJsonSchemaData
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataDepartment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of this resource.
+        name:
+          type: string
+          description: The name of the department.
+        parent:
+          type: string
+          description: The parent department.
+      description: The department of the employee.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataDepartment
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    PeopleGetParametersHiringStatusesSchemaItems:
+      type: string
+      enum:
+      - pending_invite
+      - draft
+      - invited
+      - onboarding
+      - onboarding_at_risk
+      - onboarding_overdue
+      - onboarded
+      - offboarding
+      - active
+      - inactive
+      - in_review
+      - quote_requires_changes
+      title: PeopleGetParametersHiringStatusesSchemaItems
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataClientDepartment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The department that the employee is part of
+      required:
+      - id
+      description: The department information for the employee
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataClientDepartment
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataDirectManager:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the manager.
+        last_name:
+          type: string
+          description: The last name of the manager.
+        worker_id:
+          type: number
+          format: double
+          description: The worker ID of the manager.
+        first_name:
+          type: string
+          description: The first name of the manager.
+        work_email:
+          type:
+          - string
+          - 'null'
+          description: The work email of the manager.
+      description: The direct manager of the employee.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataDirectManager
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the employee.
+        state:
+          type:
+          - string
+          - 'null'
+          description: The state of the employee.
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmailsItems'
+          description: An array of the employee's email addresses.
+        country:
+          type:
+          - string
+          - 'null'
+          description: The country of the employee.
+        timezone:
+          type:
+          - string
+          - 'null'
+          description: The timezone of the employee.
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAddressesItems'
+          description: An array of address objects containing the employee's physical addresses.
+        full_name:
+          type: string
+          description: The full name of the employee.
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: The job title of the employee.
+        last_name:
+          type: string
+          description: The last name of the employee.
+        seniority:
+          type:
+          - string
+          - 'null'
+          description: The seniority level of the employee.
+        worker_id:
+          type: string
+          description: The worker ID of the employee.
+        birth_date:
+          type:
+          - string
+          - 'null'
+          description: The birth date of the employee.
+        created_at:
+          type: string
+          format: date-time
+          description: The creation timestamp of the employee record.
+        department:
+          $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataDepartment'
+          description: The department of the employee.
+        first_name:
+          type: string
+          description: The first name of the employee.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date the employee started working.
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Long date-time format following ISO-8601
+        employments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItems'
+          description: An array of employment records associated with the employee, including contract details, team information, payment details, and employment status.
+        external_id:
+          type:
+          - string
+          - 'null'
+          description: The external ID of the employee.
+        hiring_type:
+          type: string
+          description: The type of hiring of the employee.
+        hiring_status:
+          type: string
+          description: The current hiring status of the employee.
+        nationalities:
+          type: array
+          items:
+            type: string
+          description: The nationality of the employee.
+        work_location:
+          type:
+          - string
+          - 'null'
+          description: The work location of the employee.
+        direct_manager:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataDirectManager'
+          - type: 'null'
+          description: The direct manager of the employee.
+        direct_reports:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataDirectReportsItems'
+          description: The direct reports to the employee.
+        completion_date:
+          type:
+          - string
+          - 'null'
+          description: The completion date of the task or project.
+        new_hiring_status:
+          type: string
+          description: The new hiring status of the employee.
+        additional_details:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataAdditionalDetailsItems'
+          description: Country-scoped additional employment data points (national IDs, tax IDs, etc.) sourced from hris_employment_eligibility.eligibility_data. Returned only when the caller's organization has the feature flag enabled and the request is not redacting PII.
+        client_legal_entity:
+          $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataClientLegalEntity'
+          description: The primary client legal entity associated with the employee.
+        preferred_last_name:
+          type:
+          - string
+          - 'null'
+          description: The preferred last name of the employee.
+        direct_reports_count:
+          type: integer
+          description: The count of direct reports to the employee.
+        preferred_first_name:
+          type:
+          - string
+          - 'null'
+          description: The preferred first name of the employee.
+        active_worker_termination_status:
+          oneOf:
+          - $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataActiveWorkerTerminationStatus'
+          - type: 'null'
+          description: The status of the active worker termination.
+        profile_organizational_structures:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItems'
+          description: An array of organizational structures associated with the employee profile.
+        direct_employee_termination_last_day:
+          type: string
+          format: date
+          description: The last day of work mentioned on the primary contract termination.
+        custom_fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataCustomFieldsItems'
+          description: An array of custom field objects containing additional attributes associated with the employee (e.g., Job title, Project code, etc.).
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaData
+    RetrieveASinglePerson-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: RetrieveASinglePerson-v2026-01-01RequestInternalServerError
+    people_updatePersonWorkingLocation_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PeopleIdWorkingLocationPutResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: people_updatePersonWorkingLocation_Response_200
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsBandPlacement:
+      type: string
+      enum:
+      - ABOVE
+      - WITHIN
+      - BELOW
+      description: Where the employee falls in their compensation band
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsBandPlacement
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataDirectReportsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the direct report.
+        last_name:
+          type: string
+          description: The last name of the direct report.
+        first_name:
+          type: string
+          description: The first name of the direct report.
+        work_email:
+          type:
+          - string
+          - 'null'
+          description: The work email of the direct report.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataDirectReportsItems
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error.
+        details:
+          type:
+          - string
+          - 'null'
+          description: Additional details about the error.
+        message:
+          type: string
+          description: Error message describing what went wrong.
+      required:
+      - code
+      - message
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaError
+    PeopleIdWorkingLocationPutRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        working_location_id:
+          type: number
+          format: double
+          description: Unique identifier of this resource.
+      required:
+      - working_location_id
+      title: PeopleIdWorkingLocationPutRequestBodyContentApplicationJsonSchemaData
+    CreateAPersonWithoutAContract-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/PwacPostResponsesContentApplicationJsonSchemaError'
+      required:
+      - error
+      title: CreateAPersonWithoutAContract-v2026-01-01RequestBadRequestError
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The legal entity that the employee is part of
+      required:
+      - id
+      description: The legal entity information for the employee
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity
+    PwacPostRequestBodyContentApplicationJsonSchemaDataPerson:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 255
+          description: The personal email of the person being hired
+        state:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: The state of the person being hired
+        address:
+          $ref: '#/components/schemas/PwacPostRequestBodyContentApplicationJsonSchemaDataPersonAddress'
+          description: The home address of the person being hired
+        country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: The country of the person being hired
+        end_date:
+          type: string
+          format: date
+          description: The end date of the person being hired
+        job_title:
+          type: string
+          maxLength: 255
+          description: The job title of the person being hired
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: The last name of the person being hired
+        seniority:
+          type: string
+          maxLength: 255
+          description: The seniority of the person being hired
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: The first name of the person being hired
+        start_date:
+          type: string
+          format: date
+          description: The start date of the person being hired
+        work_email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 255
+          description: The work email of the person being hired
+        external_id:
+          type: string
+          maxLength: 100
+          description: An external identifier for the person being hired
+        nationality:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: The nationality of the person being hired
+        preferred_last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: The preferred last name of the person being hired
+        preferred_first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: The preferred first name of the person being hired
+      required:
+      - email
+      - last_name
+      - first_name
+      - start_date
+      description: The person that is being hired
+      title: PwacPostRequestBodyContentApplicationJsonSchemaDataPerson
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployee:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 255
+          description: The personal email of the person being hired
+        state:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: The state of the person being hired
+        country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: The country of the person being hired
+        last_name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: The last name of the person being hired
+        first_name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: The first name of the person being hired
+        work_email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 255
+          description: The work email of the person being hired
+        external_id:
+          type: string
+          description: An external identifier for the person being hired
+        nationality:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: The nationality of the person being hired
+      required:
+      - email
+      - country
+      - last_name
+      - first_name
+      - nationality
+      description: The person that is being hired
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployee
+    PeopleGetResponsesContentApplicationJsonSchemaPage:
+      type: object
+      properties:
+        offset:
+          type: integer
+          minimum: 0
+          maximum: 999999999
+        total_rows:
+          type: number
+          format: double
+        items_per_page:
+          type: number
+          format: double
+          minimum: 1
+          maximum: 200
+      required:
+      - offset
+      - total_rows
+      - items_per_page
+      title: PeopleGetResponsesContentApplicationJsonSchemaPage
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataCustomFieldsItems:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Custom field property name.
+        value:
+          type:
+          - string
+          - 'null'
+          description: Custom field property value.
+      description: Customized attributes on people (Job title, Project code, etc).
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataCustomFieldsItems
+    PwacPostRequestBodyContentApplicationJsonSchemaDataClient:
+      type: object
+      properties:
+        team:
+          $ref: '#/components/schemas/PwacPostRequestBodyContentApplicationJsonSchemaDataClientTeam'
+        department:
+          $ref: '#/components/schemas/PwacPostRequestBodyContentApplicationJsonSchemaDataClientDepartment'
+        legal_entity:
+          $ref: '#/components/schemas/PwacPostRequestBodyContentApplicationJsonSchemaDataClientLegalEntity'
+      required:
+      - team
+      - legal_entity
+      title: PwacPostRequestBodyContentApplicationJsonSchemaDataClient
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataCompensationDetails:
+      type: object
+      properties:
+        scale:
+          $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataCompensationDetailsScale'
+          default: ANNUAL
+          description: The scale at which the salary is paid
+        salary:
+          type: string
+          title: float
+          description: The salary of the employee
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: The currency of the salary
+      required:
+      - salary
+      - currency
+      description: The compensation details of the employee
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataCompensationDetails
+    PeopleMeGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+        message:
+          type: string
+          description: A human-readable description of the error.
+      required:
+      - message
+      title: PeopleMeGetResponsesContentApplicationJsonSchemaErrorsItems
+    PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsClientLegalEntity:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of this resource.
+        name:
+          type:
+          - string
+          - 'null'
+          description: The name of the client legal entity.
+      description: The client legal entity associated with this employment contract.
+      title: PeopleGetResponsesContentApplicationJsonSchemaDataItemsEmploymentsItemsClientLegalEntity
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployment1:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataEmploymentOneOf1Type'
+          description: The type of employment
+        end_date:
+          type: string
+          format: date
+          description: The end date of the employment
+        job_title:
+          type: string
+          description: The job title of the employment
+        seniority:
+          type: string
+          description: The seniority of the employment
+        start_date:
+          type: string
+          format: date
+          description: The start date of the employment
+        document_template_id:
+          type: string
+          format: uuid
+          description: The document template ID for the employment contract
+      required:
+      - type
+      - job_title
+      - seniority
+      - start_date
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployment1
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsPayment:
+      type: object
+      properties:
+        rate:
+          $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsPaymentRate'
+          description: The payment rate. Value is a string if contract type is PEO.
+        scale:
+          type:
+          - string
+          - 'null'
+          description: The payment scale (e.g., hourly, weekly, monthly, etc.)
+        currency:
+          type: string
+          description: The currency code (ISO 4217) for the payment
+        contract_name:
+          type: string
+          description: The name of the contract associated with the payment
+      description: Payment information for the employment, including rate, scale, currency, and associated contract name.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataEmploymentsItemsPayment
+    PeoplePostResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        message:
+          type: string
+          description: Human readable error message
+      required:
+      - code
+      - message
+      title: PeoplePostResponsesContentApplicationJsonSchemaError
+    PeoplePostResponsesContentApplicationJsonSchemaDataCompensationDetails:
+      type: object
+      properties:
+        scale:
+          $ref: '#/components/schemas/PeoplePostResponsesContentApplicationJsonSchemaDataCompensationDetailsScale'
+          default: ANNUAL
+          description: The scale at which the salary is paid
+        salary:
+          type: string
+          title: float
+          description: The salary of the employee
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: The currency of the salary
+      required:
+      - salary
+      - currency
+      description: The compensation details of the employee
+      title: PeoplePostResponsesContentApplicationJsonSchemaDataCompensationDetails
+    PwacPostRequestBodyContentApplicationJsonSchemaDataInvitation:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/PwacPostRequestBodyContentApplicationJsonSchemaDataInvitationAction'
+          description: Controls whether to send an invitation email.
+      description: Optional invitation configuration for the new hire. Defaults to 'disable' if not provided.
+      title: PwacPostRequestBodyContentApplicationJsonSchemaDataInvitation
+    PwacPostResponsesContentApplicationJsonSchemaError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the type of error
+        message:
+          type: string
+          description: Human readable error message
+      required:
+      - code
+      - message
+      title: PwacPostResponsesContentApplicationJsonSchemaError
+    PeoplePostResponsesContentApplicationJsonSchemaDataEmploymentType:
+      type: string
+      enum:
+      - FULL_TIME
+      - PART_TIME
+      description: The type of employment
+      title: PeoplePostResponsesContentApplicationJsonSchemaDataEmploymentType
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataEmploymentOneOf0Type:
+      type: string
+      enum:
+      - PART_TIME
+      description: The type of employment
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataEmploymentOneOf0Type
+    PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItemsTeamsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of the team.
+        name:
+          type: string
+          description: Name of the team.
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItemsTeamsItemsPositionsItems'
+          description: An array of positions held by the employee within this team.
+        name_hierarchy:
+          type:
+          - string
+          - 'null'
+          description: Hierarchy of the team.
+      title: PeopleHrisProfileIdGetResponsesContentApplicationJsonSchemaDataProfileOrganizationalStructuresItemsTeamsItems
+    PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployment0:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/PeoplePostRequestBodyContentApplicationJsonSchemaDataEmploymentOneOf0Type'
+          description: The type of employment
+        end_date:
+          type: string
+          format: date
+          description: The end date of the employment
+        job_title:
+          type: string
+          description: The job title of the employment
+        seniority:
+          type: string
+          description: The seniority of the employment
+        start_date:
+          type: string
+          format: date
+          description: The start date of the employment
+        document_template_id:
+          type: string
+          format: uuid
+          description: The document template ID for the employment contract
+        part_time_percentage:
+          type: number
+          format: double
+          minimum: 1
+          maximum: 99
+          description: The percentage of PART_TIME employment
+      required:
+      - type
+      - job_title
+      - seniority
+      - start_date
+      - part_time_percentage
+      title: PeoplePostRequestBodyContentApplicationJsonSchemaDataEmployment0
   securitySchemes:
-    BearerAuth:
+    deelToken:
       type: http
       scheme: bearer
-      bearerFormat: opaque
-    ScimBearerAuth:
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
       type: http
       scheme: bearer
-      bearerFormat: scim_token
-      description: Dedicated SCIM bearer token configured per IdP in the Developer Center.
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

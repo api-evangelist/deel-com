@@ -1,0 +1,933 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Candidates API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsCandidates
+paths:
+  /ats/candidates:
+    post:
+      operationId: atsCandidates_createAtsCandidate-v2026-01-01
+      summary: Create ATS Candidate
+      description: 'Creates a candidate record without creating a job application. Use it to add a person to the ATS before applying them to a job with `POST /rest/ats/applications`; to change an existing candidate use `PATCH /rest/ats/candidates/{candidate_id}`, and to add a CV to one use `POST /rest/ats/candidates/{candidate_id}/attachments`.
+
+
+        **Token scopes**: `ats:write`, `worker:write`'
+      tags:
+      - atsCandidates
+      responses:
+        '201':
+          description: Successful response with candidate data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-candidates_createAtsCandidate-v2026-01-01_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAtsCandidate-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAtsCandidate-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAtsCandidate-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AtsCandidatesPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: atsCandidates_retrievePaginatedListOfAtsCandidates-v2026-01-01
+      summary: Retrieve paginated list of ATS Candidates
+      description: 'Returns a paginated list of candidates, optionally filtered by job IDs, department IDs, tag IDs, current stage category or default type slugs, or a timestamp to return only records updated after a given point.
+
+
+        **Token scopes**: `ats:read`'
+      tags:
+      - atsCandidates
+      parameters:
+      - name: cursor
+        in: query
+        description: The cursor for pagination
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Maximum number of records returned in one response
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        description: Search text for filtering candidates
+        required: false
+        schema:
+          type: string
+      - name: job_ids
+        in: query
+        description: Filter candidates by job IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: department_ids
+        in: query
+        description: Filter candidates by department IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: tag_ids
+        in: query
+        description: Filter candidates by tag IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: current_stage_category_type_slugs
+        in: query
+        description: Filter candidates by current stage category type slugs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: current_stage_default_type_slugs
+        in: query
+        description: Filter candidates by current stage default type slugs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: updated_after
+        in: query
+        description: Filter applications updated after this timestamp (ISO 8601 format)
+        required: false
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-candidates_retrievePaginatedListOfAtsCandidates-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievePaginatedListOfAtsCandidates-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievePaginatedListOfAtsCandidates-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievePaginatedListOfAtsCandidates-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /ats/candidates/{candidate_id}/tags:
+    post:
+      operationId: atsCandidates_createCandidateTags-v2026-02-27
+      summary: Create candidate tags
+      description: 'Replaces all existing tags on a candidate with the provided set of `tag_ids`. This is a full replacement — any tags not included in the request body will be removed.
+
+
+        **Token scopes**: `ats:write`
+
+
+        **Deprecated**: a newer version of this endpoint is available. This version is scheduled for removal on 2027-08-10.
+
+
+        **Beta version available**: version `2026-08-10` of this endpoint is in beta. Send `X-Beta: true` to call it.'
+      tags:
+      - atsCandidates
+      parameters:
+      - name: candidate_id
+        in: path
+        description: The unique identifier of the candidate.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-candidates_createCandidateTags-v2026-02-27_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCandidateTags-v2024-06-12RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCandidateTags-v2024-06-12RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCandidateTags-v2024-06-12RequestInternalServerError'
+      deprecated: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tag_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: List of tag IDs to associate with the candidate
+              required:
+              - tag_ids
+      security:
+      - deelToken: []
+components:
+  schemas:
+    ats-candidates_createAtsCandidate-v2026-01-01_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AtsCandidatesPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: ats-candidates_createAtsCandidate-v2026-01-01_Response_201
+    CreateAtsCandidate-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateAtsCandidate-v2026-01-01RequestInternalServerError
+    AtsCandidatesCandidateIdTagsPostResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the candidate-tag association.
+        tag_id:
+          type: string
+          format: uuid
+          description: Unique identifier of the tag.
+        created_at:
+          type: string
+          format: date-time
+          description: When the association was created.
+        candidate_id:
+          type: string
+          format: uuid
+          description: Unique identifier of the candidate.
+      required:
+      - id
+      - tag_id
+      - created_at
+      - candidate_id
+      title: AtsCandidatesCandidateIdTagsPostResponsesContentApplicationJsonSchemaDataItems
+    AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsCurrentApplicationInterviewPlanStageStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - COMPLETED
+      - PENDING
+      - REJECTED
+      description: Status of the current application interview plan stage
+      title: AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsCurrentApplicationInterviewPlanStageStatus
+    RetrievePaginatedListOfAtsCandidates-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrievePaginatedListOfAtsCandidates-v2026-01-01RequestForbiddenError
+    AtsCandidatesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        city:
+          type:
+          - string
+          - 'null'
+          description: City the candidate currently lives in
+        email:
+          type: string
+          format: email
+          description: The candidate's email address
+        pic_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: The candidate's picture URL
+        last_name:
+          type: string
+          description: The candidate's last name
+        first_name:
+          type: string
+          description: The candidate's first name
+        country_code:
+          type:
+          - string
+          - 'null'
+          description: ISO 3166-1 alpha-2 code of the country the candidate currently lives in
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: The candidate's phone number
+        origin_source_slug:
+          type: string
+          description: The candidate's origin source slug. Accepts any active source slug of the organization, e.g. sourced_internally, sourced_externally, external_career_page, linkedin_basic or a custom source slug (case-insensitive)
+        linkedin_profile_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: The candidate's LinkedIn profile URL
+      required:
+      - email
+      - last_name
+      - first_name
+      title: AtsCandidatesPostRequestBodyContentApplicationJsonSchemaData
+    ats-candidates_createCandidateTags-v2026-02-27_Response_201:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesCandidateIdTagsPostResponsesContentApplicationJsonSchemaDataItems'
+          description: List of created candidate-tag associations.
+      required:
+      - data
+      title: ats-candidates_createCandidateTags-v2026-02-27_Response_201
+    ats-candidates_retrievePaginatedListOfAtsCandidates-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of candidates
+        has_more:
+          type: boolean
+          description: Indicates if there are more items to fetch
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page of results
+        total_count:
+          type: integer
+          minimum: 0
+          description: Total number of candidates
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: ats-candidates_retrievePaginatedListOfAtsCandidates-v2026-01-01_Response_200
+    AtsCandidatesCandidateIdTagsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsCandidatesCandidateIdTagsPostResponsesContentApplicationJsonSchemaErrorsItems
+    AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsCandidateTagsItemsTag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the tag
+        label:
+          type: string
+          description: Label for the tag
+      title: AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsCandidateTagsItemsTag
+    AtsCandidatesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsCandidatesGetResponsesContentApplicationJsonSchemaErrorsItems
+    AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the candidate
+        email:
+          type: string
+          format: email
+          description: Candidate's email address
+        source:
+          type:
+          - string
+          - 'null'
+          description: Source of the candidate
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the candidate's profile picture
+        last_name:
+          type: string
+          description: Candidate's last name
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the candidate was created
+        first_name:
+          type: string
+          description: Candidate's first name
+        numeric_id:
+          type: number
+          format: double
+          description: Numeric identifier for the candidate
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the candidate was last updated
+        imported_id:
+          type:
+          - string
+          - 'null'
+          description: Imported identifier
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItems'
+          description: Applications associated with the candidate
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Candidate's phone number
+        anonymized_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the candidate was anonymized
+        candidate_tags:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsCandidateTagsItems'
+          description: Tags associated with the candidate
+        import_session_id:
+          type:
+          - string
+          - 'null'
+          description: Import session identifier
+        origin_source_slug:
+          type:
+          - string
+          - 'null'
+          description: Origin source slug of the candidate (e.g. sourced_internally, external_career_page or a custom source slug)
+        final_archivation_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp of when the candidate was finally archived
+        linkedin_profile_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the candidate's LinkedIn profile
+        total_applications_count:
+          type: number
+          format: double
+          description: Total number of applications the candidate has
+      required:
+      - id
+      - email
+      - last_name
+      - created_at
+      - first_name
+      - numeric_id
+      - updated_at
+      title: AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItems
+    AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsCandidateTagsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the candidate tag
+        tag:
+          oneOf:
+          - $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsCandidateTagsItemsTag'
+          - type: 'null'
+        tag_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the tag
+        candidate_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the candidate
+      title: AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsCandidateTagsItems
+    ? AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsCurrentApplicationInterviewPlanStageInterviewPlanStage
+    : type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the interview plan stage
+        name:
+          type: string
+          description: Name of the interview plan stage
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description of the interview plan stage
+        stage_order:
+          type: number
+          format: double
+          description: Order of the stage in the interview plan
+        default_type_slug:
+          type:
+          - string
+          - 'null'
+          description: Default type slug for the interview plan stage
+        interview_plan_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the interview plan
+        category_type_slug:
+          type: string
+          description: Category type slug for the interview plan stage
+      required:
+      - id
+      - name
+      - stage_order
+      - interview_plan_id
+      - category_type_slug
+      title: AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsCurrentApplicationInterviewPlanStageInterviewPlanStage
+    AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItems:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier for the application
+        job:
+          $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsJob'
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the application was created
+        current_application_interview_plan_stage:
+          oneOf:
+          - $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsCurrentApplicationInterviewPlanStage'
+          - type: 'null'
+      title: AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItems
+    CreateAtsCandidate-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateAtsCandidate-v2026-01-01RequestBadRequestError
+    CreateCandidateTags-v2024-06-12RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesCandidateIdTagsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateCandidateTags-v2024-06-12RequestInternalServerError
+    CreateAtsCandidate-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateAtsCandidate-v2026-01-01RequestForbiddenError
+    RetrievePaginatedListOfAtsCandidates-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrievePaginatedListOfAtsCandidates-v2026-01-01RequestBadRequestError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    AtsCandidatesPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsCandidatesPostResponsesContentApplicationJsonSchemaErrorsItems
+    AtsCandidatesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the candidate
+        city:
+          type:
+          - string
+          - 'null'
+          description: City the candidate currently lives in
+        email:
+          type: string
+          format: email
+          description: Email address of the candidate
+        source:
+          type:
+          - string
+          - 'null'
+          description: Source of the candidate
+        pic_url:
+          type:
+          - string
+          - 'null'
+          description: Profile picture URL of the candidate
+        last_name:
+          type: string
+          description: Last name of the candidate
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the candidate was created
+        first_name:
+          type: string
+          description: First name of the candidate
+        numeric_id:
+          type: integer
+          description: Numeric identifier for the candidate
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the candidate was last updated
+        imported_id:
+          type:
+          - string
+          - 'null'
+          description: Imported identifier
+        country_code:
+          type:
+          - string
+          - 'null'
+          description: ISO 3166-1 alpha-2 country the candidate currently lives in
+        phone_number:
+          type:
+          - string
+          - 'null'
+          description: Phone number of the candidate
+        anonymized_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the candidate was anonymized
+        import_session_id:
+          type:
+          - string
+          - 'null'
+          description: Import session identifier
+        origin_source_slug:
+          type:
+          - string
+          - 'null'
+          description: Origin source slug of the candidate (e.g. sourced_internally, external_career_page or a custom source slug)
+        final_archivation_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the candidate was finally archived
+        linkedin_profile_url:
+          type:
+          - string
+          - 'null'
+          description: LinkedIn profile URL of the candidate
+      required:
+      - id
+      - email
+      - last_name
+      - created_at
+      - first_name
+      - numeric_id
+      - updated_at
+      title: AtsCandidatesPostResponsesContentApplicationJsonSchemaData
+    CreateCandidateTags-v2024-06-12RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesCandidateIdTagsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateCandidateTags-v2024-06-12RequestBadRequestError
+    RetrievePaginatedListOfAtsCandidates-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrievePaginatedListOfAtsCandidates-v2026-01-01RequestInternalServerError
+    AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsCurrentApplicationInterviewPlanStage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the current application interview plan stage
+        status:
+          $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsCurrentApplicationInterviewPlanStageStatus'
+          description: Status of the current application interview plan stage
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of when the current application interview plan stage was created
+        application_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the application
+        interview_plan_stage:
+          oneOf:
+          - $ref: '#/components/schemas/AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsCurrentApplicationInterviewPlanStageInterviewPlanStage'
+          - type: 'null'
+        interview_plan_stage_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the interview plan stage
+      required:
+      - id
+      - status
+      - created_at
+      - application_id
+      - interview_plan_stage_id
+      title: AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsCurrentApplicationInterviewPlanStage
+    CreateCandidateTags-v2024-06-12RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsCandidatesCandidateIdTagsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateCandidateTags-v2024-06-12RequestForbiddenError
+    AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job
+        title:
+          type: string
+          description: Job title
+      title: AtsCandidatesGetResponsesContentApplicationJsonSchemaDataItemsApplicationsItemsJob
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

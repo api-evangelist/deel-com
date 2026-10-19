@@ -1,122 +1,783 @@
 openapi: 3.2.0
 info:
-  title: Deel Contractors Milestones API
-  description: 'Independent Contractor (IC), Pay-As-You-Go, Milestone, and COR (Contractor of Record)
-
-    APIs covering contract creation, amendments, bulk signing, timesheets, milestones,
-
-    IC invoicing taxes, off-cycle payments, bonuses, expense reimbursements, and onboarding.'
-  version: '2026-05-25'
-  contact:
-    name: Deel Developer Support
-    url: https://developer.deel.com/api/contractors/introduction
+  title: Endpoints Milestones API
+  version: 1.0.0
+  description: API endpoints related to Milestones.
 servers:
-- url: https://api.letsdeel.com/rest/v2
+- url: https://api.letsdeel.com/rest
   description: Production
-- url: https://api-sandbox.demo.deel.com/rest/v2
-  description: Sandbox
-security:
-- BearerAuth: []
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
 tags:
 - name: Milestones
-  description: Milestone-based contract deliverables
+  description: API endpoints related to Milestones.
 paths:
   /contracts/{contract_id}/milestones:
-    get:
-      operationId: getMilestones
-      summary: List Milestones
+    post:
+      operationId: milestones_createContractMilestone
+      summary: Create a Milestone
+      description: 'Creates a new payment milestone on a milestone-based contract. After creation, the milestone enters a review workflow before payment is processed.
+
+
+        **Token scopes**: `milestones:write`'
       tags:
       - Milestones
       parameters:
       - name: contract_id
         in: path
+        description: The unique identifier of the Deel contract where the milestone will be added.
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Milestone created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/milestones_createContractMilestone_Response_201'
+        '400':
+          description: Bad Request - The request payload failed validation or violated a business rule, such as the contract not supporting milestones.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMilestone-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - The requester does not own this contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMilestone-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found - The specified contract or an associated resource does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMilestone-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The milestone could not be created due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMilestone-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: The milestone object containing the required details to be added to the contract.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: milestones_getContractMilestones
+      summary: Retrieve Milestones by Contract
+      description: 'Retrieves all milestones associated with a specific contract, including each milestone''s title, amount, status, relevant dates, and creator and reviewer information.
+
+
+        **Token scopes**: `milestones:read`'
+      tags:
+      - Milestones
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the Deel contract for which milestones are being retrieved.
         required: true
         schema:
           type: string
       responses:
         '200':
-          description: Milestones
+          description: A list of milestones for the specified contract.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Milestone'
-    post:
-      operationId: createMilestone
-      summary: Create Milestone
+                $ref: '#/components/schemas/milestones_getContractMilestones_Response_200'
+        '400':
+          description: Bad Request - The contract_id parameter failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMilestonesByContract-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - The requesting token does not have access to this organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMilestonesByContract-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found - The specified contract does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMilestonesByContract-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The contract milestones could not be retrieved due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMilestonesByContract-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /contracts/{contract_id}/milestones/{milestone_id}:
+    delete:
+      operationId: milestones_deleteContractMilestone
+      summary: Delete a Milestone
+      description: 'Permanently deletes a specific milestone from a contract. This operation is irreversible and removes all associated milestone data.
+
+
+        **Token scopes**: `milestones:write`'
       tags:
       - Milestones
       parameters:
       - name: contract_id
         in: path
+        description: The unique identifier of the Deel contract from which the milestone will be deleted.
         required: true
         schema:
           type: string
-      requestBody:
+      - name: milestone_id
+        in: path
+        description: The unique identifier of the milestone that is to be deleted.
         required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MilestoneCreate'
+        schema:
+          type: string
       responses:
-        '201':
-          description: Milestone created
+        '200':
+          description: Milestone successfully deleted.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Milestone'
+                $ref: '#/components/schemas/milestones_deleteContractMilestone_Response_200'
+        '400':
+          description: Bad Request - The milestone cannot be removed given its current status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteMilestoneById-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden - The requester does not own this contract.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteMilestoneById-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Not Found - The specified contract or milestone does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteMilestoneById-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The milestone could not be deleted due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteMilestoneById-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+    get:
+      operationId: milestones_getContractMilestoneById
+      summary: Retrieve a single milestone
+      description: 'Retrieves a single milestone identified by milestone_id within a specific contract.
+
+
+        **Token scopes**: `milestones:read`'
+      tags:
+      - Milestones
+      parameters:
+      - name: contract_id
+        in: path
+        description: Deel contract id.
+        required: true
+        schema:
+          type: string
+      - name: milestone_id
+        in: path
+        description: ID of milestone to return
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/milestones_getContractMilestoneById_Response_200'
+        '400':
+          description: Bad Request - The contract_id or milestone_id parameter failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMilestonesByContractAndId-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not Found - The specified contract or milestone does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMilestonesByContractAndId-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Internal Server Error - The milestone could not be retrieved due to an unexpected upstream or internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMilestonesByContractAndId-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
 components:
   schemas:
-    MilestoneCreate:
+    GetMilestonesByContractAndId-v2026-01-01RequestBadRequestError:
       type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation errors describing why the milestone could not be retrieved.
+      required:
+      - errors
+      title: GetMilestonesByContractAndId-v2026-01-01RequestBadRequestError
+    GetMilestonesByContractAndId-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the milestone cannot be retrieved.
+      required:
+      - errors
+      title: GetMilestonesByContractAndId-v2026-01-01RequestInternalServerError
+    ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the milestone.
+        amount:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaDataAmount'
+        description:
+          type: string
+          description: A detailed description of the milestone.
       required:
       - title
       - amount
-      - currency
+      - description
+      title: ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaData:
+      type: object
       properties:
-        title:
+        created:
+          type: boolean
+          description: Indicates whether the milestone was successfully created.
+      required:
+      - created
+      title: ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaData
+    CreateMilestone-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation or business rule errors describing why the milestone could not be created, such as invalid input, an unsupported contract type, or an amount exceeding the allowed maximum.
+      required:
+      - errors
+      title: CreateMilestone-v2026-01-01RequestBadRequestError
+    DeleteMilestoneById-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the milestone could not be found.
+      required:
+      - errors
+      title: DeleteMilestoneById-v2026-01-01RequestNotFoundError
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
           type: string
-        description:
+          description: Machine-readable error code identifying the failure category.
+        message:
           type: string
-        amount:
-          type: number
-        currency:
-          type: string
-        due_date:
-          type: string
-          format: date
-    Milestone:
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    milestones_createContractMilestone_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: milestones_createContractMilestone_Response_201
+    CreateMilestone-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the milestone cannot be created.
+      required:
+      - errors
+      title: CreateMilestone-v2026-01-01RequestInternalServerError
+    GetMilestonesByContract-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the contract milestones cannot be retrieved.
+      required:
+      - errors
+      title: GetMilestonesByContract-v2026-01-01RequestInternalServerError
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaData:
       type: object
       properties:
         id:
-          type: string
-        contract_id:
-          type: string
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataId'
         title:
           type: string
-        description:
-          type: string
+          description: Title of milestone.
         amount:
-          type: number
-        currency:
           type: string
+          description: Amount to be paid for the milestone.
         status:
           type: string
-          enum:
-          - pending
-          - in_progress
-          - submitted
-          - approved
-          - paid
-        due_date:
+          description: Current status of milestone.
+        created_at:
+          type:
+          - string
+          - 'null'
+          pattern: ^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$
+          description: Long date-time format following ISO-8601
+        description:
           type: string
-          format: date
+          description: Description of milestone.
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedBy'
+          description: Milestone creator.
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedBy'
+          - type: 'null'
+          description: Reviewer's information.
+        approval_requested:
+          type: boolean
+          description: Indicates if the contractor has requested the approval for the milestone.
+      required:
+      - id
+      - title
+      - amount
+      - status
+      - created_at
+      - description
+      - reported_by
+      - reviewed_by
+      - approval_requested
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaData
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedById
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataId
+    CreateMilestone-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why a referenced resource, such as the contract or reporting preset, could not be found.
+      required:
+      - errors
+      title: CreateMilestone-v2026-01-01RequestNotFoundError
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedById
+    milestones_getContractMilestoneById_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: milestones_getContractMilestoneById_Response_200
+    GetMilestonesByContractAndId-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the milestone could not be found.
+      required:
+      - errors
+      title: GetMilestonesByContractAndId-v2026-01-01RequestNotFoundError
+    GetMilestonesByContract-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why access to the contract milestones was denied.
+      required:
+      - errors
+      title: GetMilestonesByContract-v2026-01-01RequestForbiddenError
+    DeleteMilestoneById-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Generic upstream or internal errors emitted when the milestone cannot be deleted.
+      required:
+      - errors
+      title: DeleteMilestoneById-v2026-01-01RequestInternalServerError
+    milestones_getContractMilestones_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItems'
+          description: An array of milestone objects associated with the contract.
+      required:
+      - data
+      title: milestones_getContractMilestones_Response_200
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedById'
+        full_name:
+          type: string
+          description: The full name of the person who reported the milestone.
+      required:
+      - id
+      description: Information about the creator of the milestone.
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedBy
+    GetMilestonesByContract-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Validation errors describing why the contract milestones could not be retrieved.
+      required:
+      - errors
+      title: GetMilestonesByContract-v2026-01-01RequestBadRequestError
+    GetMilestonesByContract-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the contract could not be found.
+      required:
+      - errors
+      title: GetMilestonesByContract-v2026-01-01RequestNotFoundError
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedById'
+        full_name:
+          type: string
+          description: Reviewer's full name.
+      required:
+      - id
+      description: Reviewer's information.
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReviewedBy
+    ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaDataAmount:
+      oneOf:
+      - type: string
+      - type: number
+        format: double
+      title: ContractsContractIdMilestonesPostRequestBodyContentApplicationJsonSchemaDataAmount
+    DeleteMilestoneById-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Business rule errors describing why the milestone could not be removed, such as its current review status.
+      required:
+      - errors
+      title: DeleteMilestoneById-v2026-01-01RequestBadRequestError
+    CreateMilestone-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the milestone could not be created for this contract.
+      required:
+      - errors
+      title: CreateMilestone-v2026-01-01RequestForbiddenError
+    ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        deleted:
+          type: boolean
+          description: Confirms that the milestone was successfully deleted.
+      required:
+      - deleted
+      title: ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaData
+    milestones_deleteContractMilestone_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: milestones_deleteContractMilestone_Response_200
+    ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: ContractsContractIdMilestonesPostResponsesContentApplicationJsonSchemaErrorsItems
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    DeleteMilestoneById-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+          description: Errors describing why the milestone could not be deleted.
+      required:
+      - errors
+      title: DeleteMilestoneById-v2026-01-01RequestForbiddenError
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsId
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedById
+    ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedById'
+        full_name:
+          type: string
+          description: Reporter's full name.
+      required:
+      - id
+      description: Milestone creator.
+      title: ContractsContractIdMilestonesMilestoneIdGetResponsesContentApplicationJsonSchemaDataReportedBy
+    ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: ContractsContractIdMilestonesMilestoneIdDeleteResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code identifying the failure category.
+        message:
+          type: string
+          description: Human-readable error message describing the unexpected condition.
+      required:
+      - message
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedById:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedById
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedById'
+        full_name:
+          type: string
+          description: The full name of the person who reviewed the milestone.
+      required:
+      - id
+      description: Information about the person who reviewed the milestone.
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy
+    ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsId'
+        title:
+          type: string
+          description: The title of the milestone.
+        amount:
+          type: string
+          description: The amount to be paid for completing this milestone.
+        status:
+          type: string
+          description: The current status of the milestone, such as 'Pending Approval', 'Approved', or 'Completed'.
+        created_at:
+          type:
+          - string
+          - 'null'
+          pattern: ^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$
+          description: The creation date of the milestone in ISO-8601 format.
+        description:
+          type: string
+          description: A detailed description of the milestone.
+        reported_by:
+          $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReportedBy'
+          description: Information about the creator of the milestone.
+        reviewed_by:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItemsReviewedBy'
+          - type: 'null'
+          description: Information about the person who reviewed the milestone.
+        approval_requested:
+          type: boolean
+          description: Indicates whether approval has been requested for the milestone.
+      required:
+      - id
+      - title
+      - amount
+      - status
+      - created_at
+      - description
+      - reported_by
+      - reviewed_by
+      - approval_requested
+      title: ContractsContractIdMilestonesGetResponsesContentApplicationJsonSchemaDataItems
   securitySchemes:
-    BearerAuth:
+    deelToken:
       type: http
       scheme: bearer
-      bearerFormat: opaque
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

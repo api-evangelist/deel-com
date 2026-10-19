@@ -1,0 +1,1659 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Worker Relations API
+  version: 1.0.0
+  description: API endpoints related to Worker Relations.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: workerRelations
+  description: API endpoints related to Worker Relations.
+paths:
+  /hris/worker_relations/profile/{hrisProfileOid}/parent:
+    put:
+      operationId: workerRelations_addWorkerRelationParent
+      summary: Create a parent worker relation
+      description: 'Creates or replaces the parent worker relation for the HrisProfile. If a parent relation already exists for this profile, it is overwritten with the supplied data.
+
+
+        **Token scopes**: `profile:write`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: hrisProfileOid
+        in: path
+        description: HrisProfile ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisWorkerRelationsProfileHrisProfileOidParentPutRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /hris/worker_relations/profile/external/{profile_id}/parent:
+    put:
+      operationId: workerRelations_addWorkerRelationParentByExternalId
+      summary: Create a parent worker relation with external id
+      description: 'Sets or replaces the parent relationship for the specified HRIS profile, using external identifiers. Pass null as parent_profile_external_id to remove the existing parent relationship.
+
+
+        **Token scopes**: `profile:write`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: profile_id
+        in: path
+        description: HrisProfile external ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad request - The request body is invalid or missing required fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAParentWorkerRelationWithExternalId-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not found - The HRIS profile, relationship type, or parent profile was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAParentWorkerRelationWithExternalId-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdParentPutRequestBodyContentApplicationJsonSchemaData'
+                  description: The request payload containing parent relationship details.
+      security:
+      - deelToken: []
+  /hris/worker_relations/profile:
+    post:
+      operationId: workerRelations_createWorkerRelationProfile
+      summary: Create a worker relation
+      description: 'Establishes a hierarchical relationship between a worker and one or more subordinates. The request body must identify both the parent worker and the subordinate profiles to be linked.
+
+
+        **Token scopes**: `profile:write`'
+      tags:
+      - workerRelations
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-relations_createWorkerRelationProfile_Response_201'
+        '400':
+          description: Bad request - The request body is invalid, missing required fields, or a circular relationship was detected.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAWorkerRelation-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not found - The parent profile, child profile, or relationship type was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAWorkerRelation-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisWorkerRelationsProfilePostRequestBodyContentApplicationJsonSchemaData'
+                  description: The request payload containing the relationship details.
+      security:
+      - deelToken: []
+  /hris/worker_relations/profile/{hris_profile_oid}/child:
+    put:
+      operationId: workerRelations_addWorkerRelationChild
+      summary: Create child worker relation
+      description: 'Replaces all child relationships of a given type for the specified HRIS profile. Any existing child relationships of that type not included in the request will be removed.
+
+
+        **Token scopes**: `profile:write`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: hris_profile_oid
+        in: path
+        description: HrisProfile ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad request - The request body is invalid or missing required fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildWorkerRelation-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not found - The HRIS profile or relationship type was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChildWorkerRelation-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisWorkerRelationsProfileHrisProfileOidChildPutRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /hris/worker_relations/profile/external/{profileId}/child:
+    put:
+      operationId: workerRelations_addWorkerRelationChildByExternalId
+      summary: Create child worker relation with external Id
+      description: 'Creates or replaces the child worker relation for the HrisProfile identified by the given external ID. If a child relation already exists for this profile, it is overwritten with the supplied data.
+
+
+        **Token scopes**: `profile:write`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: profileId
+        in: path
+        description: HrisProfile external ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdChildPutRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /hris/worker_relations/types:
+    post:
+      operationId: workerRelations_createWorkerRelationType
+      summary: Create worker relation type
+      description: 'Creates a new worker relation type, defining a named parent–child relationship structure that can be applied to worker associations. The `is_default` flag on the response indicates whether the created type has been set as the default relation type.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - workerRelations
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-relations_createWorkerRelationType_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWorkerRelationType-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWorkerRelationType-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisWorkerRelationsTypesPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+    get:
+      operationId: workerRelations_getWorkerRelationTypes
+      summary: Retrieve all worker relation types
+      description: 'Returns all configured worker relation types available in the organization, which define the valid relationship categories that can be assigned when creating or upserting worker relations.
+
+
+        **Token scopes**: `organizations:read`'
+      tags:
+      - workerRelations
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-relations_getWorkerRelationTypes_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAllWorkerRelationTypes-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAllWorkerRelationTypes-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /hris/worker_relations/profile/external:
+    post:
+      operationId: workerRelations_createWorkerRelationProfileByExternalId
+      summary: Create worker relation with external Ids
+      description: 'Creates a hierarchical worker relation between a worker and their subordinates, using external IDs to identify all parties. The request body must supply the external IDs of both the parent and child workers along with the relation type.
+
+
+        **Token scopes**: `profile:write`'
+      tags:
+      - workerRelations
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-relations_createWorkerRelationProfileByExternalId_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalPostRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /hris/worker_relations/profile/{hrisProfileOid}:
+    delete:
+      operationId: workerRelations_deleteWorkerRelationProfile
+      summary: Delete a worker relation
+      description: 'Removes the worker relation. This operation removes all hierarchical associations (parent and child) linked to that profile.
+
+
+        **Token scopes**: `profile:write`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: hrisProfileOid
+        in: path
+        description: Worker Relation ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    get:
+      operationId: workerRelations_getWorkerRelationProfile
+      summary: List of worker relations
+      description: 'Returns all worker relations associated with the HrisProfile, including both parent and child relationships.
+
+
+        **Token scopes**: `profile:read`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: hrisProfileOid
+        in: path
+        description: HrisProfile ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-relations_getWorkerRelationProfile_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /hris/worker_relations/profile/external/{profileId}:
+    delete:
+      operationId: workerRelations_deleteWorkerRelationProfileByExternalId
+      summary: Delete a worker relation by external id
+      description: 'Removes the worker relation identified by the given external ID. This operation removes all hierarchical associations (parent and child) linked to that relation.
+
+
+        **Token scopes**: `profile:write`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: profileId
+        in: path
+        description: Worker Relation external ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /hris/worker_relations/types/{type_id}:
+    delete:
+      operationId: workerRelations_deleteWorkerRelationType
+      summary: Delete a worker relation type
+      description: 'Deletes an existing worker relationship type.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: type_id
+        in: path
+        description: Worker Relation Type ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteAWorkerRelationType-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteAWorkerRelationType-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+  /hris/worker_relations/types/external/{externalId}:
+    delete:
+      operationId: workerRelations_deleteWorkerRelationTypeByExternalId
+      summary: Delete a worker relation type by external id
+      description: 'Permanently deletes the worker relation type.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: externalId
+        in: path
+        description: Worker Relation Type external ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+    patch:
+      operationId: workerRelations_updateWorkerRelationTypeByExternalId
+      summary: Update a worker relation type by external id
+      description: 'Applies a partial update to a worker relation type. Only fields included in the request body are modified; omitted fields retain their current values.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: externalId
+        in: path
+        description: Worker Relation Type external ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisWorkerRelationsTypesExternalExternalIdPatchRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+  /hris/worker_relations/profile/external/{profile_id}:
+    get:
+      operationId: workerRelations_getWorkerRelationProfileByExternalId
+      summary: Fetch Worker Relations of a given HrisProfile by external id
+      description: 'Retrieves all worker relationships for a given HRIS profile identified by its external identifier, including parent and child relationships.
+
+
+        **Token scopes**: `profile:read`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: profile_id
+        in: path
+        description: HrisProfile external ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/worker-relations_getWorkerRelationProfileByExternalId_Response_200'
+        '400':
+          description: Bad request - The provided profileId parameter is invalid or missing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchWorkerRelationsOfAGivenHrisProfileByExternalId-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Not found - No HRIS profile exists for the provided externalId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FetchWorkerRelationsOfAGivenHrisProfileByExternalId-v2026-01-01RequestNotFoundError'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      security:
+      - deelToken: []
+  /hris/worker_relations/types/{typeId}:
+    patch:
+      operationId: workerRelations_updateWorkerRelationType
+      summary: Update a worker relation type
+      description: 'Applies a partial update to an existing worker relation type. Only fields provided in the request body are modified; omitted fields retain their current values.
+
+
+        **Token scopes**: `organizations:write`'
+      tags:
+      - workerRelations
+      parameters:
+      - name: typeId
+        in: path
+        description: Worker Relation Type id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HrisWorkerRelationsTypesTypeIdPatchRequestBodyContentApplicationJsonSchemaData'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    FetchWorkerRelationsOfAGivenHrisProfileByExternalId-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchWorkerRelationsOfAGivenHrisProfileByExternalId-v2026-01-01RequestNotFoundError
+    CreateChildWorkerRelation-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileHrisProfileOidChildPutResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateChildWorkerRelation-v2026-01-01RequestBadRequestError
+    HrisWorkerRelationsProfileHrisProfileOidParentPutRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the parent profile
+        hris_relationship_type_id:
+          type: string
+          format: uuid
+          description: The ID of the relationship type
+      required:
+      - id
+      - hris_relationship_type_id
+      title: HrisWorkerRelationsProfileHrisProfileOidParentPutRequestBodyContentApplicationJsonSchemaData
+    HrisWorkerRelationsTypesTypeIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        child_name:
+          type: string
+          maxLength: 100
+          description: The name of the secondary party in the relationship
+        external_id:
+          type: string
+          maxLength: 100
+          description: A custom ID for the relation type
+        parent_name:
+          type: string
+          maxLength: 100
+          description: The name of the primary party in the relationship
+      title: HrisWorkerRelationsTypesTypeIdPatchRequestBodyContentApplicationJsonSchemaData
+    HrisWorkerRelationsProfileExternalProfileIdParentPutRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        relation_external_id:
+          type:
+          - string
+          - 'null'
+          maxLength: 100
+          description: The external identifier for this specific relation record.
+        parent_profile_external_id:
+          type:
+          - string
+          - 'null'
+          maxLength: 100
+          description: The external identifier of the parent HRIS Profile. Pass null to remove the existing parent relationship.
+        hris_relationship_type_external_id:
+          type: string
+          maxLength: 100
+          description: The external identifier of the relationship type to apply.
+      required:
+      - parent_profile_external_id
+      - hris_relationship_type_external_id
+      description: The request payload containing parent relationship details.
+      title: HrisWorkerRelationsProfileExternalProfileIdParentPutRequestBodyContentApplicationJsonSchemaData
+    HrisWorkerRelationsProfileExternalPostRequestBodyContentApplicationJsonSchemaDataChildHrisProfileIdsItems:
+      type: object
+      properties:
+        relation_external_id:
+          type: string
+          maxLength: 100
+          description: A custom ID to set to the relation.
+        external_hris_profile_id:
+          type: string
+          maxLength: 100
+          description: The external ID of the secondary HrisProfile.
+      required:
+      - relation_external_id
+      - external_hris_profile_id
+      title: HrisWorkerRelationsProfileExternalPostRequestBodyContentApplicationJsonSchemaDataChildHrisProfileIdsItems
+    HrisWorkerRelationsTypesPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the relation type
+        child_name:
+          type: string
+          description: The name of the secondary party in the relationship
+        is_default:
+          type: boolean
+          description: Whether this relation is default or not
+        external_id:
+          type: string
+          description: A custom ID for the relation type
+        parent_name:
+          type: string
+          description: The name of the primary party in the relationship
+      title: HrisWorkerRelationsTypesPostResponsesContentApplicationJsonSchemaData
+    worker-relations_getWorkerRelationProfileByExternalId_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaDataItems'
+          description: An array containing the Worker Relations of the profile. It includes either the parent or child relations.
+      title: worker-relations_getWorkerRelationProfileByExternalId_Response_200
+    HrisWorkerRelationsTypesExternalExternalIdPatchRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        child_name:
+          type: string
+          maxLength: 100
+          description: The name of the secondary party in the relationship
+        external_id:
+          type: string
+          maxLength: 100
+          description: A custom ID for the relation type
+        parent_name:
+          type: string
+          maxLength: 100
+          description: The name of the primary party in the relationship
+      title: HrisWorkerRelationsTypesExternalExternalIdPatchRequestBodyContentApplicationJsonSchemaData
+    HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the relation type
+        name:
+          type: string
+          description: The name of the relation type
+        is_parent:
+          type: boolean
+          description: Whether this relation is the parent or not
+        is_default:
+          type: boolean
+          description: Whether this relation is default or not
+        child_relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaDataItemsChildRelationshipsItems'
+          description: An array containing the information about the child profiles in the relation.
+        parent_relationship:
+          $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaDataItemsParentRelationship'
+          description: An object that has information about the parent profile in the relation.
+      title: HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaDataItems
+    HrisWorkerRelationsProfileHrisProfileOidChildPutRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: An array containing the IDs of the child profiles
+        hris_relationship_type_id:
+          type: string
+          format: uuid
+          description: The ID of the relationship type
+      required:
+      - ids
+      - hris_relationship_type_id
+      title: HrisWorkerRelationsProfileHrisProfileOidChildPutRequestBodyContentApplicationJsonSchemaData
+    HrisWorkerRelationsTypesTypeIdDeleteResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: HrisWorkerRelationsTypesTypeIdDeleteResponsesContentApplicationJsonSchemaErrorsItems
+    CreateWorkerRelationType-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsTypesPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateWorkerRelationType-v2026-01-01RequestInternalServerError
+    HrisWorkerRelationsProfileExternalProfileIdChildPutRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        child_hris_profile_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdChildPutRequestBodyContentApplicationJsonSchemaDataChildHrisProfileIdsItems'
+        hris_relationship_type_external_id:
+          type: string
+          format: uuid
+      required:
+      - child_hris_profile_ids
+      title: HrisWorkerRelationsProfileExternalProfileIdChildPutRequestBodyContentApplicationJsonSchemaData
+    HrisWorkerRelationsProfileHrisProfileOidGetResponsesContentApplicationJsonSchemaDataItemsChildRelationshipsItems:
+      type: object
+      properties:
+        last_name:
+          type: string
+          description: The last name of the child profile
+        first_name:
+          type: string
+          description: The first name of the child profile
+        profile_id:
+          type: string
+          format: uuid
+          description: The ID of the child profile
+        relation_id:
+          type: string
+          format: uuid
+          description: The ID of the relation between the profiles
+      title: HrisWorkerRelationsProfileHrisProfileOidGetResponsesContentApplicationJsonSchemaDataItemsChildRelationshipsItems
+    HrisWorkerRelationsTypesGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: HrisWorkerRelationsTypesGetResponsesContentApplicationJsonSchemaErrorsItems
+    CreateWorkerRelationType-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsTypesPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: CreateWorkerRelationType-v2026-01-01RequestBadRequestError
+    HrisWorkerRelationsTypesGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the relation type
+        child_name:
+          type: string
+          description: The name of the secondary party in the relationship
+        is_default:
+          type: boolean
+          description: Whether this relation is default or not
+        external_id:
+          type:
+          - string
+          - 'null'
+          maxLength: 100
+          description: A custom ID for the relation type
+        parent_name:
+          type: string
+          description: The name of the primary party in the relationship
+      title: HrisWorkerRelationsTypesGetResponsesContentApplicationJsonSchemaDataItems
+    CreateAWorkerRelation-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfilePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateAWorkerRelation-v2026-01-01RequestNotFoundError
+    HrisWorkerRelationsProfilePostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        child_hris_profile_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: An array containing the secondary HrisProfiles IDs.
+        parent_hris_profile_id:
+          type: string
+          format: uuid
+          description: Primary HrisProfile ID
+        hris_relationship_type_id:
+          type: string
+          format: uuid
+          description: The ID of the Worker Relation Type.
+      required:
+      - child_hris_profile_ids
+      - parent_hris_profile_id
+      - hris_relationship_type_id
+      description: The request payload containing the relationship details.
+      title: HrisWorkerRelationsProfilePostRequestBodyContentApplicationJsonSchemaData
+    worker-relations_createWorkerRelationProfile_Response_201:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: worker-relations_createWorkerRelationProfile_Response_201
+    HrisWorkerRelationsProfileHrisProfileOidChildPutResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: HrisWorkerRelationsProfileHrisProfileOidChildPutResponsesContentApplicationJsonSchemaErrorsItems
+    HrisWorkerRelationsProfileExternalProfileIdParentPutResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: HrisWorkerRelationsProfileExternalProfileIdParentPutResponsesContentApplicationJsonSchemaErrorsItems
+    CreateAParentWorkerRelationWithExternalId-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdParentPutResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateAParentWorkerRelationWithExternalId-v2026-01-01RequestBadRequestError
+    HrisWorkerRelationsProfileHrisProfileOidGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the relation type
+        name:
+          type: string
+          description: The name of the relation type
+        is_parent:
+          type: boolean
+          description: Whether this relation is the parent or not
+        is_default:
+          type: boolean
+          description: Whether this relation is default or not
+        child_relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileHrisProfileOidGetResponsesContentApplicationJsonSchemaDataItemsChildRelationshipsItems'
+          description: An array containing the information about the child profiles in the relation.
+        parent_relationship:
+          oneOf:
+          - $ref: '#/components/schemas/HrisWorkerRelationsProfileHrisProfileOidGetResponsesContentApplicationJsonSchemaDataItemsParentRelationship'
+          - type: 'null'
+          description: An object that has information about the parent profile in the relation.
+      title: HrisWorkerRelationsProfileHrisProfileOidGetResponsesContentApplicationJsonSchemaDataItems
+    HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaDataItemsChildRelationshipsItems:
+      type: object
+      properties:
+        last_name:
+          type: string
+          description: The last name of the child profile
+        first_name:
+          type: string
+          description: The first name of the child profile
+        profile_id:
+          type: string
+          format: uuid
+          description: The ID of the child profile
+        external_id:
+          type: string
+          description: The external ID of the child profile
+        relation_id:
+          type: string
+          format: uuid
+          description: The ID of the relation between the profiles
+      title: HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaDataItemsChildRelationshipsItems
+    HrisWorkerRelationsTypesPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: HrisWorkerRelationsTypesPostResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveAllWorkerRelationTypes-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsTypesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveAllWorkerRelationTypes-v2026-01-01RequestInternalServerError
+    HrisWorkerRelationsProfileHrisProfileOidGetResponsesContentApplicationJsonSchemaDataItemsParentRelationship:
+      type: object
+      properties:
+        last_name:
+          type: string
+          description: The last name of the parent profile
+        first_name:
+          type: string
+          description: The first name of the parent profile
+        profile_id:
+          type: string
+          format: uuid
+          description: The ID of the parent profile
+        relation_id:
+          type: string
+          format: uuid
+          description: The ID of the relation between the profiles
+      description: An object that has information about the parent profile in the relation.
+      title: HrisWorkerRelationsProfileHrisProfileOidGetResponsesContentApplicationJsonSchemaDataItemsParentRelationship
+    HrisWorkerRelationsProfileExternalPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        child_hris_profile_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalPostRequestBodyContentApplicationJsonSchemaDataChildHrisProfileIdsItems'
+          description: An array containing the secondary HrisProfiles external IDs and the relation external ID.
+        parent_external_hris_profile_id:
+          type: string
+          maxLength: 100
+          description: Primary HrisProfile external ID
+        hris_relationship_type_external_id:
+          type: string
+          maxLength: 100
+          description: The external ID of the Worker Relation Type.
+      required:
+      - child_hris_profile_ids
+      - parent_external_hris_profile_id
+      - hris_relationship_type_external_id
+      title: HrisWorkerRelationsProfileExternalPostRequestBodyContentApplicationJsonSchemaData
+    DeleteAWorkerRelationType-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsTypesTypeIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteAWorkerRelationType-v2026-01-01RequestInternalServerError
+    FetchWorkerRelationsOfAGivenHrisProfileByExternalId-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: FetchWorkerRelationsOfAGivenHrisProfileByExternalId-v2026-01-01RequestBadRequestError
+    worker-relations_createWorkerRelationType_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/HrisWorkerRelationsTypesPostResponsesContentApplicationJsonSchemaData'
+      title: worker-relations_createWorkerRelationType_Response_201
+    HrisWorkerRelationsProfileExternalProfileIdChildPutRequestBodyContentApplicationJsonSchemaDataChildHrisProfileIdsItems0:
+      type: object
+      properties:
+        relation_external_id:
+          type: string
+          maxLength: 100
+        external_hris_profile_id:
+          type: string
+          maxLength: 100
+      required:
+      - relation_external_id
+      - external_hris_profile_id
+      title: HrisWorkerRelationsProfileExternalProfileIdChildPutRequestBodyContentApplicationJsonSchemaDataChildHrisProfileIdsItems0
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaDataItemsParentRelationship:
+      type: object
+      properties:
+        last_name:
+          type: string
+          description: The last name of the parent profile
+        first_name:
+          type: string
+          description: The first name of the parent profile
+        profile_id:
+          type: string
+          format: uuid
+          description: The ID of the parent profile
+        relation_id:
+          type: string
+          format: uuid
+          description: The ID of the relation between the profiles
+        profile_external_id:
+          type: string
+          description: The external ID of the parent profile
+        relation_external_id:
+          type: string
+          description: The external ID of the relation
+      description: An object that has information about the parent profile in the relation.
+      title: HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaDataItemsParentRelationship
+    CreateChildWorkerRelation-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileHrisProfileOidChildPutResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateChildWorkerRelation-v2026-01-01RequestNotFoundError
+    DeleteAWorkerRelationType-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsTypesTypeIdDeleteResponsesContentApplicationJsonSchemaErrorsItems'
+      title: DeleteAWorkerRelationType-v2026-01-01RequestBadRequestError
+    CreateAWorkerRelation-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfilePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateAWorkerRelation-v2026-01-01RequestBadRequestError
+    HrisWorkerRelationsTypesPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        child_name:
+          type: string
+          maxLength: 100
+          description: The name of the secondary party in the relationship
+        is_default:
+          type: boolean
+          default: false
+          description: Whether this relation is default or not
+        external_id:
+          type: string
+          maxLength: 100
+          description: A custom ID for the relation type
+        parent_name:
+          type: string
+          maxLength: 100
+          description: The name of the primary party in the relationship
+      title: HrisWorkerRelationsTypesPostRequestBodyContentApplicationJsonSchemaData
+    worker-relations_createWorkerRelationProfileByExternalId_Response_201:
+      type: object
+      properties: {}
+      description: Empty response body
+      title: worker-relations_createWorkerRelationProfileByExternalId_Response_201
+    HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: HrisWorkerRelationsProfileExternalProfileIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveAllWorkerRelationTypes-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsTypesGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: RetrieveAllWorkerRelationTypes-v2026-01-01RequestBadRequestError
+    CreateAParentWorkerRelationWithExternalId-v2026-01-01RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdParentPutResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CreateAParentWorkerRelationWithExternalId-v2026-01-01RequestNotFoundError
+    HrisWorkerRelationsProfilePostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+      title: HrisWorkerRelationsProfilePostResponsesContentApplicationJsonSchemaErrorsItems
+    HrisWorkerRelationsProfileExternalProfileIdChildPutRequestBodyContentApplicationJsonSchemaDataChildHrisProfileIdsItems:
+      oneOf:
+      - $ref: '#/components/schemas/HrisWorkerRelationsProfileExternalProfileIdChildPutRequestBodyContentApplicationJsonSchemaDataChildHrisProfileIdsItems0'
+      title: HrisWorkerRelationsProfileExternalProfileIdChildPutRequestBodyContentApplicationJsonSchemaDataChildHrisProfileIdsItems
+    worker-relations_getWorkerRelationProfile_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsProfileHrisProfileOidGetResponsesContentApplicationJsonSchemaDataItems'
+          description: An array containing the Worker Relations of the profile. It includes either the parent or child relations.
+      title: worker-relations_getWorkerRelationProfile_Response_200
+    worker-relations_getWorkerRelationTypes_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HrisWorkerRelationsTypesGetResponsesContentApplicationJsonSchemaDataItems'
+      title: worker-relations_getWorkerRelationTypes_Response_200
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

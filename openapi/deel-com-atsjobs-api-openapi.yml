@@ -1,0 +1,1077 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Jobs API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsJobs
+paths:
+  /ats/jobs:
+    post:
+      operationId: atsJobs_createAtsJob
+      summary: Create ATS Job
+      description: 'Creates a new job in the ATS once an interview plan, team, location, and employment type have been determined. Use this after those prerequisites are set; the response includes the job''s id, initial status, and associated approval identifiers.
+
+
+        **Token scopes**: `ats:write`'
+      tags:
+      - atsJobs
+      responses:
+        '201':
+          description: Job successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-jobs_createAtsJob_Response_201'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAtsJob-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAtsJob-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAtsJob-v2026-01-01RequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AtsJobsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+    get:
+      operationId: atsJobs_retrieveAListOfAtsJobs
+      summary: Retrieve a list of ATS jobs
+      description: 'Use this endpoint to resolve a job''s interview plan stages: every stage of the plan is returned, and because stage names are customer-defined you look up a stage''s id here before filtering applications or interviews by stage. Pass a set of job ids to resolve a known group of jobs in one call instead of paging the full list.
+
+
+        **Token scopes**: `ats:read`, `worker:read`'
+      tags:
+      - atsJobs
+      parameters:
+      - name: cursor
+        in: query
+        description: The cursor for pagination
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Maximum number of records returned in one response
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        description: Text to search for in job records (optional)
+        required: false
+        schema:
+          type: string
+      - name: job_ids
+        in: query
+        description: Array of job UUIDs (optional). Returns only these jobs, so a caller holding job ids from another endpoint can resolve them in one request instead of paging the whole list. Omitting it leaves the result set unchanged.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: interview_plan_id
+        in: query
+        description: Interview plan UUID (optional)
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: location_ids
+        in: query
+        description: Array of location UUIDs (optional)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: team_ids
+        in: query
+        description: Array of team UUIDs (optional)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: employment_type_ids
+        in: query
+        description: Array of employment type UUIDs (optional)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: department_ids
+        in: query
+        description: Array of department UUIDs (optional)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: updated_after
+        in: query
+        description: Filter jobs updated after this timestamp (ISO 8601 format)
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: status
+        in: query
+        description: Array of job status values (optional)
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsGetParametersStatusSchemaItems'
+      - name: work_arrangements
+        in: query
+        description: Array of work arrangement values to filter by (optional)
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsGetParametersWorkArrangementsSchemaItems'
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-jobs_retrieveAListOfAtsJobs_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsJobs-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsJobs-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAListOfAtsJobs-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    AtsJobsPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the created job
+        title:
+          type: string
+          description: The job title
+        status:
+          $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current status of the job
+        job_teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaDataJobTeamsItems'
+          description: Teams associated with the job
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the job was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the job was last updated
+        job_locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaDataJobLocationsItems'
+          description: Locations associated with the job
+        is_confidential:
+          type: boolean
+          description: Whether the job posting is confidential
+        job_departments:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaDataJobDepartmentsItems'
+          description: Departments associated with the job
+        approval_rule_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: ID of the approval rule applied to this job
+        approval_request_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: ID of the approval request for this job
+        job_employment_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaDataJobEmploymentTypesItems'
+          description: Employment types associated with the job
+        richtext_description:
+          type:
+          - string
+          - 'null'
+          description: Rich text description of the job
+        work_arrangement_enum:
+          oneOf:
+          - $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaDataWorkArrangementEnum'
+          - type: 'null'
+          description: Work arrangement of the job. Null when unspecified.
+        created_by_hris_organization_user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: ID of the user who created the job
+      required:
+      - id
+      - title
+      - status
+      - job_teams
+      - job_locations
+      - is_confidential
+      - approval_rule_id
+      - approval_request_id
+      - job_employment_types
+      - created_by_hris_organization_user_id
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaData
+    ats-jobs_createAtsJob_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: ats-jobs_createAtsJob_Response_201
+    AtsJobsPostResponsesContentApplicationJsonSchemaDataJobDepartmentsItemsDepartment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the department
+        name:
+          type: string
+          description: Department name
+      required:
+      - id
+      - name
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaDataJobDepartmentsItemsDepartment
+    AtsJobsPostRequestBodyContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - DRAFT
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - NOT_APPROVED
+      - OPEN
+      - CLOSED
+      - ARCHIVED
+      description: Initial status of the job. Defaults to the status derived from the applicable approval rule when omitted.
+      title: AtsJobsPostRequestBodyContentApplicationJsonSchemaDataStatus
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobLocationsItemsLocation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the location
+        name:
+          type: string
+          description: Location name
+      required:
+      - id
+      - name
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobLocationsItemsLocation
+    AtsJobsPostResponsesContentApplicationJsonSchemaDataJobDepartmentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job department
+        department:
+          oneOf:
+          - $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaDataJobDepartmentsItemsDepartment'
+          - type: 'null'
+      required:
+      - id
+      - department
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaDataJobDepartmentsItems
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsInterviewPlanStagesItemsCategoryTypeSlug:
+      type: string
+      enum:
+      - LEAD
+      - ACTIVE
+      - COMPLETED
+      description: Category type of the interview plan stage
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsInterviewPlanStagesItemsCategoryTypeSlug
+    RetrieveAListOfAtsJobs-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsJobs-v2026-01-01RequestInternalServerError
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsHiringMembersItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the hiring member
+        hris_organization_user_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the HRIS organization user
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsHiringMembersItems
+    AtsJobsPostResponsesContentApplicationJsonSchemaDataJobLocationsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job location
+        location:
+          $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaDataJobLocationsItemsLocation'
+      required:
+      - id
+      - location
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaDataJobLocationsItems
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobTeamsItemsTeam:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the team
+        name:
+          type: string
+          description: Team name
+      required:
+      - id
+      - name
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobTeamsItemsTeam
+    RetrieveAListOfAtsJobs-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsJobs-v2026-01-01RequestForbiddenError
+    AtsJobsGetParametersWorkArrangementsSchemaItems:
+      type: string
+      enum:
+      - ON_SITE
+      - HYBRID
+      - REMOTE
+      title: AtsJobsGetParametersWorkArrangementsSchemaItems
+    AtsJobsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaErrorsItems
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentTypesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job employment type
+        employment_type:
+          $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentTypesItemsEmploymentType'
+      required:
+      - id
+      - employment_type
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentTypesItems
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsWorkArrangementEnum:
+      type: string
+      enum:
+      - ON_SITE
+      - HYBRID
+      - REMOTE
+      description: Work arrangement of the job. Null when unspecified.
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsWorkArrangementEnum
+    AtsJobsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaErrorsItems
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsHiringMemberJobPermissionsByTypeSlug:
+      type: object
+      properties:
+        hiring_team:
+          type: string
+          description: Hiring team permissions
+        job_posting:
+          type: string
+          description: Job posting permissions
+        compensation:
+          type: string
+          description: Compensation permissions
+        interview_plan:
+          type: string
+          description: Interview plan permissions
+        application_form_submission:
+          type: string
+          description: Application form submission permissions
+        application_form_submission_sensitive_fields:
+          type: string
+          description: Application form submission sensitive fields permissions
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsHiringMemberJobPermissionsByTypeSlug
+    AtsJobsPostResponsesContentApplicationJsonSchemaDataJobLocationsItemsLocation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the location
+        name:
+          type: string
+          description: Location name
+      required:
+      - id
+      - name
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaDataJobLocationsItemsLocation
+    AtsJobsPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: The job title
+        status:
+          $ref: '#/components/schemas/AtsJobsPostRequestBodyContentApplicationJsonSchemaDataStatus'
+          description: Initial status of the job. Defaults to the status derived from the applicable approval rule when omitted.
+        team_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Array of team IDs (at least one required)
+        location_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Array of location IDs (at least one required)
+        department_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Array of department IDs (optional)
+        is_confidential:
+          type: boolean
+          default: false
+          description: Whether the job posting is confidential
+        interview_plan_id:
+          type: string
+          format: uuid
+          description: Interview Plan ID must be a valid UUID
+        employment_type_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Array of employment type IDs (at least one required)
+        richtext_description:
+          type:
+          - string
+          - 'null'
+          maxLength: 20000
+          description: Rich text description of the job
+        work_arrangement_enum:
+          oneOf:
+          - $ref: '#/components/schemas/AtsJobsPostRequestBodyContentApplicationJsonSchemaDataWorkArrangementEnum'
+          - type: 'null'
+          description: Work arrangement of the job. Omit or send null to leave it unspecified.
+      required:
+      - title
+      - team_ids
+      - location_ids
+      - interview_plan_id
+      - employment_type_ids
+      title: AtsJobsPostRequestBodyContentApplicationJsonSchemaData
+    AtsJobsPostResponsesContentApplicationJsonSchemaDataWorkArrangementEnum:
+      type: string
+      enum:
+      - ON_SITE
+      - HYBRID
+      - REMOTE
+      description: Work arrangement of the job. Null when unspecified.
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaDataWorkArrangementEnum
+    CreateAtsJob-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateAtsJob-v2026-01-01RequestInternalServerError
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsCurrentCompensationPeriodSlug:
+      type: string
+      enum:
+      - ANNUALLY
+      - MONTHLY
+      - SEMIMONTHLY
+      - BIWEEKLY
+      - WEEKLY
+      - DAILY
+      - HOURLY
+      description: Compensation period
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsCurrentCompensationPeriodSlug
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsInterviewPlanStagesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the interview plan stage
+        name:
+          type: string
+          description: Interview plan stage name
+        position_number:
+          type:
+          - integer
+          - 'null'
+          description: Position number of the stage in the interview plan
+        default_type_slug:
+          type:
+          - string
+          - 'null'
+          description: Default type slug of the interview plan stage
+        interview_plan_id:
+          type: string
+          format: uuid
+          description: Interview plan ID associated with this stage
+        category_type_slug:
+          $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsInterviewPlanStagesItemsCategoryTypeSlug'
+          description: Category type of the interview plan stage
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsInterviewPlanStagesItems
+    AtsJobsPostRequestBodyContentApplicationJsonSchemaDataWorkArrangementEnum:
+      type: string
+      enum:
+      - ON_SITE
+      - HYBRID
+      - REMOTE
+      description: Work arrangement of the job. Omit or send null to leave it unspecified.
+      title: AtsJobsPostRequestBodyContentApplicationJsonSchemaDataWorkArrangementEnum
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobTeamsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job team
+        team:
+          $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobTeamsItemsTeam'
+      required:
+      - id
+      - team
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobTeamsItems
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - OPEN
+      - PAUSED
+      - CLOSED
+      - DRAFT
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - NOT_APPROVED
+      - ARCHIVED
+      description: Job status
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    AtsJobsPostResponsesContentApplicationJsonSchemaDataJobEmploymentTypesItemsEmploymentType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the employment type
+        name:
+          type: string
+          description: Employment type name
+      required:
+      - id
+      - name
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaDataJobEmploymentTypesItemsEmploymentType
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobDepartmentsItemsDepartment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the department
+        name:
+          type: string
+          description: Department name
+      required:
+      - id
+      - name
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobDepartmentsItemsDepartment
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    CreateAtsJob-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateAtsJob-v2026-01-01RequestForbiddenError
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsCurrentCompensation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the compensation
+        job_id:
+          type: string
+          format: uuid
+          description: Job ID associated with the compensation
+        max_amount:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Maximum compensation amount
+        min_amount:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Minimum compensation amount
+        period_slug:
+          $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsCurrentCompensationPeriodSlug'
+          description: Compensation period
+        currency_iso_code:
+          type: string
+          description: ISO code of the currency
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsCurrentCompensation
+    CreateAtsJob-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: CreateAtsJob-v2026-01-01RequestBadRequestError
+    AtsJobsPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - DRAFT
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - NOT_APPROVED
+      - OPEN
+      - CLOSED
+      - ARCHIVED
+      description: Current status of the job
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaDataStatus
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentTypesItemsEmploymentType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the employment type
+        name:
+          type: string
+          description: Employment type name
+      required:
+      - id
+      - name
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentTypesItemsEmploymentType
+    AtsJobsPostResponsesContentApplicationJsonSchemaDataJobEmploymentTypesItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job employment type
+        employment_type:
+          $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaDataJobEmploymentTypesItemsEmploymentType'
+      required:
+      - id
+      - employment_type
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaDataJobEmploymentTypesItems
+    RetrieveAListOfAtsJobs-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAListOfAtsJobs-v2026-01-01RequestBadRequestError
+    ats-jobs_retrieveAListOfAtsJobs_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of jobs.
+        has_more:
+          type: boolean
+          description: Whether more pages are available.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to fetch the next page; null when there are no more pages.
+        total_count:
+          type: integer
+          description: Total number of jobs matching filters.
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: ats-jobs_retrieveAListOfAtsJobs_Response_200
+    AtsJobsPostResponsesContentApplicationJsonSchemaDataJobTeamsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job team
+        team:
+          $ref: '#/components/schemas/AtsJobsPostResponsesContentApplicationJsonSchemaDataJobTeamsItemsTeam'
+      required:
+      - id
+      - team
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaDataJobTeamsItems
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobDepartmentsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job department
+        department:
+          oneOf:
+          - $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobDepartmentsItemsDepartment'
+          - type: 'null'
+      required:
+      - id
+      - department
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobDepartmentsItems
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job
+        title:
+          type: string
+          description: Job title
+        status:
+          $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Job status
+        job_teams:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobTeamsItems'
+          description: Teams associated with the job
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the job was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the job was last updated
+        job_locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobLocationsItems'
+          description: Locations associated with the job
+        hiring_members:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsHiringMembersItems'
+          description: Hiring members associated with the job
+        is_confidential:
+          type: boolean
+          description: Indicates if the job is confidential
+        job_departments:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobDepartmentsItems'
+          description: Departments associated with the job
+        approval_rule_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier for the approval rule
+        applications_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of applications for the job
+        approval_request_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier for the approval request
+        current_compensation:
+          oneOf:
+          - $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsCurrentCompensation'
+          - type: 'null'
+        job_employment_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobEmploymentTypesItems'
+          description: Employment types associated with the job
+        richtext_description:
+          type:
+          - string
+          - 'null'
+          description: Rich text description of the job
+        interview_plan_stages:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsInterviewPlanStagesItems'
+          description: Interview plan stages
+        work_arrangement_enum:
+          oneOf:
+          - $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsWorkArrangementEnum'
+          - type: 'null'
+          description: Work arrangement of the job. Null when unspecified.
+        approval_request_stringified:
+          type:
+          - string
+          - 'null'
+          description: Stringified approval request
+        created_by_hris_organization_user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Unique identifier of the user who created the job
+        hiring_member_job_permissions_by_type_slug:
+          oneOf:
+          - $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsHiringMemberJobPermissionsByTypeSlug'
+          - type: 'null'
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItems
+    AtsJobsPostResponsesContentApplicationJsonSchemaDataJobTeamsItemsTeam:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the team
+        name:
+          type: string
+          description: Team name
+      required:
+      - id
+      - name
+      title: AtsJobsPostResponsesContentApplicationJsonSchemaDataJobTeamsItemsTeam
+    AtsJobsGetParametersStatusSchemaItems:
+      type: string
+      enum:
+      - OPEN
+      - PAUSED
+      - CLOSED
+      - DRAFT
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - NOT_APPROVED
+      - ARCHIVED
+      title: AtsJobsGetParametersStatusSchemaItems
+    AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobLocationsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the job location
+        location:
+          $ref: '#/components/schemas/AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobLocationsItemsLocation'
+      required:
+      - id
+      - location
+      title: AtsJobsGetResponsesContentApplicationJsonSchemaDataItemsJobLocationsItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

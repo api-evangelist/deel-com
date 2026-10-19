@@ -1,0 +1,263 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Hiring Members API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsHiringMembers
+paths:
+  /ats/hiring-members:
+    get:
+      operationId: atsHiringMembers_retrieveAtsHiringMembers
+      summary: Retrieve ATS hiring members
+      description: 'Returns all hiring members (recruiters, hiring managers, interviewers) configured in the organization, to support assigning screening tasks, scheduling interviews, and configuring hiring workflows.
+
+
+        **Token scopes**: `ats:read`, `worker:read`'
+      tags:
+      - atsHiringMembers
+      parameters:
+      - name: cursor
+        in: query
+        description: The cursor for pagination
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Maximum number of records returned in one response
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-hiring-members_retrieveAtsHiringMembers_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAtsHiringMembers-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAtsHiringMembers-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAtsHiringMembers-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    AtsHiringMembersGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsHiringMembersGetResponsesContentApplicationJsonSchemaErrorsItems
+    RetrieveAtsHiringMembers-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsHiringMembersGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAtsHiringMembers-v2026-01-01RequestForbiddenError
+    ats-hiring-members_retrieveAtsHiringMembers_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsHiringMembersGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Page of resources.
+        has_more:
+          type: boolean
+          description: Indicates if there are more items to fetch.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page of results
+        total_count:
+          type: integer
+          minimum: 0
+          description: Total number of users
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: ats-hiring-members_retrieveAtsHiringMembers_Response_200
+    RetrieveAtsHiringMembers-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsHiringMembersGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAtsHiringMembers-v2026-01-01RequestInternalServerError
+    RetrieveAtsHiringMembers-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsHiringMembersGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrieveAtsHiringMembers-v2026-01-01RequestBadRequestError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    AtsHiringMembersGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier
+        pic_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: URL to the user's profile picture
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: User's job title
+        last_name:
+          type: string
+          description: User's last name
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        first_name:
+          type: string
+          description: User's first name
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Last update timestamp
+        work_email:
+          type: string
+          format: email
+          description: User's work email address
+        hris_organization_user_id:
+          type: string
+          description: Unique identifier for the HRIS organization user
+      required:
+      - id
+      - last_name
+      - created_at
+      - first_name
+      - work_email
+      - hris_organization_user_id
+      title: AtsHiringMembersGetResponsesContentApplicationJsonSchemaDataItems
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

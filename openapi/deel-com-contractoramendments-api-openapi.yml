@@ -1,0 +1,956 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Contractor Amendments API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: contractorAmendments
+paths:
+  /contracts/{contract_id}/amendments:
+    get:
+      operationId: contractorAmendments_getContractAmendments
+      summary: List contract amendments
+      description: 'Retrieves the paginated list of amendments associated with a given contract, with optional filtering by amendment status and sign status.
+
+
+        **Token scopes**: `contracts:read`, `contracts:write`'
+      tags:
+      - contractorAmendments
+      parameters:
+      - name: contract_id
+        in: path
+        description: Unique identifier of the contract
+        required: true
+        schema:
+          type: string
+      - name: statuses
+        in: query
+        description: Filter by work statement status.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsGetParametersStatusesSchemaItems'
+      - name: sign_statuses
+        in: query
+        description: Filter by work statement sign status.
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsGetParametersSignStatusesSchemaItems'
+      - name: limit
+        in: query
+        description: Maximum number of work statements to return.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: cursor
+        in: query
+        description: Cursor for pagination.
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/contractor-amendments_getContractAmendments_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListContractAmendments-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListContractAmendments-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+    post:
+      operationId: contractorAmendments_createContractAmendment
+      summary: Update contract
+      description: 'Submits an amendment to modify the details of an existing contract. If the contract is already signed or active, the amendment must be approved and re-signed before the changes take effect. For Global Payroll contracts, calling this again while an amendment is still pending updates it in place instead of creating a new one.
+
+
+        **Token scopes**: `contracts:write`'
+      tags:
+      - contractorAmendments
+      parameters:
+      - name: contract_id
+        in: path
+        description: The unique identifier of the employee contract.
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/contractor-amendments_createContractAmendment_Response_201'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AmendContract-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AmendContract-v2026-01-01RequestInternalServerError'
+      requestBody:
+        description: Contract object that needs to be amended
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+components:
+  schemas:
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0CycleEndType:
+      type: string
+      enum:
+      - DAY_OF_WEEK
+      - DAY_OF_LAST_WEEK
+      - DAY_OF_MONTH
+      description: Cycle end can be weekly 1-7 (Monday = 1) or monthly 1-31.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0CycleEndType
+    ContractsContractIdAmendmentsGetParametersSignStatusesSchemaItems:
+      type: string
+      enum:
+      - PENDING
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - DECLINED
+      title: ContractsContractIdAmendmentsGetParametersSignStatusesSchemaItems
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf1Scale:
+      type: string
+      enum:
+      - hourly
+      - daily
+      - weekly
+      - monthly
+      - annually
+      - two_weekly
+      - bi_monthly
+      - custom
+      - one_off
+      description: Payment scale for the base compensation.
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf1Scale
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData1:
+      type: object
+      properties:
+        scale:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1Scale'
+          description: Defines the scale at which the base compensation amount is paid.
+        amount:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1000000000
+          description: Base compensation amount to be paid per scale.
+        end_date:
+          type: string
+          format: date
+          description: Short date in format ISO-8601 (YYYY-MM-DD). Required when contract_term is 'definite'.
+        type_of_edit:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1TypeOfEdit'
+          default: amendment
+          description: Whether the change requires a signature. 'amendment' (default) creates a pending amendment that must be signed via POST /rest/contracts/{contract_id}/amendments/{amendment_id}/sign before it takes effect. 'direct' applies the change immediately, with no signature required.
+        change_reason:
+          type: string
+          format: uuid
+          description: The unique identifier (oid) of a modification reason configured for the organization, not free text. Required by organizations that have modification reasons configured.
+        contract_term:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1ContractTerm'
+          description: Whether the contract has a fixed end date. 'end_date' is required when this is 'definite'.
+        currency_code:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Currency code in ISO 4217 format.
+        custom_fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1CustomFieldsItems'
+          description: Custom field values to update.
+        effective_date:
+          type: string
+          format: date
+          description: Short date in format ISO-8601 (YYYY-MM-DD) when the amendment takes effect. Required — the amendment cannot be signed without it.
+        payout_currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Currency the worker is paid out in.
+        pay_slip_currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Currency shown on the payslip.
+        contract_start_date:
+          type: string
+          format: date
+          description: Short date in format ISO-8601 (YYYY-MM-DD). The contract start date.
+        base_compensation_type:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1BaseCompensationType'
+          default: salaried
+          description: Type of base compensation. Defaults to salaried if base compensation fields are provided and this is omitted.
+        variable_compensations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1VariableCompensationsItems'
+          description: Variable compensations to add or update alongside the base compensation change.
+        base_compensation_custom_name:
+          type: string
+          maxLength: 255
+          description: Custom display name for the base compensation.
+      required:
+      - effective_date
+      description: You can specify any combination of data points that need changing for a Global Payroll amendment, alongside the required effective_date.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData1
+    ListContractAmendments-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListContractAmendments-v2026-01-01RequestBadRequestError
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData:
+      oneOf:
+      - $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData0'
+      - $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData1'
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData
+    ContractsContractIdAmendmentsGetParametersStatusesSchemaItems:
+      type: string
+      enum:
+      - INITIAL
+      - PENDING
+      - ACTIVE
+      - OUTDATED
+      - APPROVED
+      - DECLINED
+      title: ContractsContractIdAmendmentsGetParametersStatusesSchemaItems
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - INITIAL
+      - PENDING
+      - ACTIVE
+      - OUTDATED
+      - APPROVED
+      - DECLINED
+      description: Current status of the work statement.
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    AmendContract-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: AmendContract-v2026-01-01RequestBadRequestError
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf0Status:
+      type: string
+      enum:
+      - initial
+      - pending
+      - active
+      - outdated
+      - approved
+      - declined
+      description: Status of the amended work statement.
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf0Status
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1ContractTerm:
+      type: string
+      enum:
+      - definite
+      - indefinite
+      description: Whether the contract has a fixed end date. 'end_date' is required when this is 'definite'.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1ContractTerm
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf1Status:
+      type: string
+      enum:
+      - waiting_for_approval
+      - waiting_client_sign
+      - waiting_worker_sign
+      - signed
+      - completed
+      - obsolete
+      - applied
+      description: Status of the Global Payroll amendment. 'applied' only appears after a type_of_edit=direct request — the change took effect immediately and no pending amendment remains.
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf1Status
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1VariableCompensationsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of an existing variable compensation being updated. Omit when adding a new one.
+        rate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1000000000
+          description: Variable compensation amount to be paid per scale.
+        scale:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1VariableCompensationsItemsScale'
+          description: Defines the scale at which the variable compensation amount is paid.
+        format:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1VariableCompensationsItemsFormat'
+          description: Whether the rate is a fixed amount or a percentage.
+        currency_code:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Currency code in ISO 4217 format.
+        effective_date:
+          type: string
+          format: date
+          description: Short date in format ISO-8601 (YYYY-MM-DD) when this variable compensation takes effect.
+        effective_end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Short date in format ISO-8601 (YYYY-MM-DD) when this variable compensation stops applying, if it does.
+        variable_compensation_configuration_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the variable compensation configuration.
+      required:
+      - rate
+      - scale
+      - currency_code
+      - effective_date
+      - variable_compensation_configuration_id
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1VariableCompensationsItems
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0JobTitleId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0JobTitleId
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1CustomFieldsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the custom field.
+        value:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1CustomFieldsItemsValue'
+          description: The new value for the custom field.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Currency code in ISO 4217 format, for a currency-typed custom field.
+      required:
+      - id
+      - value
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1CustomFieldsItems
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData1:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the amendment.
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Base compensation rate for the amended employment agreement.
+        scale:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf1Scale'
+          - type: 'null'
+          description: Payment scale for the base compensation.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf1Status'
+          description: Status of the Global Payroll amendment. 'applied' only appears after a type_of_edit=direct request — the change took effect immediately and no pending amendment remains.
+        created:
+          type: boolean
+          description: True if this call created a new amendment, false if it updated an existing pending one.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the amendment was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the amendment was last updated.
+        currency_code:
+          type:
+          - string
+          - 'null'
+          description: Currency code for the base compensation.
+        effective_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Short date in format ISO-8601 (YYYY-MM-DD) when the amendment takes effect.
+        base_compensation_type:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf1BaseCompensationType'
+          - type: 'null'
+          description: Type of base compensation for the amendment.
+      required:
+      - id
+      - status
+      - created
+      - created_at
+      - updated_at
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData1
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1VariableCompensationsItemsFormat:
+      type: string
+      enum:
+      - amount
+      - percentage
+      description: Whether the rate is a fixed amount or a percentage.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1VariableCompensationsItemsFormat
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0Scale:
+      type: string
+      enum:
+      - hourly
+      - daily
+      - weekly
+      - monthly
+      - biweekly
+      - semimonthly
+      - custom
+      description: Defines the scale at which the amount is paid. For example, enter 'hourly' to define the amount per hour. This field can be excluded when creating a Pay-as-you-go task-based or Milestone contracts.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0Scale
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1BaseCompensationType:
+      type: string
+      enum:
+      - salaried
+      - hourly
+      - unpaid
+      - commission_only
+      default: salaried
+      description: Type of base compensation. Defaults to salaried if base compensation fields are provided and this is omitted.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1BaseCompensationType
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1Scale:
+      type: string
+      enum:
+      - hourly
+      - daily
+      - weekly
+      - monthly
+      - annually
+      - two_weekly
+      - bi_monthly
+      - custom
+      - one_off
+      description: Defines the scale at which the base compensation amount is paid.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1Scale
+    AmendContract-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaErrorsItems'
+      title: AmendContract-v2026-01-01RequestInternalServerError
+    ListContractAmendments-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      title: ListContractAmendments-v2026-01-01RequestInternalServerError
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsSignStatus:
+      type: string
+      enum:
+      - PENDING
+      - WAITING_FOR_APPROVAL
+      - APPROVED
+      - DECLINED
+      description: Current sign status of the work statement.
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsSignStatus
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf1BaseCompensationType:
+      type: string
+      enum:
+      - salaried
+      - hourly
+      - unpaid
+      - commission_only
+      description: Type of base compensation for the amendment.
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf1BaseCompensationType
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1TypeOfEdit:
+      type: string
+      enum:
+      - amendment
+      - direct
+      default: amendment
+      description: Whether the change requires a signature. 'amendment' (default) creates a pending amendment that must be signed via POST /rest/contracts/{contract_id}/amendments/{amendment_id}/sign before it takes effect. 'direct' applies the change immediately, with no signature required.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1TypeOfEdit
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf0Scale:
+      type: string
+      enum:
+      - hourly
+      - daily
+      - weekly
+      - monthly
+      - biweekly
+      - semimonthly
+      - custom
+      description: Payment scale for the amended work statement.
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf0Scale
+    contractor-amendments_getContractAmendments_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: List of work statements (amendments).
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor for the next page of results.
+        has_more:
+          type: boolean
+          description: Indicates if there are more work statements available.
+        total_count:
+          type: integer
+          description: Total number of work statements matching the filters.
+      required:
+      - data
+      - cursor
+      - has_more
+      - total_count
+      title: contractor-amendments_getContractAmendments_Response_200
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData0:
+      type: object
+      properties:
+        scale:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0Scale'
+          description: Defines the scale at which the amount is paid. For example, enter 'hourly' to define the amount per hour. This field can be excluded when creating a Pay-as-you-go task-based or Milestone contracts.
+        amount:
+          type: number
+          format: double
+          minimum: 1
+          description: Amount to be paid per scale.
+        cycle_end:
+          type: number
+          format: double
+          minimum: 1
+          maximum: 31
+          description: Day of the month when the cycle ends.
+        frequency:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0Frequency'
+          description: Scale of the invoice cycle.
+        start_date:
+          type: string
+          format: date
+          description: The contract start date in ISO-8601 format (YYYY-MM-DD). Updates the contract's effective date.
+        job_title_id:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0JobTitleId'
+        seniority_id:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0SeniorityId'
+        currency_code:
+          type: string
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Currency code in ISO 4217 format.
+        first_payment:
+          type: number
+          format: double
+          minimum: 0
+          description: Amount to be paid as the first payment.
+        scope_of_work:
+          type: string
+          description: Text to describe the scope of work of the contract.
+        cycle_end_type:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0CycleEndType'
+          description: Cycle end can be weekly 1-7 (Monday = 1) or monthly 1-31.
+        effective_date:
+          type: string
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        job_title_name:
+          type: string
+          description: You can enter new job title.
+        special_clause:
+          type: string
+          description: Text to describe any special clause in contract.
+        payment_due_days:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 90
+          description: Number of days after the invoice is sent that the payment is due.
+        payment_due_type:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0PaymentDueType'
+          default: REGULAR
+          description: Type of payment due. If the payment is due on the last day of month, enter 'WITHIN_MONTH'.
+        first_payment_date:
+          type: string
+          format: date
+          description: 'Short date in format ISO-8601 (YYYY-MM-DD). For example: 2022-12-31.'
+        pay_before_weekends:
+          type: boolean
+          description: If the payment due is on a weekend, pay on Friday.
+      description: You can specify any combination of data points that need changing.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaData0
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable explanation of the error
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1VariableCompensationsItemsScale:
+      type: string
+      enum:
+      - bi_annually
+      - annually
+      - quarterly
+      - monthly
+      - one_off
+      description: Defines the scale at which the variable compensation amount is paid.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1VariableCompensationsItemsScale
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData0:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the created amendment.
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Rate/amount for the amended work statement.
+        scale:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf0Scale'
+          - type: 'null'
+          description: Payment scale for the amended work statement.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaDataOneOf0Status'
+          description: Status of the amended work statement.
+        created:
+          type: boolean
+          description: Contract has been successfully amended.
+        job_title:
+          type:
+          - string
+          - 'null'
+          description: Job title for the amended work statement.
+        worker_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The unique identifier of the worker.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the work statement was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the work statement was last updated.
+        currency_code:
+          type: string
+          description: Currency code for the amended work statement.
+        scope_of_work:
+          type:
+          - string
+          - 'null'
+          description: Scope of work for the amended work statement.
+        special_clause:
+          type:
+          - string
+          - 'null'
+          description: Special clause for the amended work statement.
+        termination_notice_days:
+          type: integer
+          description: Number of days notice required for termination. Defaults to 10 if not provided.
+      required:
+      - id
+      - status
+      - created
+      - created_at
+      - updated_at
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData0
+    contractor-amendments_createContractAmendment_Response_201:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: contractor-amendments_createContractAmendment_Response_201
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType:
+      type: string
+      enum:
+      - milestones
+      - time_based
+      - ongoing_time_based
+      - pay_as_you_go_time_based
+      - commission
+      - payg_milestones
+      - payg_tasks
+      description: Type of the associated IC contract.
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsScale:
+      type: string
+      enum:
+      - hourly
+      - daily
+      - weekly
+      - monthly
+      - biweekly
+      - semimonthly
+      - custom
+      description: Payment frequency/scale that defines how often the rate is paid.
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsScale
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0Frequency:
+      type: string
+      enum:
+      - weekly
+      - monthly
+      - biweekly
+      - semimonthly
+      - calendar-month
+      description: Scale of the invoice cycle.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0Frequency
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1CustomFieldsItemsValue:
+      oneOf:
+      - type: string
+        maxLength: 5000
+      - type: number
+        format: double
+      - type: boolean
+      description: The new value for the custom field.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf1CustomFieldsItemsValue
+    ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData:
+      oneOf:
+      - $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData0'
+      - $ref: '#/components/schemas/ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData1'
+      title: ContractsContractIdAmendmentsPostResponsesContentApplicationJsonSchemaData
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0SeniorityId:
+      oneOf:
+      - type: string
+      - type: integer
+        format: int64
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0SeniorityId
+    ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the work statement.
+        rate:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Compensation rate per scale. The amount paid according to the specified scale (e.g., 5000 per month).
+        scale:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsScale'
+          - type: 'null'
+          description: Payment frequency/scale that defines how often the rate is paid.
+        status:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Current status of the work statement.
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the work statement was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the work statement was last updated.
+        sign_status:
+          $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsSignStatus'
+          description: Current sign status of the work statement.
+        contract_name:
+          type:
+          - string
+          - 'null'
+          description: Name of the associated contract.
+        contract_type:
+          oneOf:
+          - $ref: '#/components/schemas/ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItemsContractType'
+          - type: 'null'
+          description: Type of the associated IC contract.
+        currency_code:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{3}$
+          minLength: 3
+          maxLength: 3
+          description: Currency code in ISO 4217 format (e.g., USD, EUR, GBP).
+        effective_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Effective date when the work statement becomes active.
+      required:
+      - id
+      - status
+      - created_at
+      - updated_at
+      - sign_status
+      title: ContractsContractIdAmendmentsGetResponsesContentApplicationJsonSchemaDataItems
+    ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0PaymentDueType:
+      type: string
+      enum:
+      - REGULAR
+      - WITHIN_MONTH
+      default: REGULAR
+      description: Type of payment due. If the payment is due on the last day of month, enter 'WITHIN_MONTH'.
+      title: ContractsContractIdAmendmentsPostRequestBodyContentApplicationJsonSchemaDataOneOf0PaymentDueType
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

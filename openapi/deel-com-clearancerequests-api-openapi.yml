@@ -1,0 +1,2427 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Clearance Requests API
+  version: 1.0.0
+  description: API endpoints related to Clearance requests.
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: clearanceRequests
+  description: API endpoints related to Clearance requests.
+paths:
+  /it/clearance-requests/{clearance_request_id}/decide:
+    post:
+      operationId: clearanceRequests_decideAClearanceRequest-v2026-09-17
+      summary: Approve or reject quotes on a clearance request
+      description: 'Approves or rejects each item in a clearance request that is `PENDING_DECISION`. Every request item currently in the clearance request must be included in the payload. When every item is rejected the clearance request is cancelled. Accepted items move on to collection and hand-off to the clearance partner.
+
+
+        **Token scopes**: `it-service-requests:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-17.'
+      tags:
+      - clearanceRequests
+      parameters:
+      - name: clearance_request_id
+        in: path
+        description: Unique identifier of the clearance request
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clearance_requests_decideAClearanceRequest-v2026-09-17_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecideAClearanceRequest-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecideAClearanceRequest-v2026-09-17RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecideAClearanceRequest-v2026-09-17RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecideAClearanceRequest-v2026-09-17RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecideAClearanceRequest-v2026-09-17RequestConflictError'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecideAClearanceRequest-v2026-09-17RequestUnprocessableEntityError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecideAClearanceRequest-v2026-09-17RequestInternalServerError'
+      requestBody:
+        description: Per-item decisions for the clearance request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /it/clearance-requests/{clearance_request_id}/cancel:
+    post:
+      operationId: clearanceRequests_cancelAClearanceRequest-v2026-09-15
+      summary: Cancel a clearance request
+      description: 'Cancels a clearance request belonging to your organization. Only clearance requests in `PENDING_QUOTE` or `PENDING_DECISION` status can be cancelled. Cancelling reverts every associated asset back to active tracking.
+
+
+        **Token scopes**: `it-service-requests:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-15.'
+      tags:
+      - clearanceRequests
+      parameters:
+      - name: clearance_request_id
+        in: path
+        description: Unique identifier of the clearance request
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clearance_requests_cancelAClearanceRequest-v2026-09-15_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelAClearanceRequest-v2026-09-15RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelAClearanceRequest-v2026-09-15RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelAClearanceRequest-v2026-09-15RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelAClearanceRequest-v2026-09-15RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelAClearanceRequest-v2026-09-15RequestConflictError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelAClearanceRequest-v2026-09-15RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/assets/{asset_id}/clear:
+    post:
+      operationId: clearanceRequests_clearItAsset-v2026-09-17
+      summary: Create a clearance request for an asset
+      description: 'Retires a device at end of life, for resale value or certified data erasure. Creates a clearance request for the given asset so it can be recovered, resold, or written off. The referenced manager is recorded as the requester and receives lifecycle notifications. Clearance must be enabled for the organization.
+
+
+        **Token scopes**: `it-service-requests:write`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-17.'
+      tags:
+      - clearanceRequests
+      parameters:
+      - name: asset_id
+        in: path
+        description: Unique identifier of the IT asset
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItAssetsAssetIdClearPostParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clearance_requests_clearItAsset-v2026-09-17_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClearItAsset-v2026-09-17RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClearItAsset-v2026-09-17RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClearItAsset-v2026-09-17RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClearItAsset-v2026-09-17RequestNotFoundError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClearItAsset-v2026-09-17RequestConflictError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClearItAsset-v2026-09-17RequestInternalServerError'
+      requestBody:
+        description: Clearance request details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/ItAssetsAssetIdClearPostRequestBodyContentApplicationJsonSchemaData'
+              required:
+              - data
+      security:
+      - deelToken: []
+  /it/clearance-requests:
+    get:
+      operationId: clearanceRequests_listClearanceRequests-v2026-09-16
+      summary: List clearance requests
+      description: 'Lists the clearance requests your organization has raised to retire devices for resale value or certified data erasure. Use it to find requests waiting on you — those in `PENDING_DECISION` need a response via `POST /rest/it/clearance-requests/{clearance_request_id}/decide` before their assets move on to collection.
+
+
+        **Token scopes**: `it-service-requests:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-16.'
+      tags:
+      - clearanceRequests
+      parameters:
+      - name: cursor
+        in: query
+        description: Indicates where the next page of results starts, as returned in a paginated list response
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Return a page of results with given number of records
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: status
+        in: query
+        description: Filter clearance requests by their status. Repeat the key to filter on multiple values.
+        required: false
+        schema:
+          $ref: '#/components/schemas/ItClearanceRequestsGetParametersStatus'
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItClearanceRequestsGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clearance_requests_listClearanceRequests-v2026-09-16_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClearanceRequests-v2026-09-16RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClearanceRequests-v2026-09-16RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClearanceRequests-v2026-09-16RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListClearanceRequests-v2026-09-16RequestInternalServerError'
+      security:
+      - deelToken: []
+  /it/clearance-requests/{clearance_request_id}:
+    get:
+      operationId: clearanceRequests_retrieveAClearanceRequest-v2026-09-15
+      summary: Retrieve a clearance request
+      description: 'Retrieves one clearance request with the status of each item being cleared. Call this once a quote lands to review what each asset is worth before approving or rejecting items via `POST /rest/it/clearance-requests/{clearance_request_id}/decide`.
+
+
+        **Token scopes**: `it-service-requests:read`
+
+
+        **Beta**: this version requires the `X-Beta: true` request header and its contract may change before it is promoted to stable. It is scheduled to become stable on 2026-12-15.'
+      tags:
+      - clearanceRequests
+      parameters:
+      - name: clearance_request_id
+        in: path
+        description: Unique identifier of the clearance request
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Beta
+        in: header
+        description: Opts in to the beta version of this endpoint. Must be `true`.
+        required: true
+        schema:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetParametersXBeta'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Clearance_requests_retrieveAClearanceRequest-v2026-09-15_Response_200'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAClearanceRequest-v2026-09-15RequestBadRequestError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAClearanceRequest-v2026-09-15RequestUnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAClearanceRequest-v2026-09-15RequestForbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAClearanceRequest-v2026-09-15RequestNotFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveAClearanceRequest-v2026-09-15RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    ItClearanceRequestsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the clearance request
+        status:
+          $ref: '#/components/schemas/ItClearanceRequestsGetResponsesContentApplicationJsonSchemaDataItemsStatus'
+          description: Current state of the clearance request
+        public_id:
+          type: string
+          description: Public identifier of the clearance request
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the clearance request
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp indicating when the request expires and the manager can no longer take action, absent when no deadline applies
+        cancelled_reason:
+          oneOf:
+          - $ref: '#/components/schemas/ItClearanceRequestsGetResponsesContentApplicationJsonSchemaDataItemsCancelledReason'
+          - type: 'null'
+          description: Reason the clearance request was cancelled, absent unless the status is CANCELLED
+      required:
+      - id
+      - status
+      - public_id
+      - created_at
+      - expires_at
+      - cancelled_reason
+      title: ItClearanceRequestsGetResponsesContentApplicationJsonSchemaDataItems
+    RetrieveAClearanceRequest-v2026-09-15RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAClearanceRequest-v2026-09-15RequestInternalServerError
+    DecideAClearanceRequest-v2026-09-17RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DecideAClearanceRequest-v2026-09-17RequestInternalServerError
+    DecideAClearanceRequest-v2026-09-17RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DecideAClearanceRequest-v2026-09-17RequestForbiddenError
+    ListClearanceRequests-v2026-09-16RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListClearanceRequests-v2026-09-16RequestInternalServerError
+    ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: Product details of the asset
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct
+    ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataCancelledReason:
+      type: string
+      enum:
+      - DEADLINE_EXCEEDED
+      - REQUESTED_BY_CUSTOMER
+      description: Reason the clearance request was cancelled, absent unless the status is CANCELLED
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataCancelledReason
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Quote price offered by the clearance partner for the asset, absent until a quote is received
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice
+    ? ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency
+    : type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency
+    ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the clearance request
+        status:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current state of the clearance request
+        public_id:
+          type: string
+          description: Public identifier of the clearance request
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the clearance request
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp indicating when the request expires and the manager can no longer take action, absent when no deadline applies
+        request_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItems'
+          description: Items included in this clearance request, one per asset being cleared
+        cancelled_reason:
+          oneOf:
+          - $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataCancelledReason'
+          - type: 'null'
+          description: Reason the clearance request was cancelled, absent unless the status is CANCELLED
+      required:
+      - id
+      - status
+      - public_id
+      - created_at
+      - expires_at
+      - request_items
+      - cancelled_reason
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaData
+    DecideAClearanceRequest-v2026-09-17RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DecideAClearanceRequest-v2026-09-17RequestConflictError
+    Clearance_requests_cancelAClearanceRequest-v2026-09-15_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Clearance requests_cancelAClearanceRequest-v2026-09-15_Response_200
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: Product details of the asset
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the asset
+        product:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct'
+          description: Product details of the asset
+        public_id:
+          type: string
+          description: Public identifier of the asset
+        serial_number:
+          type:
+          - string
+          - 'null'
+          description: Asset serial number, absent when the manufacturer did not assign one
+      required:
+      - id
+      - product
+      - public_id
+      - serial_number
+      description: Asset being cleared as part of this clearance request item
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset
+    CancelAClearanceRequest-v2026-09-15RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelAClearanceRequest-v2026-09-15RequestUnauthorizedError
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - COMPLETED
+      - DECIDED
+      - PENDING_DECISION
+      - PENDING_QUOTE
+      - PENDING_RETURN
+      description: Current state of the clearance request
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataStatus
+    ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems
+    CancelAClearanceRequest-v2026-09-15RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelAClearanceRequest-v2026-09-15RequestForbiddenError
+    ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: Product details of the asset
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct
+    CancelAClearanceRequest-v2026-09-15RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelAClearanceRequest-v2026-09-15RequestConflictError
+    ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the asset
+        product:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct'
+          description: Product details of the asset
+        public_id:
+          type: string
+          description: Public identifier of the asset
+        serial_number:
+          type:
+          - string
+          - 'null'
+          description: Asset serial number, absent when the manufacturer did not assign one
+      required:
+      - id
+      - product
+      - public_id
+      - serial_number
+      description: Asset being cleared as part of this clearance request item
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataCancelledReason:
+      type: string
+      enum:
+      - DEADLINE_EXCEEDED
+      - REQUESTED_BY_CUSTOMER
+      description: Reason the clearance request was cancelled, absent unless the status is CANCELLED
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataCancelledReason
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory
+    ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataCancelledReason:
+      type: string
+      enum:
+      - DEADLINE_EXCEEDED
+      - REQUESTED_BY_CUSTOMER
+      description: Reason the clearance request was cancelled, absent unless the status is CANCELLED
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataCancelledReason
+    ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the clearance request item
+        asset:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset'
+          description: Asset being cleared as part of this clearance request item
+        status:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus'
+          description: Current state of the item within the clearance request lifecycle
+        quote_price:
+          oneOf:
+          - $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice'
+          - type: 'null'
+          description: Quote price offered by the clearance partner for the asset, absent until a quote is received
+      required:
+      - id
+      - asset
+      - status
+      - quote_price
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItems
+    DecideAClearanceRequest-v2026-09-17RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DecideAClearanceRequest-v2026-09-17RequestUnauthorizedError
+    CancelAClearanceRequest-v2026-09-15RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelAClearanceRequest-v2026-09-15RequestBadRequestError
+    Clearance_requests_listClearanceRequests-v2026-09-16_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsGetResponsesContentApplicationJsonSchemaDataItems'
+        has_more:
+          type: boolean
+          description: Whether there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Cursor to the next page
+        total_count:
+          type: integer
+          format: int64
+          description: Total number of records
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: Clearance requests_listClearanceRequests-v2026-09-16_Response_200
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataCancelledReason:
+      type: string
+      enum:
+      - DEADLINE_EXCEEDED
+      - REQUESTED_BY_CUSTOMER
+      description: Reason the clearance request was cancelled, absent unless the status is CANCELLED
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataCancelledReason
+    DecideAClearanceRequest-v2026-09-17RequestUnprocessableEntityError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DecideAClearanceRequest-v2026-09-17RequestUnprocessableEntityError
+    ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Quote price offered by the clearance partner for the asset, absent until a quote is received
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice
+    ListClearanceRequests-v2026-09-16RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListClearanceRequests-v2026-09-16RequestBadRequestError
+    ListClearanceRequests-v2026-09-16RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListClearanceRequests-v2026-09-16RequestForbiddenError
+    Clearance_requests_clearItAsset-v2026-09-17_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Clearance requests_clearItAsset-v2026-09-17_Response_200
+    ItAssetsAssetIdClearPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItAssetsAssetIdClearPostParametersXBeta
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaErrorsItems
+    ItClearanceRequestsGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItClearanceRequestsGetParametersXBeta
+    Clearance_requests_decideAClearanceRequest-v2026-09-17_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Clearance requests_decideAClearanceRequest-v2026-09-17_Response_200
+    ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - COMPLETED
+      - DECIDED
+      - PENDING_DECISION
+      - PENDING_QUOTE
+      - PENDING_RETURN
+      description: Current state of the clearance request
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataStatus
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the clearance request
+        status:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current state of the clearance request
+        public_id:
+          type: string
+          description: Public identifier of the clearance request
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the clearance request
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp indicating when the request expires and the manager can no longer take action, absent when no deadline applies
+        request_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItems'
+          description: Items included in this clearance request, one per asset being cleared
+        cancelled_reason:
+          oneOf:
+          - $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataCancelledReason'
+          - type: 'null'
+          description: Reason the clearance request was cancelled, absent unless the status is CANCELLED
+      required:
+      - id
+      - status
+      - public_id
+      - created_at
+      - expires_at
+      - request_items
+      - cancelled_reason
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaData
+    CancelAClearanceRequest-v2026-09-15RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelAClearanceRequest-v2026-09-15RequestInternalServerError
+    RetrieveAClearanceRequest-v2026-09-15RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAClearanceRequest-v2026-09-15RequestBadRequestError
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    ItClearanceRequestsClearanceRequestIdGetParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItClearanceRequestsClearanceRequestIdGetParametersXBeta
+    ClearItAsset-v2026-09-17RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ClearItAsset-v2026-09-17RequestUnauthorizedError
+    ? ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency
+    : type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency
+    ClearItAsset-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ClearItAsset-v2026-09-17RequestBadRequestError
+    ItClearanceRequestsClearanceRequestIdDecidePostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostRequestBodyContentApplicationJsonSchemaDataItemsItems'
+          description: Decisions on each request item in the clearance request. Every request item in the clearance request must be included; otherwise the endpoint returns a `clearance_request_items_undecided` error.
+      required:
+      - items
+      title: ItClearanceRequestsClearanceRequestIdDecidePostRequestBodyContentApplicationJsonSchemaData
+    RetrieveAClearanceRequest-v2026-09-15RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAClearanceRequest-v2026-09-15RequestNotFoundError
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Quote price offered by the clearance partner for the asset, absent until a quote is received
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice
+    DecideAClearanceRequest-v2026-09-17RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DecideAClearanceRequest-v2026-09-17RequestBadRequestError
+    ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - CUSTOMER_ACCEPTED_QUOTE
+      - CUSTOMER_REJECTED_QUOTE
+      - PENDING_CUSTOMER_DECISION
+      - PENDING_QUOTE
+      - SKIPPED_QUOTE
+      description: Current state of the item within the clearance request lifecycle
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus
+    ItClearanceRequestsClearanceRequestIdDecidePostRequestBodyContentApplicationJsonSchemaDataItemsItems:
+      type: object
+      properties:
+        is_accepted:
+          type: boolean
+          description: Whether the quote for this request item is accepted (`true`) or rejected (`false`). When every item is rejected the clearance request is cancelled.
+        request_item_id:
+          type: string
+          format: uuid
+          description: Unique identifier of the clearance request item the decision applies to
+      required:
+      - is_accepted
+      - request_item_id
+      title: ItClearanceRequestsClearanceRequestIdDecidePostRequestBodyContentApplicationJsonSchemaDataItemsItems
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - CUSTOMER_ACCEPTED_QUOTE
+      - CUSTOMER_REJECTED_QUOTE
+      - PENDING_CUSTOMER_DECISION
+      - PENDING_QUOTE
+      - SKIPPED_QUOTE
+      description: Current state of the item within the clearance request lifecycle
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus
+    DecideAClearanceRequest-v2026-09-17RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: DecideAClearanceRequest-v2026-09-17RequestNotFoundError
+    CancelAClearanceRequest-v2026-09-15RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: CancelAClearanceRequest-v2026-09-15RequestNotFoundError
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - CUSTOMER_ACCEPTED_QUOTE
+      - CUSTOMER_REJECTED_QUOTE
+      - PENDING_CUSTOMER_DECISION
+      - PENDING_QUOTE
+      - SKIPPED_QUOTE
+      description: Current state of the item within the clearance request lifecycle
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus
+    Clearance_requests_retrieveAClearanceRequest-v2026-09-15_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaData'
+      required:
+      - data
+      title: Clearance requests_retrieveAClearanceRequest-v2026-09-15_Response_200
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the clearance request item
+        asset:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset'
+          description: Asset being cleared as part of this clearance request item
+        status:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus'
+          description: Current state of the item within the clearance request lifecycle
+        quote_price:
+          oneOf:
+          - $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice'
+          - type: 'null'
+          description: Quote price offered by the clearance partner for the asset, absent until a quote is received
+      required:
+      - id
+      - asset
+      - status
+      - quote_price
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItems
+    ? ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory
+    : type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ClearItAsset-v2026-09-17RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ClearItAsset-v2026-09-17RequestInternalServerError
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - COMPLETED
+      - DECIDED
+      - PENDING_DECISION
+      - PENDING_QUOTE
+      - PENDING_RETURN
+      description: Current state of the clearance request
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataStatus
+    RetrieveAClearanceRequest-v2026-09-15RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAClearanceRequest-v2026-09-15RequestForbiddenError
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the product
+        name:
+          type: string
+          description: Product name
+        brand:
+          type: string
+          description: Product brand
+        category:
+          $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory'
+          description: Product category
+      required:
+      - id
+      - name
+      - brand
+      - category
+      description: Product details of the asset
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct
+    ItClearanceRequestsGetResponsesContentApplicationJsonSchemaDataItemsCancelledReason:
+      type: string
+      enum:
+      - DEADLINE_EXCEEDED
+      - REQUESTED_BY_CUSTOMER
+      description: Reason the clearance request was cancelled, absent unless the status is CANCELLED
+      title: ItClearanceRequestsGetResponsesContentApplicationJsonSchemaDataItemsCancelledReason
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the asset
+        product:
+          $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct'
+          description: Product details of the asset
+        public_id:
+          type: string
+          description: Public identifier of the asset
+        serial_number:
+          type:
+          - string
+          - 'null'
+          description: Asset serial number, absent when the manufacturer did not assign one
+      required:
+      - id
+      - product
+      - public_id
+      - serial_number
+      description: Asset being cleared as part of this clearance request item
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset
+    ItClearanceRequestsClearanceRequestIdCancelPostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItClearanceRequestsClearanceRequestIdCancelPostParametersXBeta
+    ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaErrorsItems
+    ListClearanceRequests-v2026-09-16RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ListClearanceRequests-v2026-09-16RequestUnauthorizedError
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the clearance request item
+        asset:
+          $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset'
+          description: Asset being cleared as part of this clearance request item
+        status:
+          $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus'
+          description: Current state of the item within the clearance request lifecycle
+        quote_price:
+          oneOf:
+          - $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice'
+          - type: 'null'
+          description: Quote price offered by the clearance partner for the asset, absent until a quote is received
+      required:
+      - id
+      - asset
+      - status
+      - quote_price
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItems
+    ClearItAsset-v2026-09-17RequestConflictError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ClearItAsset-v2026-09-17RequestConflictError
+    ItClearanceRequestsClearanceRequestIdDecidePostParametersXBeta:
+      type: string
+      enum:
+      - 'true'
+      default: 'true'
+      title: ItClearanceRequestsClearanceRequestIdDecidePostParametersXBeta
+    ItClearanceRequestsGetParametersStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - COMPLETED
+      - DECIDED
+      - PENDING_DECISION
+      - PENDING_QUOTE
+      - PENDING_RETURN
+      title: ItClearanceRequestsGetParametersStatus
+    ItClearanceRequestsGetResponsesContentApplicationJsonSchemaDataItemsStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - COMPLETED
+      - DECIDED
+      - PENDING_DECISION
+      - PENDING_QUOTE
+      - PENDING_RETURN
+      description: Current state of the clearance request
+      title: ItClearanceRequestsGetResponsesContentApplicationJsonSchemaDataItemsStatus
+    RetrieveAClearanceRequest-v2026-09-15RequestUnauthorizedError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: RetrieveAClearanceRequest-v2026-09-15RequestUnauthorizedError
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the clearance request
+        status:
+          $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current state of the clearance request
+        public_id:
+          type: string
+          description: Public identifier of the clearance request
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the clearance request
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp indicating when the request expires and the manager can no longer take action, absent when no deadline applies
+        request_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItems'
+          description: Items included in this clearance request, one per asset being cleared
+        cancelled_reason:
+          oneOf:
+          - $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataCancelledReason'
+          - type: 'null'
+          description: Reason the clearance request was cancelled, absent unless the status is CANCELLED
+      required:
+      - id
+      - status
+      - public_id
+      - created_at
+      - expires_at
+      - request_items
+      - cancelled_reason
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaData
+    ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory:
+      type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory
+    ? ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory
+    : type: string
+      enum:
+      - ADAPTER
+      - CABLE
+      - CHAIR
+      - CHARGER
+      - COMPACT_DESKTOP
+      - DESK
+      - DESKTOP
+      - DESK_RISER
+      - DESK_TIDY
+      - DOCKING_STATION
+      - DONGLE
+      - FOOTREST
+      - HEADSET
+      - KEYBOARD
+      - LAPTOP
+      - LAPTOP_STAND
+      - MICE_TRACKPAD
+      - MOBILE_DEVICE
+      - MONITOR
+      - MONITOR_ARM
+      - OTHER
+      - PRINTER
+      - SHREDDER
+      - STANDING_MAT
+      - TABLET
+      - TASK_LIGHT
+      - WEBCAM
+      - WELCOME_PACK
+      - WIFI_RANGE_EXTENDER
+      description: Product category
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProductCategory
+    ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - CUSTOMER_ACCEPTED_QUOTE
+      - CUSTOMER_REJECTED_QUOTE
+      - PENDING_CUSTOMER_DECISION
+      - PENDING_QUOTE
+      - SKIPPED_QUOTE
+      description: Current state of the item within the clearance request lifecycle
+      title: ItClearanceRequestsClearanceRequestIdDecidePostResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus
+    ItClearanceRequestsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code of the handler which produced the returned error
+        field:
+          type:
+          - string
+          - 'null'
+          description: The field name where input validation failed
+        message:
+          type: string
+          description: Description of the returned error
+      required:
+      - code
+      - field
+      - message
+      title: ItClearanceRequestsGetResponsesContentApplicationJsonSchemaErrorsItems
+    ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          description: Amount
+        currency:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency'
+          description: Three-letter currency code for the price
+      required:
+      - amount
+      - currency
+      description: Quote price offered by the clearance partner for the asset, absent until a quote is received
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice
+    ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the clearance request item
+        asset:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset'
+          description: Asset being cleared as part of this clearance request item
+        status:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsStatus'
+          description: Current state of the item within the clearance request lifecycle
+        quote_price:
+          oneOf:
+          - $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePrice'
+          - type: 'null'
+          description: Quote price offered by the clearance partner for the asset, absent until a quote is received
+      required:
+      - id
+      - asset
+      - status
+      - quote_price
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItems
+    ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the clearance request
+        status:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataStatus'
+          description: Current state of the clearance request
+        public_id:
+          type: string
+          description: Public identifier of the clearance request
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp of the clearance request
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp indicating when the request expires and the manager can no longer take action, absent when no deadline applies
+        request_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItems'
+          description: Items included in this clearance request, one per asset being cleared
+        cancelled_reason:
+          oneOf:
+          - $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataCancelledReason'
+          - type: 'null'
+          description: Reason the clearance request was cancelled, absent unless the status is CANCELLED
+      required:
+      - id
+      - status
+      - public_id
+      - created_at
+      - expires_at
+      - request_items
+      - cancelled_reason
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaData
+    ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency:
+      type: string
+      enum:
+      - AED
+      - AFN
+      - ALL
+      - AMD
+      - ANG
+      - AOA
+      - ARS
+      - AUD
+      - AWG
+      - AZN
+      - BAM
+      - BDT
+      - BGN
+      - BHD
+      - BIF
+      - BMD
+      - BOB
+      - BRL
+      - BSD
+      - BTN
+      - BWP
+      - BYN
+      - BZD
+      - CAD
+      - CDF
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CUC
+      - CVE
+      - CZK
+      - DJF
+      - DKK
+      - DOP
+      - DZD
+      - EGP
+      - ERN
+      - ETB
+      - EUR
+      - FJD
+      - FKP
+      - GBP
+      - GEL
+      - GHS
+      - GIP
+      - GMD
+      - GNF
+      - GTQ
+      - GYD
+      - HKD
+      - HNL
+      - HRK
+      - HTG
+      - HUF
+      - IDR
+      - ILS
+      - INR
+      - IQD
+      - IRR
+      - ISK
+      - JMD
+      - JOD
+      - JPY
+      - KES
+      - KGS
+      - KHR
+      - KMF
+      - KPW
+      - KRW
+      - KWD
+      - KYD
+      - KZT
+      - LAK
+      - LBP
+      - LKR
+      - LRD
+      - LSL
+      - LTL
+      - LYD
+      - MAD
+      - MDL
+      - MGA
+      - MKD
+      - MMK
+      - MNT
+      - MRU
+      - MUR
+      - MVR
+      - MWK
+      - MXN
+      - MYR
+      - MZN
+      - NAD
+      - NGN
+      - NIO
+      - NOK
+      - NPR
+      - NZD
+      - OMR
+      - PAB
+      - PEN
+      - PGK
+      - PHP
+      - PKR
+      - PLN
+      - PYG
+      - QAR
+      - RON
+      - RSD
+      - RUB
+      - RWF
+      - SAR
+      - SBD
+      - SCR
+      - SDG
+      - SEK
+      - SGD
+      - SHP
+      - SLL
+      - SOS
+      - SRD
+      - SSP
+      - STD
+      - SYP
+      - SZL
+      - THB
+      - TJS
+      - TMT
+      - TND
+      - TOP
+      - TRY
+      - TTD
+      - TWD
+      - TZS
+      - UAH
+      - UGX
+      - USD
+      - UYU
+      - UZS
+      - VEF
+      - VND
+      - VUV
+      - WST
+      - XAF
+      - XCD
+      - XOF
+      - XPF
+      - YER
+      - ZAR
+      - ZMW
+      - ZWD
+      description: Three-letter currency code for the price
+      title: ItClearanceRequestsClearanceRequestIdGetResponsesContentApplicationJsonSchemaDataRequestItemsItemsQuotePriceCurrency
+    ClearItAsset-v2026-09-17RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ClearItAsset-v2026-09-17RequestForbiddenError
+    ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataStatus:
+      type: string
+      enum:
+      - CANCELLED
+      - COMPLETED
+      - DECIDED
+      - PENDING_DECISION
+      - PENDING_QUOTE
+      - PENDING_RETURN
+      description: Current state of the clearance request
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataStatus
+    ItAssetsAssetIdClearPostRequestBodyContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        manager_hris_profile_id:
+          type: string
+          format: uuid
+          description: HRIS profile identifier of the manager attributed as the requester of the clearance. Must be a manager in the same organization.
+      required:
+      - manager_hris_profile_id
+      title: ItAssetsAssetIdClearPostRequestBodyContentApplicationJsonSchemaData
+    ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the asset
+        product:
+          $ref: '#/components/schemas/ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAssetProduct'
+          description: Product details of the asset
+        public_id:
+          type: string
+          description: Public identifier of the asset
+        serial_number:
+          type:
+          - string
+          - 'null'
+          description: Asset serial number, absent when the manufacturer did not assign one
+      required:
+      - id
+      - product
+      - public_id
+      - serial_number
+      description: Asset being cleared as part of this clearance request item
+      title: ItClearanceRequestsClearanceRequestIdCancelPostResponsesContentApplicationJsonSchemaDataRequestItemsItemsAsset
+    ClearItAsset-v2026-09-17RequestNotFoundError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItAssetsAssetIdClearPostResponsesContentApplicationJsonSchemaErrorsItems'
+      required:
+      - errors
+      title: ClearItAsset-v2026-09-17RequestNotFoundError
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/

@@ -1,0 +1,383 @@
+openapi: 3.2.0
+info:
+  title: Endpoints Ats Reasons API
+  version: 1.0.0
+servers:
+- url: https://api.letsdeel.com/rest
+  description: Production
+- url: https://api-staging.letsdeel.com/rest
+  description: Demo
+- url: https://api.letsdeel.com/scim/v2
+  description: Production
+- url: https://api-staging.letsdeel.com/scim/v2
+  description: Demo
+tags:
+- name: atsReasons
+paths:
+  /ats/reasons:
+    get:
+      operationId: atsReasons_retrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01
+      summary: Retrieve paginated list of ATS Rejection/Archivation reasons
+      description: 'Returns a paginated list of rejection and archivation reasons, filterable by `reason_group_slug` and `subgroup_slug`; when `include_counts` is true, each reason includes a usage count.
+
+
+        **Token scopes**: `ats:read`, `worker:read`'
+      tags:
+      - atsReasons
+      parameters:
+      - name: cursor
+        in: query
+        description: The cursor for pagination
+        required: false
+        schema:
+          type: string
+          maxLength: 1000
+      - name: limit
+        in: query
+        description: Maximum number of records returned in one response
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        description: Search text for filtering reasons
+        required: false
+        schema:
+          type: string
+          maxLength: 500
+      - name: reason_group_slug
+        in: query
+        description: Filter by reason group
+        required: true
+        schema:
+          $ref: '#/components/schemas/AtsReasonsGetParametersReasonGroupSlug'
+      - name: include_counts
+        in: query
+        description: If true, includes usage counts for each reason
+        required: false
+        schema:
+          type: string
+      - name: include_archived
+        in: query
+        description: If true, archived reasons are included in the response; they are excluded by default
+        required: false
+        schema:
+          type: string
+      - name: subgroup_slug
+        in: query
+        description: Filter by reason subgroup
+        required: false
+        schema:
+          $ref: '#/components/schemas/AtsReasonsGetParametersSubgroupSlug'
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ats-reasons_retrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01_Response_200'
+        '400':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01RequestBadRequestError'
+        '401':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '403':
+          description: Forbidden. ATS is not enabled for this organization or insufficient permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01RequestForbiddenError'
+        '404':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorContainer'
+        '500':
+          description: Operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01RequestInternalServerError'
+      security:
+      - deelToken: []
+components:
+  schemas:
+    AtsReasonsGetResponsesContentApplicationJsonSchemaDataItemsSubgroupSlug:
+      type: string
+      enum:
+      - INTEREST
+      - LOCATION
+      - COMPENSATION
+      - RESPONSIVENESS
+      - QUALIFICATION
+      - FIT
+      - EXPERIENCE
+      - STATUS
+      - ROLE_CHANGE
+      - WITHDREW
+      - BENEFITS
+      - COUNTER_OFFER
+      - REMOTE_WORK
+      - PERSONAL
+      - TIMING
+      - BUDGET
+      - BUSINESS_NEEDS
+      - EXTERNAL_CANDIDATE
+      - INTERNAL_TRANSFER
+      - HIRING_FREEZE
+      description: Reason subgroup slug
+      title: AtsReasonsGetResponsesContentApplicationJsonSchemaDataItemsSubgroupSlug
+    AtsReasonsGetResponsesContentApplicationJsonSchemaDataItems:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the reason
+        label:
+          type: string
+          description: Label of the reason
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the reason was created
+        jobs_count:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of jobs associated with this reason
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the reason was last updated
+        archived_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the reason was archived; null while the reason is active and selectable
+        subgroup_slug:
+          oneOf:
+          - $ref: '#/components/schemas/AtsReasonsGetResponsesContentApplicationJsonSchemaDataItemsSubgroupSlug'
+          - type: 'null'
+          description: Reason subgroup slug
+        email_template:
+          oneOf:
+          - $ref: '#/components/schemas/AtsReasonsGetResponsesContentApplicationJsonSchemaDataItemsEmailTemplate'
+          - type: 'null'
+          description: Associated email template
+        candidates_count:
+          type:
+          - number
+          - 'null'
+          format: double
+          description: Number of candidates associated with this reason
+        reason_group_slug:
+          $ref: '#/components/schemas/AtsReasonsGetResponsesContentApplicationJsonSchemaDataItemsReasonGroupSlug'
+          description: Reason group slug
+      required:
+      - id
+      - label
+      - created_at
+      - reason_group_slug
+      title: AtsReasonsGetResponsesContentApplicationJsonSchemaDataItems
+    RetrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01RequestBadRequestError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsReasonsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01RequestBadRequestError
+    RetrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01RequestForbiddenError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsReasonsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01RequestForbiddenError
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A description of the returned error
+        path:
+          type: string
+          description: The JSON path where input validation failed
+      title: ApiError
+    ats-reasons_retrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01_Response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsReasonsGetResponsesContentApplicationJsonSchemaDataItems'
+          description: Array of reason objects
+        has_more:
+          type: boolean
+          description: Indicates if there are more results available
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          maxLength: 1000
+          description: Cursor for pagination to fetch next page
+        total_count:
+          type: number
+          format: double
+          description: Total count of reasons
+      required:
+      - data
+      - has_more
+      - next_cursor
+      - total_count
+      title: ats-reasons_retrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01_Response_200
+    AtsReasonsGetResponsesContentApplicationJsonSchemaDataItemsEmailTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Email template ID
+        title:
+          type: string
+          description: Email template title
+      required:
+      - id
+      - title
+      description: Associated email template
+      title: AtsReasonsGetResponsesContentApplicationJsonSchemaDataItemsEmailTemplate
+    AtsReasonsGetParametersReasonGroupSlug:
+      type: string
+      enum:
+      - CANDIDATE_ARCHIVATION
+      - OFFER_REJECTION
+      - JOB_CLOSURE
+      - INTERVIEW_CANCELLATION
+      title: AtsReasonsGetParametersReasonGroupSlug
+    AtsReasonsGetParametersSubgroupSlug:
+      type: string
+      enum:
+      - INTEREST
+      - LOCATION
+      - COMPENSATION
+      - RESPONSIVENESS
+      - QUALIFICATION
+      - FIT
+      - EXPERIENCE
+      - STATUS
+      - ROLE_CHANGE
+      - WITHDREW
+      - BENEFITS
+      - COUNTER_OFFER
+      - REMOTE_WORK
+      - PERSONAL
+      - TIMING
+      - BUDGET
+      - BUSINESS_NEEDS
+      - EXTERNAL_CANDIDATE
+      - INTERNAL_TRANSFER
+      - HIRING_FREEZE
+      title: AtsReasonsGetParametersSubgroupSlug
+    ApiErrorContainer:
+      type: object
+      properties:
+        request:
+          $ref: '#/components/schemas/ApiErrorRequest'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      title: ApiErrorContainer
+    RetrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01RequestInternalServerError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AtsReasonsGetResponsesContentApplicationJsonSchemaErrorsItems'
+          description: List of error objects
+      required:
+      - errors
+      title: RetrievePaginatedListOfAtsRejectionArchivationReasons-v2026-01-01RequestInternalServerError
+    ApiErrorRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          description: The HTTP method of the failed request
+        url:
+          type: string
+          description: The relative URL of the failed request
+        status:
+          type: number
+          format: double
+          description: The status code of the response
+        api_req_id:
+          type: string
+          description: The request ID of the failed request
+        docs:
+          type: string
+          description: A link to the official documentation for the requested endpoint resource
+        source:
+          type: string
+          description: The source handler which produced the returned error
+        code:
+          type: number
+          format: double
+          description: The code of the source handler which produced the returned error
+      title: ApiErrorRequest
+    AtsReasonsGetResponsesContentApplicationJsonSchemaDataItemsReasonGroupSlug:
+      type: string
+      enum:
+      - CANDIDATE_ARCHIVATION
+      - OFFER_REJECTION
+      - JOB_CLOSURE
+      - INTERVIEW_CANCELLATION
+      description: Reason group slug
+      title: AtsReasonsGetResponsesContentApplicationJsonSchemaDataItemsReasonGroupSlug
+    AtsReasonsGetResponsesContentApplicationJsonSchemaErrorsItems:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+        field:
+          type: string
+          description: Request field related to the error, if applicable
+        message:
+          type: string
+          description: Human-readable error message
+      required:
+      - code
+      - message
+      title: AtsReasonsGetResponsesContentApplicationJsonSchemaErrorsItems
+  securitySchemes:
+    deelToken:
+      type: http
+      scheme: bearer
+      description: "## Authentication\nThe Deel API uses bearer tokens to authenticate requests. All API calls must be made over HTTPS — calls over plain HTTP or without authentication will fail.\n\n```curl\ncurl -X GET 'https://api.letsdeel.com/rest/v2/contracts' \\\n  -H 'Authorization: Bearer YOUR-TOKEN-HERE'\n```\n\n[Learn more about authentication](/api/authentication)"
+    oauth2:
+      type: http
+      scheme: bearer
+      description: Standard OAuth2 security scheme based on https://swagger.io/docs/specification/authentication/
